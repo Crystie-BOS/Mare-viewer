@@ -541,6 +541,17 @@ class WindowsManifest(ViewerManifest):
                 print err.message
                 print "Skipping GLOD library (assumming linked statically)"
 
+            # Get fmodstudio dll, continue if missing
+            try:
+                if self.args['configuration'].lower() == 'debug':
+                    self.path("fmodL.dll")
+                    self.path("fmodL64.dll")
+                else:
+                    self.path("fmod.dll")
+                    self.path("fmod64.dll")
+            except:
+                print "Skipping fmodstudio audio library(assuming other audio engine)"
+
             # Get fmodex dll, continue if missing
             try:
                 if(self.address_size == 64):
@@ -1093,6 +1104,18 @@ class DarwinManifest(ViewerManifest):
                 # dylibs that vary based on configuration
                 if self.args['configuration'].lower() == 'debug':
                     for libfile in (
+                                "libfmodL.dylib",
+                                ):
+                        dylibs += path_optional(os.path.join(debpkgdir, libfile), libfile)
+                else:
+                    for libfile in (
+                                "libfmod.dylib",
+                                ):
+                        dylibs += path_optional(os.path.join(relpkgdir, libfile), libfile)
+
+                # dylibs that vary based on configuration
+                if self.args['configuration'].lower() == 'debug':
+                    for libfile in (
                                 "libfmodexL.dylib",
                                 ):
                         dylibs += path_optional(os.path.join(debpkgdir, libfile), libfile)
@@ -1594,6 +1617,24 @@ class Linux_x86_64_Manifest(LinuxManifest):
 
         # support file for valgrind debug tool
         self.path("secondlife-i686.supp")
+
+            try:
+                self.path("libfmodstusio*.so")
+                self.path("libfmodstudio.so")
+                self.path("libfmodstusio.so*")
+                pass
+            except:
+            print "Skipping libfmodex.so - not found"
+                pass
+            try:
+                self.path("libfmodex64-*.so")
+                self.path("libfmodex64.so")
+                self.path("libfmodex64.so*")
+                pass
+            except:
+                print "Skipping libfmodex.so - not found"
+                pass
+            
 
 ################################################################
 
