@@ -60,6 +60,10 @@
 #include "llsdutil.h"
 #include <boost/foreach.hpp>
 
+//CA
+#include "../newview/RRInterfaceHelper.h"
+extern BOOL gRRenabled;
+//ca
 
 // use this to control "jumping" behavior when Ctrl-Tabbing
 const S32 TABBED_FLOATER_OFFSET = 0;
@@ -584,6 +588,11 @@ LLControlGroup*	LLFloater::getControlGroup()
 
 void LLFloater::setVisible( BOOL visible )
 {
+//CA new RLV intercept primarily for area search, but more effective than current method for some other floaters too
+//  so they are included here (existing intercepts have been left in place for easier merging). After having problems
+//	with header inclusion this is now a simple function call with all the intelligence inside the function
+	if (gRRenabled && RRHelper::preventFloater(getName())) visible = FALSE;
+//ca
 	LLPanel::setVisible(visible); // calls onVisibilityChange()
 	if( visible && mFirstLook )
 	{

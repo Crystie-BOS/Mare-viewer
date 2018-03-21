@@ -734,6 +734,7 @@ set(viewer_HEADER_FILES
     CMakeLists.txt
     ViewerInstall.cmake
     RRInterface.h
+    RRInterfaceHelper.h
     groupchatlistener.h
     llaccountingcost.h
     llaccountingcostmanager.h
