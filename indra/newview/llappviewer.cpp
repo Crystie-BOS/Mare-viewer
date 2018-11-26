@@ -1097,7 +1097,7 @@ bool LLAppViewer::init()
 // don't nag developers who need to run the executable directly
 #if LL_RELEASE_FOR_DOWNLOAD
 	// MAINT-8305: If we're processing a SLURL, skip the launcher check.
-	if (gSavedSettings.getString("CmdLineLoginLocation").empty())
+	if (gSavedSettings.getString("CmdLineLoginLocation").empty() && !beingDebugged())
 	{
 		const char* PARENT = getenv("PARENT");
 	if (! (PARENT && std::string(PARENT) == "SL_Launcher"))
@@ -3231,7 +3231,7 @@ LLSD LLAppViewer::getViewerInfo() const
 	}
 	else
 	{
-		LL_WARNS("Driver version")<< "Cannot get driver version from getDriverVersionWMI" << LL_ENDL;
+		LL_WARNS("DriverVersion")<< "Cannot get driver version from getDriverVersionWMI" << LL_ENDL;
 		LLSD driver_info = gDXHardware.getDisplayInfo();
 		if (driver_info.has("DriverVersion"))
 		{
@@ -4041,12 +4041,6 @@ void LLAppViewer::requestQuit()
 	// Try to send metrics back to the grid
 	metricsSend(!gDisconnected);
 
-	// Try to send last batch of avatar rez metrics.
-	if (!gDisconnected && isAgentAvatarValid())
-	{
-		gAgentAvatarp->updateAvatarRezMetrics(true); // force a last packet to be sent.
-	}
-	
 	// Try to send last batch of avatar rez metrics.
 	if (!gDisconnected && isAgentAvatarValid())
 	{

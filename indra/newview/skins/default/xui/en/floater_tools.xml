@@ -2,7 +2,6 @@
 <floater
  positioning="cascading"
  legacy_header_height="18"
- follows="left|top|right"
  height="600"
  layout="topleft"
  bg_opaque_image="Window_NoTitle_Foreground"
@@ -74,26 +73,6 @@
     <floater.string
      name="status_remaining_capacity">
         Remaining capacity [LAND_CAPACITY].
-    </floater.string>
-		<floater.string
-     name="grid_screen_text">
-        Screen
-    </floater.string>
-    <floater.string
-     name="grid_local_text">
-        Local
-    </floater.string>
-    <floater.string
-     name="grid_world_text">
-        World
-    </floater.string>
-    <floater.string
-     name="grid_reference_text">
-        Reference
-    </floater.string>
-    <floater.string
-     name="grid_attachment_text">
-        Attachment
     </floater.string>
     <button
      follows="left|top"
@@ -259,25 +238,20 @@
 		 layout="topleft"
 		 name="radio position" />
         <radio_item
-		 top_pad="5"
+		 top_pad="6"
          label="Rotate (Ctrl)"
          layout="topleft"
          name="radio rotate" />
         <radio_item
-		 top_pad="5"
+		 top_pad="6"
          label="Stretch (Ctrl+Shift)"
          layout="topleft"
          name="radio stretch" />
         <radio_item
-		 top_pad="5"
+		 top_pad="6"
          label="Select Face"
          layout="topleft"
          name="radio select face" />
-        <radio_item
-		 top_pad="5"
-         label="Align"
-         layout="topleft"
-         name="radio align" />
 			<radio_group.commit_callback
 			function="BuildTool.commitRadioEdit"/>
     </radio_group>
@@ -289,7 +263,7 @@
      label="Edit linked"
      layout="topleft"
      name="checkbox edit linked parts"
-     top_pad="-10">
+     top_pad="-18">
 		  <check_box.commit_callback
 			function="BuildTool.selectComponent"/>
 	</check_box>
@@ -802,7 +776,7 @@
 	  layout="topleft"
 	  left="10"
 	  name="selection_empty"
-	  top_pad="10"
+	  top_pad="0"
 	  width="100">
 		Nothing selected.
 	</text>
@@ -868,7 +842,7 @@
     layout="topleft"
     left="6"
     name="cost_text_border"
-    top="145"
+    top="135"
     width="282"/>
     <tab_container
      follows="left|top"
@@ -881,7 +855,7 @@
      tab_position="top"
      tab_height="25"
      open_tabs_on_drag_and_drop="true"
-     top="183"
+     top="173"
      width="295">
 	
 <panel
@@ -2188,7 +2162,7 @@ even though the user gets a free copy.
         <panel
          border="false"
          follows="all"
-         height="367"
+         height="387"
          label="Features"
          layout="topleft"
          left_delta="0"
@@ -2226,13 +2200,23 @@ even though the user gets a free copy.
                 Edit object features:
             </text>
             <check_box
-             height="19"
+             height="15"
+             label="Animated Mesh"
+             layout="topleft"
+             left="10"
+             name="Animated Mesh Checkbox Ctrl"
+             tool_tip="Allows rigged mesh objects to be animated independently"
+             top_pad="10"
+             width="121" />
+            <check_box
+             height="10"
              label="Flexible Path"
+             follows="left|top"
              layout="topleft"
              left="10"
              name="Flexible1D Checkbox Ctrl"
              tool_tip="Allows object to flex about the Z axis (Client-side only)"
-             top_pad="20"
+             top_pad="15"
              width="121" />
             <spinner
              follows="left|top"

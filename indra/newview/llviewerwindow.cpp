@@ -543,7 +543,14 @@ public:
 								object_count++;
 								S32 bytes = 0;	
 								S32 visible = 0;
-								cost += object->getStreamingCost(&bytes, &visible);
+								cost += object->getStreamingCost();
+                                LLMeshCostData costs;
+                                if (object->getCostData(costs))
+                                {
+                                    bytes = costs.getSizeTotal();
+                                    visible = costs.getSizeByLOD(object->getLOD());
+                                }
+
 								S32 vt = 0;
 								count += object->getTriangleCount(&vt);
 								vcount += vt;
@@ -1159,7 +1166,9 @@ LLWindowCallbacks::DragNDropResult LLViewerWindow::handleDragNDrop( LLWindow *wi
 
 				if (prim_media_dnd_enabled)
 				{
-					LLPickInfo pick_info = pickImmediate( pos.mX, pos.mY,  TRUE /*BOOL pick_transparent*/, FALSE );
+					LLPickInfo pick_info = pickImmediate( pos.mX, pos.mY,
+                                                          TRUE /* pick_transparent */, 
+                                                          FALSE /* pick_rigged */);
 
 					LLUUID object_id = pick_info.getObjectID();
 					S32 object_face = pick_info.mObjectFace;
@@ -3868,52 +3877,22 @@ void LLViewerWindow::renderSelections( BOOL for_gl_pick, BOOL pick_parcel_walls,
 			{
 				if( !LLSelectMgr::getInstance()->getSelection()->isEmpty() )
 				{
-					BOOL moveable_object_selected = FALSE;
-					BOOL all_selected_objects_move = TRUE;
-					BOOL all_selected_objects_modify = TRUE;
-					BOOL selecting_linked_set = !gSavedSettings.getBOOL("EditLinkedParts");
-
-					for (LLObjectSelection::iterator iter = LLSelectMgr::getInstance()->getSelection()->begin();
-						 iter != LLSelectMgr::getInstance()->getSelection()->end(); iter++)
-					{
-						LLSelectNode* nodep = *iter;
-						LLViewerObject* object = nodep->getObject();
-						LLViewerObject *root_object = (object == NULL) ? NULL : object->getRootEdit();
-						BOOL this_object_movable = FALSE;
-						if (object->permMove() && !object->isPermanentEnforced() &&
-							((root_object == NULL) || !root_object->isPermanentEnforced()) &&
-							(object->permModify() || selecting_linked_set))
-						{
-							moveable_object_selected = TRUE;
-							this_object_movable = TRUE;
-//MK
-							// can't edit objects that someone is sitting on,
-							// when prevented from sit-tping
-							LLVOAvatar* avatar = gAgentAvatarp;
-							if (gRRenabled && (gAgent.mRRInterface.mSittpMax < EXTREMUM
-								|| (avatar && avatar->mIsSitting && 
-								    (gAgent.mRRInterface.mContainsUnsit || gAgent.mRRInterface.mContainsStandtp))))
-							{
-								if (gAgentAvatarp->isSitting() && gAgentAvatarp->getRoot() == object->getRoot())
-								{
-									moveable_object_selected = FALSE;
-									this_object_movable = FALSE;
-								}
-							}
-//mk
-						}
-						all_selected_objects_move = all_selected_objects_move && this_object_movable;
-						all_selected_objects_modify = all_selected_objects_modify && object->permModify();
-					}
+					bool all_selected_objects_move;
+					bool all_selected_objects_modify;
+					// Note: This might be costly to do on each frame and when a lot of objects are selected
+					// we might be better off with some kind of memory for selection and/or states, consider
+					// optimizing, perhaps even some kind of selection generation at level of LLSelectMgr to
+					// make whole viewer benefit.
+					LLSelectMgr::getInstance()->selectGetEditMoveLinksetPermissions(all_selected_objects_move, all_selected_objects_modify);
 
 					BOOL draw_handles = TRUE;
 
-					if (tool == LLToolCompTranslate::getInstance() && (!moveable_object_selected || !all_selected_objects_move))
+					if (tool == LLToolCompTranslate::getInstance() && !all_selected_objects_move)
 					{
 						draw_handles = FALSE;
 					}
 
-					if (tool == LLToolCompRotate::getInstance() && (!moveable_object_selected || !all_selected_objects_move))
+					if (tool == LLToolCompRotate::getInstance() && !all_selected_objects_move)
 					{
 						draw_handles = FALSE;
 					}
