@@ -4117,8 +4117,10 @@ void process_time_synch(LLMessageSystem *mesgsys, void **user_data)
 	mesgsys->getVector3Fast(_PREHASH_TimeInfo, _PREHASH_SunAngVelocity, sun_ang_velocity);
 
 	LLWorld::getInstance()->setSpaceTimeUSec(space_time_usec);
-
-	LL_DEBUGS("Windlight Sync") << "Sun phase: " << phase << " rad = " << fmodf(phase / F_TWO_PI + 0.25, 1.f) * 24.f << " h" << LL_ENDL;
+//MK
+////	LL_DEBUGS("Windlight Sync") << "Sun phase: " << phase << " rad = " << fmodf(phase / F_TWO_PI + 0.25, 1.f) * 24.f << " h" << LL_ENDL;
+	LL_DEBUGS("WindlightSync") << "Sun phase: " << phase << " rad = " << fmodf(phase / F_TWO_PI + 0.25, 1.f) * 24.f << " h" << LL_ENDL;
+//mk
 
 	gSky.setSunPhase(phase);
 	gSky.setSunTargetDirection(sun_direction, sun_ang_velocity);
