@@ -163,6 +163,7 @@
 #include "llsyswellwindow.h"
 
 // *NOTE: Please add files in alphabetical order to keep merges easy.
+#include "kokuarlvfloaters.h"
 
 // handle secondlife:///app/openfloater/{NAME} URLs
 class LLFloaterOpenHandler : public LLCommandHandler
@@ -380,5 +381,10 @@ void LLViewerFloaterReg::registerFloaters()
 
 	// *NOTE: Please keep these alphabetized for easier merges
 	
+	LLFloaterReg::add("rlv_debug", "floater_rlv_debug.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<KokuaFloaterRLVDebug>);
+	LLFloaterReg::add("rlv_debug_output", "floater_rlv_debug_panel.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<KokuaFloaterRLVDebugOutput>);
+	LLFloaterReg::add("rlv_console", "floater_rlv_console.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<KokuaFloaterRLVConsole>);
+	LLFloaterReg::add("rlv_status", "floater_rlv_status.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<KokuaFloaterRLVStatus>);
+	LLFloaterReg::add("rlv_worn", "floater_rlv_worn.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<KokuaFloaterRLVWorn>);
 	LLFloaterReg::registerControlVariables(); // Make sure visibility and rect controls get preserved when saving
 }

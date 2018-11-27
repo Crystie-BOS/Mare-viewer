@@ -725,6 +725,7 @@ set(viewer_SOURCE_FILES
     noise.cpp
     pipeline.cpp
 	qtoolalign.cpp
+	  kokuarlvfloaters.cpp
     )
 
 set(VIEWER_BINARY_NAME "secondlife-bin" CACHE STRING
@@ -1351,6 +1352,7 @@ set(viewer_HEADER_FILES
     qtoolalign.h
     VertexCache.h
     VorbisFramework.h
+	  kokuarlvfloaters.h
     )
 
 source_group("CMake Rules" FILES ViewerInstall.cmake)
