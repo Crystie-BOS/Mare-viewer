@@ -2044,156 +2044,139 @@ void LLDrawPoolAvatar::renderRiggedShadows(LLVOAvatar* avatar)
 
 	stop_glerror();
 
-	U32 rigTypes[18] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,21 };
+	U32 rigTypes[18] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 21 };
 	for (U32 j = 0; j < 18; ++j)
-	for (U32 i = 0; i < mRiggedFace[rigTypes[j]].size(); ++i)
-	{
-		LLFace* face = mRiggedFace[rigTypes[j]][i];
-		LLDrawable* drawable = face->getDrawable();
-		if (!drawable)
+		for (U32 i = 0; i < mRiggedFace[rigTypes[j]].size(); ++i)
 		{
-			continue;
-		}
+			LLFace* face = mRiggedFace[rigTypes[j]][i];
+			LLDrawable* drawable = face->getDrawable();
+			if (!drawable)
+			{
+				continue;
+			}
 
-		LLVOVolume* vobj = drawable->getVOVolume();
+			LLVOVolume* vobj = drawable->getVOVolume();
 
-		if (!vobj)
-		{
-			continue;
-		}
+			if (!vobj)
+			{
+				continue;
+			}
 
-		LLVolume* volume = vobj->getVolume();
-		S32 te = face->getTEOffset();
+			LLVolume* volume = vobj->getVolume();
+			S32 te = face->getTEOffset();
 
-		if (!volume || volume->getNumVolumeFaces() <= te || !volume->isMeshAssetLoaded())
-		{
-			continue;
-		}
+			if (!volume || volume->getNumVolumeFaces() <= te || !volume->isMeshAssetLoaded())
+			{
+				continue;
+			}
 
-		LLUUID mesh_id = volume->getParams().getSculptID();
-		if (mesh_id.isNull())
-		{
-			continue;
-		}
+			LLUUID mesh_id = volume->getParams().getSculptID();
+			if (mesh_id.isNull())
+			{
+				continue;
+			}
 
-		const LLMeshSkinInfo* skin = gMeshRepo.getSkinInfo(mesh_id, vobj);
-		if (!skin)
-		{
-			continue;
-		}
+			const LLMeshSkinInfo* skin = gMeshRepo.getSkinInfo(mesh_id, vobj);
+			if (!skin)
+			{
+				continue;
+			}
 
-		U32 data_mask = LLFace::getRiggedDataMask(24);
+			U32 data_mask = LLFace::getRiggedDataMask(24);
 
-		LLVertexBuffer* buff = face->getVertexBuffer();
+			LLVertexBuffer* buff = face->getVertexBuffer();
 
-		if (buff)
-		{
-			if (sShaderLevel > 0)
-			{ //upload matrix palette to shader
-				LLMatrix4 mat[LL_MAX_JOINTS_PER_MESH_OBJECT];
-
-				U32 count = llmin((U32)skin->mJointNames.size(), (U32)LL_MAX_JOINTS_PER_MESH_OBJECT);
-
-				for (U32 i = 0; i < count; ++i)
+			if (buff)
+			{
+				if (sShaderLevel > 0)
 				{
-					LLJoint* joint = avatar->getJoint(skin->mJointNames[i]);
-					if (joint)
+					// upload matrix palette to shader
+					LLMatrix4a mat[LL_MAX_JOINTS_PER_MESH_OBJECT];
+					U32 count = LLSkinningUtil::getMeshJointCount(skin);
+					LLSkinningUtil::initSkinningMatrixPalette((LLMatrix4*)mat, count, skin, avatar);
+
+					stop_glerror();
+
+					F32 mp[LL_MAX_JOINTS_PER_MESH_OBJECT * 12];
+
+					for (U32 i = 0; i < count; ++i)
 					{
-						mat[i] = skin->mInvBindMatrix[i];
-						mat[i] *= joint->getWorldMatrix();
+						F32* m = (F32*)mat[i].mMatrix[0].getF32ptr();
+
+						U32 idx = i * 12;
+
+						mp[idx + 0] = m[0];
+						mp[idx + 1] = m[1];
+						mp[idx + 2] = m[2];
+						mp[idx + 3] = m[12];
+
+						mp[idx + 4] = m[4];
+						mp[idx + 5] = m[5];
+						mp[idx + 6] = m[6];
+						mp[idx + 7] = m[13];
+
+						mp[idx + 8] = m[8];
+						mp[idx + 9] = m[9];
+						mp[idx + 10] = m[10];
+						mp[idx + 11] = m[14];
 					}
+
+					LLDrawPoolAvatar::sVertexProgram->uniformMatrix3x4fv(LLViewerShaderMgr::AVATAR_MATRIX,
+						count,
+						FALSE,
+						(GLfloat*)mp);
+
+					stop_glerror();
+				}
+				else
+				{
+					data_mask &= ~LLVertexBuffer::MAP_WEIGHT4;
 				}
 
-				stop_glerror();
+				U16 start = face->getGeomStart();
+				U16 end = start + face->getGeomCount() - 1;
+				S32 offset = face->getIndicesStart();
+				U32 count = face->getIndicesCount();
 
-				F32 mp[LL_MAX_JOINTS_PER_MESH_OBJECT * 9];
-
-				F32 transp[LL_MAX_JOINTS_PER_MESH_OBJECT * 3];
-
-				for (U32 i = 0; i < count; ++i)
+				if ((rigTypes[j] < 4) || (rigTypes[j] == 5) || (rigTypes[j] == 6) || (rigTypes[j] == 9) || (rigTypes[j] == 10) || (rigTypes[j] == 13) || (rigTypes[j] == 14) || (rigTypes[j] == 21))
 				{
-					F32* m = (F32*)mat[i].mMatrix;
+					gGL.getTexUnit(sDiffuseChannel)->bind(face->getTexture());
+					sVertexProgram->setMinimumAlpha(0.f);
 
-					U32 idx = i * 9;
+					if ((rigTypes[j] == 2) || (rigTypes[j] == 6) || (rigTypes[j] == 10) || (rigTypes[j] == 14))
+					{
+						const LLTextureEntry* te = face->getTextureEntry();
+						LLMaterial* mat = te->getMaterialParams().get();
 
-					mp[idx + 0] = m[0];
-					mp[idx + 1] = m[1];
-					mp[idx + 2] = m[2];
+						if (mat)
+							if (mat->getDiffuseAlphaMode() == LLMaterial::DIFFUSE_ALPHA_MODE_MASK)
+								sVertexProgram->setMinimumAlpha(mat->getAlphaMaskCutoff() / 255.f);
+					}
 
-					mp[idx + 3] = m[4];
-					mp[idx + 4] = m[5];
-					mp[idx + 5] = m[6];
-
-					mp[idx + 6] = m[8];
-					mp[idx + 7] = m[9];
-					mp[idx + 8] = m[10];
-
-					idx = i * 3;
-
-					transp[idx + 0] = m[12];
-					transp[idx + 1] = m[13];
-					transp[idx + 2] = m[14];
-				}
-
-				LLDrawPoolAvatar::sVertexProgram->uniformMatrix3fv(LLViewerShaderMgr::AVATAR_MATRIX,
-					count,
-					FALSE,
-					(GLfloat*)mp);
-
-				LLDrawPoolAvatar::sVertexProgram->uniform3fv(LLShaderMgr::AVATAR_TRANSLATION, count, transp);
-
-
-				stop_glerror();
-			}
-			else
-			{
-				data_mask &= ~LLVertexBuffer::MAP_WEIGHT4;
-			}
-
-			U16 start = face->getGeomStart();
-			U16 end = start + face->getGeomCount() - 1;
-			S32 offset = face->getIndicesStart();
-			U32 count = face->getIndicesCount();
-
-			if ((rigTypes[j] < 4) || (rigTypes[j] == 5) || (rigTypes[j] == 6) || (rigTypes[j] == 9) || (rigTypes[j] == 10) || (rigTypes[j] == 13) || (rigTypes[j] == 14) || (rigTypes[j] == 21))
-			{
-				gGL.getTexUnit(sDiffuseChannel)->bind(face->getTexture());
-				sVertexProgram->setMinimumAlpha(0.f);
-
-				if ((rigTypes[j] == 2) || (rigTypes[j] == 6) || (rigTypes[j] == 10) || (rigTypes[j] == 14))
-				{
-					const LLTextureEntry* te = face->getTextureEntry();
-					LLMaterial* mat = te->getMaterialParams().get();
-
-					if (mat)
-						if (mat->getDiffuseAlphaMode() == LLMaterial::DIFFUSE_ALPHA_MODE_MASK)
-							sVertexProgram->setMinimumAlpha(mat->getAlphaMaskCutoff() / 255.f);
-				}
-
-				if (face->mTextureMatrix && vobj->mTexAnimMode)
-				{
-					gGL.matrixMode(LLRender::MM_TEXTURE);
-					gGL.loadMatrix((F32*)face->mTextureMatrix->mMatrix);
-					buff->setBuffer(data_mask);
-					buff->drawRange(LLRender::TRIANGLES, start, end, count, offset);
-					gGL.loadIdentity();
-					gGL.matrixMode(LLRender::MM_MODELVIEW);
+					if (face->mTextureMatrix && vobj->mTexAnimMode)
+					{
+						gGL.matrixMode(LLRender::MM_TEXTURE);
+						gGL.loadMatrix((F32*)face->mTextureMatrix->mMatrix);
+						buff->setBuffer(data_mask);
+						buff->drawRange(LLRender::TRIANGLES, start, end, count, offset);
+						gGL.loadIdentity();
+						gGL.matrixMode(LLRender::MM_MODELVIEW);
+					}
+					else
+					{
+						buff->setBuffer(data_mask);
+						buff->drawRange(LLRender::TRIANGLES, start, end, count, offset);
+					}
 				}
 				else
 				{
 					buff->setBuffer(data_mask);
 					buff->drawRange(LLRender::TRIANGLES, start, end, count, offset);
 				}
-			}
-			else
-			{
-				buff->setBuffer(data_mask);
-				buff->drawRange(LLRender::TRIANGLES, start, end, count, offset);
-			}
 
-			gPipeline.addTrianglesDrawn(count, LLRender::TRIANGLES);
+				gPipeline.addTrianglesDrawn(count, LLRender::TRIANGLES);
+			}
 		}
-	}
 }
 //mk from cy
 
