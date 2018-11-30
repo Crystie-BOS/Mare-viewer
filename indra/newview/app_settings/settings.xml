@@ -16740,7 +16740,6 @@
       <key>Value</key>
       <integer>0</integer>
     </map>
-  </map>
   <key>KokuaRLVDebugFloaterAutoOpen</key>
 	  <map>
 	    <key>Comment</key>
@@ -16774,5 +16773,6 @@
 	    <key>Value</key>
 	    <integer>1</integer>
 	  </map>   
+  </map>
 </llsd>
 
