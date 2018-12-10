@@ -49,6 +49,9 @@
 #include "llagentui.h"
 #include "llagentwearables.h"
 #include "llagentpilot.h"
+//MK from KB
+#include "llattachmentsmgr.h"
+//mk from kb
 #include "llcompilequeue.h"
 #include "llconsole.h"
 #include "lldaycyclemanager.h"
@@ -1986,6 +1989,13 @@ class LLAdvancedRebakeTextures : public view_listener_t
 };
 	
 	
+//MK from KB
+void handle_refresh_attachments()
+{
+	LLAttachmentsMgr::instance().refreshAttachments();
+}
+//mk from kb
+
 #if 1 //ndef LL_RELEASE_FOR_DOWNLOAD
 ///////////////////////////
 // DEBUG AVATAR TEXTURES //
@@ -10013,6 +10023,9 @@ void initialize_menus()
 	view_listener_t::addMenu(new LLAdvancedCheckDebugCharacterVis(), "Advanced.CheckDebugCharacterVis");
 	view_listener_t::addMenu(new LLAdvancedDumpAttachments(), "Advanced.DumpAttachments");
 	view_listener_t::addMenu(new LLAdvancedRebakeTextures(), "Advanced.RebakeTextures");
+//MK from KB
+	commit.add("Advanced.RefreshAttachments", boost::bind(&handle_refresh_attachments));
+//mk from kb
 	view_listener_t::addMenu(new LLAdvancedDebugAvatarTextures(), "Advanced.DebugAvatarTextures");
 	view_listener_t::addMenu(new LLAdvancedDumpAvatarLocalTextures(), "Advanced.DumpAvatarLocalTextures");
 	// Advanced > Network
