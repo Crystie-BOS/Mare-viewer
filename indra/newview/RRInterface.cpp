@@ -1981,7 +1981,8 @@ std::string RRInterface::crunchEmote (std::string msg, unsigned int truncateTo) 
 		// Only allow OOC chat, starting with "((" and ending with "))".
 		crunched = "...";
 	}
-	return prefix + crunched;
+	return crunched;
+	//return prefix + crunched;
 }
 
 std::string RRInterface::getOutfitLayerAsString (LLWearableType::EType layer)
