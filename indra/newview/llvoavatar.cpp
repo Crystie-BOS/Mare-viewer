@@ -3922,9 +3922,16 @@ void LLVOAvatar::computeUpdatePeriod()
 		LLVector3d my_head_pos (gAgent.getPosGlobalFromAgent(gAgentAvatarp->mHeadp->getWorldPosition()));
 		LLVector3d their_head_pos (gAgent.getPosGlobalFromAgent(mHeadp->getWorldPosition()));
 		LLVector3d offset (their_head_pos - my_head_pos);
-		F32 distance = (F32)offset.magVec();
+		F32 distance_squared = (F32)offset.magVecSquared();
+		F32 show_avs_dist_max_squared = gAgent.mRRInterface.mShowavsDistMax * gAgent.mRRInterface.mShowavsDistMax;
+		F32 cam_dist_draw_max_squared = gAgent.mRRInterface.mCamDistDrawMax * gAgent.mRRInterface.mCamDistDrawMax;
 
-		mRenderAsSilhouette = (distance > gAgent.mRRInterface.mShowavsDistMax);
+		// If the avatar is farther than the "camavdist" distance, render as silhouette.
+		// But if the outer sphere is opaque, no need to render a silhouette or even the avatar at all.
+		mRenderAsSilhouette = (
+			distance_squared > show_avs_dist_max_squared
+			&& !(distance_squared > cam_dist_draw_max_squared && gAgent.mRRInterface.mCamDistDrawAlphaMax >= 1.f)
+			);
 	}
 //mk
 	bool visually_muted = isVisuallyMuted();
