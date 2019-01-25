@@ -262,7 +262,10 @@ class ViewerManifest(LLManifest):
         return CHANNEL_VENDOR_BASE + ' ' + app_suffix
 
     def app_name_oneword(self):
-        return ''.join(self.app_name().split())
+        #MK
+        ##return ''.join(self.app_name().split())
+        return 'RestrainedLove'
+        #mk
     
     def icon_path(self):
         return "icons/" + self.channel_type()
