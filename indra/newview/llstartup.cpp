@@ -353,6 +353,7 @@ bool idle_startup()
 	gRRenabled = TRUE; // gSavedSettings.getBOOL("RestrainedLove");
 	RRInterface::sRRNoSetEnv = gSavedSettings.getBOOL("RestrainedLoveNoSetEnv");
 	RRInterface::sRestrainedLoveDebug = gSavedSettings.getBOOL("RestrainedLoveDebug");
+	RRInterface::sRestrainedLoveLogging = gSavedSettings.getBOOL("RestrainedLoveLogging");
 	RRInterface::sRestrainedLoveHeadMouselookRenderRigged = gSavedSettings.getBOOL("RestrainedLoveHeadMouselookRenderRigged");
 
 	// Deactivated for now so we can't send OOC messages on the chat and cheat with them.
