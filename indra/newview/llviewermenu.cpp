@@ -8965,6 +8965,10 @@ void handle_rebake_textures(void*)
 //mk from HB
 		LLAppearanceMgr::instance().requestServerAppearanceUpdate();
 	}
+//MK
+	// Refresh the attachments for good measure.
+	LLAttachmentsMgr::instance().refreshAttachments();
+//mk
 }
 
 void toggle_visibility(void* user_data)
