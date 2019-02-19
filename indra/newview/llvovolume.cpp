@@ -6197,7 +6197,7 @@ U32 LLVolumeGeometryManager::genDrawInfo(LLSpatialGroup* group, U32 mask, LLFace
 	{
 		return geometryBytes;
 	}
-	bool vision_restricted = (gRRenabled && gAgent.mRRInterface.mCamDistDrawMax < EXTREMUM);
+	bool vision_restricted = (gRRenabled && gAgent.mRRInterface.mVisionRestricted);
 	// Optimization : Rather than compare the distances for every face (which involves square roots, which are costly), we compare squared distances.
 	LLVector3 joint_pos = LLVector3::zero;
 	F32 cam_dist_draw_max_squared = EXTREMUM;
