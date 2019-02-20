@@ -5295,13 +5295,14 @@ void RRInterface::drawRenderLimit ()
 		return;
 	}
 
-	gGL.setColorMask(true, true);
+	gGL.setColorMask(true, false);
 	if (LLGLSLShader::sNoFixedFunction) {
 		gUIProgram.bind();
 	}
 
 	gGL.getTexUnit(0)->unbind(LLTexUnit::TT_TEXTURE);
 	gGL.matrixMode(LLRender::MM_MODELVIEW);
+	gPipeline.disableLights();
 
 	// Calculate the center of the spheres
 	LLVector3 center = isAgentAvatarValid() 
