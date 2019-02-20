@@ -5344,10 +5344,11 @@ void RRInterface::drawRenderLimit ()
 	}
 
 	gGL.flush();
+	gGL.setColorMask(true, false);
 
-	//if (LLGLSLShader::sNoFixedFunction) {
-	//	gUIProgram.unbind();
-	//}
+	if (LLGLSLShader::sNoFixedFunction) {
+		gUIProgram.unbind();
+	}
 
 	sRenderLimitRenderedThisFrame = TRUE;
 }
