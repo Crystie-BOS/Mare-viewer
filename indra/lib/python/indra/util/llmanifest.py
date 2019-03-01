@@ -284,7 +284,7 @@ def main(extra=[]):
             args['dest'] = base_dest_template.format(package_id)
             if touch:
                 print '================ Creating additional package for "', package_id, '" in ', args['dest']
-                else:
+            else:
                 print '================ Starting additional copy for "', package_id, '" in ', args['dest']
             try:
                 wm = LLManifest.for_platform(args['platform'], args.get('arch'))(args)
@@ -294,14 +294,14 @@ def main(extra=[]):
             if touch:
                 print '================ Created additional package ', wm.package_file, ' for ', package_id
                 with open(base_touch_template.format(package_id), 'w') as fp:
-                fp.write('set package_file=%s\n' % wm.package_file)
+                    fp.write('set package_file=%s\n' % wm.package_file)
             else:
                 print '================ Finished additional copy "', package_id, '" in ', args['dest']
     # Write out the package file in this format, so that it can easily be called
     # and used in a .bat file - yeah, it sucks, but this is the simplest...
     if touch:
         with open(touch, 'w') as fp:
-        fp.write('set package_file=%s\n' % base_package_file)
+            fp.write('set package_file=%s\n' % base_package_file)
         print 'touched', touch
     return 0
 
@@ -408,9 +408,10 @@ class LLManifest(object):
                                  os.path.join(*getattr(self, stack)))
 
     class PrefixManager(object):
-            # stack attributes we manage in this LLManifest (sub)class
-            # instance
-            stacks = ("src_prefix", "artwork_prefix", "build_prefix", "dst_prefix")
+        # stack attributes we manage in this LLManifest (sub)class
+        # instance
+        stacks = ("src_prefix", "artwork_prefix", "build_prefix", "dst_prefix")
+
         def __init__(self, manifest):
             self.manifest = manifest
             # If the caller wrote:
