@@ -92,6 +92,8 @@ BOOL		 gTeleportDisplay = FALSE;
 LLFrameTimer gTeleportDisplayTimer;
 LLFrameTimer gTeleportArrivalTimer;
 const F32		RESTORE_GL_TIME = 5.f;	// Wait this long while reloading textures before we raise the curtain
+// <FS:Ansariel> FIRE-12004: Attachments getting lost on TP
+LLFrameTimer gPostTeleportFinishKillObjectDelayTimer;
 
 BOOL gForceRenderLandFence = FALSE;
 BOOL gDisplaySwapBuffers = FALSE;
@@ -480,7 +482,10 @@ void display(BOOL rebuild, F32 zoom_factor, int subfield, BOOL for_snapshot)
 			// Let's not reset the view, we could be stuck in mouselook with @camdistmax set to 0
 ////			gAgentCamera.resetView(TRUE, TRUE);
 //mk
-			
+
+// <FS:Ansariel> FIRE-12004: Attachments getting lost on TP
+			gPostTeleportFinishKillObjectDelayTimer.reset();
+
 			break;
 
 		case LLAgent::TELEPORT_ARRIVING:

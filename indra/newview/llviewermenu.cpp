@@ -8958,17 +8958,27 @@ void handle_rebake_textures(void*)
 	gAgentAvatarp->forceBakeAllTextures(slam_for_debug);
 	if (gAgent.getRegion() && gAgent.getRegion()->getCentralBakeVersion())
 	{
+// [SL:KB] - Patch: Appearance-Misc | Checked: 2015-06-27 (Catznip-3.7)
+		if (!gAgent.getRegionCapability("IncrementCOFVersion").empty())
+		{
+			LLAppearanceMgr::instance().syncCofVersionAndRefresh();
+		}
+		else
+		{
 //MK from HB
-		gAgentWearables.checkModifiableShape();
-		LLPointer<LLInventoryCallback> cb = new LLUpdateAppearanceOnDestroy;
-		LLAppearanceMgr::instance().enforceCOFItemRestrictions (cb);
+			gAgentWearables.checkModifiableShape();
+			LLPointer<LLInventoryCallback> cb = new LLUpdateAppearanceOnDestroy;
+			LLAppearanceMgr::instance().enforceCOFItemRestrictions(cb);
 //mk from HB
+		}
+// [/SL:KB]
 		LLAppearanceMgr::instance().requestServerAppearanceUpdate();
 	}
 //MK
 	// Refresh the attachments for good measure.
 	LLAttachmentsMgr::instance().refreshAttachments();
 //mk
+	gAgentAvatarp->setIsCrossingRegion(false); // <FS:Ansariel> FIRE-12004: Attachments getting lost on TP
 }
 
 void toggle_visibility(void* user_data)
