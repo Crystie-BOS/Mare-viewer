@@ -260,13 +260,16 @@ class ViewerManifest(LLManifest):
         return "%(channel_vendor_base)s%(channel_variant_underscores)s_%(version_underscores)s_%(arch)s" % substitution_strings
 
     def app_name(self):
-        global CHANNEL_VENDOR_BASE
-        channel_type=self.channel_type()
-        if channel_type == 'release':
-            app_suffix='Viewer'
-        else:
-            app_suffix=self.channel_variant()
-        return CHANNEL_VENDOR_BASE + ' ' + app_suffix
+        #MK
+        ##global CHANNEL_VENDOR_BASE
+        ##channel_type=self.channel_type()
+        ##if channel_type == 'release':
+        ##    app_suffix='Viewer'
+        ##else:
+        ##    app_suffix=self.channel_variant()
+        ##return CHANNEL_VENDOR_BASE + ' ' + app_suffix
+        return 'RestrainedLove'
+        #mk
 
     def app_name_oneword(self):
         #MK
