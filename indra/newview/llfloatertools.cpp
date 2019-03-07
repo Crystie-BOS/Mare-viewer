@@ -672,6 +672,9 @@ void LLFloaterTools::updatePopup(LLCoordGL center, MASK mask)
 						tool == LLToolCompScale::getInstance() ||
 						tool == LLToolFace::getInstance() ||
 						tool == LLToolIndividual::getInstance() ||
+//MK
+						tool == QToolAlign::getInstance() ||
+//mk
 						tool == LLToolPipette::getInstance();
 
 	mBtnEdit	->setToggleState( edit_visible );
@@ -707,6 +710,12 @@ void LLFloaterTools::updatePopup(LLCoordGL center, MASK mask)
 	{
 		mRadioGroupEdit->setValue("radio select face");
 	}
+//MK
+	else if (tool == QToolAlign::getInstance())
+	{
+		mRadioGroupEdit->setValue("radio align");
+	}
+//mk
 
 	if (mComboGridMode) 
 	{
