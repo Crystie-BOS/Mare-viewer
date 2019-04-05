@@ -2529,7 +2529,7 @@ void LLPipeline::updateCull(LLCamera& camera, LLCullResult& result, S32 water_cl
 		LLVOCachePartition* vo_part = region->getVOCachePartition();
 		if(vo_part)
 		{
-			bool do_occlusion_cull = can_use_occlusion && use_occlusion && !gUseWireframe/* && !gViewerWindow->getProgressView()->getVisible()*/;
+			bool do_occlusion_cull = can_use_occlusion && use_occlusion && !gUseWireframe && 0 > water_clip /* && !gViewerWindow->getProgressView()->getVisible()*/;
 			vo_part->cull(camera, do_occlusion_cull);
 		}
 	}
@@ -2658,9 +2658,12 @@ void LLPipeline::downsampleDepthBuffer(LLRenderTarget& source, LLRenderTarget& d
 
 	if (scratch_space)
 	{
+        GLint bits = 0;
+        bits |= (source.hasStencil() && dest.hasStencil()) ? GL_STENCIL_BUFFER_BIT : 0;
+        bits |= GL_DEPTH_BUFFER_BIT;
 		scratch_space->copyContents(source, 
 									0, 0, source.getWidth(), source.getHeight(), 
-									0, 0, scratch_space->getWidth(), scratch_space->getHeight(), GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, GL_NEAREST);
+									0, 0, scratch_space->getWidth(), scratch_space->getHeight(), bits, GL_NEAREST);
 	}
 
 	dest.bindTarget();
@@ -11483,6 +11486,7 @@ void LLPipeline::generateImpostor(LLVOAvatar* avatar)
 			LLPipeline::RENDER_TYPE_PASS_FULLBRIGHT_ALPHA_MASK,
 			LLPipeline::RENDER_TYPE_PASS_FULLBRIGHT_SHINY,
 			LLPipeline::RENDER_TYPE_PASS_GLOW,
+			LLPipeline::RENDER_TYPE_PASS_GRASS,
 			LLPipeline::RENDER_TYPE_PASS_SHINY,
 			LLPipeline::RENDER_TYPE_PASS_INVISIBLE,
 			LLPipeline::RENDER_TYPE_PASS_INVISI_SHINY,
@@ -11507,7 +11511,6 @@ void LLPipeline::generateImpostor(LLVOAvatar* avatar)
 			LLPipeline::RENDER_TYPE_FULLBRIGHT_ALPHA_MASK,
 			LLPipeline::RENDER_TYPE_INVISIBLE,
 			LLPipeline::RENDER_TYPE_SIMPLE,
-			LLPipeline::RENDER_TYPE_MATERIALS,
 		END_RENDER_TYPES);
 
 		////andRenderTypeMask(LLPipeline::RENDER_TYPE_ALPHA,
@@ -11666,7 +11669,7 @@ void LLPipeline::generateImpostor(LLVOAvatar* avatar)
 	}
 	
 	F32 old_alpha = LLDrawPoolAvatar::sMinimumAlpha;
-	if (visually_muted)
+	if (visually_muted || too_complex)
 	{ //disable alpha masking for muted avatars (get whole skin silhouette)
 		LLDrawPoolAvatar::sMinimumAlpha = 0.f;
 	}
