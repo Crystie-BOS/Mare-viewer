@@ -598,7 +598,8 @@ void LLDrawPoolAvatar::renderShadow(S32 pass)
 //	{
 //		renderRiggedShadows (avatarp);
 //	}
-////mk from cy    else if (pass == SHADOW_PASS_AVATAR_ALPHA_BLEND)
+////mk from cy
+	else if (pass == SHADOW_PASS_AVATAR_ALPHA_BLEND)
 	{
         LLDrawPoolAvatar::sSkipOpaque = true;
 		avatarp->renderSkinned();
