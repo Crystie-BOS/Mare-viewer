@@ -355,6 +355,7 @@ bool idle_startup()
 	RRInterface::sRestrainedLoveDebug = gSavedSettings.getBOOL("RestrainedLoveDebug");
 	RRInterface::sRestrainedLoveLogging = gSavedSettings.getBOOL("RestrainedLoveLogging");
 	RRInterface::sRestrainedLoveHeadMouselookRenderRigged = gSavedSettings.getBOOL("RestrainedLoveHeadMouselookRenderRigged");
+	RRInterface::sRestrainedLoveRenderInvisibleSurfaces = gSavedSettings.getBOOL("RestrainedLoveRenderInvisibleSurfaces");
 
 	// Deactivated for now so we can't send OOC messages on the chat and cheat with them.
 	RRInterface::sCanOoc = FALSE; // gSavedSettings.getBOOL("RestrainedLoveCanOoc");
