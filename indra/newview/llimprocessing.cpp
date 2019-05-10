@@ -1080,6 +1080,23 @@ void LLIMProcessing::processNewMessage(LLUUID from_id,
 		}
 		else // IM_TASK_INVENTORY_OFFERED
 		{
+                if (offline == IM_OFFLINE && session_id.isNull() && aux_id.notNull() && binary_bucket_size > sizeof(S8)* 5)
+                {
+                    // cap received offline message
+                    std::string str_bucket = ll_safe_string((char*)binary_bucket, binary_bucket_size);
+                    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+                    boost::char_separator<char> sep("|", "", boost::keep_empty_tokens);
+                    tokenizer tokens(str_bucket, sep);
+                    tokenizer::iterator iter = tokens.begin();
+
+                    info->mType = (LLAssetType::EType)(atoi((*(iter++)).c_str()));
+                    // Note There is more elements in 'tokens' ...
+
+                    info->mObjectID = LLUUID::null;
+                    info->mFromObject = TRUE;
+                }
+                else
+                {
 			if (sizeof(S8) != binary_bucket_size)
 			{
 				LL_WARNS("Messaging") << "Malformed inventory offer from object" << LL_ENDL;
@@ -1090,6 +1107,7 @@ void LLIMProcessing::processNewMessage(LLUUID from_id,
 			info->mObjectID = LLUUID::null;
 			info->mFromObject = TRUE;
 		}
+            }
 
 		info->mIM = dialog;
 		info->mFromID = from_id;

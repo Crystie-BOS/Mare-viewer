@@ -45,6 +45,15 @@ class LLPanelPresetsPulldown;
 class LLPanelVolumePulldown;
 class LLPanelNearByMedia;
 class LLIconCtrl;
+class LLSearchEditor;
+
+namespace ll
+{
+	namespace statusbar
+	{
+		struct SearchData;
+	}
+}
 
 //MK
 class LLParcelChangeObserver;
@@ -152,6 +161,15 @@ private:
 	static void onClickMediaToggle(void* data);
 	static void onClickBalance(void* data);
 
+	LLSearchEditor *mFilterEdit;
+	LLPanel *mSearchPanel;
+	void onUpdateFilterTerm();
+
+	std::unique_ptr< ll::statusbar::SearchData > mSearchData;
+	void collectSearchableItems();
+	void updateMenuSearchVisibility( const LLSD& data );
+	void updateMenuSearchPosition();
+
 //MK
 	class LLParcelChangeObserver;
 
@@ -231,7 +249,6 @@ public:
 	void updateParcelIcons();
 
 private:
-//MK
 	/**
 	 * Updates health information (mDamageText).
 	 */

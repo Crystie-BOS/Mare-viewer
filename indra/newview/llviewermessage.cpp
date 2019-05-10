@@ -4061,6 +4061,7 @@ void process_terse_object_update_improved(LLMessageSystem *mesgsys, void **user_
 }
 
 static LLTrace::BlockTimerStatHandle FTM_PROCESS_OBJECTS("Process Kill Objects");
+//MK from CA and Ansariel
 
 //CA Largely replaced this routine with a version from Henri Beauchamp (used with permission)
 //   which includes a fix for a current server bug that tends to kill attachments on arrival
@@ -4183,8 +4184,8 @@ void process_kill_object(LLMessageSystem *mesgsys, void **user_data)
 		// Display green bubble on kill
 		if (gShowObjectUpdates)
 		{
-			gPipeline.addDebugBlip(objectp->getPositionAgent(),
-				LLColor4::green);
+			LLColor4 color(0.f,1.f,0.f,1.f);
+			gPipeline.addDebugBlip(objectp->getPositionAgent(), color);
 		}
 
 		// Do the kill
@@ -4196,6 +4197,11 @@ void process_kill_object(LLMessageSystem *mesgsys, void **user_data)
 		}
 	}
 
+	// We should remove the object from selection after it is marked dead by gObjectList to make LLToolGrab,
+    // which is using the object, release the mouse capture correctly when the object dies.
+    // See LLToolGrab::handleHoverActive() and LLToolGrab::handleHoverNonPhysical().
+	LLSelectMgr::getInstance()->removeObjectFromSelections(id);
+
 	if (need_cof_resync)
 	{
 		//CA: Use Kitty's version of this since we have it already rather than Henri's additions for the same purpose
@@ -4203,6 +4209,8 @@ void process_kill_object(LLMessageSystem *mesgsys, void **user_data)
 	}
 }
 //CA Imported code from Henri Beachamp ends above this comment
+
+//mk from ca and ansariel
 
 void process_time_synch(LLMessageSystem *mesgsys, void **user_data)
 {
@@ -4225,10 +4233,8 @@ void process_time_synch(LLMessageSystem *mesgsys, void **user_data)
 	mesgsys->getVector3Fast(_PREHASH_TimeInfo, _PREHASH_SunAngVelocity, sun_ang_velocity);
 
 	LLWorld::getInstance()->setSpaceTimeUSec(space_time_usec);
-//MK
-////	LL_DEBUGS("Windlight Sync") << "Sun phase: " << phase << " rad = " << fmodf(phase / F_TWO_PI + 0.25, 1.f) * 24.f << " h" << LL_ENDL;
+
 	LL_DEBUGS("WindlightSync") << "Sun phase: " << phase << " rad = " << fmodf(phase / F_TWO_PI + 0.25, 1.f) * 24.f << " h" << LL_ENDL;
-//mk
 
 	gSky.setSunPhase(phase);
 	gSky.setSunTargetDirection(sun_direction, sun_ang_velocity);
@@ -6034,17 +6040,6 @@ void notify_cautioned_script_question(const LLSD& notification, const LLSD& resp
 
 void script_question_mute(const LLUUID& item_id, const std::string& object_name);
 
-bool unknown_script_question_cb(const LLSD& notification, const LLSD& response)
-{
-	// Only care if they muted the object here.
-	if ( response["Mute"] ) // mute
-	{
-		LLUUID task_id = notification["payload"]["task_id"].asUUID();
-		script_question_mute(task_id,notification["payload"]["object_name"].asString());
-	}
-	return false;
-}
-
 void experiencePermissionBlock(LLUUID experience, LLSD result)
 {
     LLSD permission;
@@ -6150,8 +6145,7 @@ void script_question_mute(const LLUUID& task_id, const std::string& object_name)
       	bool matches(const LLNotificationPtr notification) const
         {
             if (notification->getName() == "ScriptQuestionCaution"
-                || notification->getName() == "ScriptQuestion"
-				|| notification->getName() == "UnknownScriptQuestion")
+                || notification->getName() == "ScriptQuestion")
             {
                 return (notification->getPayload()["task_id"].asUUID() == blocked_id);
             }
@@ -6168,7 +6162,6 @@ void script_question_mute(const LLUUID& task_id, const std::string& object_name)
 static LLNotificationFunctorRegistration script_question_cb_reg_1("ScriptQuestion", script_question_cb);
 static LLNotificationFunctorRegistration script_question_cb_reg_2("ScriptQuestionCaution", script_question_cb);
 static LLNotificationFunctorRegistration script_question_cb_reg_3("ScriptQuestionExperience", script_question_cb);
-static LLNotificationFunctorRegistration unknown_script_question_cb_reg("UnknownScriptQuestion", unknown_script_question_cb);
 
 void process_script_experience_details(const LLSD& experience_details, LLSD args, LLSD payload)
 {
@@ -6338,14 +6331,12 @@ void process_script_question(LLMessageSystem *msg, void **user_data)
 		args["QUESTIONS"] = script_question;
 
 		if (known_questions != questions)
-		{	// This is in addition to the normal dialog.
-			LLSD payload;
-			payload["task_id"] = taskid;
-			payload["item_id"] = itemid;
-			payload["object_name"] = object_name;
-			
-			args["DOWNLOADURL"] = LLTrans::getString("ViewerDownloadURL");
-			LLNotificationsUtil::add("UnknownScriptQuestion",args,payload);
+		{
+			// This is in addition to the normal dialog.
+			// Viewer got a request for not supported/implemented permission 
+			LL_WARNS("Messaging") << "Object \"" << object_name << "\" requested " << script_question
+								<< " permission. Permission is unknown and can't be granted. Item id: " << itemid
+								<< " taskid:" << taskid << LL_ENDL;
 		}
 		
 		if (known_questions)
