@@ -14,95 +14,95 @@
  tab_stop="false"
  width="1000">
 
-   <panel
-    height="18"
-    left="500"
-    width="95"
-    top="0"
-    follows="left|top"
-    name="parcel_info_panel"
-    bg_visible="false"
-    background_opaque="false">
-   <button
-    follows="left|top"
-    height="16"
-    hover_glow_amount="0.15"
-    image_disabled="Info_Off"
-    image_disabled_selected="Info_Off"
-    image_selected="Info_Off"
-    image_unselected="Info_Off"
-    left="0"
-    name="place_info_btn"
-    top="2"
-    width="16"/>
-   <text
-     follows="left|top|right"
+  <panel
+   height="18"
+   left="500"
+   width="95"
+   top="0"
+   follows="left|top"
+   name="parcel_info_panel"
+   bg_visible="false"
+   background_opaque="false">
+    <button
+     follows="left|top"
      height="16"
-     layout="topleft"
-     left_pad="11"
-     length="1"
-     name="parcel_info_text"
-     top="5"
-     value="(loading...)"
-     type="string"
-     width="100"/>
-  <icon
-    enabled="true"
-    follows="right|top"
-    height="18"
-    image_name="Parcel_VoiceNo_Dark"
-    name="voice_icon"
-    top="0"
-    left="100"
-    visible="true"
-    width="22"
-	scale_image="false"
+     hover_glow_amount="0.15"
+     image_disabled="Info_Off"
+     image_disabled_selected="Info_Off"
+     image_selected="Info_Off"
+     image_unselected="Info_Off"
+     left="0"
+     name="place_info_btn"
+     top="2"
+     width="16"/>
+    <text
+      follows="left|top|right"
+      height="16"
+      layout="topleft"
+      left_pad="11"
+      length="1"
+      name="parcel_info_text"
+      top="5"
+      value="(loading...)"
+      type="string"
+      width="100"/>
+    <icon
+      enabled="true"
+      follows="right|top"
+      height="18"
+      image_name="Parcel_VoiceNo_Dark"
+      name="voice_icon"
+      top="0"
+      left="100"
+      visible="true"
+      width="22"
+    scale_image="false"
     />
-  <icon
-    follows="right|top"
-    height="18"
-    image_name="Parcel_FlyNo_Dark"
-    name="fly_icon"
-    top="0"
-    left="122"
-    visible="true"
-    width="22"
-	scale_image="false"
+    <icon
+      follows="right|top"
+      height="18"
+      image_name="Parcel_FlyNo_Dark"
+      name="fly_icon"
+      top="0"
+      left="122"
+      visible="true"
+      width="22"
+    scale_image="false"
     />
-  <icon
-    follows="right|top"
-    height="18"
-    image_name="Parcel_PushNo_Dark"
-    name="push_icon"
-    top="0"
-    left="144"
-    visible="true"
-    width="22"
-	scale_image="false"
+    <icon
+      follows="right|top"
+      height="18"
+      image_name="Parcel_PushNo_Dark"
+      name="push_icon"
+      top="0"
+      left="144"
+      visible="true"
+      width="22"
+    scale_image="false"
     />
-  <icon
-    follows="right|top"
-    height="18"
-    image_name="Parcel_BuildNo_Dark"
-    name="build_icon"
-    top="0"
-    left="166"
-    visible="true"
-    width="22"
-	scale_image="false"
+    <icon
+      follows="right|top"
+      height="18"
+      image_name="Parcel_BuildNo_Dark"
+      name="build_icon"
+      top="0"
+      left="166"
+      visible="true"
+      width="22"
+    scale_image="false"
     />
-  <icon
-    follows="right|top"
-    height="18"
-    image_name="Parcel_ScriptsNo_Dark"
-    name="scripts_icon"
-    top="0"
-    left="188"
-    visible="true"
-    width="22"
-	scale_image="false"
+    <icon
+      follows="right|top"
+      height="18"
+      image_name="Parcel_ScriptsNo_Dark"
+      name="scripts_icon"
+      top="0"
+      left="188"
+      visible="true"
+      width="22"
+    scale_image="false"
     />
-     <!--
+    <!--
    <button
     follows="right|top"
     height="16"
@@ -117,51 +117,119 @@
     tool_tip="Parcel has WL settings" 
     width="16"/>
     -->
-  <icon
-    follows="right|top"
-    height="13"
-    image_name="Parcel_Health_Dark"
-    name="damage_icon"
-    top="4"
-    left="210"
-    visible="true"
-    width="14"
-	scale_image="false"
+    <icon
+      follows="right|top"
+      height="13"
+      image_name="Parcel_Health_Dark"
+      name="damage_icon"
+      top="4"
+      left="210"
+      visible="true"
+      width="14"
+    scale_image="false"
     />
-  <text
-    follows="right|top"
-    font="SansSerifSmall"
-    halign="right"
-    height="18"
-    name="damage_text"
-    value="100%"
-    top="3"
-    left="224"
-    visible="true"
-    width="35"
+    <text
+      follows="right|top"
+      font="SansSerifSmall"
+      halign="right"
+      height="18"
+      name="damage_text"
+      value="100%"
+      top="3"
+      left="224"
+      visible="true"
+      width="35"
     />
   </panel>
 
-    <panel.string
-     name="packet_loss_tooltip">
-        Packet Loss
-    </panel.string>
-    <panel.string
-     name="bandwidth_tooltip">
-        Bandwidth
-    </panel.string>
-    <panel.string
-     name="time">
-        [hour12, datetime, slt]:[min, datetime, slt] [ampm, datetime, slt] [timezone,datetime, slt]
-    </panel.string>
-    <panel.string
-     name="timeTooltip">
-        [weekday, datetime, slt], [day, datetime, slt] [month, datetime, slt] [year, datetime, slt]
-    </panel.string>
-	<panel.string
+  <panel.string
+   name="packet_loss_tooltip">
+    Packet Loss
+  </panel.string>
+  <panel.string
+   name="bandwidth_tooltip">
+    Bandwidth
+  </panel.string>
+  <panel.string
+   name="time">
+    [hour12, datetime, slt]:[min, datetime, slt] [ampm, datetime, slt] [timezone,datetime, slt]
+  </panel.string>
+  <panel.string
+   name="timeTooltip">
+    [weekday, datetime, slt], [day, datetime, slt] [month, datetime, slt] [year, datetime, slt]
+  </panel.string>
+  <panel.string
      name="buycurrencylabel">
-        L$ [AMT]
-    </panel.string>
+    L$ [AMT]
+  </panel.string>
+  <!-- RLV panel -->
+  <panel
+	 height="18"
+	 left="-80"
+	 top="0"
+	 width="120"
+	 follows="right|top"
+	 name="rlv_panel"
+	 background_opaque="true"
+	 background_visible="true"
+	 bg_opaque_color="MouseGray">
+    <!-- Draw distance widget here -->
+    <slider
+    control_name="RenderFarClip"
+    decimal_digits="0"
+    follows="right|top"
+    height="15"
+    increment="16"
+    initial_value="64"
+    layout="topleft"
+    tool_tip="Maximum distance away from camera to be rezzed (meters)"
+    top="5"
+    label="Draw:"
+    label_length="40"
+    left_delta="-600"
+    max_val="992"
+    min_val="32"
+    name="drawdistance"
+    top_delta="0"
+    width="130" />
+    <!-- End Draw distance widget here -->
+    <!-- Avatar Z Offset widget here -->
+    <button
+     follows="right|top"
+     height="16"
+     hover_glow_amount="0.15"
+     image_disabled="RadioButton_Disabled"
+     image_disabled_selected="RadioButton_On_Disabled"
+     image_selected="RadioButton_On"
+     image_unselected="RadioButton_Off"
+     left_delta="-40"
+     name="avatar_z_offset_reset_btn"
+     top="2"
+     width="16"/>
+    <slider bottom="-20"
+			control_name="AvatarHoverOffsetZ"
+			decimal_digits="2"
+			enabled="true"
+			follows="right|top"
+			halign="left"
+			height="15"
+			increment="0.01"
+			label="Offset:"
+			label_length="50"
+			layout="topleft"
+			left_delta="-300"
+			mouse_opaque="false"
+			tool_tip="Altitude offset of your avatar to adjust your height. Click the button to reset."
+			name="avatar_z_offset"
+			top_delta="0"
+			width="300"
+			hidden="false"
+			initial_val="0.0"
+			max_val="1.0"
+			min_val="-1.0" />
+    <!-- end Avatar Z Offset widget -->
+  </panel>
+  <!-- end RLV panel -->
   <panel
 	 height="18"
 	 left="-458"
@@ -172,7 +240,7 @@
 	 background_opaque="true"
 	 background_visible="true"
 	 bg_opaque_color="MouseGray">
-		<search_editor
+    <search_editor
 		 clear_button_visible="true"
 		 follows="left|top"
 		 height="18"
@@ -185,14 +253,14 @@
 		 text_pad_left="6"
 		 tool_tip="Type the search term you are interested in here. Results will be displayed for partial fulltext matches within the menu."
 		 top="0">
-			<search_button 
+      <search_button
 			 top_pad="4"
-			 left_pad="4" 
+			 left_pad="4"
 			 width="12"
-			 height="12" 
+			 height="12"
 			 image_unselected="Search"
 			 image_selected="Search"/>
-			<clear_button
+      <clear_button
 			 bottom="2"
 			 height="12"
 			 image_unselected="Icon_Close_Foreground"
@@ -200,27 +268,27 @@
 			 pad_right="4"
 			 pad_left="4"
 			 width="12"/>
-		</search_editor>
+    </search_editor>
   </panel>
   <panel
     height="18"
     left="-376"
     width="168"
     top="1"
-    follows="right|top" 
+    follows="right|top"
     name="balance_bg">
     <text
      halign="center"
      font="SansSerifSmall"
      follows="all"
      height="18"
-     left="0" 
+     left="0"
      name="balance"
      tool_tip="Click to refresh your L$ balance"
      v_pad="4"
      top="0"
-     wrap="false" 
-     value="L$??" 
+     wrap="false"
+     value="L$??"
      width="40" />
     <button
      halign="center"
@@ -259,107 +327,52 @@
      top="0"
      width="65" />
   </panel>
-    <text
-     type="string"
-     font="SansSerifSmall"
-     text_readonly_color="TimeTextColor"
-     follows="right|top"
-     halign="right"
-     height="16"
-     top="5"
-     layout="topleft"
-     left_pad="0"
-     name="TimeText"
-     tool_tip="Current time (Pacific)"
-     width="145">
-        24:00 AM PST
-    </text>
-    <icon
-     follows="right|top"
-     height="16"
-     image_name="Presets_Icon"
-     left_pad="8"
-     top="2"
-     name="presets_icon"
-     width="18" />
-    <button
-     follows="right|top"
-     height="16"
-     image_selected="Play_Off"
-     image_unselected="Pause_Off"
-     image_pressed="Pause_Press"
-     image_pressed_selected="Play_Press"
-     is_toggle="true"
-     left_pad="5"
-     top="1"
-     name="media_toggle_btn"
-     tool_tip="Start/Stop All Media (Music, Video, Web pages)"
-     width="16" >
-    </button>
-    <button
-     follows="right|top"
-     height="16"
-     image_selected="AudioMute_Off"
-     image_pressed="Audio_Press"
-     image_unselected="Audio_Off"
-     is_toggle="true"
-     left_pad="5"
-     top="2"
-     name="volume_btn"
-     width="16" />
-<!-- Draw distance widget here -->
-     <slider
-     control_name="RenderFarClip"
-     decimal_digits="0"
-     follows="right|top"
-     height="15"
-     increment="16"
-     initial_value="64"
-     layout="topleft"
-     tool_tip="Maximum distance away from camera to be rezzed (meters)"
-     top="5"
-     label="Draw:"
-     label_length="40"
-     left_delta="-600"
-     max_val="992"
-     min_val="32"
-     name="drawdistance" 
-     top_delta="0"
-     width="130" />
-<!-- End Draw distance widget here -->
-<!-- Avatar Z Offset widget here -->
-     <button
-      follows="right|top"
-      height="16"
-      hover_glow_amount="0.15"
-      image_disabled="RadioButton_Disabled"
-      image_disabled_selected="RadioButton_On_Disabled"
-      image_selected="RadioButton_On"
-      image_unselected="RadioButton_Off"
-			left_delta="-40"
-      name="avatar_z_offset_reset_btn"
-      top="2"
-      width="16"/>
-		<slider bottom="-20"
-			control_name="AvatarHoverOffsetZ"
-			decimal_digits="2"
-			enabled="true"
-			follows="right|top"
-			halign="left"   
-			height="15"
-			increment="0.01"
-			label="Offset:"
-			label_length="50"
-			layout="topleft"
-			left_delta="-300"
-			mouse_opaque="false"
-			tool_tip="Altitude offset of your avatar to adjust your height. Click the button to reset."
-			name="avatar_z_offset"
-			top_delta="0"
-			width="300"
-			hidden="false"
-			initial_val="0.0"
-			max_val="1.0"
-			min_val="-1.0" />
-<!-- end Avatar Z Offset widget -->
+  <text
+   type="string"
+   font="SansSerifSmall"
+   text_readonly_color="TimeTextColor"
+   follows="right|top"
+   halign="right"
+   height="16"
+   top="5"
+   layout="topleft"
+   left_pad="0"
+   name="TimeText"
+   tool_tip="Current time (Pacific)"
+   width="145">
+    24:00 AM PST
+  </text>
+  <icon
+   follows="right|top"
+   height="16"
+   image_name="Presets_Icon"
+   left_pad="8"
+   top="2"
+   name="presets_icon"
+   width="18" />
+  <button
+   follows="right|top"
+   height="16"
+   image_selected="Play_Off"
+   image_unselected="Pause_Off"
+   image_pressed="Pause_Press"
+   image_pressed_selected="Play_Press"
+   is_toggle="true"
+   left_pad="5"
+   top="1"
+   name="media_toggle_btn"
+   tool_tip="Start/Stop All Media (Music, Video, Web pages)"
+   width="16" >
+  </button>
+  <button
+   follows="right|top"
+   height="16"
+   image_selected="AudioMute_Off"
+   image_pressed="Audio_Press"
+   image_unselected="Audio_Off"
+   is_toggle="true"
+   left_pad="5"
+   top="2"
+   name="volume_btn"
+   width="16" />
 </panel>
