@@ -850,7 +850,7 @@
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/NickyP/3p-fmodstudio/downloads/fmodstudio-2.00.01-darwin-191621840.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-fmodstudio/downloads/fmodstudio-2.00.01-darwin-191621840.tar.bz2</string>
             </map>
             <key>name</key>
             <string>darwin</string>
@@ -864,7 +864,7 @@
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/NickyP/3p-fmodstudio/downloads/fmodstudio-2.00.01-darwin64-191621825.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-fmodstudio/downloads/fmodstudio-2.00.01-darwin64-191621825.tar.bz2</string>
             </map>
             <key>name</key>
             <string>darwin64</string>
@@ -878,7 +878,7 @@
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/NickyP/3p-fmodstudio/downloads/fmodstudio-2.00.01-linux64-191641905.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-fmodstudio/downloads/fmodstudio-2.00.01-linux64-191641905.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -892,7 +892,7 @@
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/NickyP/3p-fmodstudio/downloads/fmodstudio-2.00.01-windows-191652331.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-fmodstudio/downloads/fmodstudio-2.00.01-windows-191652331.tar.bz2</string>
             </map>
             <key>name</key>
             <string>windows</string>
@@ -906,7 +906,7 @@
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/NickyP/3p-fmodstudio/downloads/fmodstudio-2.00.01-windows64-191652341.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-fmodstudio/downloads/fmodstudio-2.00.01-windows64-191652341.tar.bz2</string>
             </map>
             <key>name</key>
             <string>windows64</string>
