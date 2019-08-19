@@ -102,6 +102,9 @@ openjpeg.dll
 .metadata
 build-vc*
 openjpeg.dll__
+_Before_autobuild/__Put these files in AppData Local Temp Install.cache.txt
+fmodstudio-2.00.01-windows-191652331.tar.bz2.md5.txt
+fmodstudio-2.00.01-windows64-191652341.tar.bz2.md5.sum
 syntax: regexp
 fmodapi375win/*
 glob:*.diff
