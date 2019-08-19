@@ -1616,25 +1616,25 @@ class Linux_x86_64_Manifest(LinuxManifest):
         # support file for valgrind debug tool
         self.path("secondlife-i686.supp")
 
-            try:
-                self.path("libfmodstudio*.so")
-                self.path("libfmodstudio.so")
-                self.path("libfmodstudio.so*")
-                self.path("libfmod*.so")
-                self.path("libfmod.so")
-                self.path("libfmod.so*")
-                pass
-            except:
-                print "Skipping libfmodex.so - not found"
-                pass
-            try:
-                self.path("libfmodex64-*.so")
-                self.path("libfmodex64.so")
-                self.path("libfmodex64.so*")
-                pass
-            except:
-                print "Skipping libfmodex.so - not found"
-                pass
+        try:
+            self.path("libfmodstudio*.so")
+            self.path("libfmodstudio.so")
+            self.path("libfmodstudio.so*")
+            self.path("libfmod*.so")
+            self.path("libfmod.so")
+            self.path("libfmod.so*")
+            pass
+        except:
+            print "Skipping libfmodex.so - not found"
+            pass
+        try:
+            self.path("libfmodex64-*.so")
+            self.path("libfmodex64.so")
+            self.path("libfmodex64.so*")
+            pass
+        except:
+            print "Skipping libfmodex.so - not found"
+            pass
             
 
 ################################################################
