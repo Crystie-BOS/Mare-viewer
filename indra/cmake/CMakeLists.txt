@@ -28,6 +28,7 @@ set(cmake_SOURCE_FILES
     FindAPR.cmake
     FindAutobuild.cmake
     FindBerkeleyDB.cmake
+    FindFMODSTUDIO.cmake
     FindFMODEX.cmake
     FindGLH.cmake
     FindGoogleBreakpad.cmake
@@ -94,6 +95,8 @@ set(cmake_SOURCE_FILES
     Variables.cmake
     ViewerMiscLibs.cmake
     VisualLeakDetector.cmake
+    FindFMODSTUDIO.cmake
+    FMODSTUDIO.cmake
     LibVLCPlugin.cmake
     XmlRpcEpi.cmake
     ZLIB.cmake
