@@ -1188,8 +1188,11 @@ bool LLAppViewer::init()
 		LL_WARNS("LLLeap") << "Failed to run LLLeap" << LL_ENDL;
 	}
 #else
- 	// Run the updater. An exception from launching the updater should bother us.
-	LLLeap::create(updater, true);
+//MK
+	// For the RLV, we don't want to launch the updater.
+ 	////// Run the updater. An exception from launching the updater should bother us.
+	////LLLeap::create(updater, true);
+//mk
 #endif
 
 	// Iterate over --leap command-line options. But this is a bit tricky: if
