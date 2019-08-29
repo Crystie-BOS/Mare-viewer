@@ -1704,7 +1704,11 @@ void LLAgentWearables::createWearable(LLWearableType::EType type, bool wear, con
 			if (gAgent.mRRInterface.containsSubstr("attachthis:")
 			|| gAgent.mRRInterface.containsSubstr("attachallthis:"))
 			{
-				return;
+				if (type == LLWearableType::WT_UNIVERSAL && !gAgent.getRegion()->bakesOnMeshEnabled())
+				{
+					LL_WARNS("Inventory") << "Can't create WT_UNIVERSAL type " << LL_ENDL;
+					return;
+				}
 			}
 		}
 	}
