@@ -46,7 +46,7 @@ viewer_dir = os.path.dirname(__file__)
 # Put it FIRST because some of our build hosts have an ancient install of
 # indra.util.llmanifest under their system Python!
 sys.path.insert(0, os.path.join(viewer_dir, os.pardir, "lib", "python"))
-from indra.util.llmanifest import LLManifest, main, path_ancestors, CHANNEL_VENDOR_BASE, RELEASE_CHANNEL, ManifestError, MissingError
+from indra.util.llmanifest import LLManifest, main, path_ancestors, CHANNEL_VENDOR_BASE, RELEASE_CHANNEL, ManifestError
 from llbase import llsd
 
 class ViewerManifest(LLManifest):
@@ -511,6 +511,17 @@ class WindowsManifest(ViewerManifest):
         # Get shared libs from the shared libs staging directory
         with self.prefix(src=os.path.join(self.args['build'], os.pardir,
                                           'sharedlibs', self.args['configuration'])):
+
+            # Get llcommon and deps. If missing assume static linkage and continue.
+            try:
+                self.path('llcommon.dll')
+                self.path('libapr-1.dll')
+                self.path('libaprutil-1.dll')
+                self.path('libapriconv-1.dll')
+                
+            except RuntimeError as err:
+                print err.message
+                print "Skipping llcommon.dll (assuming llcommon was linked statically)"
 
             # Mesh 3rd party libs needed for auto LOD and collada reading
             try:
@@ -1018,15 +1029,11 @@ class DarwinManifest(ViewerManifest):
                     # (source, dest) pair to self.file_list for every expanded
                     # file processed. Remember its size before the call.
                     oldlen = len(self.file_list)
-                    try:
-                        self.path(src, dst)
-                        # The dest appended to self.file_list has been prepended
-                        # with self.get_dst_prefix(). Strip it off again.
-                        added = [os.path.relpath(d, self.get_dst_prefix())
-                                 for s, d in self.file_list[oldlen:]]
-                    except MissingError as err:
-                        print >> sys.stderr, "Warning: "+err.msg
-                        added = []
+                    self.path(src, dst)
+                    # The dest appended to self.file_list has been prepended
+                    # with self.get_dst_prefix(). Strip it off again.
+                    added = [os.path.relpath(d, self.get_dst_prefix())
+                             for s, d in self.file_list[oldlen:]]
                     if not added:
                         print "Skipping %s" % dst
                     return added
@@ -1036,7 +1043,14 @@ class DarwinManifest(ViewerManifest):
                 # symlink from sub-app/Contents/Resources to the real .dylib.
                 # Need to get the llcommon dll from any of the build directories as well.
                 libfile_parent = self.get_dst_prefix()
-                dylibs=[]
+                libfile = "libllcommon.dylib"
+                dylibs = path_optional(self.find_existing_file(os.path.join(os.pardir,
+                                                               "llcommon",
+                                                               self.args['configuration'],
+                                                               libfile),
+                                                               os.path.join(relpkgdir, libfile)),
+                                       dst=libfile)
+
                 for libfile in (
                                 "libapr-1.0.dylib",
                                 "libaprutil-1.0.dylib",
@@ -1605,9 +1619,4 @@ if __name__ == "__main__":
         dict(name='bugsplat', description="""BugSplat database to which to post crashes,
              if BugSplat crash reporting is desired""", default=''),
         ]
-    try:
-        main(extra=extra_arguments)
-    except (ManifestError, MissingError) as err:
-        sys.exit("\nviewer_manifest.py failed: "+err.msg)
-    except:
-        raise
+    main(extra=extra_arguments)
