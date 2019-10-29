@@ -122,7 +122,7 @@
 #include "llhudmanager.h"
 #include "llhudobject.h"
 #include "llhudview.h"
-#include "llimagebmp.h"
+#include "llimage.h"
 #include "llimagej2c.h"
 #include "llimageworker.h"
 #include "llkeyboard.h"
@@ -3871,7 +3871,7 @@ void LLViewerWindow::renderSelections( BOOL for_gl_pick, BOOL pick_parcel_walls,
 
 					BOOL draw_handles = TRUE;
 
-					if (tool == LLToolCompTranslate::getInstance() && !all_selected_objects_move)
+					if (tool == LLToolCompTranslate::getInstance() && !all_selected_objects_move && !LLSelectMgr::getInstance()->isSelfAvatarSelected())
 					{
 						draw_handles = FALSE;
 					}
@@ -4555,32 +4555,46 @@ void LLViewerWindow::movieSize(S32 new_width, S32 new_height)
 	}
 }
 
-BOOL LLViewerWindow::saveSnapshot(const std::string& filepath, S32 image_width, S32 image_height, BOOL show_ui, BOOL do_rebuild, LLSnapshotModel::ESnapshotLayerType type)
+BOOL LLViewerWindow::saveSnapshot(const std::string& filepath, S32 image_width, S32 image_height, BOOL show_ui, BOOL do_rebuild, LLSnapshotModel::ESnapshotLayerType type, LLSnapshotModel::ESnapshotFormat format)
 {
-	LL_INFOS() << "Saving snapshot to: " << filepath << LL_ENDL;
+    LL_INFOS() << "Saving snapshot to: " << filepath << LL_ENDL;
 
-	LLPointer<LLImageRaw> raw = new LLImageRaw;
-	BOOL success = rawSnapshot(raw, image_width, image_height, TRUE, FALSE, show_ui, do_rebuild);
+    LLPointer<LLImageRaw> raw = new LLImageRaw;
+    BOOL success = rawSnapshot(raw, image_width, image_height, TRUE, FALSE, show_ui, do_rebuild);
 
-	if (success)
-	{
-		LLPointer<LLImageBMP> bmp_image = new LLImageBMP;
-		success = bmp_image->encode(raw, 0.0f);
-		if( success )
-		{
-			success = bmp_image->save(filepath);
-		}
-		else
-		{
-			LL_WARNS() << "Unable to encode bmp snapshot" << LL_ENDL;
-		}
-	}
-	else
-	{
-		LL_WARNS() << "Unable to capture raw snapshot" << LL_ENDL;
-	}
+    if (success)
+    {
+        U8 image_codec = IMG_CODEC_BMP;
+        switch (format)
+        {
+        case LLSnapshotModel::SNAPSHOT_FORMAT_PNG:
+            image_codec = IMG_CODEC_PNG;
+            break;
+        case LLSnapshotModel::SNAPSHOT_FORMAT_JPEG:
+            image_codec = IMG_CODEC_JPEG;
+            break;
+        default:
+            image_codec = IMG_CODEC_BMP;
+            break;
+        }
 
-	return success;
+        LLPointer<LLImageFormatted> formated_image = LLImageFormatted::createFromType(image_codec);
+        success = formated_image->encode(raw, 0.0f);
+        if (success)
+        {
+            success = formated_image->save(filepath);
+        }
+        else
+        {
+            LL_WARNS() << "Unable to encode snapshot of format " << format << LL_ENDL;
+        }
+    }
+    else
+    {
+        LL_WARNS() << "Unable to capture raw snapshot" << LL_ENDL;
+    }
+
+    return success;
 }
 
 
@@ -4828,6 +4842,7 @@ BOOL LLViewerWindow::rawSnapshot(LLImageRaw *raw, S32 image_width, S32 image_hei
 				{
 					// Required for showing the GUI in snapshots and performing bloom composite overlay
 					// Call even if show_ui is FALSE
+					LL_RECORD_BLOCK_TIME(FTM_RENDER_UI);
 					render_ui(scale_factor, subfield);
 					swap();
 				}

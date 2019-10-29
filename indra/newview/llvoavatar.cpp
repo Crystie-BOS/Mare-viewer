@@ -1,4 +1,4 @@
-/** 
+﻿/** 
  * @File llvoavatar.cpp
  * @brief Implementation of LLVOAvatar class which is a derivation of LLViewerObject
  *
@@ -10691,6 +10691,11 @@ void LLVOAvatar::calcMutedAVColor()
         // blocked avatars are dark grey
         new_color = LLColor4::grey4;
         change_msg = " blocked: color is grey4";
+    }
+    else if (!isTooComplex())
+    {
+        new_color = LLColor4::white;
+        change_msg = " simple imposter ";
     }
     else if ( mMutedAVColor == LLColor4::white || mMutedAVColor == LLColor4::grey3 || mMutedAVColor == LLColor4::grey4 )
 {

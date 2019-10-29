@@ -42,7 +42,7 @@
 #include "llfeaturemanager.h"
 //#include "llfirstuse.h"
 #include "llhudmanager.h"
-#include "llimagebmp.h"
+#include "llimagepng.h"
 #include "llmemory.h"
 #include "llselectmgr.h"
 #include "llsky.h"
@@ -250,6 +250,7 @@ void display_stats()
 
 static LLTrace::BlockTimerStatHandle FTM_PICK("Picking");
 static LLTrace::BlockTimerStatHandle FTM_RENDER("Render");
+static LLTrace::BlockTimerStatHandle FTM_RENDER_HUD("Render HUD");
 static LLTrace::BlockTimerStatHandle FTM_UPDATE_SKY("Update Sky");
 static LLTrace::BlockTimerStatHandle FTM_UPDATE_DYNAMIC_TEXTURES("Update Dynamic Textures");
 static LLTrace::BlockTimerStatHandle FTM_IMAGE_UPDATE("Update Images");
@@ -591,6 +592,7 @@ void display(BOOL rebuild, F32 zoom_factor, int subfield, BOOL for_snapshot)
 	if (gDisconnected)
 	{
 		LLAppViewer::instance()->pingMainloopTimeout("Display:Disconnected");
+		LL_RECORD_BLOCK_TIME(FTM_RENDER_UI);
 		render_ui();
 		swap();
 	}
@@ -1338,7 +1340,7 @@ void render_ui(F32 zoom_factor, int subfield)
 		{
 			gPipeline.renderBloom(gSnapshot, zoom_factor, subfield);
 		}
-		
+
 //MK
 		// Draw a big black sphere around our avatar if the camera render is limited by RLV
 		// This call happens only while the avatar is a cloud. This is a crutch while we wait
@@ -1348,7 +1350,7 @@ void render_ui(F32 zoom_factor, int subfield)
 			gAgent.mRRInterface.drawRenderLimit();
 		}
 //mk
-
+		LL_RECORD_BLOCK_TIME(FTM_RENDER_HUD);
 		render_hud_elements();
 		render_hud_attachments();
 	}
@@ -1363,8 +1365,6 @@ void render_ui(F32 zoom_factor, int subfield)
 		gGL.color4f(1,1,1,1);
 		if (gPipeline.hasRenderDebugFeatureMask(LLPipeline::RENDER_DEBUG_FEATURE_UI))
 		{
-			LL_RECORD_BLOCK_TIME(FTM_RENDER_UI);
-
 			if (!gDisconnected)
 			{
 				render_ui_3d();
@@ -1643,17 +1643,17 @@ void render_disconnected_background()
 		LL_INFOS() << "Loading last bitmap..." << LL_ENDL;
 
 		std::string temp_str;
-		temp_str = gDirUtilp->getLindenUserDir() + gDirUtilp->getDirDelimiter() + SCREEN_LAST_FILENAME;
+		temp_str = gDirUtilp->getLindenUserDir() + gDirUtilp->getDirDelimiter() + LLStartUp::getScreenLastFilename();
 
-		LLPointer<LLImageBMP> image_bmp = new LLImageBMP;
-		if( !image_bmp->load(temp_str) )
+		LLPointer<LLImagePNG> image_png = new LLImagePNG;
+		if( !image_png->load(temp_str) )
 		{
 			//LL_INFOS() << "Bitmap load failed" << LL_ENDL;
 			return;
 		}
 		
 		LLPointer<LLImageRaw> raw = new LLImageRaw;
-		if (!image_bmp->decode(raw, 0.0f))
+		if (!image_png->decode(raw, 0.0f))
 		{
 			LL_INFOS() << "Bitmap decode failed" << LL_ENDL;
 			gDisconnectedImagep = NULL;
@@ -1661,7 +1661,7 @@ void render_disconnected_background()
 		}
 
 		U8 *rawp = raw->getData();
-		S32 npixels = (S32)image_bmp->getWidth()*(S32)image_bmp->getHeight();
+		S32 npixels = (S32)image_png->getWidth()*(S32)image_png->getHeight();
 		for (S32 i = 0; i < npixels; i++)
 		{
 			S32 sum = 0;
