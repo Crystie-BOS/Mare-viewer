@@ -1022,6 +1022,7 @@ void LLPanelPeople::updateRecentList()
 		return;
 	}
 //mk
+}
 
 //MK from FS
 void LLPanelPeople::updateNearbyRange()
