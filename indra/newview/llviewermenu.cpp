@@ -6882,7 +6882,7 @@ void dump_inventory(void*)
 
 void handle_dump_followcam(void*)
 {
-	LLFollowCamMgr::dump();
+	LLFollowCamMgr::getInstance()->dump();
 }
 
 void handle_viewer_enable_message_log(void*)
@@ -9614,7 +9614,6 @@ class LLWorldPostProcess : public view_listener_t
 
 void handle_flush_name_caches()
 {
-	SUBSYSTEM_CLEANUP(LLAvatarNameCache);
 	if (gCacheName) gCacheName->clear();
 }
 
