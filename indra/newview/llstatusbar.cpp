@@ -1136,24 +1136,3 @@ void LLStatusBar::updateBalancePanelPosition()
     balance_bg_view->setShape(balance_bg_rect);
 }
 
-
-// Implements secondlife:///app/balance/request to request a L$ balance
-// update via UDP message system. JC
-class LLBalanceHandler : public LLCommandHandler
-{
-public:
-	// Requires "trusted" browser/URL source
-	LLBalanceHandler() : LLCommandHandler("balance", UNTRUSTED_BLOCK) { }
-	bool handle(const LLSD& tokens, const LLSD& query_map, LLMediaCtrl* web)
-	{
-		if (tokens.size() == 1
-			&& tokens[0].asString() == "request")
-		{
-			LLStatusBar::sendMoneyBalanceRequest();
-			return true;
-		}
-		return false;
-	}
-};
-// register with command dispatch system
-LLBalanceHandler gBalanceHandler;
