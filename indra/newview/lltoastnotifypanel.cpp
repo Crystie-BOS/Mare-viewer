@@ -33,6 +33,7 @@
 
 // library includes
 #include "lldbstrings.h"
+#include "llcheckboxctrl.h"
 #include "lllslconstants.h"
 #include "llnotifications.h"
 #include "lluiconstants.h"
@@ -55,7 +56,7 @@ const LLFontGL* LLToastNotifyPanel::sFontSmall = NULL;
 LLToastNotifyPanel::button_click_signal_t LLToastNotifyPanel::sButtonClickSignal;
 
 LLToastNotifyPanel::LLToastNotifyPanel(const LLNotificationPtr& notification, const LLRect& rect, bool show_images) 
-:	LLToastPanel(notification),
+:	LLCheckBoxToastPanel(notification),
 	LLInstanceTracker<LLToastNotifyPanel, LLUUID, LLInstanceTrackerReplaceOnCollision>(notification->getID())
 
 	{
@@ -163,6 +164,11 @@ void LLToastNotifyPanel::updateButtonsLayout(const std::vector<index_button_pair
 		if (buttons.size() == 1) // for the one-button forms, center that button
 		{
 			left = (max_width - btn_rect.getWidth()) / 2;
+		}
+		else if (left == 0 && buttons.size() == 2)
+		{
+			// Note: this and "size() == 1" shouldn't be inside the cycle, might be good idea to refactor whole placing process
+			left = (max_width - (btn_rect.getWidth() * 2) - h_pad) / 2;
 		}
 		else if (left + btn_rect.getWidth() > max_width)// whether there is still some place for button+h_pad in the mControlPanel
 		{
@@ -415,11 +421,23 @@ void LLToastNotifyPanel::init( LLRect rect, bool show_images )
 	if (!mIsScriptDialog)
 	{
 //mk
-	snapToMessageHeight(mTextBox, LLToastPanel::MAX_TEXT_LENGTH);
+    setCheckBoxes(HPAD * 2, 0, mInfoPanel);
+    if (mCheck)
+    {
+        mCheck->setFollows(FOLLOWS_BOTTOM | FOLLOWS_LEFT);
+    }
+    // Snap to message, then to checkbox if present
+    snapToMessageHeight(mTextBox, LLToastPanel::MAX_TEXT_LENGTH);
+    if (mCheck)
+    {
+        S32 new_panel_height = mCheck->getRect().getHeight() + getRect().getHeight() + VPAD;
+        reshape(getRect().getWidth(), new_panel_height);
+    }
 //MK
 		adjustPanelForScriptNotice(mControlPanel->getRect().getWidth(), mControlPanel->getRect().getHeight()+20);
 	}
 //mk
+
 
 	// reshape the panel to its previous size
 	if (current_rect.notEmpty())
