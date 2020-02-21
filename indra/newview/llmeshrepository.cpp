@@ -2770,7 +2770,7 @@ void LLMeshUploadThread::onCompleted(LLCore::HttpHandle handle, LLCore::HttpResp
 
 			if (observer)
 			{
-				observer->setModelPhysicsFeeErrorStatus(status.toULong(), reason);
+				observer->setModelPhysicsFeeErrorStatus(status.toULong(), reason, body["error"]);
 			}
 		}
 		else
@@ -2803,7 +2803,7 @@ void LLMeshUploadThread::onCompleted(LLCore::HttpHandle handle, LLCore::HttpResp
 
 				if (observer)
 				{
-					observer->setModelPhysicsFeeErrorStatus(status.toULong(), reason);
+					observer->setModelPhysicsFeeErrorStatus(status.toULong(), reason, body["error"]);
 				}
 			}
 		}
