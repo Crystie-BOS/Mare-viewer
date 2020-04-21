@@ -1404,11 +1404,11 @@ void LLFloaterPreferenceGraphicsAdvanced::refreshEnabledState()
 	// Shaders checkboxes are ticked and disabled
 	if (gRRenabled && (gAgent.mRRInterface.mContainsSetenv || gAgent.mRRInterface.mContainsSetdebug))
 	{
-		gSavedSettings.setBOOL("VertexShaderEnable", TRUE);
+//		gSavedSettings.setBOOL("VertexShaderEnable", TRUE);
 		gSavedSettings.setBOOL("WindLightUseAtmosShaders", TRUE);
 
-		ctrl_shader_enable->setEnabled(FALSE);
-		ctrl_shader_enable->setValue(TRUE);
+//		ctrl_shader_enable->setEnabled(FALSE);
+//		ctrl_shader_enable->setValue(TRUE);
 
 		ctrl_wind_light->setEnabled(FALSE);
 		ctrl_wind_light->setValue(TRUE);

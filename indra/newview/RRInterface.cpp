@@ -35,7 +35,7 @@
 #include "llcamera.h"
 #include "lldrawpoolalpha.h"
 //#include "llfloaterenvsettings.h"
-#include "llfloatereditsky.h"
+//#include "llfloatereditsky.h"
 #include "llfloaterimnearbychat.h"
 #include "llfloatermap.h"
 #include "llfloaterpostprocess.h"
@@ -73,7 +73,7 @@
 #include "llviewerobjectlist.h"
 #include "llviewertexturelist.h"
 #include "llviewerwindow.h"
-#include "llwaterparammanager.h"
+//#include "llwaterparammanager.h"
 #include "llwlparammanager.h"
 #include "llinventorybridge.h"
 #include "llviewerdisplay.h"
@@ -83,6 +83,7 @@
 #include "llviewerparcelmgr.h"
 #include "llworldmapmessage.h"
 #include "pipeline.h"
+#include "llviewershadermgr.h"
 
 #include <boost/algorithm/string.hpp>
 
@@ -3689,6 +3690,7 @@ std::string RRInterface::getCensoredMessage (std::string str)
 	return str;
 }
 
+#if 0
 void updateAndSave (WLColorControl* color)
 {
 	if (color == NULL) return;
@@ -3707,9 +3709,11 @@ void updateAndSave (WLFloatControl* floatControl)
 	if (floatControl == NULL) return;
 	floatControl->update (LLWLParamManager::getInstance()->mCurParams);
 }
+#endif
 
 BOOL RRInterface::forceEnvironment (std::string command, std::string option)
 {
+#if 0
 	// command is "setenv_<something>"
 	double val = atof (option.c_str());
 
@@ -3962,13 +3966,14 @@ BOOL RRInterface::forceEnvironment (std::string command, std::string option)
 
 	// send the current parameters to shaders
 	LLWLParamManager::getInstance()->propagateParameters();
-
+#endif
 	return TRUE;
 }
 
 std::string RRInterface::getEnvironment (std::string command)
 {
 	F64 res = 0;
+#if 0
 	int length = 7; // size of "getenv_"
 	command = command.substr (length);
 	LLWLParamManager* params = LLWLParamManager::getInstance();
@@ -4033,7 +4038,7 @@ std::string RRInterface::getEnvironment (std::string command)
 	else if (command == "cloudscrolly") res = params->mCurParams.getCloudScrollY() - 10;
 
 	else if (command == "preset") return getLastLoadedPreset();
-
+#endif
 	std::stringstream str;
 	str << res;
 	return str.str();
