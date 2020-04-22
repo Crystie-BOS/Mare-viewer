@@ -416,7 +416,7 @@ void do_bulk_upload(std::vector<std::string> filenames, const LLSD& notification
 	for (std::vector<std::string>::const_iterator in_iter = filenames.begin(); in_iter != filenames.end(); ++in_iter)
 	{
 		std::string filename = (*in_iter);
-			
+		
 		std::string name = gDirUtilp->getBaseFileName(filename, true);
 		std::string asset_name = name;
 		LLStringUtil::replaceNonstandardASCII(asset_name, '?');
@@ -432,16 +432,16 @@ void do_bulk_upload(std::vector<std::string> filenames, const LLSD& notification
 			LLAgentBenefitsMgr::current().findUploadCost(asset_type, expected_upload_cost))
 		{
 			LLResourceUploadInfo::ptr_t uploadInfo(new LLNewFileResourceUploadInfo(
-													   filename,
-													   asset_name,
-													   asset_name, 0,
-													   LLFolderType::FT_NONE, LLInventoryType::IT_NONE,
-													   LLFloaterPerms::getNextOwnerPerms("Uploads"),
-													   LLFloaterPerms::getGroupPerms("Uploads"),
-													   LLFloaterPerms::getEveryonePerms("Uploads"),
-													   expected_upload_cost));
-			
-			upload_new_resource(uploadInfo, NULL, NULL);
+				filename,
+				asset_name,
+				asset_name, 0,
+				LLFolderType::FT_NONE, LLInventoryType::IT_NONE,
+				LLFloaterPerms::getNextOwnerPerms("Uploads"),
+				LLFloaterPerms::getGroupPerms("Uploads"),
+				LLFloaterPerms::getEveryonePerms("Uploads"),
+				expected_upload_cost));
+
+			upload_new_resource(uploadInfo);
 		}
 	}
 }
@@ -778,8 +778,7 @@ LLUUID upload_new_resource(
 	void *userdata,
 	bool show_inventory)
 {	
-	
-    LLResourceUploadInfo::ptr_t uploadInfo(new LLNewFileResourceUploadInfo(
+    LLResourceUploadInfo::ptr_t uploadInfo(std::make_shared<LLNewFileResourceUploadInfo>(
         src_filename,
         name, desc, compression_info,
         destination_folder_type, inv_type,
@@ -862,7 +861,7 @@ void upload_done_callback(
 					create_inventory_item(gAgent.getID(), gAgent.getSessionID(),
 							      folder_id, data->mAssetInfo.mTransactionID, data->mAssetInfo.getName(),
 							      data->mAssetInfo.getDescription(), data->mAssetInfo.mType,
-							      data->mInventoryType, NOT_WEARABLE, next_owner_perms,
+                                  data->mInventoryType, NO_INV_SUBTYPE, next_owner_perms,
 							      LLPointer<LLInventoryCallback>(NULL));
 				}
 				else
@@ -897,7 +896,7 @@ void upload_done_callback(
 		LLStringUtil::trim(asset_name);
 
 		std::string display_name = LLStringUtil::null;
-		LLAssetStorage::LLStoreAssetCallback callback = NULL;
+		LLAssetStorage::LLStoreAssetCallback callback;
 		void *userdata = NULL;
 		upload_new_resource(
 			next_file,
