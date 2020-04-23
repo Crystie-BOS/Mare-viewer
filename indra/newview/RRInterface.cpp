@@ -34,16 +34,16 @@
 #include "llavatarnamecache.h"
 #include "llcamera.h"
 #include "lldrawpoolalpha.h"
-//#include "llfloaterenvsettings.h"
-#include "llfloatereditsky.h"
+//#include "llfloaterenvsettings.h" => removed by EEP
+//#include "llfloatereditsky.h" => removed by EEP
 #include "llfloaterimnearbychat.h"
 #include "llfloatermap.h"
 #include "llfloaterpostprocess.h"
 #include "llfloaterreg.h"
 #include "llfloatersettingsdebug.h"
 #include "llfloatersidepanelcontainer.h"
-//#include "llfloaterwater.h"
-//#include "llfloaterwindlight.h"
+//#include "llfloaterwater.h" => removed by EEP
+//#include "llfloaterwindlight.h" => removed by EEP
 #include "llfloaterworldmap.h"
 #include "llfocusmgr.h"
 #include "llgroupactions.h"
@@ -73,14 +73,15 @@
 #include "llviewerobjectlist.h"
 #include "llviewertexturelist.h"
 #include "llviewerwindow.h"
-#include "llwaterparammanager.h"
-#include "llwlparammanager.h"
+//#include "llwaterparammanager.h" => removed by EEP
+//#include "llwlparammanager.h" => removed by EEP
 #include "llinventorybridge.h"
 #include "llviewerdisplay.h"
 #include "llviewerjoystick.h"
 #include "llviewerregion.h"
 #include "llviewermessage.h"
 #include "llviewerparcelmgr.h"
+#include "llviewershadermgr.h"
 #include "llworldmapmessage.h"
 #include "pipeline.h"
 
@@ -3688,7 +3689,7 @@ std::string RRInterface::getCensoredMessage (std::string str)
 	}
 	return str;
 }
-
+/*
 void updateAndSave (WLColorControl* color)
 {
 	if (color == NULL) return;
@@ -3707,9 +3708,10 @@ void updateAndSave (WLFloatControl* floatControl)
 	if (floatControl == NULL) return;
 	floatControl->update (LLWLParamManager::getInstance()->mCurParams);
 }
-
+*/
 BOOL RRInterface::forceEnvironment (std::string command, std::string option)
 {
+	/*
 	// command is "setenv_<something>"
 	double val = atof (option.c_str());
 
@@ -3962,12 +3964,14 @@ BOOL RRInterface::forceEnvironment (std::string command, std::string option)
 
 	// send the current parameters to shaders
 	LLWLParamManager::getInstance()->propagateParameters();
-
+*/
 	return TRUE;
 }
 
 std::string RRInterface::getEnvironment (std::string command)
 {
+	return "";
+	/*
 	F64 res = 0;
 	int length = 7; // size of "getenv_"
 	command = command.substr (length);
@@ -4037,6 +4041,7 @@ std::string RRInterface::getEnvironment (std::string command)
 	std::stringstream str;
 	str << res;
 	return str.str();
+	*/
 }
 
 BOOL RRInterface::forceDebugSetting (std::string command, std::string option)

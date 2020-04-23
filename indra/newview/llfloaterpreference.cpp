@@ -1407,8 +1407,12 @@ void LLFloaterPreferenceGraphicsAdvanced::refreshEnabledState()
 		gSavedSettings.setBOOL("VertexShaderEnable", TRUE);
 		gSavedSettings.setBOOL("WindLightUseAtmosShaders", TRUE);
 
-		ctrl_shader_enable->setEnabled(FALSE);
-		ctrl_shader_enable->setValue(TRUE);
+		LLCheckBoxCtrl* ctrl_shader_enable = getChild<LLCheckBoxCtrl>("BasicShaders");
+		if (ctrl_shader_enable)
+		{
+			ctrl_shader_enable->setEnabled(FALSE);
+			ctrl_shader_enable->setValue(TRUE);
+		}
 
 		ctrl_wind_light->setEnabled(FALSE);
 		ctrl_wind_light->setValue(TRUE);

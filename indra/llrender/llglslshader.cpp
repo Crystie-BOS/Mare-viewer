@@ -1009,44 +1009,27 @@ S32 LLGLSLShader::disableTexture(S32 uniform, LLTexUnit::eTextureType mode, LLTe
 {
 	if (uniform < 0 || uniform >= (S32)mTexture.size())
 	{
-        LL_SHADER_UNIFORM_ERRS() << "Uniform out of range: " << uniform << LL_ENDL;
-        return -1;
-    }
-    S32 index = mTexture[uniform];
-    if (index != -1)
-    {
-        gGL.getTexUnit(index)->activate();
-        gGL.getTexUnit(index)->enable(mode);
-        gGL.getTexUnit(index)->setTextureColorSpace(space);
-    }
-    return index;
-}
-
-S32 LLGLSLShader::disableTexture(S32 uniform, LLTexUnit::eTextureType mode, LLTexUnit::eTextureColorSpace space)
-{
-    if (uniform < 0 || uniform >= (S32)mTexture.size())
-    {
-        LL_SHADER_UNIFORM_ERRS() << "Uniform out of range: " << uniform << LL_ENDL;
-        return -1;
-    }
-    S32 index = mTexture[uniform];
-    if (index != -1 && gGL.getTexUnit(index)->getCurrType() != LLTexUnit::TT_NONE)
-    {
-        if (gDebugGL && gGL.getTexUnit(index)->getCurrType() != mode && gGL.getTexUnit(index)->getCurrColorSpace() != space)
-        {
-            if (gDebugSession)
-            {
-                gFailLog << "Texture channel " << index << " texture type corrupted." << std::endl;
-                ll_fail("LLGLSLShader::disableTexture failed");
-            }
-            else
-            {
-                LL_ERRS() << "Texture channel " << index << " texture type corrupted." << LL_ENDL;
-            }
-        }
-        gGL.getTexUnit(index)->disable();
-    }
-    return index;
+		LL_SHADER_UNIFORM_ERRS() << "Uniform out of range: " << uniform << LL_ENDL;
+		return -1;
+	}
+	S32 index = mTexture[uniform];
+	if (index != -1 && gGL.getTexUnit(index)->getCurrType() != LLTexUnit::TT_NONE)
+	{
+		if (gDebugGL && gGL.getTexUnit(index)->getCurrType() != mode && gGL.getTexUnit(index)->getCurrColorSpace() != space)
+		{
+			if (gDebugSession)
+			{
+				gFailLog << "Texture channel " << index << " texture type corrupted." << std::endl;
+				ll_fail("LLGLSLShader::disableTexture failed");
+			}
+			else
+			{
+				LL_ERRS() << "Texture channel " << index << " texture type corrupted." << LL_ENDL;
+			}
+		}
+		gGL.getTexUnit(index)->disable();
+	}
+	return index;
 }
 
 void LLGLSLShader::uniform1i(U32 index, GLint x)
