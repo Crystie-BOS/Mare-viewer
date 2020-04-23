@@ -187,10 +187,7 @@ LLGLSLShader			gWLSkyProgram;
 LLGLSLShader			gWLCloudProgram;
 LLGLSLShader            gWLSunProgram;
 LLGLSLShader            gWLMoonProgram;
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/master
 // Effects Shaders
 LLGLSLShader			gGlowProgram;
 LLGLSLShader			gGlowExtractProgram;
@@ -404,15 +401,6 @@ S32 LLViewerShaderMgr::getShaderLevel(S32 type)
 
 void LLViewerShaderMgr::setShaders()
 {
-<<<<<<< HEAD
-	//setShaders might be called redundantly by gSavedSettings, so return on reentrance
-	static bool reentrance = false;
-	
-	if (!gPipeline.mInitialized || !sInitialized || reentrance || sSkipReload)
-	{
-		return;
-	}
-=======
     //setShaders might be called redundantly by gSavedSettings, so return on reentrance
     static bool reentrance = false;
     
@@ -420,7 +408,6 @@ void LLViewerShaderMgr::setShaders()
     {
         return;
     }
->>>>>>> origin/master
 
     static LLCachedControl<U32> max_texture_index(gSavedSettings, "RenderMaxTextureIndex", 16);
     LLGLSLShader::sIndexedTextureChannels = llmax(llmin(gGLManager.mNumTextureImageUnits, (S32) max_texture_index), 1);
@@ -449,12 +436,8 @@ void LLViewerShaderMgr::setShaders()
 		}
 	}
 //mk
-<<<<<<< HEAD
 
-=======
-	
->>>>>>> origin/master
-    //setup preprocessor definitions
+	//setup preprocessor definitions
     LLShaderMgr::instance()->mDefinitions["NUM_TEX_UNITS"] = llformat("%d", gGLManager.mNumTextureImageUnits);
 	
     // Make sure the compiled shader map is cleared before we recompile shaders.
@@ -1373,11 +1356,7 @@ BOOL LLViewerShaderMgr::loadShadersDeferred()
 
 	if (success)
 	{
-<<<<<<< HEAD
-		gDeferredDiffuseProgram.mName = "Deferred Diffuse Shader";
-=======
 		gDeferredDiffuseProgram.mName = "Deferred Diffuse Shader";		
->>>>>>> origin/master
         gDeferredDiffuseProgram.mFeatures.encodesNormal = true;
         gDeferredDiffuseProgram.mFeatures.hasSrgb = true;
 		gDeferredDiffuseProgram.mShaderFiles.clear();
@@ -1754,11 +1733,7 @@ BOOL LLViewerShaderMgr::loadShadersDeferred()
 	}
 
 	if (success)
-<<<<<<< HEAD
-	{
-=======
 	{		
->>>>>>> origin/master
 		gDeferredLightProgram.mName = "Deferred Light Shader";
 		gDeferredLightProgram.mFeatures.isDeferred = true;
 		gDeferredLightProgram.mFeatures.hasShadows = true;
@@ -2677,11 +2652,7 @@ BOOL LLViewerShaderMgr::loadShadersDeferred()
 		gFXAAProgram.mShaderLevel = mShaderLevel[SHADER_DEFERRED];
 		success = gFXAAProgram.createShader(NULL, NULL);
 		llassert(success);
-<<<<<<< HEAD
 	}
-=======
-		}
->>>>>>> origin/master
 
 	if (success)
 		{
@@ -2705,11 +2676,7 @@ BOOL LLViewerShaderMgr::loadShadersDeferred()
 		gDeferredCoFProgram.mShaderLevel = mShaderLevel[SHADER_DEFERRED];
 		success = gDeferredCoFProgram.createShader(NULL, NULL);
 		llassert(success);
-<<<<<<< HEAD
 	}
-=======
-		}
->>>>>>> origin/master
 
 	if (success)
 		{
@@ -2721,11 +2688,7 @@ BOOL LLViewerShaderMgr::loadShadersDeferred()
 		gDeferredDoFCombineProgram.mShaderLevel = mShaderLevel[SHADER_DEFERRED];
 		success = gDeferredDoFCombineProgram.createShader(NULL, NULL);
 		llassert(success);
-<<<<<<< HEAD
 	}
-=======
-		}
->>>>>>> origin/master
 
 	if (success)
 	{
