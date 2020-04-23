@@ -372,6 +372,8 @@ public:
 	BOOL mGarbageCollectorCalledOnce; // TRUE when the garbageCollector() method has been called at least once since the beginning of the session
 
 	BOOL mVisionRestricted; // this boolean is just a way to accelerate the chack "is our vision restricted ?"
+	static F32 previousEastAngle; // remember it since we can't reliably read it back
+	static F32 previousSunMoonPosition ; // remember it since we can't reliably read it back
 
 private:
 	bool mScriptsEnabledOnce; // to know if we have been in a script enabled area at least once (so that no-script areas prevent detaching only when we have logged in there)

@@ -148,7 +148,14 @@ BOOL LLFloaterFixedEnvironment::postBuild()
 
 void LLFloaterFixedEnvironment::onOpen(const LLSD& key)
 {
-    LLUUID invid;
+//MK by CA
+	if (gRRenabled && gAgent.mRRInterface.mContainsSetenv)
+	{
+		closeFloater();
+		return;
+	}
+//mk by CA
+	LLUUID invid;
 
     if (key.has(KEY_INVENTORY_ID))
     {
@@ -838,7 +845,7 @@ void LLFloaterFixedEnvironmentSky::updateEditEnvironment(void)
 
 void LLFloaterFixedEnvironmentSky::onOpen(const LLSD& key)
 {
-    if (!mSettings)
+	if (!mSettings)
     {
         // Initialize the settings, take a snapshot of the current water. 
         mSettings = LLEnvironment::instance().getEnvironmentFixedSky(LLEnvironment::ENV_CURRENT)->buildClone();

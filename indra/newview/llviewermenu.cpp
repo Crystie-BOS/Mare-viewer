@@ -9449,7 +9449,10 @@ class LLWorldEnvSettings : public view_listener_t
     void defocusEnvFloaters()
     {
         //currently there is only one instance of each floater
-        std::vector<std::string> env_floaters_names = { "env_edit_extdaycycle", "env_fixed_environmentent_water", "env_fixed_environmentent_sky" };
+//MK : typo in the floater name
+////		std::vector<std::string> env_floaters_names = { "env_edit_extdaycycle", "env_fixed_environmentent_water", "env_fixed_environmentent_sky" };
+		std::vector<std::string> env_floaters_names = { "env_edit_extdaycycle", "env_fixed_environment_water", "env_fixed_environment_sky" };
+//mk
         for (std::vector<std::string>::const_iterator it = env_floaters_names.begin(); it != env_floaters_names.end(); ++it)
         {
             LLFloater* env_floater = LLFloaterReg::findTypedInstance<LLFloater>(*it);
@@ -9531,6 +9534,15 @@ class LLWorldEnvSettings : public view_listener_t
 	}
 };
 
+//CA allow for fading of menu items around environment
+class LLWorldAllowEnvSettings : public view_listener_t
+{
+	bool handleEvent(const LLSD& userdata)
+	{
+		return (!gRRenabled || (gRRenabled && !gAgent.mRRInterface.mContainsSetenv));
+	}
+};
+//ca
 class LLWorldEnableEnvSettings : public view_listener_t
 {
 	bool handleEvent(const LLSD& userdata)
@@ -9595,19 +9607,31 @@ class LLWorldEnvPreset : public view_listener_t
 
 		if (item == "new_water")
 		{
-            LLFloaterReg::showInstance("env_fixed_environmentent_water", "new");
+//MK : typo in the floater name
+////			LLFloaterReg::showInstance("env_fixed_environmentent_water", "new");
+			LLFloaterReg::showInstance("env_fixed_environment_water", "new");
+//mk
 		}
 		else if (item == "edit_water")
 		{
-            LLFloaterReg::showInstance("env_fixed_environmentent_water", "edit");
+//MK : typo in the floater name
+////			LLFloaterReg::showInstance("env_fixed_environmentent_water", "edit");
+			LLFloaterReg::showInstance("env_fixed_environment_water", "edit");
+//mk
 		}
 		else if (item == "new_sky")
 		{
-            LLFloaterReg::showInstance("env_fixed_environmentent_sky", "new");
+//MK : typo in the floater name
+////			LLFloaterReg::showInstance("env_fixed_environmentent_sky", "new");
+			LLFloaterReg::showInstance("env_fixed_environment_sky", "new");
+//mk
 		}
 		else if (item == "edit_sky")
 		{
-            LLFloaterReg::showInstance("env_fixed_environmentent_sky", "edit");
+//MK : typo in the floater name
+////			LLFloaterReg::showInstance("env_fixed_environmentent_sky", "edit");
+			LLFloaterReg::showInstance("env_fixed_environment_sky", "edit");
+//mk
 		}
 		else if (item == "new_day_cycle")
 		{
@@ -9935,6 +9959,9 @@ void initialize_menus()
 	view_listener_t::addMenu(new LLWorldCheckAlwaysRun(), "World.CheckAlwaysRun");
 	
 	view_listener_t::addMenu(new LLWorldEnvSettings(), "World.EnvSettings");
+//CA
+	view_listener_t::addMenu(new LLWorldAllowEnvSettings(), "World.AllowEnvSettings");
+//CA
 	view_listener_t::addMenu(new LLWorldEnableEnvSettings(), "World.EnableEnvSettings");
 	view_listener_t::addMenu(new LLWorldEnvPreset(), "World.EnvPreset");
 	view_listener_t::addMenu(new LLWorldEnableEnvPreset(), "World.EnableEnvPreset");

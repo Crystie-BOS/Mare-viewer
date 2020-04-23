@@ -766,7 +766,6 @@ void LLPipeline::resizeScreenTexture()
 		// resolution wouldn't change when that debug setting is modified.
 ////		if ((resX != mScreen.getWidth()) || (resY != mScreen.getHeight()))
 //mk
-		if (gResizeScreenTexture || (resX != mScreen.getWidth()) || (resY != mScreen.getHeight()))
 		{
 			releaseScreenBuffers();
             releaseShadowTargets();
