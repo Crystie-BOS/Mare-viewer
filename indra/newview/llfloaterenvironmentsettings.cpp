@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /** 
  * @file llfloaterenvironmentsettings.cpp
  * @brief LLFloaterEnvironmentSettings class definition
@@ -291,3 +292,5 @@ void LLFloaterEnvironmentSettings::populateDayCyclePresetsList()
 		mDayCyclePresetCombo->add(*it);
 	}
 }
+=======
+>>>>>>> origin/master

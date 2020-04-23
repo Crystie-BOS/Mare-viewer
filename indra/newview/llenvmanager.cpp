@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * @file llenvmanager.cpp
  * @brief Implementation of classes managing WindLight and water settings.
@@ -760,3 +761,5 @@ void LLEnvManagerNew::onRegionChange()
 							   << LL_ENDL;
 	}
 }
+=======
+>>>>>>> origin/master

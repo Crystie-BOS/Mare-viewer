@@ -3689,7 +3689,7 @@ std::string RRInterface::getCensoredMessage (std::string str)
 	}
 	return str;
 }
-/*
+#if 0
 void updateAndSave (WLColorControl* color)
 {
 	if (color == NULL) return;
@@ -3708,10 +3708,11 @@ void updateAndSave (WLFloatControl* floatControl)
 	if (floatControl == NULL) return;
 	floatControl->update (LLWLParamManager::getInstance()->mCurParams);
 }
-*/
+#endif
+
 BOOL RRInterface::forceEnvironment (std::string command, std::string option)
 {
-	/*
+#if 0
 	// command is "setenv_<something>"
 	double val = atof (option.c_str());
 
@@ -3964,15 +3965,14 @@ BOOL RRInterface::forceEnvironment (std::string command, std::string option)
 
 	// send the current parameters to shaders
 	LLWLParamManager::getInstance()->propagateParameters();
-*/
+#endif
 	return TRUE;
 }
 
 std::string RRInterface::getEnvironment (std::string command)
 {
-	return "";
-	/*
 	F64 res = 0;
+#if 0
 	int length = 7; // size of "getenv_"
 	command = command.substr (length);
 	LLWLParamManager* params = LLWLParamManager::getInstance();
@@ -4037,11 +4037,10 @@ std::string RRInterface::getEnvironment (std::string command)
 	else if (command == "cloudscrolly") res = params->mCurParams.getCloudScrollY() - 10;
 
 	else if (command == "preset") return getLastLoadedPreset();
-
+#endif
 	std::stringstream str;
 	str << res;
 	return str.str();
-	*/
 }
 
 BOOL RRInterface::forceDebugSetting (std::string command, std::string option)

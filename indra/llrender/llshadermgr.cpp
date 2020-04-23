@@ -1099,7 +1099,7 @@ BOOL LLShaderMgr::linkProgramObject(GLhandleARB obj, BOOL suppress_errors)
 			success = GL_FALSE;
 			suppress_errors = FALSE;		
 		}
-		}
+	}
 
 #else
 	std::string log = get_object_log(obj);

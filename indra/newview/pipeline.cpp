@@ -961,11 +961,11 @@ bool LLPipeline::allocateScreenBuffer(U32 resX, U32 resY, U32 samples)
 		mDeferredScreen.release(); //make sure to release any render targets that share a depth buffer with mDeferredScreen first
 		mDeferredDepth.release();
 		mOcclusionDepth.release();
-						
+		
 		if (!mScreen.allocate(resX, resY, GL_RGBA, TRUE, TRUE, LLTexUnit::TT_RECT_TEXTURE, FALSE)) return false;		
 	}
 	
-	if (LLPipeline::sRenderDeferred)
+		if (LLPipeline::sRenderDeferred)
 	{ //share depth buffer between deferred targets
 		mDeferredScreen.shareDepthBuffer(mScreen);
 	}
@@ -1027,23 +1027,22 @@ bool LLPipeline::allocateShadowBuffer(U32 resX, U32 resY)
 			for (U32 i = 4; i < 6; i++)
 			{
                 if (!mShadow[i].allocate(spot_shadow_map_width, spot_shadow_map_height, 0, TRUE, FALSE))
-		{
+				{
                     return false;
+				}
+	            if (!mShadowOcclusion[i].allocate(spot_shadow_map_width/occlusion_divisor, height/occlusion_divisor, 0, TRUE, FALSE))
+				{
+					return false;
+				}
 			}
-                if (!mShadowOcclusion[i].allocate(spot_shadow_map_width/occlusion_divisor, height/occlusion_divisor, 0, TRUE, FALSE))
-		{
-			return false;
-		}
-	}
         }
-	else
-	{
-            for (U32 i = 4; i < 6; i++)
+		else
 		{
+            for (U32 i = 4; i < 6; i++)
+			{
                 releaseShadowTarget(i);
+			}
 		}
-	}
-	
 	}
 
 	return true;
@@ -1227,7 +1226,7 @@ void LLPipeline::releaseScreenBuffers()
 	mDeferredLight.release();
 	mOcclusionDepth.release();
 }
-		
+	
 		
 void LLPipeline::releaseShadowTarget(U32 index)
 {
@@ -8538,11 +8537,11 @@ void LLPipeline::renderDeferredLighting(LLRenderTarget* screen_target)
 
 		LLStrider<LLVector3> vert; 
 		mDeferredVB->getVertexStrider(vert);
-		
+
 		vert[0].set(-1,1,0);
 		vert[1].set(-1,-3,0);
 		vert[2].set(3,1,0);
-		
+
         setupHWLights(NULL); //to set mSun/MoonDir;
 
         glh::vec4f tc(mSunDir.mV);
@@ -8669,11 +8668,11 @@ void LLPipeline::renderDeferredLighting(LLRenderTarget* screen_target)
 
 		stop_glerror();
 		gGL.popMatrix();
-			stop_glerror();
+		stop_glerror();
 		gGL.matrixMode(LLRender::MM_MODELVIEW);
-			stop_glerror();
+		stop_glerror();
 		gGL.popMatrix();
-			stop_glerror();
+		stop_glerror();
 
         screen_target->bindTarget();
 		// clear color buffer here - zeroing alpha (glow) is important or it will accumulate against sky
@@ -8732,7 +8731,7 @@ void LLPipeline::renderDeferredLighting(LLRenderTarget* screen_target)
 		}
 
 		bool render_local = RenderLocalLights;
-
+				
 		if (render_local)
 		{
 			gGL.setSceneBlendType(LLRender::BT_ADD);
@@ -8758,7 +8757,7 @@ void LLPipeline::renderDeferredLighting(LLRenderTarget* screen_target)
 				}
 
 				mCubeVB->setBuffer(LLVertexBuffer::MAP_VERTEX);
-
+				
 				LLGLDepthTest depth(GL_TRUE, GL_FALSE);
 				for (LLDrawable::drawable_set_t::iterator iter = mLights.begin(); iter != mLights.end(); ++iter)
 				{
@@ -8825,7 +8824,7 @@ void LLPipeline::renderDeferredLighting(LLRenderTarget* screen_target)
 					}
 
 					sVisibleLightCount++;
-
+										
 					if (camera->getOrigin().mV[0] > c[0] + s + 0.2f ||
 						camera->getOrigin().mV[0] < c[0] - s - 0.2f ||
 						camera->getOrigin().mV[1] > c[1] + s + 0.2f ||
@@ -8919,7 +8918,6 @@ void LLPipeline::renderDeferredLighting(LLRenderTarget* screen_target)
 			vert[2].set(3,1,0);
 
 			{
-
 				LLGLDepthTest depth(GL_FALSE);
 
 				//full screen blit
@@ -9116,6 +9114,13 @@ void LLPipeline::renderDeferredLighting(LLRenderTarget* screen_target)
 			gObjectList.resetObjectBeacons();
             gSky.addSunMoonBeacons();
 		}
+		
+				
+				
+										
+
+					
+					
 	}
 
 	screen_target->flush();                        
@@ -9378,7 +9383,6 @@ void LLPipeline::generateWaterReflection(LLCamera& camera_in)
 
         if (!camera_is_underwater)
         {   //generate planar reflection map
-
 			LLViewerCamera::sCurCameraID = LLViewerCamera::CAMERA_WATER0;
 
             gGL.matrixMode(LLRender::MM_MODELVIEW);
@@ -9424,7 +9428,7 @@ void LLPipeline::generateWaterReflection(LLCamera& camera_in)
 
                     updateCull(camera, mSky);
                     stateSort(camera, mSky);
-						renderGeom(camera, TRUE);
+					renderGeom(camera, TRUE);
 
 					gPipeline.popRenderTypeMask();
 				}
@@ -9457,8 +9461,8 @@ void LLPipeline::generateWaterReflection(LLCamera& camera_in)
 					LLGLDisable cull(GL_CULL_FACE);
                     updateCull(camera, mReflectedObjects, -water_clip, &plane);
                     stateSort(camera, mReflectedObjects);
-							renderGeom(camera);
-						}
+					renderGeom(camera);
+				}
                 gPipeline.popRenderTypeMask();
                 mWaterRef.flush();
 				}
@@ -10700,8 +10704,6 @@ void LLPipeline::generateSunShadow(LLCamera& camera)
 
 		mShadowModelview[j] = view[j];
 		mShadowProjection[j] = proj[j];
-
-	
 		mSunShadowMatrix[j] = trans*proj[j]*view[j]*inv_view;
 		
 		stop_glerror();
@@ -10710,12 +10712,12 @@ void LLPipeline::generateSunShadow(LLCamera& camera)
 		mShadow[j].getViewport(gGLViewport);
 		mShadow[j].clear();
 
-			U32 target_width = mShadow[j].getWidth();
+		U32 target_width = mShadow[j].getWidth();
 
-			{
-				static LLCullResult result[4];
-				renderShadow(view[j], proj[j], shadow_cam, result[j], TRUE, FALSE, target_width);
-			}
+		{
+			static LLCullResult result[4];
+			renderShadow(view[j], proj[j], shadow_cam, result[j], TRUE, FALSE, target_width);
+		}
 
 		mShadow[j].flush();
  

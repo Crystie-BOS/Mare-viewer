@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * @file llwlparammanager.h
  * @brief Implementation for the LLWLParamManager class.
@@ -324,3 +325,5 @@ inline LLVector4 LLWLParamManager::getRotatedLightDir(void) const
 
 #endif
 
+=======
+>>>>>>> origin/master

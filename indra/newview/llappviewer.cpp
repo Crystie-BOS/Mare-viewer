@@ -1184,7 +1184,7 @@ bool LLAppViewer::init()
 
 //MK
 	// For the RLV, we don't want to launch the updater.
- 	////// Run the updater. An exception from launching the updater should bother us.
+ 	// Run the updater. An exception from launching the updater should bother us.
 	////LLLeap::create(updater, true);
 //mk
 	}

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * @file llwlparammanager.cpp
  * @brief Implementation for the LLWLParamManager class.
@@ -741,3 +742,5 @@ std::string LLWLParamManager::escapeString(const std::string& str)
 
 	return escaped_str;
 }
+=======
+>>>>>>> origin/master

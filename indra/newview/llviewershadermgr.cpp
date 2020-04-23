@@ -187,7 +187,10 @@ LLGLSLShader			gWLSkyProgram;
 LLGLSLShader			gWLCloudProgram;
 LLGLSLShader            gWLSunProgram;
 LLGLSLShader            gWLMoonProgram;
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/master
 // Effects Shaders
 LLGLSLShader			gGlowProgram;
 LLGLSLShader			gGlowExtractProgram;
@@ -401,6 +404,7 @@ S32 LLViewerShaderMgr::getShaderLevel(S32 type)
 
 void LLViewerShaderMgr::setShaders()
 {
+<<<<<<< HEAD
 	//setShaders might be called redundantly by gSavedSettings, so return on reentrance
 	static bool reentrance = false;
 	
@@ -408,20 +412,29 @@ void LLViewerShaderMgr::setShaders()
 	{
 		return;
 	}
+=======
+    //setShaders might be called redundantly by gSavedSettings, so return on reentrance
+    static bool reentrance = false;
+    
+    if (!gPipeline.mInitialized || !sInitialized || reentrance || sSkipReload)
+    {
+        return;
+    }
+>>>>>>> origin/master
 
-	static LLCachedControl<U32> max_texture_index(gSavedSettings, "RenderMaxTextureIndex", 16);
-	LLGLSLShader::sIndexedTextureChannels = llmax(llmin(gGLManager.mNumTextureImageUnits, (S32) max_texture_index), 1);
+    static LLCachedControl<U32> max_texture_index(gSavedSettings, "RenderMaxTextureIndex", 16);
+    LLGLSLShader::sIndexedTextureChannels = llmax(llmin(gGLManager.mNumTextureImageUnits, (S32) max_texture_index), 1);
 
-	//NEVER use more than 16 texture channels (work around for prevalent driver bug)
-	LLGLSLShader::sIndexedTextureChannels = llmin(LLGLSLShader::sIndexedTextureChannels, 16);
+    //NEVER use more than 16 texture channels (work around for prevalent driver bug)
+    LLGLSLShader::sIndexedTextureChannels = llmin(LLGLSLShader::sIndexedTextureChannels, 16);
 
-	if (gGLManager.mGLSLVersionMajor < 1 ||
-		(gGLManager.mGLSLVersionMajor == 1 && gGLManager.mGLSLVersionMinor <= 20))
-	{ //NEVER use indexed texture rendering when GLSL version is 1.20 or earlier
-		LLGLSLShader::sIndexedTextureChannels = 1;
-	}
+    if (gGLManager.mGLSLVersionMajor < 1 ||
+        (gGLManager.mGLSLVersionMajor == 1 && gGLManager.mGLSLVersionMinor <= 20))
+    { //NEVER use indexed texture rendering when GLSL version is 1.20 or earlier
+        LLGLSLShader::sIndexedTextureChannels = 1;
+    }
 
-	reentrance = true;
+    reentrance = true;
 
 //MK
 	// Make sure the basic shaders are enabled when the vision is restricted.
@@ -436,10 +449,14 @@ void LLViewerShaderMgr::setShaders()
 		}
 	}
 //mk
+<<<<<<< HEAD
 
+=======
+	
+>>>>>>> origin/master
     //setup preprocessor definitions
     LLShaderMgr::instance()->mDefinitions["NUM_TEX_UNITS"] = llformat("%d", gGLManager.mNumTextureImageUnits);
-    
+	
     // Make sure the compiled shader map is cleared before we recompile shaders.
     mVertexShaderObjects.clear();
     mFragmentShaderObjects.clear();
@@ -506,9 +523,9 @@ void LLViewerShaderMgr::setShaders()
     {
         //shadows
         switch (shadow_detail)
-        {                
+			{ //shadows
             case 1:
-                deferred_class = 2; // PCF shadows
+				deferred_class = 2;
             break; 
 
             case 2:
@@ -1356,7 +1373,11 @@ BOOL LLViewerShaderMgr::loadShadersDeferred()
 
 	if (success)
 	{
+<<<<<<< HEAD
 		gDeferredDiffuseProgram.mName = "Deferred Diffuse Shader";
+=======
+		gDeferredDiffuseProgram.mName = "Deferred Diffuse Shader";		
+>>>>>>> origin/master
         gDeferredDiffuseProgram.mFeatures.encodesNormal = true;
         gDeferredDiffuseProgram.mFeatures.hasSrgb = true;
 		gDeferredDiffuseProgram.mShaderFiles.clear();
@@ -1733,7 +1754,11 @@ BOOL LLViewerShaderMgr::loadShadersDeferred()
 	}
 
 	if (success)
+<<<<<<< HEAD
 	{
+=======
+	{		
+>>>>>>> origin/master
 		gDeferredLightProgram.mName = "Deferred Light Shader";
 		gDeferredLightProgram.mFeatures.isDeferred = true;
 		gDeferredLightProgram.mFeatures.hasShadows = true;
@@ -1864,16 +1889,16 @@ BOOL LLViewerShaderMgr::loadShadersDeferred()
 
         if (use_ao)
         {
-            fragment = "deferred/sunLightSSAOF.glsl";
-        }
-        else
-        {
-            fragment = "deferred/sunLightF.glsl";
+			fragment = "deferred/sunLightSSAOF.glsl";
+		}
+		else
+		{
+			fragment = "deferred/sunLightF.glsl";
             if (mShaderLevel[SHADER_DEFERRED] == 1)
             { //no shadows, no SSAO, no frag coord
                 vertex = "deferred/sunLightNoFragCoordV.glsl";
             }
-        }
+		}
 
         gDeferredSunProgram.mName = "Deferred Sun Shader";
         gDeferredSunProgram.mFeatures.isDeferred    = true;
@@ -2652,7 +2677,11 @@ BOOL LLViewerShaderMgr::loadShadersDeferred()
 		gFXAAProgram.mShaderLevel = mShaderLevel[SHADER_DEFERRED];
 		success = gFXAAProgram.createShader(NULL, NULL);
 		llassert(success);
+<<<<<<< HEAD
 	}
+=======
+		}
+>>>>>>> origin/master
 
 	if (success)
 		{
@@ -2676,7 +2705,11 @@ BOOL LLViewerShaderMgr::loadShadersDeferred()
 		gDeferredCoFProgram.mShaderLevel = mShaderLevel[SHADER_DEFERRED];
 		success = gDeferredCoFProgram.createShader(NULL, NULL);
 		llassert(success);
+<<<<<<< HEAD
 	}
+=======
+		}
+>>>>>>> origin/master
 
 	if (success)
 		{
@@ -2688,7 +2721,11 @@ BOOL LLViewerShaderMgr::loadShadersDeferred()
 		gDeferredDoFCombineProgram.mShaderLevel = mShaderLevel[SHADER_DEFERRED];
 		success = gDeferredDoFCombineProgram.createShader(NULL, NULL);
 		llassert(success);
+<<<<<<< HEAD
 	}
+=======
+		}
+>>>>>>> origin/master
 
 	if (success)
 	{

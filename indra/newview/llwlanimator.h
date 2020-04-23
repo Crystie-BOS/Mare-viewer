@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * @file llwlanimator.h
  * @brief Interface for the LLWLAnimator class.
@@ -144,3 +145,5 @@ private:
 
 #endif // LL_WL_ANIMATOR_H
 
+=======
+>>>>>>> origin/master

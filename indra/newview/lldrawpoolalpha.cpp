@@ -627,6 +627,10 @@ void LLDrawPoolAlpha::renderAlpha(U32 mask, S32 pass)
 		cam_dist_draw_max_squared = gAgent.mRRInterface.mCamDistDrawMax * gAgent.mRRInterface.mCamDistDrawMax;
 	}
 //mk
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/master
     BOOL batch_fullbrights = gSavedSettings.getBOOL("RenderAlphaBatchFullbrights");
     BOOL batch_emissives   = gSavedSettings.getBOOL("RenderAlphaBatchEmissives");
 	BOOL initialized_lighting = FALSE;
@@ -901,6 +905,7 @@ void LLDrawPoolAlpha::renderAlpha(U32 mask, S32 pass)
 
             if (current_shader)
             {
+					
                 current_shader->bind();
             }
 		}        

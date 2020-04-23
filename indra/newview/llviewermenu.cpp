@@ -9468,7 +9468,6 @@ class LLWorldEnvSettings : public view_listener_t
 			return true;
 		}
 //mk
-
 		std::string event_name = userdata.asString();
 		
 		if (event_name == "sunrise")
