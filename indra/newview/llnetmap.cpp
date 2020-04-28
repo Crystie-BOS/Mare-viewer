@@ -359,7 +359,7 @@ void LLNetMap::draw()
 //MK
 				// Don't show as friend under @shownames, since it can give away an
 				// information about the avatars who are around
-				if (gRRenabled && (gAgent.mRRInterface.mContainsShownames || gAgent.mRRInterface.mContainsShownametags))
+				if (gRRenabled && (gAgent.mRRInterface.mContainsShownames || gAgent.mRRInterface.mContainsShownametags || gAgent.mRRInterface.mContainsShowNearby))
 				{
 					show_as_friend = false;
 				}
@@ -677,7 +677,7 @@ BOOL LLNetMap::handleToolTipAgent(const LLUUID& avatar_id)
 		p.message(av_name.getCompleteName());
 //MK
 		std::string label = av_name.getCompleteName();
-		if (gRRenabled && (gAgent.mRRInterface.mContainsShownames || gAgent.mRRInterface.mContainsShownametags))
+		if (gRRenabled && (gAgent.mRRInterface.mContainsShownames || gAgent.mRRInterface.mContainsShownametags || gAgent.mRRInterface.mContainsShowNearby))
 		{
 			label = gAgent.mRRInterface.getDummyName(av_name.mUsername);
 		}
