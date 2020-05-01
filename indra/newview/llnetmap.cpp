@@ -345,74 +345,78 @@ void LLNetMap::draw()
 
 		LLWorld::getInstance()->getAvatars(&avatar_ids, &positions, gAgentCamera.getCameraPositionGlobal());
 
-		// Draw avatars
-		for (U32 i = 0; i < avatar_ids.size(); i++)
+		// new for @shownearby - don't draw nearby green dots at all
+		if (!gRRenabled || !gAgent.mRRInterface.mContainsShowNearby)
 		{
-			LLUUID uuid = avatar_ids[i];
-			// Skip self, we'll draw it later
-			if (uuid == gAgent.getID()) continue;
-
-			pos_map = globalPosToView(positions[i]);
-
-			bool show_as_friend = (LLAvatarTracker::instance().getBuddyInfo(uuid) != NULL);
-
-//MK
-				// Don't show as friend under @shownames, since it can give away an
-				// information about the avatars who are around
-				if (gRRenabled && (gAgent.mRRInterface.mContainsShownames || gAgent.mRRInterface.mContainsShownametags || gAgent.mRRInterface.mContainsShowNearby))
-				{
-					show_as_friend = false;
-				}
-//mk
-			LLColor4 color = show_as_friend ? map_avatar_friend_color : map_avatar_color;
-
-			unknown_relative_z = positions[i].mdV[VZ] >= COARSEUPDATE_MAX_Z &&
-					camera_position.mV[VZ] >= COARSEUPDATE_MAX_Z;
-
-			LLWorldMapView::drawAvatar(
-				pos_map.mV[VX], pos_map.mV[VY], 
-				color, 
-				pos_map.mV[VZ], mDotRadius,
-				unknown_relative_z);
-
-			if(uuid.notNull())
+			// Draw avatars
+			for (U32 i = 0; i < avatar_ids.size(); i++)
 			{
-				bool selected = false;
-				uuid_vec_t::iterator sel_iter = gmSelected.begin();
-				for (; sel_iter != gmSelected.end(); sel_iter++)
-				{
-					if(*sel_iter == uuid)
+				LLUUID uuid = avatar_ids[i];
+				// Skip self, we'll draw it later
+				if (uuid == gAgent.getID()) continue;
+
+				pos_map = globalPosToView(positions[i]);
+
+				bool show_as_friend = (LLAvatarTracker::instance().getBuddyInfo(uuid) != NULL);
+
+	//MK
+					// Don't show as friend under @shownames, since it can give away an
+					// information about the avatars who are around
+					if (gRRenabled && (gAgent.mRRInterface.mContainsShownames || gAgent.mRRInterface.mContainsShownametags || gAgent.mRRInterface.mContainsShowNearby))
 					{
-						selected = true;
-						break;
+						show_as_friend = false;
+					}
+	//mk
+				LLColor4 color = show_as_friend ? map_avatar_friend_color : map_avatar_color;
+
+				unknown_relative_z = positions[i].mdV[VZ] >= COARSEUPDATE_MAX_Z &&
+						camera_position.mV[VZ] >= COARSEUPDATE_MAX_Z;
+
+				LLWorldMapView::drawAvatar(
+					pos_map.mV[VX], pos_map.mV[VY], 
+					color, 
+					pos_map.mV[VZ], mDotRadius,
+					unknown_relative_z);
+
+				if(uuid.notNull())
+				{
+					bool selected = false;
+					uuid_vec_t::iterator sel_iter = gmSelected.begin();
+					for (; sel_iter != gmSelected.end(); sel_iter++)
+					{
+						if(*sel_iter == uuid)
+						{
+							selected = true;
+							break;
+						}
+					}
+					if(selected)
+					{
+						if( (pos_map.mV[VX] < 0) ||
+							(pos_map.mV[VY] < 0) ||
+							(pos_map.mV[VX] >= getRect().getWidth()) ||
+							(pos_map.mV[VY] >= getRect().getHeight()) )
+						{
+							S32 x = ll_round( pos_map.mV[VX] );
+							S32 y = ll_round( pos_map.mV[VY] );
+							LLWorldMapView::drawTrackingCircle( getRect(), x, y, color, 1, 10);
+						} else
+						{
+							LLWorldMapView::drawTrackingDot(pos_map.mV[VX],pos_map.mV[VY],color,0.f);
+						}
 					}
 				}
-				if(selected)
-				{
-					if( (pos_map.mV[VX] < 0) ||
-						(pos_map.mV[VY] < 0) ||
-						(pos_map.mV[VX] >= getRect().getWidth()) ||
-						(pos_map.mV[VY] >= getRect().getHeight()) )
-					{
-						S32 x = ll_round( pos_map.mV[VX] );
-						S32 y = ll_round( pos_map.mV[VY] );
-						LLWorldMapView::drawTrackingCircle( getRect(), x, y, color, 1, 10);
-					} else
-					{
-						LLWorldMapView::drawTrackingDot(pos_map.mV[VX],pos_map.mV[VY],color,0.f);
-					}
-				}
-			}
 
-			F32	dist_to_cursor_squared = dist_vec_squared(LLVector2(pos_map.mV[VX], pos_map.mV[VY]),
-										  LLVector2(local_mouse_x,local_mouse_y));
-			if(dist_to_cursor_squared < min_pick_dist_squared && dist_to_cursor_squared < closest_dist_squared)
-			{
-				closest_dist_squared = dist_to_cursor_squared;
-				mClosestAgentToCursor = uuid;
-//MK
-					mClosestAgentPosition = LLVector3d (positions[i]);
-//mk
+				F32	dist_to_cursor_squared = dist_vec_squared(LLVector2(pos_map.mV[VX], pos_map.mV[VY]),
+											  LLVector2(local_mouse_x,local_mouse_y));
+				if(dist_to_cursor_squared < min_pick_dist_squared && dist_to_cursor_squared < closest_dist_squared)
+				{
+					closest_dist_squared = dist_to_cursor_squared;
+					mClosestAgentToCursor = uuid;
+	//MK
+						mClosestAgentPosition = LLVector3d (positions[i]);
+	//mk
+				}
 			}
 		}
 
