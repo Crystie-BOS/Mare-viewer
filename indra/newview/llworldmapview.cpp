@@ -861,6 +861,12 @@ void LLWorldMapView::drawAgents()
 		{
 			continue;
 		}
+		// @shownearby - skip for the agent's region
+		LLViewerRegion *region = gAgent.getRegion();
+		if (region && region->getHandle() == handle && gRRenabled && gAgent.mRRInterface.mContainsShowNearby)
+		{
+			continue;
+		}
 		LLSimInfo::item_info_list_t::const_iterator it = siminfo->getAgentLocation().begin();
 		while (it != siminfo->getAgentLocation().end())
 		{
@@ -1064,6 +1070,11 @@ BOOL LLWorldMapView::handleToolTip( S32 x, S32 y, MASK mask )
 			if (region && (region->getHandle() == handle))
 			{
 				++agent_count; // Bump by 1 if we're here
+				// @shownearby - force this back to 0, ie no agent count on tooltip
+				if (gRRenabled && gAgent.mRRInterface.mContainsShowNearby)
+				{
+					agent_count = 0;
+				}
 			}
 
 			// We may not have an agent count when the map is really
