@@ -10349,7 +10349,7 @@ void LLVOAvatar::updateImpostorRendering(U32 newMaxNonImpostorsValue)
 	sUseImpostors = (0 != sMaxNonImpostors);
 //MK
 	// Without this test, when setting the max number of non-impostors to "no limit", we wouldn't get silhouettes under @camavdist.
-	if (gRRenabled && gAgent.mRRInterface.mShowavsDistMax < EXTREMUM || gAgent.mRRInterface.mCamDistDrawAlphaMax >= ALPHA_ALMOST_OPAQUE)
+	if (gRRenabled && (gAgent.mRRInterface.mShowavsDistMax < EXTREMUM || gAgent.mRRInterface.mCamDistDrawAlphaMax >= ALPHA_ALMOST_OPAQUE))
 	{
 		if (newMaxNonImpostorsValue == 0)
 		{
