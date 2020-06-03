@@ -8,6 +8,7 @@ ca_*.sh
 *.bak
 *.diff
 *.orig
+*.patch
 *.pyc
 *.rej
 *.swp

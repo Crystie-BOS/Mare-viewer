@@ -18,7 +18,6 @@ include(DirectX)
 include(DragDrop)
 include(EXPAT)
 include(FMODSTUDIO)
-include(FMODEX)
 include(GLOD)
 include(Hunspell)
 include(JsonCpp)
@@ -74,9 +73,6 @@ if(FMODSTUDIO)
   include_directories(${FMODSTUDIO_INCLUDE_DIR})
 endif(FMODSTUDIO)
 
-if(FMODEX)
-  include_directories(${FMODEX_INCLUDE_DIR})
-endif(FMODEX)
 
 include_directories(
     ${DBUSGLIB_INCLUDE_DIRS}
@@ -1747,12 +1743,8 @@ if (FMODSTUDIO)
   set(FMODWRAPPER_LIBRARY ${FMODSTUDIO_LIBRARY})
 endif (FMODSTUDIO)
 
-if (FMODEX)
-  set(LLSTARTUP_COMPILE_FLAGS "${LLSTARTUP_COMPILE_FLAGS} -DLL_FMODEX")
-  set(FMODWRAPPER_LIBRARY ${FMODEX_LIBRARY})
-endif (FMODEX)
-
 set_source_files_properties(llstartup.cpp PROPERTIES COMPILE_FLAGS "${LLSTARTUP_COMPILE_FLAGS}")
+set_source_files_properties(llprogressview.cpp PROPERTIES COMPILE_FLAGS "${LLSTARTUP_COMPILE_FLAGS}")
 
 list(APPEND viewer_SOURCE_FILES ${viewer_HEADER_FILES})
 
@@ -1869,28 +1861,12 @@ if (WINDOWS)
 
     if (FMODSTUDIO)
       list(APPEND COPY_INPUT_DEPENDENCIES
-           ${SHARED_LIB_STAGING_DIR}/Release/fmodstudio.dll
-           ${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/fmodstudio.dll
-           ${SHARED_LIB_STAGING_DIR}/Debug/fmodstudioL.dll
+           ${SHARED_LIB_STAGING_DIR}/Release/fmod.dll
+           ${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/fmod.dll
+           ${SHARED_LIB_STAGING_DIR}/Debug/fmodL.dll
           )
     endif (FMODSTUDIO)
 
-    if (FMODEX)
-        if ( ADDRESS_SIZE EQUAL 32 )
-                list(APPEND COPY_INPUT_DEPENDENCIES
-                   ${SHARED_LIB_STAGING_DIR}/Release/fmodex.dll
-                   ${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/fmodex.dll
-                   ${SHARED_LIB_STAGING_DIR}/Debug/fmodexL.dll
-                  )
-        elseif( ADDRESS_SIZE EQUAL 64 )
-                list(APPEND COPY_INPUT_DEPENDENCIES
-                   ${SHARED_LIB_STAGING_DIR}/Release/fmodex64.dll
-                   ${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/fmodex64.dll
-                   ${SHARED_LIB_STAGING_DIR}/Debug/fmodexL64.dll
-                  )
-        endif ( ADDRESS_SIZE EQUAL 32 )
-    endif (FMODEX)
-    
     add_custom_command(
       OUTPUT  ${CMAKE_CFG_INTDIR}/copy_touched.bat
       COMMAND ${PYTHON_EXECUTABLE}
@@ -1900,6 +1876,7 @@ if (WINDOWS)
         --arch=${ARCH}
         --artwork=${ARTWORK_DIR}
         "--bugsplat=${BUGSPLAT_DB}"
+        "--fmodstudio=${FMODSTUDIO}"
         --build=${CMAKE_CURRENT_BINARY_DIR}
         --buildtype=${CMAKE_BUILD_TYPE}
         "--channel=${VIEWER_CHANNEL}"
@@ -1961,6 +1938,7 @@ if (WINDOWS)
           --arch=${ARCH}
           --artwork=${ARTWORK_DIR}
           "--bugsplat=${BUGSPLAT_DB}"
+          "--fmodstudio=${FMODSTUDIO}"
           --build=${CMAKE_CURRENT_BINARY_DIR}
           --buildtype=${CMAKE_BUILD_TYPE}
           "--channel=${VIEWER_CHANNEL}"
@@ -2107,6 +2085,7 @@ if (LINUX)
         --arch=${ARCH}
         --artwork=${ARTWORK_DIR}
         "--bugsplat=${BUGSPLAT_DB}"
+        "--fmodstudio=${FMODSTUDIO}"
         --build=${CMAKE_CURRENT_BINARY_DIR}
         --buildtype=${CMAKE_BUILD_TYPE}
         "--channel=${VIEWER_CHANNEL}"
@@ -2132,6 +2111,7 @@ if (LINUX)
       --arch=${ARCH}
       --artwork=${ARTWORK_DIR}
       "--bugsplat=${BUGSPLAT_DB}"
+      "--fmodstudio=${FMODSTUDIO}"
       --build=${CMAKE_CURRENT_BINARY_DIR}
       --buildtype=${CMAKE_BUILD_TYPE}
       "--channel=${VIEWER_CHANNEL}"
@@ -2208,6 +2188,7 @@ if (DARWIN)
       --arch=${ARCH}
       --artwork=${ARTWORK_DIR}
       "--bugsplat=${BUGSPLAT_DB}"
+      "--fmodstudio=${FMODSTUDIO}"
       --build=${CMAKE_CURRENT_BINARY_DIR}
       --buildtype=${CMAKE_BUILD_TYPE}
       --bundleid=${MACOSX_BUNDLE_GUI_IDENTIFIER}
@@ -2242,6 +2223,7 @@ if (DARWIN)
           --arch=${ARCH}
           --artwork=${ARTWORK_DIR}
           "--bugsplat=${BUGSPLAT_DB}"
+          "--fmodstudio=${FMODSTUDIO}"
           --build=${CMAKE_CURRENT_BINARY_DIR}
           --buildtype=${CMAKE_BUILD_TYPE}
           "--channel=${VIEWER_CHANNEL}"
