@@ -8982,7 +8982,7 @@
       <key>Type</key>
       <string>F32</string>
       <key>Value</key>
-      <real>0.125</real>
+    <real>0.02</real>
     </map>
     <key>MediaRollOffMin</key>
     <map>
@@ -8993,7 +8993,7 @@
       <key>Type</key>
       <string>F32</string>
       <key>Value</key>
-    <real>10.0</real>
+    <real>40.0</real>
     </map>
     <key>MediaRollOffMax</key>
     <map>
@@ -9004,7 +9004,7 @@
       <key>Type</key>
       <string>F32</string>
       <key>Value</key>
-      <real>30.0</real>
+    <real>80.0</real>
     </map>
     <key>RecentItemsSortOrder</key>
     <map>
@@ -16930,10 +16930,10 @@
       <key>Value</key>
     <real>1.0</real>
     </map>
-  <key>FMODProfilerEnable</key>
+  <key>FMODExProfilerEnable</key>
     <map>
       <key>Comment</key>
-    <string>Enable profiler tool if using FMOD</string>
+    <string>Enable profiler tool if using FMOD Ex</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
@@ -16941,10 +16941,10 @@
       <key>Value</key>
       <integer>0</integer>
     </map>
-  <key>FMODDecodeBufferSize</key>
+  <key>FMODExDecodeBufferSize</key>
     <map>
       <key>Comment</key>
-      <string>Sets the streaming decode buffer size (in milliseconds)</string>
+    <string>Sets the streaming decode buffer size (in milliseconds) for FMOD Ex or FMOD Studio</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
@@ -16952,10 +16952,10 @@
       <key>Value</key>
       <integer>1000</integer>
     </map>
-  <key>FMODStreamBufferSize</key>
+  <key>FMODExStreamBufferSize</key>
     <map>
       <key>Comment</key>
-      <string>Sets the streaming buffer size (in milliseconds)</string>
+    <string>Sets the streaming buffer size (in milliseconds) for FMOD Ex or FMOD Studio</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
@@ -16963,17 +16963,6 @@
       <key>Value</key>
       <integer>7000</integer>
     </map>
-  <key>FMODResampleMethod</key>
-  <map>
-    <key>Comment</key>
-    <string>Sets the method used for internal resampler 0(Linear), 1(Cubic), 2(Spline)</string>
-    <key>Persist</key>
-    <integer>1</integer>
-    <key>Type</key>
-    <string>U32</string>
-    <key>Value</key>
-    <integer>0</integer>
-  </map>
     <key>DisablePrecacheDelayAfterTeleporting</key>
     <map>
       <key>Comment</key>
