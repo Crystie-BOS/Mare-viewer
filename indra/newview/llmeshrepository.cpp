@@ -3512,7 +3512,6 @@ void LLMeshRepository::init()
     {
         LL_INFOS(LOG_MESH) << "Using STUB for LLConvexDecomposition" << LL_ENDL;
     }
-
 	mDecompThread = new LLPhysicsDecomp();
 	mDecompThread->start();
 

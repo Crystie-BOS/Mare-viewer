@@ -268,7 +268,7 @@ void LLVOVolume::markDead()
 	{
         if (getVolume())
         {
-		LLSculptIDSize::instance().rem(getVolume()->getParams().getSculptID());
+			LLSculptIDSize::instance().rem(getVolume()->getParams().getSculptID());
         }
 
 		if(getMDCImplCount() > 0)
