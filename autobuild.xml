@@ -4118,12 +4118,9 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
                 <array>
                   <string>-G</string>
                   <string>${AUTOBUILD_WIN_CMAKE_GEN|NOTWIN}</string>
-<!--
-****                  <string>Visual Studio 12 2013 Win64</string>
--->
-                  <string>-DUNATTENDED:BOOL=ON</string>
                   <string>-DINSTALL_PROPRIETARY=FALSE</string>
                   <string>-DUSE_KDU=FALSE</string>
+                  <string>-DOPENAL:BOOL=ON</string>
                   <string>-DFMODEX=TRUE</string>
                   <string>'-DROOT_PROJECT_NAME:STRING=Restrained Love Debug'</string>
                   <string>'-DVIEWER_CHANNEL:STRING=Restrained Love Debug'</string>
@@ -4161,9 +4158,7 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
                 <array>
                   <string>-G</string>
                   <string>${AUTOBUILD_WIN_CMAKE_GEN|NOTWIN}</string>
-<!--
-****                  <string>Visual Studio 12 2013 Win64</string>
--->
+
                   <string>-DUNATTENDED:BOOL=ON</string>
                   <string>-DINSTALL_PROPRIETARY=FALSE</string>
                   <string>-DUSE_KDU=FALSE</string>
@@ -4211,12 +4206,10 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
                 <array>
                   <string>-G</string>
                   <string>${AUTOBUILD_WIN_CMAKE_GEN|NOTWIN}</string>
-<!--
-****                  <string>Visual Studio 12 2013 Win64</string>
--->
                   <string>-DUNATTENDED:BOOL=ON</string>
                   <string>-DINSTALL_PROPRIETARY=FALSE</string>
                   <string>-DUSE_KDU=FALSE</string>
+                  <string>-DOPENAL:BOOL=ON</string>
                   <string>-DFMODEX=TRUE</string>
                   <string>'-DROOT_PROJECT_NAME:STRING=Restrained Love Release'</string>
                   <string>'-DVIEWER_CHANNEL:STRING=Restrained Love Release'</string>

@@ -1508,7 +1508,7 @@ void LLIMProcessing::processNewMessage(LLUUID from_id,
 		{
 			send_do_not_disturb_message(gMessageSystem, from_id);
 		}
-		else if (gSavedSettings.getBOOL("VoiceCallsFriendsOnly") && (LLAvatarTracker::instance().getBuddyInfo(from_id) == NULL))
+            else if (gSavedPerAccountSettings.getBOOL("VoiceCallsFriendsOnly") && (LLAvatarTracker::instance().getBuddyInfo(from_id) == NULL))
 		{
 			return;
 		}

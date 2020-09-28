@@ -413,8 +413,8 @@ void LLProgressView::initLogos()
         default_clip);
 
     texture_start_x += icon_width + default_pad + 1;
-#endif
-#ifdef LL_HAVOK_TPV
+#endif //LL_FMODSTUDIO
+#ifdef LL_HAVOK
     // original image size is 342x113, central element is on a larger side
     // plus internal padding, so it gets slightly more height than desired 32
     icon_width = 88;
@@ -427,7 +427,8 @@ void LLProgressView::initLogos()
         default_clip);
 
     texture_start_x += icon_width + default_pad;
-#endif
+#endif //LL_HAVOK
+
     // 108x41
     icon_width = 74;
     loadLogo(temp_str + "vivox_logo.png",

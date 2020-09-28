@@ -674,7 +674,7 @@ bool idle_startup()
 			if (gAudiop)
 			{
 #if LL_WINDOWS
-				// FMOD Studio and FMOD Ex on Windows need the window handle to stop playing audio
+				// FMOD Studio and FMOD Ex on Windows needs the window handle to stop playing audio
 				// when window is minimized. JC
 				void* window_handle = (HWND)gViewerWindow->getPlatformWindow();
 #else

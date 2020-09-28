@@ -4511,10 +4511,9 @@ BOOL LLVOAvatar::updateCharacter(LLAgent &agent)
 
     if (visible)
     {
-	// System avatar mesh vertices need to be reskinned.
-	mNeedsSkin = TRUE;
+        // System avatar mesh vertices need to be reskinned.
+        mNeedsSkin = TRUE;
     }
-
 	return visible;
 }
 //-----------------------------------------------------------------------------

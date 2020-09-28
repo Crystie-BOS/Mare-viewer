@@ -1099,7 +1099,6 @@ void LLAgent::setRegion(LLViewerRegion *regionp)
 	if (mRegionp != regionp)
 	{
 
-		std::string ip = regionp->getHost().getString();
 //MK
 		if (!gRRenabled || !gAgent.mRRInterface.mContainsShowloc)
 		{
