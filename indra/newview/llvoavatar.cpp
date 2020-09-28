@@ -2425,6 +2425,7 @@ S32 LLVOAvatar::setTETexture(const U8 te, const LLUUID& uuid)
 }
 
 static LLTrace::BlockTimerStatHandle FTM_AVATAR_UPDATE("Avatar Update");
+static LLTrace::BlockTimerStatHandle FTM_AVATAR_UPDATE_COMPLEXITY("Avatar Update Complexity");
 static LLTrace::BlockTimerStatHandle FTM_JOINT_UPDATE("Update Joints");
 
 //------------------------------------------------------------------------
