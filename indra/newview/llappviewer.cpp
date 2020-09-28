@@ -73,6 +73,7 @@
 #include "llviewermedia.h"
 #include "llviewerparcelaskplay.h"
 #include "llviewerparcelmedia.h"
+#include "llviewershadermgr.h"
 #include "llviewermediafocus.h"
 #include "llviewermessage.h"
 #include "llviewerobjectlist.h"
@@ -703,7 +704,7 @@ LLAppViewer::LLAppViewer()
 	mFastTimerLogThread(NULL),
 	mSettingsLocationList(NULL),
 	mIsFirstRun(false),
-	mMinMicroSecPerFrame(0.f)
+	mMinMicroSecPerFrame(0.f) // LL removed this in 6.4.9 without provding any alternative, so keep it in for now
 {
 	if(NULL != sInstance)
 	{
@@ -1275,7 +1276,7 @@ bool LLAppViewer::init()
 	joystick = LLViewerJoystick::getInstance();
 	joystick->setNeedsReset(true);
 	/*----------------------------------------------------------------------*/
-
+	// LL removed this in 6.4.9 without provding any alternative, so keep it in for now
 	gSavedSettings.getControl("FramePerSecondLimit")->getSignal()->connect(boost::bind(&LLAppViewer::onChangeFrameLimit, this, _2));
 	onChangeFrameLimit(gSavedSettings.getLLSD("FramePerSecondLimit"));
 
@@ -1580,6 +1581,7 @@ bool LLAppViewer::doFrame()
 					RRInterface::sRenderLimitRenderedThisFrame = FALSE;
 //mk
 				display();
+				// LL removed this in 6.4.9 without provding any alternative, so keep it in for now
 				static U64 last_call = 0;
 				if (!gTeleportDisplay || gGLManager.mIsIntel) // SL-10625...throttle early, throttle often with Intel
 				{
@@ -1594,6 +1596,7 @@ bool LLAppViewer::doFrame()
 					}
 				}
 				last_call = LLTimer::getTotalTime();
+				// end keep section
 					pingMainloopTimeout("Main:Snapshot");
 					LLFloaterSnapshot::update(); // take snapshots
 					LLFloaterOutfitSnapshot::update();
@@ -5563,6 +5566,7 @@ void LLAppViewer::disconnectViewer()
 	LLUrlEntryParcel::setDisconnected(gDisconnected);
 }
 
+// LL removed this in 6.4.9 without provding any alternative, so keep it in for now
 bool LLAppViewer::onChangeFrameLimit(LLSD const & evt)
 {
 	if (evt.asInteger() > 0)
