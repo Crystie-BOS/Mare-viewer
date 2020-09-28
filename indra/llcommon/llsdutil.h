@@ -621,5 +621,4 @@ LLSD shallow(LLSD value, LLSD filter=LLSD()) { return llsd_shallow(value, filter
 //        return seed;
 //    }
 //};
-
 #endif // LL_LLSDUTIL_H

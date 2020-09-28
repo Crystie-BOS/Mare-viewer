@@ -41,7 +41,6 @@
 #include "llcommandhandler.h"		// for secondlife:///app/login/
 #include "llcombobox.h"
 #include "llviewercontrol.h"
-#include "llfloaterpreference.h"
 #include "llfocusmgr.h"
 #include "lllineeditor.h"
 #include "llnotificationsutil.h"
@@ -455,6 +454,10 @@ void LLPanelLogin::addFavoritesToStartLocation()
 		}
 		break;
 	}
+	if (combo->getValue().asString().empty())
+	{
+		combo->selectFirstItem();
+	}
 }
 
 LLPanelLogin::~LLPanelLogin()
@@ -521,9 +524,6 @@ void LLPanelLogin::giveFocus()
 }
 
 // static
-		// *NOTE: Mani - This may or may not be obselete code.
-		// It seems to be part of the defunct? reg-in-client project.
-		// *TODO: Append all the usual login parameters, like first_login=Y etc.
 void LLPanelLogin::show(const LLRect &rect,
 						void (*callback)(S32 option, void* user_data),
 						void* callback_data)
@@ -1173,7 +1173,7 @@ void LLPanelLogin::updateServer()
 	try 
 	{
 		// if they've selected another grid, we should load the credentials
-			// for that grid and set them to the UI.
+			// for that grid and set them to the UI. But if there were any modifications to
 			// fields, modifications should carry over.
 			// Not sure if it should carry over password but it worked like this before login changes
 			// Example: you started typing in and found that your are under wrong grid,
@@ -1341,13 +1341,13 @@ void LLPanelLogin::onSelectServer()
 {
 			std::string location = location_combo->getValue().asString();
 			LLSLURL slurl(location); // generata a slurl from the location combo contents
-			if (   slurl.getType() == LLSLURL::LOCATION
-				&& slurl.getGrid() != LLGridManager::getInstance()->getGrid()
-				)
-	{
+			if (location.empty()
+				|| (slurl.getType() == LLSLURL::LOCATION
+				    && slurl.getGrid() != LLGridManager::getInstance()->getGrid())
+				   )
+			{
 				// the grid specified by the location is not this one, so clear the combo
 				location_combo->setCurrentByIndex(0); // last location on the new grid
-				location_combo->setTextEntry(LLStringUtil::null);
 			}
 		}			
 		break;

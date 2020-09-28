@@ -1044,6 +1044,17 @@ bool LLAgent::enableFlying()
 	return !sitting;
 }
 
+// static
+bool LLAgent::isSitting()
+{
+    BOOL sitting = FALSE;
+    if (isAgentAvatarValid())
+    {
+        sitting = gAgentAvatarp->isSitting();
+    }
+    return sitting;
+}
+
 void LLAgent::standUp()
 {
 //MK
@@ -1093,8 +1104,7 @@ void LLAgent::setRegion(LLViewerRegion *regionp)
 		if (!gRRenabled || !gAgent.mRRInterface.mContainsShowloc)
 		{
 //mk
-		LL_INFOS("AgentLocation") << "Moving agent into region: " << regionp->getName()
-				<< " located at " << ip << LL_ENDL;
+		LL_INFOS("AgentLocation") << "Moving agent into region: " << regionp->getName();
 //MK
 		}
 //mk
