@@ -314,6 +314,8 @@ private:
 	LLAppCoreHttp mAppCoreHttp;
 
     bool mIsFirstRun;
+	U64 mMinMicroSecPerFrame; // frame throttling // LL removed this in 6.4.9 without provding any alternative, so keep it in for now
+
 };
 
 // consts from viewer.h
