@@ -1579,7 +1579,7 @@ EAcceptance LLToolDragAndDrop::willObjectAcceptInventory(LLViewerObject* obj, LL
 		// when prevented from sit-tping
 		if (gAgent.mRRInterface.mSittpMax < EXTREMUM || gAgent.mRRInterface.mContainsUnsit || gAgent.mRRInterface.mContainsStandtp)
 		{
-			if (gAgentAvatarp->isSitting() && gAgentAvatarp->getRoot() == obj->getRoot())
+			if (gAgentAvatarp->isSitting() && !obj->isAttachment() && gAgentAvatarp->getRoot() == obj->getRoot())
 			{
 				return ACCEPT_NO_LOCKED;
 			}
