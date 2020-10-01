@@ -3740,7 +3740,7 @@ void LLSpatialPartition::renderDebug()
 		return;
 	}
 //MK
-	if (gRRenabled && gAgent.mRRInterface.mCamDistDrawMax < EXTREMUM)
+	if (gRRenabled && gAgent.mRRInterface.mVisionRestricted)
 	{
 		return;
 	}

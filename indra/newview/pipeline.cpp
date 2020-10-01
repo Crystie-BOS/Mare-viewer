@@ -6823,7 +6823,7 @@ void LLPipeline::toggleRenderType(U32 type)
 	gPipeline.mRenderTypeEnabled[type] = !gPipeline.mRenderTypeEnabled[type];
 //MK
 	// Force the render type to TRUE if our vision is restricted
-	if (gRRenabled && type == LLPipeline::RENDER_TYPE_AVATAR && gAgent.mRRInterface.mCamDistDrawMax < EXTREMUM)
+	if (gRRenabled && type == LLPipeline::RENDER_TYPE_AVATAR && gAgent.mRRInterface.mVisionRestricted)
 	{
 		gPipeline.mRenderTypeEnabled[type] = TRUE;
 	}
@@ -6866,7 +6866,7 @@ bool LLPipeline::toggleRenderTypeControlNegated(S32 type)
 void LLPipeline::toggleRenderDebug(U64 bit)
 {
 //MK
-	if (gRRenabled && gAgent.mRRInterface.mCamDistDrawMax < EXTREMUM)
+	if (gRRenabled && gAgent.mRRInterface.mVisionRestricted)
 	{
 		bit = 0;
 	}
