@@ -9075,7 +9075,8 @@ class LLViewHighlightTransparent : public view_listener_t
 	bool handleEvent(const LLSD& userdata)
 	{
 //MK
-		if (gRRenabled && (gAgent.mRRInterface.mContainsEdit || gAgent.mRRInterface.mCamDistDrawMin < EXTREMUM || gAgent.mRRInterface.mCamDistDrawMax < EXTREMUM))
+		//if (gRRenabled && (gAgent.mRRInterface.mContainsEdit || gAgent.mRRInterface.mCamDistDrawMin < EXTREMUM || gAgent.mRRInterface.mCamDistDrawMax < EXTREMUM))
+		if (gRRenabled && gAgent.mRRInterface.mContainsEdit)
 		{
 			return true;
 		}
@@ -9101,7 +9102,8 @@ class LLViewCheckHighlightTransparent : public view_listener_t
 	{
 		bool new_value = LLDrawPoolAlpha::sShowDebugAlpha;
 //MK
-		if (gRRenabled && (gAgent.mRRInterface.mContainsEdit || gAgent.mRRInterface.mCamDistDrawMin < EXTREMUM || gAgent.mRRInterface.mCamDistDrawMax < EXTREMUM))
+		//if (gRRenabled && (gAgent.mRRInterface.mContainsEdit || gAgent.mRRInterface.mCamDistDrawMin < EXTREMUM || gAgent.mRRInterface.mCamDistDrawMax < EXTREMUM))
+		if (gRRenabled && gAgent.mRRInterface.mContainsEdit)
 		{
 			new_value = false;
 		}
