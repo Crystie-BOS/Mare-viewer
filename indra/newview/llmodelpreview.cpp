@@ -240,6 +240,10 @@ LLModelPreview::~LLModelPreview()
     // glod.dll!glodGetGroupParameteriv()  + 0x119 bytes	
     // glod.dll!glodShutdown()  + 0x77 bytes	
     //
+
+	// WS: Mark the preview avatar as dead, when the floater closes. Prevents memleak!
+	mPreviewAvatar->markDead();
+	//*HACK : *TODO : turn this back on when we understand why this crashes
     //glodShutdown();
     if (mModelLoader)
     {
@@ -1856,17 +1860,21 @@ void LLModelPreview::updateStatusMessages()
         }
     }
 
-    // flag degenerates here rather than deferring to a MAV error later
-    mFMP->childSetVisible("physics_status_message_text", mHasDegenerate); //display or clear
-    auto degenerateIcon = mFMP->getChild<LLIconCtrl>("physics_status_message_icon");
-    degenerateIcon->setVisible(mHasDegenerate);
-    if (mHasDegenerate)
-    {
-        has_physics_error |= PhysicsError::DEGENERATE;
-        mFMP->childSetValue("physics_status_message_text", mFMP->getString("phys_status_degenerate_triangles"));
-        LLUIImagePtr img = LLUI::getUIImage("ModelImport_Status_Error");
-        degenerateIcon->setImage(img);
-    }
+	// flag degenerates here rather than deferring to a MAV error later
+	// <FS>
+	//mFMP->childSetVisible("physics_status_message_text", mHasDegenerate); //display or clear
+	//auto degenerateIcon = mFMP->getChild<LLIconCtrl>("physics_status_message_icon");
+	//degenerateIcon->setVisible(mHasDegenerate);
+	// </FS>
+	if (mHasDegenerate)
+	{
+		has_physics_error |= PhysicsError::DEGENERATE;
+		// <FS>
+		//mFMP->childSetValue("physics_status_message_text", mFMP->getString("phys_status_degenerate_triangles"));
+		//LLUIImagePtr img = LLUI::getUIImage("ModelImport_Status_Error");
+		//degenerateIcon->setImage(img);
+		// </FS>
+	}
 
     mFMP->childSetTextArg("submeshes_info", "[SUBMESHES]", llformat("%d", total_submeshes[LLModel::LOD_HIGH]));
 
@@ -1973,43 +1981,102 @@ void LLModelPreview::updateStatusMessages()
     }
 
 
-    //warn if hulls have more than 256 points in them
-    BOOL physExceededVertexLimit = FALSE;
-    for (U32 i = 0; mModelNoErrors && i < mModel[LLModel::LOD_PHYSICS].size(); ++i)
-    {
-        LLModel* mdl = mModel[LLModel::LOD_PHYSICS][i];
+	//warn if hulls have more than 256 points in them
+	BOOL physExceededVertexLimit = FALSE;
+	for (U32 i = 0; mModelNoErrors && (i < mModel[LLModel::LOD_PHYSICS].size()); ++i)
+	{
+		LLModel* mdl = mModel[LLModel::LOD_PHYSICS][i];
 
-        if (mdl)
-        {
-            for (U32 j = 0; j < mdl->mPhysics.mHull.size(); ++j)
-            {
-                if (mdl->mPhysics.mHull[j].size() > 256)
-                {
-                    physExceededVertexLimit = TRUE;
-                    LL_INFOS() << "Physical model " << mdl->mLabel << " exceeds vertex per hull limitations." << LL_ENDL;
-                    break;
-                }
-            }
-        }
-    }
+		if (mdl)
+		{
+			// <FS:Beq> Better error handling
+			auto num_hulls = mdl->mPhysics.mHull.size();
+			for (U32 j = 0; j < num_hulls; ++j)
+			{		
+			// </FS:Beq>
+				if (mdl->mPhysics.mHull[j].size() > 256)
+				{
+					physExceededVertexLimit = TRUE;
+					LL_INFOS() << "Physical model " << mdl->mLabel << " exceeds vertex per hull limitations." << LL_ENDL;
+					break;
+				}
+			}
+			// <FS:Beq> Better error handling
+			if (num_hulls > 256) // decomp cannot have more than 256 hulls (http://wiki.secondlife.com/wiki/Mesh/Mesh_physics)
+			{
+				LL_INFOS() << "Physical model " << mdl->mLabel << " exceeds 256 hull limitation." << LL_ENDL;
+				has_physics_error |= PhysicsError::TOOMANYHULLS;
+			}
+			// </FS:Beq>
+		}
+	}
 
-    if (physExceededVertexLimit)
-    {
-        has_physics_error |= PhysicsError::TOOMANYVERTSINHULL;
-    }
+	if (physExceededVertexLimit)
+	{
+		has_physics_error |= PhysicsError::TOOMANYVERTSINHULL;
+	}
 
-    if (!(has_physics_error & PhysicsError::DEGENERATE)){ // only update this field (incluides clearing it) if it is not already in use.
-        mFMP->childSetVisible("physics_status_message_text", physExceededVertexLimit);
-        LLIconCtrl* physStatusIcon = mFMP->getChild<LLIconCtrl>("physics_status_message_icon");
-        physStatusIcon->setVisible(physExceededVertexLimit);
-        if (physExceededVertexLimit)
-        {
-            mFMP->childSetValue("physics_status_message_text", mFMP->getString("phys_status_vertex_limit_exceeded"));
-            LLUIImagePtr img = LLUI::getUIImage("ModelImport_Status_Warning");
-            physStatusIcon->setImage(img);
-        }
-    }
+// <FS:Beq> standardise error handling
+	//if (!(has_physics_error & PhysicsError::DEGENERATE)){ // only update this field (incluides clearing it) if it is not already in use.
+	//	mFMP->childSetVisible("physics_status_message_text", physExceededVertexLimit);
+	//	LLIconCtrl* physStatusIcon = mFMP->getChild<LLIconCtrl>("physics_status_message_icon");
+	//	physStatusIcon->setVisible(physExceededVertexLimit);
+	//	if (physExceededVertexLimit)
+	//	{
+	//		mFMP->childSetValue("physics_status_message_text", mFMP->getString("phys_status_vertex_limit_exceeded"));
+	//		LLUIImagePtr img = LLUI::getUIImage("ModelImport_Status_Warning");
+	//		physStatusIcon->setImage(img);
+	//	}
+	//}
+#ifndef HAVOK_TPV 
+	has_physics_error |= PhysicsError::NOHAVOK;
+#endif 
 
+	auto physStatusIcon = mFMP->getChild<LLIconCtrl>("physics_status_message_icon");
+
+	if (has_physics_error != PhysicsError::NONE)
+	{
+		mFMP->childSetVisible("physics_status_message_text", true); //display or clear
+		physStatusIcon->setVisible(true);
+		// The order here is important. 
+		if (has_physics_error & PhysicsError::TOOMANYHULLS)
+		{
+			mFMP->childSetValue("physics_status_message_text", mFMP->getString("phys_status_hull_limit_exceeded"));
+			LLUIImagePtr img = LLUI::getUIImage("ModelImport_Status_Error");
+			physStatusIcon->setImage(img);
+		}
+		else if (has_physics_error & PhysicsError::TOOMANYVERTSINHULL)
+		{
+			mFMP->childSetValue("physics_status_message_text", mFMP->getString("phys_status_vertex_limit_exceeded"));
+			LLUIImagePtr img = LLUI::getUIImage("ModelImport_Status_Error");
+			physStatusIcon->setImage(img);
+		}
+		else if (has_physics_error & PhysicsError::DEGENERATE)
+		{
+			mFMP->childSetValue("physics_status_message_text", mFMP->getString("phys_status_degenerate_triangles"));
+			LLUIImagePtr img = LLUI::getUIImage("ModelImport_Status_Error");
+			physStatusIcon->setImage(img);
+		}
+		else if (has_physics_error & PhysicsError::NOHAVOK)
+		{
+			mFMP->childSetValue("physics_status_message_text", mFMP->getString("phys_status_no_havok"));
+			LLUIImagePtr img = LLUI::getUIImage("ModelImport_Status_Warning");
+			physStatusIcon->setImage(img);
+		}
+		else
+		{
+			// This should not happen
+			mFMP->childSetValue("physics_status_message_text", mFMP->getString("phys_status_unknown_error"));
+			LLUIImagePtr img = LLUI::getUIImage("ModelImport_Status_Warning");
+			physStatusIcon->setImage(img);
+		}
+	}
+	else
+	{
+		mFMP->childSetVisible("physics_status_message_text", false); //display or clear
+		physStatusIcon->setVisible(false);
+	}
+// </FS:Beq>
     if (getLoadState() >= LLModelLoader::ERROR_PARSING)
     {
         mModelNoErrors = false;
@@ -2036,18 +2103,19 @@ void LLModelPreview::updateStatusMessages()
             mModelNoErrors = false;
         }
     }
-
-    if (!mModelNoErrors || mHasDegenerate)
-    {
-        mFMP->childDisable("ok_btn");
-        mFMP->childDisable("calculate_btn");
-    }
-    else
-    {
-        mFMP->childEnable("ok_btn");
-        mFMP->childEnable("calculate_btn");
-    }
-
+	// <FS:Beq> Improve the error checking the TO DO here is no longer applicable but not an FS comment so edited to stop it being picked up
+	//if (!mModelNoErrors || mHasDegenerate)
+	if (!gSavedSettings.getBOOL("FSIgnoreClientsideMeshValidation") && (!mModelNoErrors || (has_physics_error > PhysicsError::NOHAVOK))) // block for all cases of phsyics error except NOHAVOK
+	// </FS:Beq>
+	{
+		mFMP->childDisable("ok_btn");
+		mFMP->childDisable("calculate_btn");
+	}
+	else
+	{
+		mFMP->childEnable("ok_btn");
+		mFMP->childEnable("calculate_btn");
+	}
     if (mModelNoErrors && mLodsWithParsingError.empty())
     {
         mFMP->childEnable("calculate_btn");

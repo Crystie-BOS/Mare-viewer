@@ -254,6 +254,13 @@ BOOL LLFloaterModelPreview::postBuild()
 	{
 		validate_url = llformat("http://secondlife.%s.lindenlab.com/my/account/mesh.php",current_grid.c_str());
 	}
+// <FS:CR> Show an alert dialog if Havok not included in this build as functionality will be limited
+#ifndef HAVOK_TPV
+	LLSD args;
+	args["FEATURE"] = getString("no_havok");
+	LLNotificationsUtil::add("NoHavok", args);
+#endif
+// </FS:CR>
 	getChild<LLTextBox>("warning_message")->setTextArg("[VURL]", validate_url);
 
 	mUploadBtn = getChild<LLButton>("ok_btn");
@@ -451,6 +458,13 @@ void LLFloaterModelPreview::loadHighLodModel()
 
 void LLFloaterModelPreview::loadModel(S32 lod)
 {
+	// <FS:Ansariel> FIRE-15204: Viewer crashes when clicking "upload model" quickly twice then closing both filepickers
+	if (mModelPreview->mLoading)
+	{
+		return;
+	}
+	// </FS:Ansariel>
+
 	mModelPreview->mLoading = true;
 	if (lod == LLModel::LOD_PHYSICS)
 	{
@@ -463,6 +477,13 @@ void LLFloaterModelPreview::loadModel(S32 lod)
 
 void LLFloaterModelPreview::loadModel(S32 lod, const std::string& file_name, bool force_disable_slm)
 {
+	// <FS:Ansariel> FIRE-15204: Viewer crashes when clicking "upload model" quickly twice then closing both filepickers
+	if (mModelPreview->mLoading)
+	{
+		return;
+	}
+	// </FS:Ansariel>
+
 	mModelPreview->mLoading = true;
 
 	mModelPreview->loadModel(file_name, lod, force_disable_slm);
