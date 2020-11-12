@@ -315,6 +315,7 @@ void LLPreviewNotecard::loadAsset()
 		{
 			editor->setEnabled(FALSE);
 			getChildView("lock")->setVisible( TRUE);
+			getChildView("Edit")->setEnabled(FALSE);
 		}
 
 		if((allow_modify || is_owner) && !source_library)
