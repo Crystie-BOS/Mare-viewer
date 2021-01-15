@@ -357,7 +357,13 @@ void LLAgentCamera::resetView(BOOL reset_camera, BOOL change_camera)
 			gAgent.resetAxes(lerp(gAgent.getAtAxis(), agent_at_axis, LLSmoothInterpolation::getInterpolant(0.3f)));
 		}
 
-		setFocusOnAvatar(TRUE, ANIMATE);
+//MK
+		// Set "reset_axes" to FALSE so the avatar does not move when we press ESC, the camera simply goes back to its default position, like before.
+		// However, allow the camera to reset when we nudge the avatar with the arrow keys.
+		// change_camera is FALSE when we nudge, TRUE when we reset the view.
+////		setFocusOnAvatar(TRUE, ANIMATE);
+		setFocusOnAvatar(TRUE, ANIMATE, !change_camera);
+//mk
 
 		mCameraFOVZoomFactor = 0.f;
 	}
