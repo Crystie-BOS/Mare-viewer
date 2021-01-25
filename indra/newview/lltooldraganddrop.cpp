@@ -1664,16 +1664,23 @@ static void show_object_sharing_confirmation(const std::string name,
 		llassert(NULL != inv_item);
 		return;
 	}
-		LLSD substitutions;
-		substitutions["RESIDENTS"] = name;
-		substitutions["ITEMS"] = inv_item->getName();
-		LLSD payload;
-		payload["agent_id"] = dest_agent;
-		payload["item_id"] = inv_item->getUUID();
-		payload["session_id"] = session_id;
-		payload["d&d_dest"] = dest.asString();
-		LLNotificationsUtil::add("ShareItemsConfirmation", substitutions, payload, &give_inventory_cb);
+//MK
+	if (gRRenabled && gAgent.mRRInterface.containsWithoutException("share", dest_agent.asString()))
+	{
+		return;
 	}
+//mk
+
+	LLSD substitutions;
+	substitutions["RESIDENTS"] = name;
+	substitutions["ITEMS"] = inv_item->getName();
+	LLSD payload;
+	payload["agent_id"] = dest_agent;
+	payload["item_id"] = inv_item->getUUID();
+	payload["session_id"] = session_id;
+	payload["d&d_dest"] = dest.asString();
+	LLNotificationsUtil::add("ShareItemsConfirmation", substitutions, payload, &give_inventory_cb);
+}
 
 static void get_name_cb(const LLUUID& id,
 						const LLAvatarName& av_name,
