@@ -546,9 +546,16 @@
     <color
      name="MenuItemHighlightBgColor"
      reference="EmphasisColor_35" />
+<!--MK-->
+<!--
     <color
      name="MenuItemFlashBgColor"
      reference="BeaconColor" />
+-->
+    <color
+     name="MenuItemFlashBgColor"
+     reference="Orange_40" />
+<!--mk-->
     <color
      name="MenuItemHighlightFgColor"
      reference="White" />
@@ -879,6 +886,11 @@
      name="DirectChatColor"
      reference="LtOrange" />
 
+<!--MK-->
+    <color
+      name="Orange_40"
+      value="1 .82 .46 0.5" />
+<!--mk-->
     <color
       name="ToolbarDropZoneColor"
       value=".48 .69 1 .5" />
