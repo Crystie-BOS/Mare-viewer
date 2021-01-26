@@ -751,6 +751,7 @@ set(viewer_HEADER_FILES
     ViewerInstall.cmake
     RRInterface.h
     RRInterfaceHelper.h
+    RRInterfaceVersion.h
     groupchatlistener.h
     llaccountingcost.h
     llaccountingcostmanager.h
