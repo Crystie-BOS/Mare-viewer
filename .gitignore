@@ -1,7 +1,9 @@
 # Chorazin's build scripts and build logs
 ca_*.sh
+ca_*.txt
 *-build-*.log
 *-config-*.log
+*Rel.log
 
 # By extension
 *.DS_Store
