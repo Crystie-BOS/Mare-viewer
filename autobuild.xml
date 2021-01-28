@@ -3790,7 +3790,7 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
                   <string>-DCMAKE_BUILD_TYPE:STRING=Release</string>
                   <string>-DADDRESS_SIZE:STRING=$AUTOBUILD_ADDRSIZE</string>
                   <string>-DINSTALL_PROPRIETARY=FALSE</string>
-                  <string>-DFMODEX=TRUE</string>
+                  <string>-DFMODSTUDIO=TRUE</string>
                   <string>'-DROOT_PROJECT_NAME:STRING=Restrained Love Release'</string>
                   <string>'-DVIEWER_CHANNEL:STRING=Restrained Love Release'</string>
                   <string>-DPACKAGE:BOOL=ON</string>
@@ -4045,13 +4045,6 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
           <key>name</key>
           <string>linux</string>
         </map>
-<!-- There are changes below to force building with VS2013 on dual VS2013+VS2017 systems. This should be
-**** overwritten by the original value ( ${AUTOBUILD_WIN_CMAKE_GEN|NOTWIN} ) once the VS2017 merge is done
-**** but will need manual attention since the change will be newer on this side of the merge.
-**** The original lines have had **** prefixes added to force a merge conflict.
-**** Also note the hardwired definition of vc120 within the build output folder path name. This file on the
-**** VS2017 side must have that changed to vc150.
--->
         <key>windows</key>
         <map>
           <key>build_directory</key>
@@ -4064,7 +4057,7 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
               <map>
                 <key>arguments</key>
                 <array>
-                  <string>RestrainedLove.sln</string>
+                  <string>SecondLife.sln</string>
                 </array>
                 <key>command</key>
                 <string>devenv</string>
@@ -4084,9 +4077,6 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
                 <array>
                   <string>-G</string>
                   <string>${AUTOBUILD_WIN_CMAKE_GEN|NOTWIN}</string>
-<!--
-****                  <string>Visual Studio 12 2013 Win64</string>
--->
                 </array>
               </map>
               <key>default</key>
@@ -4100,7 +4090,7 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
               <map>
                 <key>arguments</key>
                 <array>
-                  <string>RestrainedLove.sln</string>
+                  <string>SecondLife.sln</string>
                 </array>
                 <key>command</key>
                 <string>devenv</string>
@@ -4140,7 +4130,7 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
               <map>
                 <key>arguments</key>
                 <array>
-                  <string>RestrainedLove.sln</string>
+                  <string>SecondLife.sln</string>
                 </array>
                 <key>command</key>
                 <string>devenv</string>
@@ -4164,7 +4154,7 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
                   <string>-DUNATTENDED:BOOL=ON</string>
                   <string>-DINSTALL_PROPRIETARY=FALSE</string>
                   <string>-DUSE_KDU=FALSE</string>
-                  <string>-DFMODEX=TRUE</string>
+                  <string>-DFMODSTUDIO=TRUE</string>
                   <string>'-DROOT_PROJECT_NAME:STRING=Restrained Love Release'</string>
                   <string>'-DVIEWER_CHANNEL:STRING=Restrained Love Release'</string>
                   <string>-DPACKAGE:BOOL=ON</string>
@@ -4181,19 +4171,12 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
               <map>
                 <key>arguments</key>
                 <array>
-                  <string>RestrainedLove.sln</string>
+                  <string>SecondLife.sln</string>
                 </array>
                 <key>command</key>
                 <string>devenv</string>
                 <key>options</key>
                 <array>
-                  <string>/p:Configuration=Release</string>
-                  <string>/p:Platform=${AUTOBUILD_WIN_VSPLATFORM|NOTWIN}</string>
-                  <string>/t:Build</string>
-                  <string>/p:useenv=true</string>
-                  <string>/verbosity:minimal</string>
-                  <string>/toolsversion:12.0</string>
-                  <string>/p:VCBuildAdditionalOptions= /incremental</string>
                   <string>/build</string>
                   <string>Release|${AUTOBUILD_WIN_VSPLATFORM|NOTWIN}</string>
                 </array>
@@ -4212,7 +4195,7 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
                   <string>-DINSTALL_PROPRIETARY=FALSE</string>
                   <string>-DUSE_KDU=FALSE</string>
                   <string>-DOPENAL:BOOL=ON</string>
-                  <string>-DFMODEX=TRUE</string>
+                  <string>-DFMODSTUDIO=TRUE</string>
                   <string>'-DROOT_PROJECT_NAME:STRING=Restrained Love Release'</string>
                   <string>'-DVIEWER_CHANNEL:STRING=Restrained Love Release'</string>
                   <string>-DPACKAGE:BOOL=ON</string>
