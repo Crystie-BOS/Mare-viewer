@@ -2257,6 +2257,19 @@ BOOL LLOutgoingCallDialog::postBuild()
 // Class LLIncomingCallDialog
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+const std::array<std::string, 4> voice_call_types =
+{
+    "VoiceInviteP2P",
+    "VoiceInviteGroup",
+    "VoiceInviteAdHoc",
+    "InviteAdHoc"
+};
+
+bool is_voice_call_type(const std::string &value)
+{
+    return std::find(voice_call_types.begin(), voice_call_types.end(), value) != voice_call_types.end();
+}
+
 LLIncomingCallDialog::LLIncomingCallDialog(const LLSD& payload) :
 LLCallDialog(payload),
 mAvatarNameCacheConnection()
@@ -2286,9 +2299,28 @@ BOOL LLIncomingCallDialog::postBuild()
 {
 	LLCallDialog::postBuild();
 
+    if (!mPayload.isMap() || mPayload.size() == 0)
+    {
+        LL_INFOS("IMVIEW") << "IncomingCall: invalid argument" << LL_ENDL;
+        return TRUE;
+    }
+
 	LLUUID session_id = mPayload["session_id"].asUUID();
 	LLSD caller_id = mPayload["caller_id"];
 	std::string caller_name = mPayload["caller_name"].asString();
+
+    if (session_id.isNull() && caller_id.asUUID().isNull())
+    {
+        LL_INFOS("IMVIEW") << "IncomingCall: invalid ids" << LL_ENDL;
+        return TRUE;
+    }
+
+    std::string notify_box_type = mPayload["notify_box_type"].asString();
+    if (!is_voice_call_type(notify_box_type))
+    {
+        LL_INFOS("IMVIEW") << "IncomingCall: notify_box_type was not provided" << LL_ENDL;
+        return TRUE;
+    }
 	
 	// init notification's lifetime
 	std::istringstream ss( getString("lifetime") );
@@ -2305,15 +2337,14 @@ BOOL LLIncomingCallDialog::postBuild()
 		if (gAgent.getGroupData(session_id, data))
 		{
 			args["[GROUP]"] = data.mName;
-			call_type = getString(mPayload["notify_box_type"], args);
+			call_type = getString(notify_box_type, args);
 		}
 	}
 	else
 	{
-		call_type = getString(mPayload["notify_box_type"]);
+		call_type = getString(notify_box_type);
 	}
-		
-	
+
 	// check to see if this is an Avaline call
 	bool is_avatar = LLVoiceClient::getInstance()->isParticipantAvatar(session_id);
 	if (caller_name == "anonymous")
@@ -2343,7 +2374,6 @@ BOOL LLIncomingCallDialog::postBuild()
 	childSetAction("Start IM", onStartIM, this);
 	setDefaultBtn("Accept");
 
-	std::string notify_box_type = mPayload["notify_box_type"].asString();
 	if(notify_box_type != "VoiceInviteGroup" && notify_box_type != "VoiceInviteAdHoc")
 	{
 		// starting notification's timer for P2P and AVALINE invitations
@@ -2495,10 +2525,10 @@ void LLIncomingCallDialog::processCallResponse(S32 response, const LLSD &payload
 							correct_session_name.append(ADHOC_NAME_SUFFIX); 
 						}
 					}
-					LL_INFOS() << "Corrected session name is " << correct_session_name << LL_ENDL; 
+					LL_INFOS("IMVIEW") << "Corrected session name is " << correct_session_name << LL_ENDL;
 					break;
 				default: 
-					LL_WARNS() << "Received an empty session name from a server and failed to generate a new proper session name" << LL_ENDL;
+					LL_WARNS("IMVIEW") << "Received an empty session name from a server and failed to generate a new proper session name" << LL_ENDL;
 					break;
 				}
 			}
@@ -2697,6 +2727,14 @@ void LLIMMgr::addMessage(
 	bool new_session = !hasSession(new_session_id);
 	if (new_session)
 	{
+		// Group chat session was initiated by muted resident, do not start this session viewerside
+		// do not send leave msg either, so we are able to get group messages from other participants
+		if ((IM_SESSION_INVITE == dialog) && gAgent.isInGroup(new_session_id) &&
+			LLMuteList::getInstance()->isMuted(other_participant_id, LLMute::flagTextChat) && !from_linden)
+		{
+			return;
+		}
+
 		LLAvatarName av_name;
 		if (LLAvatarNameCache::get(other_participant_id, &av_name) && !name_is_setted)
 		{
@@ -2707,50 +2745,50 @@ void LLIMMgr::addMessage(
 		LLIMModel::LLIMSession* session = LLIMModel::instance().findIMSession(new_session_id);
 		if (session)
 		{
-		skip_message &= !session->isGroupSessionType();			// Do not skip group chats...
-		if(skip_message)
-		{
-			gIMMgr->leaveSession(new_session_id);
-		}
-		// When we get a new IM, and if you are a god, display a bit
-		// of information about the source. This is to help liaisons
-		// when answering questions.
-		if(gAgent.isGodlike())
-		{
-			// *TODO:translate (low priority, god ability)
-			std::ostringstream bonus_info;
-			bonus_info << LLTrans::getString("***")+ " "+ LLTrans::getString("IMParentEstate") + ":" + " "
-				<< parent_estate_id
-				<< ((parent_estate_id == 1) ? "," + LLTrans::getString("IMMainland") : "")
-				<< ((parent_estate_id == 5) ? "," + LLTrans::getString ("IMTeen") : "");
-
-			// once we have web-services (or something) which returns
-			// information about a region id, we can print this out
-			// and even have it link to map-teleport or something.
-			//<< "*** region_id: " << region_id << std::endl
-			//<< "*** position: " << position << std::endl;
-
-			LLIMModel::instance().addMessage(new_session_id, from, other_participant_id, bonus_info.str());
-		}
-
-		// Logically it would make more sense to reject the session sooner, in another area of the
-		// code, but the session has to be established inside the server before it can be left.
-			if (LLMuteList::getInstance()->isMuted(other_participant_id, LLMute::flagTextChat) && !from_linden)
-		{
-			LL_WARNS() << "Leaving IM session from initiating muted resident " << from << LL_ENDL;
-			if(!gIMMgr->leaveSession(new_session_id))
+			skip_message &= !session->isGroupSessionType();			// Do not skip group chats...
+			if (skip_message)
 			{
-				LL_INFOS() << "Session " << new_session_id << " does not exist." << LL_ENDL;
+				gIMMgr->leaveSession(new_session_id);
 			}
-			return;
-		}
+			// When we get a new IM, and if you are a god, display a bit
+			// of information about the source. This is to help liaisons
+			// when answering questions.
+			if (gAgent.isGodlike())
+			{
+				// *TODO:translate (low priority, god ability)
+				std::ostringstream bonus_info;
+				bonus_info << LLTrans::getString("***") + " " + LLTrans::getString("IMParentEstate") + ":" + " "
+					<< parent_estate_id
+					<< ((parent_estate_id == 1) ? "," + LLTrans::getString("IMMainland") : "")
+					<< ((parent_estate_id == 5) ? "," + LLTrans::getString("IMTeen") : "");
 
-        //Play sound for new conversations
+				// once we have web-services (or something) which returns
+				// information about a region id, we can print this out
+				// and even have it link to map-teleport or something.
+				//<< "*** region_id: " << region_id << std::endl
+				//<< "*** position: " << position << std::endl;
+
+				LLIMModel::instance().addMessage(new_session_id, from, other_participant_id, bonus_info.str());
+			}
+
+			// Logically it would make more sense to reject the session sooner, in another area of the
+			// code, but the session has to be established inside the server before it can be left.
+			if (LLMuteList::getInstance()->isMuted(other_participant_id, LLMute::flagTextChat) && !from_linden)
+			{
+				LL_WARNS() << "Leaving IM session from initiating muted resident " << from << LL_ENDL;
+				if (!gIMMgr->leaveSession(new_session_id))
+				{
+					LL_INFOS("IMVIEW") << "Session " << new_session_id << " does not exist." << LL_ENDL;
+				}
+				return;
+			}
+
+			//Play sound for new conversations
 			if (!skip_message & !gAgent.isDoNotDisturb() && (gSavedSettings.getBOOL("PlaySoundNewConversation") == TRUE))
-        {
-		make_ui_sound("UISndNewIncomingIMSession");
-	}
-	}
+			{
+				make_ui_sound("UISndNewIncomingIMSession");
+			}
+		}
 		else
 		{
 			// Failed to create a session, most likely due to empty name (name cache failed?)
@@ -2958,7 +2996,7 @@ LLUUID LLIMMgr::addSession(
 	//we don't need to show notes about online/offline, mute/unmute users' statuses for existing sessions
 	if (!new_session) return session_id;
 	
-    LL_INFOS() << "LLIMMgr::addSession, new session added, name = " << name << ", session id = " << session_id << LL_ENDL;
+    LL_INFOS("IMVIEW") << "LLIMMgr::addSession, new session added, name = " << name << ", session id = " << session_id << LL_ENDL;
     
 	//Per Plan's suggestion commented "explicit offline status warning" out to make Dessie happier (see EXT-3609)
 	//*TODO After February 2010 remove this commented out line if no one will be missing that warning
@@ -2995,7 +3033,7 @@ void LLIMMgr::removeSession(const LLUUID& session_id)
 
 	LLIMModel::getInstance()->clearSession(session_id);
 
-    LL_INFOS() << "LLIMMgr::removeSession, session removed, session id = " << session_id << LL_ENDL;
+    LL_INFOS("IMVIEW") << "LLIMMgr::removeSession, session removed, session id = " << session_id << LL_ENDL;
 
 	notifyObserverSessionRemoved(session_id);
 }
@@ -3061,15 +3099,15 @@ void LLIMMgr::inviteToSession(
 		if (LLMuteList::getInstance()->isMuted(caller_id, LLMute::flagVoiceChat)
 			&& voice_invite && "VoiceInviteQuestionDefault" == question_type)
 		{
-			LL_INFOS() << "Rejecting voice call from initiating muted resident " << caller_name << LL_ENDL;
+			LL_INFOS("IMVIEW") << "Rejecting voice call from initiating muted resident " << caller_name << LL_ENDL;
 			LLIncomingCallDialog::processCallResponse(1, payload);
 			return;
 		}
 		else if (LLMuteList::getInstance()->isMuted(caller_id, LLMute::flagAll & ~LLMute::flagVoiceChat) && !voice_invite)
 		{
-			LL_INFOS() << "Rejecting session invite from initiating muted resident " << caller_name << LL_ENDL;
-		return;
-	}
+			LL_INFOS("IMVIEW") << "Rejecting session invite from initiating muted resident " << caller_name << LL_ENDL;
+			return;
+		}
 	}
 
 	LLVoiceChannel* channelp = LLVoiceChannel::getChannelByID(session_id);
