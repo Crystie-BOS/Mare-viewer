@@ -264,7 +264,7 @@ class ViewerManifest(LLManifest):
         #mk
 
     def exec_name(self):
-        return "SecondLifeViewer"
+        return self.app_name_oneword()
 
     def app_name_oneword(self):
         #MK
