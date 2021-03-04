@@ -25,7 +25,10 @@
  * $/LicenseInfo$
  */
 
-// RRinterface needs this, but it's no longer provided by llwearabledata.h
+#ifndef RRINTERFACEHELPER_H
+#define RRINTERFACEHELPER_H
+
+ // RRinterface needs this, but it's no longer provided by llwearabledata.h
 #define MAX_CLOTHING_PER_TYPE 10 
 
 class RRHelper
@@ -35,3 +38,5 @@ public:
 	~RRHelper ();
 	static BOOL preventFloater(std::string floaterName); //used to check if a floater should not be made visible due to a restriction
 };
+
+#endif // RRINTERFACEHELPER_H
