@@ -3717,7 +3717,7 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
                   <string>'-DROOT_PROJECT_NAME:STRING=Restrained Love Debug'</string>
                   <string>'-DVIEWER_CHANNEL:STRING=Restrained Love Debug'</string>
                   <string>-DPACKAGE:BOOL=ON</string>
-                  <string>-DGCC_DISABLE_FATAL_WARNINGS:BOOL=ON</string>
+                  <string>-DGCC_DISABLE_FATAL_WARNINGS:BOOL=OFF</string>
                   <string>-DLL_TESTS:BOOL=OFF</string>
                 </array>
               </map>
@@ -3743,7 +3743,7 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
                   <string>'-DROOT_PROJECT_NAME:STRING=Restrained Love Debug'</string>
                   <string>'-DVIEWER_CHANNEL:STRING=Restrained Love Debug'</string>
                   <string>-DPACKAGE:BOOL=ON</string>
-                  <string>-DGCC_DISABLE_FATAL_WARNINGS:BOOL=ON</string>
+                  <string>-DGCC_DISABLE_FATAL_WARNINGS:BOOL=OFF</string>
                   <string>-DLL_TESTS:BOOL=OFF</string>
                 </array>
               </map>
@@ -3768,7 +3768,7 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
                   <string>'-DROOT_PROJECT_NAME:STRING=Restrained Love Release'</string>
                   <string>'-DVIEWER_CHANNEL:STRING=Restrained Love Release'</string>
                   <string>-DPACKAGE:BOOL=ON</string>
-                  <string>-DGCC_DISABLE_FATAL_WARNINGS:BOOL=ON</string>
+                  <string>-DGCC_DISABLE_FATAL_WARNINGS:BOOL=OFF</string>
                   <string>-DLL_TESTS:BOOL=OFF</string>
                 </array>
               </map>
@@ -3794,7 +3794,7 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
                   <string>'-DROOT_PROJECT_NAME:STRING=Restrained Love Release'</string>
                   <string>'-DVIEWER_CHANNEL:STRING=Restrained Love Release'</string>
                   <string>-DPACKAGE:BOOL=ON</string>
-                  <string>-DGCC_DISABLE_FATAL_WARNINGS:BOOL=ON</string>
+                  <string>-DGCC_DISABLE_FATAL_WARNINGS:BOOL=OFF</string>
                   <string>-DLL_TESTS:BOOL=OFF</string>
                 </array>
               </map>
