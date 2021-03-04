@@ -360,7 +360,7 @@ void LLPanelObject::getState( )
 	LLVOAvatarSelf* avatar = gAgentAvatarp;
 	if (gRRenabled && 
 		((gAgent.mRRInterface.mSittpMax < EXTREMUM
-		|| avatar && avatar->mIsSitting) && 
+		|| (avatar && avatar->mIsSitting)) && 
 		  ((gAgent.mRRInterface.mContainsUnsit || gAgent.mRRInterface.mContainsStandtp))))
 	{
 		// don't allow modification if someone is sitting on this object and avatar
