@@ -206,6 +206,10 @@ if (LINUX OR DARWIN)
 
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m${ADDRESS_SIZE}")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m${ADDRESS_SIZE}")
+else (LINUX OR DARWIN)  
+  if (GCC_DISABLE_FATAL_WARNINGS)
+  	#get rid of an unused reference warning on Windows
+  endif (GCC_DISABLE_FATAL_WARNINGS)
 endif (LINUX OR DARWIN)
 
 
