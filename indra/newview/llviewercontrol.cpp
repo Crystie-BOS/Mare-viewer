@@ -254,6 +254,13 @@ static bool handleRenderPerfTestChanged(const LLSD& newvalue)
 bool handleRenderTransparentWaterChanged(const LLSD& newvalue)
 {
 	LLRenderTarget::sUseFBO = newvalue.asBoolean();
+//MK
+	// When under @setsphere, transparent water must be rendered.
+	if (gRRenabled && gAgent.mRRInterface.mContainsSetsphere)
+	{
+		LLRenderTarget::sUseFBO = true;
+	}
+//mk
 	if (gPipeline.isInit())
 	{
 		gPipeline.updateRenderTransparentWater();
@@ -282,6 +289,13 @@ static bool handleWindowResized(const LLSD& newvalue)
 
 static bool handleReleaseGLBufferChanged(const LLSD& newvalue)
 {
+//MK
+	// When under @setsphere, don't allow DoF because it makes the alpha blended rigged surfaces win against the sphere, which lets the user see through it.
+	if (gRRenabled && gAgent.mRRInterface.mContainsSetsphere)
+	{
+		gSavedSettings.setBOOL("RenderDepthOfField", FALSE);
+	}
+//mk
 	if (gPipeline.isInit())
 	{
 		gPipeline.releaseGLBuffers();
@@ -522,6 +536,14 @@ static bool handleRenderBumpChanged(const LLSD& newval)
 // [RLVa:KB] - @setsphere
 	LLRenderTarget::sUseFBO	= newval.asBoolean() || (gSavedSettings.getBOOL("WindLightUseAtmosShaders") && LLPipeline::sUseDepthTexture);
 // [/RLVa:KB]
+
+//MK
+// When under @setsphere, bump mapping and shiny must be rendered.
+	if (gRRenabled && gAgent.mRRInterface.mContainsSetsphere)
+	{
+		LLRenderTarget::sUseFBO = true;
+	}
+//mk
 	if (gPipeline.isInit())
 	{
 		gPipeline.updateRenderBump();
