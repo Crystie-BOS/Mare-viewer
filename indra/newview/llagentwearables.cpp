@@ -54,6 +54,10 @@
 
 #include <boost/scoped_ptr.hpp>
 
+//MK
+#include "RRInterfaceHelper.h"
+//mk
+
 LLAgentWearables gAgentWearables;
 
 BOOL LLAgentWearables::mInitialWearablesUpdateReceived = FALSE;
