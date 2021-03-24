@@ -747,6 +747,10 @@ RRInterface::RRInterface():
 	, mGarbageCollectorCalledOnce(FALSE)
 	, mVisionRestricted(FALSE)
 	, mSitGroundOnStandUp(FALSE)
+	, mSetsphereDistMax(EXTREMUM) // KKA-835
+	, mSetsphereDistMin(EXTREMUM) // KKA-835
+	, mLeastDistMaxSquared(EXTREMUM) // KKA-835
+	, mSetsphereValueMax(0.0) // KKA-835
 	//, mContainsMoveUp(FALSE)
 	//, mContainsMoveDown(FALSE)
 	//, mContainsMoveForward(FALSE)
@@ -6277,6 +6281,15 @@ BOOL RRInterface::updateCameraLimits ()
 				object->setSelected(FALSE);
 			}
 		}
+  	// KKA-835 update our lowest squared distance value
+  	if (mSetsphereDistMax < mCamDistDrawMax)
+  	{
+  	  mLeastDistMaxSquared = mSetsphereDistMax * mSetsphereDistMax; 
+  	}
+  	else
+  	{
+  	  mLeastDistMaxSquared = mCamDistDrawMax * mCamDistDrawMax;
+  	}
 	}
 
 	// Recalculate mCamDistNbGradients according to the distance between mCamDistDrawMin and mCamDistDrawMax
@@ -6287,7 +6300,7 @@ BOOL RRInterface::updateCameraLimits ()
 		mCamDistNbGradients = 40;
 	}
 
-	mVisionRestricted = (mCamDistDrawMin < EXTREMUM || mCamDistDrawMax < EXTREMUM);
+	mVisionRestricted = (mCamDistDrawMin < EXTREMUM || mCamDistDrawMax < EXTREMUM || mContainsSetsphere); //KKA-835 add setsphere
 
 	// Use impostors if we use silhouettes or if the outer sphere is 99% opaque or more
 	if (mShowavsDistMax < EXTREMUM || mCamDistDrawAlphaMax >= ALPHA_ALMOST_OPAQUE) {
@@ -6352,7 +6365,8 @@ void RRInterface::drawRenderLimit (BOOL force_opaque /*= FALSE*/)
 	//	return;
 	//}
 
-	if (!mVisionRestricted) { // not vision restricted ? => bail
+  // KKA-835 Test specifically instead of using mVisionRestricted since that now includes setsphere
+	if (! (mCamDistDrawMin < EXTREMUM || mCamDistDrawMax < EXTREMUM)) { // not vision sphere restricted ? => bail
 		return;
 	}
 
@@ -6510,6 +6524,11 @@ BOOL RRInterface::updateSetsphere()
 		gPipeline.resetVertexBuffers();
 		LLViewerShaderMgr::instance()->setShaders();
 	}
+	
+	//KKA-835 as part of extending mVisionRestricted to include setsphere, we need generally accessible min and max values
+	mSetsphereDistMin = EXTREMUM;
+	mSetsphereDistMax = EXTREMUM;
+	mSetsphereValueMax = 0.0; // KKA-835 arguably this should only operate on mode 0, but we'll do it for all for now
 
 	// Part 1 : create a list of ESphereMode::Count inactive effects, some of these effects will be copied to LLVfxManager later and this list and its contents will be erased
 	std::deque<RlvSphereEffect*> effects;
@@ -6568,11 +6587,21 @@ BOOL RRInterface::updateSetsphere()
 						}
 						if (last_part == "distmin") { // mixing here means retaining the lowest value
 							if (!effect->m_nChangedDistanceMin || f_option < effect->getDistanceMin()) {
+								//KKA-835 some uses of mVisionRestricted also test camdrawmin/max so we need setsphere equivalents
+								if (f_option < mSetsphereDistMin)
+								{
+  								mSetsphereDistMin = f_option;
+  							}
 								effect->setDistanceMin(f_option);
 							}
 						}
 						else if (last_part == "distmax") { // mixing here means retaining the lowest value
 							if (!effect->m_nChangedDistanceMax || f_option < effect->getDistanceMax()) {
+								//KKA-835 some uses of mVisionRestricted also test camdrawmin/max so we need setsphere equivalents
+								if (f_option < mSetsphereDistMax)
+								{
+  								mSetsphereDistMax = f_option;
+  							}
 								effect->setDistanceMax(f_option);
 							}
 						}
@@ -6588,6 +6617,11 @@ BOOL RRInterface::updateSetsphere()
 						}
 						else if (last_part == "valuemax") { // mixing here means retaining the highest value
 							if (!effect->m_nChangedValueMax || f_option > effect->getValueMax()) {
+							  // KKA-835 provide an equivalent for testing alphamax (but note we don't restrict to mode 0)
+							  if (f_option > mSetsphereValueMax)
+							  {
+							    mSetsphereValueMax = f_option;
+							  }
 								effect->setValueMax(f_option);
 							}
 						}
@@ -6667,6 +6701,17 @@ BOOL RRInterface::updateSetsphere()
 	}
 	// All the effects that have indeed been added to LLVfxManager will be destroyed next time we call LLVfxManager::instance().clearEffects(), which means next time we call RRInterface::updateSetsphere().
 
+  // KKA-835 mVisionRestricted now covers setsphere too
+	mVisionRestricted = (mCamDistDrawMin < EXTREMUM || mCamDistDrawMax < EXTREMUM || mContainsSetsphere);
+	// KKA-835 update our lowest squared distance value
+	if (mSetsphereDistMax < mCamDistDrawMax)
+	{
+	  mLeastDistMaxSquared = mSetsphereDistMax * mSetsphereDistMax; 
+	}
+	else
+	{
+	  mLeastDistMaxSquared = mCamDistDrawMax * mCamDistDrawMax;
+	}
 	return TRUE;
 }
 
