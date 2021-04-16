@@ -799,7 +799,6 @@ RRInterface::RRInterface():
 
 RRInterface::~RRInterface()
 {
-	mCamTexturesCustom = NULL; // needed to avoid a crash on Darwin
 }
 
 std::string RRInterface::getVersion ()
