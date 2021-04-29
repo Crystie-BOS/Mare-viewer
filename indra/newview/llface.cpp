@@ -1169,7 +1169,7 @@ bool LLFace::canRenderAsMask()
 	}
 	
 	LLMaterial* mat = te->getMaterialParams();
-	if (mat && mat->getDiffuseAlphaMode() == LLMaterial::DIFFUSE_ALPHA_MODE_BLEND)
+	if (mat && mat->getDiffuseAlphaModeRender() == LLMaterial::DIFFUSE_ALPHA_MODE_BLEND)
 	{
 		return false;
 	}
@@ -1423,7 +1423,7 @@ BOOL LLFace::getGeometryVolume(const LLVolume& volume,
 			}
 			else
 			{
-				if (!mat || mat->getDiffuseAlphaMode() != LLMaterial::DIFFUSE_ALPHA_MODE_MASK)
+				if (!mat || mat->getDiffuseAlphaModeRender() != LLMaterial::DIFFUSE_ALPHA_MODE_MASK)
 				{
 					shiny_in_alpha = true;
 				}
