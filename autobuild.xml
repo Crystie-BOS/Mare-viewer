@@ -3339,9 +3339,11 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>087375378f104cdac0cb0fe0ca43dd4d</string>
+              <string>a37675fc162afb4719dc4aa9d75ba183</string>
+              <key>hash_algorithm</key>
+              <string>md5</string>
               <key>url</key>
-              <string>http://automated-builds-secondlife-com.s3.amazonaws.com/ct2/346/880/uriparser-0.8.0.1-linux64-500342.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-uriparser-ab1.1.9/downloads/uriparser-0.9.4-linux64-211210158.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
