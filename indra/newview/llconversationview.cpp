@@ -536,6 +536,7 @@ void LLConversationViewSession::onCurrentVoiceSessionChanged(const LLUUID& sessi
 
 bool LLConversationViewSession::highlightFriendTitle(LLConversationItem* vmi)
 {
+	if (gRRenabled && gAgent.mRRInterface.mContainsShownames) return false;
 	if(vmi->getType() == LLConversationItem::CONV_PARTICIPANT || vmi->getType() == LLConversationItem::CONV_SESSION_1_ON_1)
 	{
 		LLIMModel::LLIMSession* session=  LLIMModel::instance().findIMSession(vmi->getUUID());
@@ -650,7 +651,7 @@ void LLConversationViewParticipant::draw()
 	}
 	else
 	{
-		if (LLAvatarActions::isFriend(mUUID))
+		if (LLAvatarActions::isFriend(mUUID) && !(gRRenabled && gAgent.mRRInterface.mContainsShownames))
 		{
 			color = LLUIColorTable::instance().getColor("ConversationFriendColor");
 		}
