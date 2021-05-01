@@ -42,6 +42,7 @@
 #include "lluictrlfactory.h"
 #include "lltoolbarview.h"
 
+#include "llagent.h"
 //
 // Implementation of conversations list session widgets
 //
