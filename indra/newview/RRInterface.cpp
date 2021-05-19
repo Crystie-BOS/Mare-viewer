@@ -1272,6 +1272,38 @@ BOOL RRInterface::add (LLUUID object_uuid, std::string action, std::string optio
 				gSavedSettings.setBOOL("WindLightUseAtmosShaders", TRUE);
 			}
 		}
+		else if (
+			canon_action == "camdistmax" || canon_action == "setcam_avdistmax"
+			|| canon_action == "camdistmin" || canon_action == "setcam_avdistmin"
+			|| canon_action == "camdrawmax" || canon_action == "setsphere_distmax"
+			|| canon_action == "camdrawmin" || canon_action == "setsphere_distmin"
+			|| canon_action == "camdrawalphamin"
+			|| canon_action == "camdrawalphamax"
+			|| canon_action == "setsphere_param"
+			|| canon_action == "setsphere_valuemin"
+			|| canon_action == "setsphere_valuemax"
+			|| canon_action == "camzoommax" || canon_action == "setcam_fovmax"
+			|| canon_action == "camzoommin" || canon_action == "setcam_fovmin"
+			) {
+			// For these commands, if the object has already issued the same command even with a different parameter, remove that one before adding the new one, otherwise we'd blend both afterwards and that's not desirable.
+			RRMAP::iterator it;
+			it = mSpecialObjectBehaviours.begin();
+			while (it != mSpecialObjectBehaviours.end()) {
+				if (it->first == object_uuid.asString() && it->second.find(canon_action+":") == 0) {
+					notify(object_uuid, it->second, "=y");
+					if (sRestrainedLoveLogging) {
+						LL_INFOS() << it->second << " => removed. " << LL_ENDL;
+					}
+					std::string tmp = it->second;
+					mSpecialObjectBehaviours.erase(it);
+					refreshCachedVariable(tmp);
+					it = mSpecialObjectBehaviours.begin();
+				}
+				else {
+					it++;
+				}
+			}
+		}
 
 		// Insert the new behav
 		mSpecialObjectBehaviours.insert(std::pair<std::string, std::string>(object_uuid.asString(), action));
