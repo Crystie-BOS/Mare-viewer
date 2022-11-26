@@ -101,6 +101,8 @@ static const std::string PANEL_PROFILE_VIEW = "panel_profile_view";
 static const std::string PROFILE_PROPERTIES_CAP = "AgentProfile";
 static const std::string PROFILE_IMAGE_UPLOAD_CAP = "UploadAgentProfileImage";
 
+// <FS:Zi> FIRE-32184: Online/Offline status not working for non-friends
+const U32 AVATAR_ONLINE_UNDEFINED			= 0x1 << 31;
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -165,7 +167,14 @@ void request_avatar_properties_coro(std::string cap_url, LLUUID agent_id)
 
     avatar_data->flags = 0;
 
-    if (result["online"].asBoolean())
+    // <FS:Zi> FIRE-32184: Online/Offline status not working for non-friends
+    // if (result["online"].asBoolean())
+    if (result["online"].isUndefined())
+    {
+        avatar_data->flags |= AVATAR_ONLINE_UNDEFINED;
+    }
+    else if (result["online"].asBoolean())
+    // </FS:Zi>
     {
         avatar_data->flags |= AVATAR_ONLINE;
     }
@@ -876,6 +885,8 @@ LLPanelProfileSecondLife::~LLPanelProfileSecondLife()
     if (getAvatarId().notNull())
     {
         LLAvatarTracker::instance().removeParticularFriendObserver(getAvatarId(), this);
+        // <FS:Zi> FIRE-32184: Online/Offline status not working for non-friends
+        LLAvatarPropertiesProcessor::getInstance()->removeObserver(getAvatarId(), &mPropertiesObserver);
     }
 
     if (LLVoiceClient::instanceExists())
@@ -923,6 +934,18 @@ BOOL LLPanelProfileSecondLife::postBuild()
 
     return TRUE;
 }
+
+// <FS:Zi> FIRE-32184: Online/Offline status not working for non-friends
+void LLPanelProfileSecondLife::onAvatarProperties(const LLAvatarData* d)
+{
+    // only update the "unknown" status if they are showing as online, otherwise
+    // we still don't know their true status
+    if (d->agent_id == gAgentID && d->flags & AVATAR_ONLINE)
+    {
+        processOnlineStatus(false, true, true);
+    }
+}
+// </FS:Zi>
 
 void LLPanelProfileSecondLife::onOpen(const LLSD& key)
 {
@@ -1051,6 +1074,14 @@ void LLPanelProfileSecondLife::processProfileProperties(const LLAvatarData* avat
                             gAgent.isGodlike() || relationship->isRightGrantedFrom(LLRelationship::GRANT_ONLINE_STATUS),
                             (avatar_data->flags & AVATAR_ONLINE));
     }
+    // <FS:Zi> FIRE-32184: Online/Offline status not working for non-friends
+    else if (avatar_data->flags & AVATAR_ONLINE_UNDEFINED)
+    {
+        // being a friend who doesn't show online status and appears online can't happen
+        // so this is our marker for "undefined"
+        processOnlineStatus(true, false, true);
+    }
+    // </FS:Zi>
 
     fillCommonData(avatar_data);
 
@@ -1399,14 +1430,34 @@ void LLPanelProfileSecondLife::updateOnlineStatus()
         childSetVisible("frind_layout", false);
         childSetVisible("online_layout", false);
         childSetVisible("offline_layout", false);
+        childSetVisible("unknown_layout", false);
     }
 }
 
 void LLPanelProfileSecondLife::processOnlineStatus(bool is_friend, bool show_online, bool online)
 {
-    childSetVisible("frind_layout", is_friend);
+    // <FS:Zi> FIRE-32184: Online/Offline status not working for non-friends
+    // being a friend who doesn't show online status and appears online can't happen
+    // so this is our marker for "undefined"
+    if (is_friend && !show_online && online)
+    {
+	    childSetVisible("frind_layout", false);
+	    childSetVisible("online_layout", false);
+	    childSetVisible("offline_layout", false);
+	    childSetVisible("unknown_layout", true);
+
+        mPropertiesObserver.mPanelProfile = this;
+        mPropertiesObserver.mRequester = gAgentID;
+        LLAvatarPropertiesProcessor::getInstance()->addObserver(getAvatarId(), &mPropertiesObserver);
+        LLAvatarPropertiesProcessor::getInstance()->sendAvatarPropertiesRequest(getAvatarId());
+
+        return;
+    }
+    // </FS:Zi>
+    childSetVisible("frind_layout", is_friend && show_online);
     childSetVisible("online_layout", online && show_online);
     childSetVisible("offline_layout", !online && show_online);
+    childSetVisible("unknown_layout", (is_friend && !show_online && online));
 }
 
 void LLPanelProfileSecondLife::setLoaded()
@@ -2664,3 +2715,17 @@ void LLPanelProfile::createClassified()
     mTabContainer->selectTabPanel(mPanelClassifieds);
 }
 
+// <FS:Zi> FIRE-32184: Online/Offline status not working for non-friends
+FSPanelPropertiesObserver::FSPanelPropertiesObserver() : LLAvatarPropertiesObserver(),
+    mPanelProfile(nullptr)
+{
+}
+
+void FSPanelPropertiesObserver::processProperties(void* data, EAvatarProcessorType type)
+{
+    if (type == APT_PROPERTIES && mPanelProfile)
+    {
+        mPanelProfile->onAvatarProperties(static_cast<const LLAvatarData*>(data));
+    }
+}
+// </FS:Zi>
