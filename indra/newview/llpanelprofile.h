@@ -65,6 +65,20 @@ class LLPanelProfileClassifieds;
 class LLPanelProfilePicks;
 class LLViewerFetchedTexture;
 
+// <FS:Zi> FIRE-32184: Online/Offline status not working for non-friends
+class LLPanelProfileSecondLife;
+
+class FSPanelPropertiesObserver : public LLAvatarPropertiesObserver
+{
+public:
+    FSPanelPropertiesObserver();
+
+	virtual void processProperties(void* data, EAvatarProcessorType type);
+
+    LLUUID mRequester;
+    LLPanelProfileSecondLife* mPanelProfile;
+};
+// </FS:Zi>
 
 /**
 * Panel for displaying Avatar's second life related info.
@@ -110,6 +124,9 @@ public:
     void commitUnsavedChanges() override;
 
     friend void request_avatar_properties_coro(std::string cap_url, LLUUID agent_id);
+
+    // <FS:Zi> FIRE-32184: Online/Offline status not working for non-friends
+    void onAvatarProperties(const LLAvatarData* d);
 
 protected:
 	/**
@@ -222,6 +239,9 @@ private:
 	boost::signals2::connection	mAvatarNameCacheConnection;
 	boost::signals2::connection mRlvBehaviorCallbackConnection;
 	void updateRlvRestrictions(std::string behavior);
+
+    // <FS:Zi> FIRE-32184: Online/Offline status not working for non-friends
+    FSPanelPropertiesObserver mPropertiesObserver;
 };
 
 

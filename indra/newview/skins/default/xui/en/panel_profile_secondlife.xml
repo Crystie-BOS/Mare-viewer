@@ -233,6 +233,35 @@ Account: [ACCTTYPE]
        visible="true"/>
     </layout_panel>
     <layout_panel
+     name="unknown_layout"
+     follows="all"
+     layout="topleft"
+     height="16"
+     auto_resize="false"
+     user_resize="false"
+     visible="false">
+      <icon
+       name="offline_icon"
+       image_name="Profile_Friend_Offline"
+       layout="topleft"
+       follows="left|top"
+       top="0"
+       left="5"
+       height="10"
+       width="10"/>
+      <text
+       name="unknown_text"
+       value="Unknown"
+       top="0"
+       left="18"
+       right="-1"
+       height="16"
+       follows="left|top|right"
+       layout="topleft"
+       translate="false"
+       visible="true"/>
+    </layout_panel>
+    <layout_panel
      name="account_layout"
      follows="all"
      layout="topleft"
