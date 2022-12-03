@@ -29,6 +29,7 @@
 
 #include "fsfloaterwearablefavorites.h"
 #include "fscommon.h"
+#include "llagent.h" // for RLV
 #include "llappearancemgr.h"
 #include "llbutton.h"
 #include "llfiltereditor.h"
@@ -41,6 +42,7 @@
 #include "llviewermenu.h"			// for gMenuHolder
 //#include "rlvactions.h"
 //#include "rlvlocks.h"
+#include "RRinterface.h"
 
 #define FS_WEARABLE_FAVORITES_FOLDER "#Wearable Favorites"
 
@@ -349,28 +351,23 @@ void FSFloaterWearableFavorites::onDoubleClick()
 
 		if (get_is_item_worn(selected_item_id))
 		{
-//			if ((item->getType() == LLAssetType::AT_CLOTHING && (!RlvActions::isRlvEnabled() || gRlvWearableLocks.canRemove(item))) ||
-//			    ((item->getType() == LLAssetType::AT_OBJECT) && (!RlvActions::isRlvEnabled() || gRlvAttachmentLocks.canDetach(item))))
-			if ((item->getType() == LLAssetType::AT_CLOTHING) ||
-			    ((item->getType() == LLAssetType::AT_OBJECT)))
+			if ((item->getType() == LLAssetType::AT_CLOTHING && (!gRRenabled || gAgent.mRRInterface.canWear(item))) ||
+			    ((item->getType() == LLAssetType::AT_OBJECT) && (!gRRenabled || gAgent.mRRInterface.canAttach(item))))
 			{
 				LLAppearanceMgr::instance().removeItemsFromAvatar(ids);
 			}
 		}
 		else
 		{
-			if (item->getType() == LLAssetType::AT_BODYPART)
-			//if (item->getType() == LLAssetType::AT_BODYPART && (!RlvActions::isRlvEnabled() || (gRlvWearableLocks.canWear(item) & RLV_WEAR_REPLACE) == RLV_WEAR_REPLACE))
+			if (item->getType() == LLAssetType::AT_BODYPART && (!gRRenabled || gAgent.mRRInterface.canWear(item)))
 			{
 				wear_multiple(ids, true);
 			}
-			else if (item->getType() == LLAssetType::AT_CLOTHING && LLAppearanceMgr::instance().canAddWearables(ids))
-			//else if (item->getType() == LLAssetType::AT_CLOTHING && LLAppearanceMgr::instance().canAddWearables(ids) && (!RlvActions::isRlvEnabled() || (gRlvWearableLocks.canWear(item) & RLV_WEAR_ADD) == RLV_WEAR_ADD))
+			else if (item->getType() == LLAssetType::AT_CLOTHING && LLAppearanceMgr::instance().canAddWearables(ids) && (!gRRenabled || gAgent.mRRInterface.canWear(item)))
 			{
 				wear_multiple(ids, false);
 			}
-			else if (item->getType() == LLAssetType::AT_OBJECT && LLAppearanceMgr::instance().canAddWearables(ids))
-			//else if (item->getType() == LLAssetType::AT_OBJECT && LLAppearanceMgr::instance().canAddWearables(ids) && (!RlvActions::isRlvEnabled() || (gRlvAttachmentLocks.canAttach(item) & RLV_WEAR_ADD) == RLV_WEAR_ADD))
+			else if (item->getType() == LLAssetType::AT_OBJECT && LLAppearanceMgr::instance().canAddWearables(ids) && (!gRRenabled || gAgent.mRRInterface.canAttach(item)))
 			{
 				wear_multiple(ids, false);
 			}
