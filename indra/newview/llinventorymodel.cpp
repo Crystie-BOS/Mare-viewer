@@ -76,6 +76,7 @@
 
 #include <algorithm>
 #include <boost/algorithm/string/join.hpp>
+#include "fsfloaterwearablefavorites.h"
 
 // Increment this if the inventory contents change in a non-backwards-compatible way.
 // For viewer 2, the addition of link items makes a pre-viewer-2 cache incorrect.
@@ -1427,10 +1428,15 @@ void LLInventoryModel::changeItemParent(LLViewerInventoryItem* item,
 						  << new_parent_id << LL_ENDL;
 
 		// ## Zi: Animation Overrider
-		if(isObjectDescendentOf(item->getUUID(),AOEngine::instance().getAOFolder())
-			&& gSavedPerAccountSettings.getBOOL("ProtectAOFolders"))
+		if ((isObjectDescendentOf(item->getUUID(),AOEngine::instance().getAOFolder())
+			&& gSavedPerAccountSettings.getBOOL("ProtectAOFolders")) ||
+			(isObjectDescendentOf(item->getUUID(), FSFloaterWearableFavorites::getFavoritesFolder())
+				&& gSavedPerAccountSettings.getBOOL("LockWearableFavoritesFolders")))
+		{
+			LL_INFOS("Inventory") << "Cannot move item because it is descendent of a protected folder" << LL_ENDL;
 			return;
-		// ## Zi: Animation Overrider
+		}
+		// </FS>
 
 		LLInventoryModel::update_list_t update;
 		LLInventoryModel::LLCategoryUpdate old_folder(item->getParentUUID(),-1);
@@ -1465,13 +1471,14 @@ void LLInventoryModel::changeCategoryParent(LLViewerInventoryCategory* cat,
 
 	// ## Zi: Animation Overrider
 	if((isObjectDescendentOf(cat->getUUID(),AOEngine::instance().getAOFolder())
-		&& gSavedPerAccountSettings.getBOOL("ProtectAOFolders"))
-// //-TT Client LSL Bridge
-// 		|| (isObjectDescendentOf(cat->getUUID(),FSLSLBridge::instance().getBridgeFolder())
-// 			&& gSavedPerAccountSettings.getBOOL("ProtectBridgeFolder"))
-// //-TT
-		)
+		&& gSavedPerAccountSettings.getBOOL("ProtectAOFolders")) ||
+		(isObjectDescendentOf(cat->getUUID(), FSFloaterWearableFavorites::getFavoritesFolder())
+			&& gSavedPerAccountSettings.getBOOL("LockWearableFavoritesFolders")))
+	{
+		LL_INFOS("Inventory") << "Cannot move category because it is descendent of a protected folder" << LL_ENDL;
 		return;
+	}
+
 	// ## Zi: Animation Overrider
 
 	LLInventoryModel::update_list_t update;

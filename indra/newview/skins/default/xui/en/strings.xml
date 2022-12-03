@@ -4253,6 +4253,7 @@ name="Command_360_Capture_Label">360 snapshot</string>
   <string name="Command_Web_Browser_Label">Web browser</string>
   <string name="Command_Sound_Explorer_Label">Sound explorer</string>
   <string name="Command_Contact_Sets_Label">Contact sets</string>
+  <string name="Command_Wearable_Favorites_Label">Favorite Wearables</string>
   <string name="Command_RFO_Label">Show Friends Only</string>
 
   <string name="Command_AboutLand_Tooltip">Information about the land you're visiting</string>
@@ -4298,7 +4299,7 @@ name="Command_360_Capture_Label">360 snapshot</string>
   <string name="Command_Sound_Explorer_Tooltip">Opens the sound explorer</string>
   <string name="Command_Contact_Sets_Tooltip">Opens contact sets (CTRL+ALT+SHIFT+C)</string>
   <string name="Command_Legacy_Search_Tooltip">Find places, groups and people</string>
-<!-- /Firestorm commands -->
+  <string name="Command_Wearable_Favorites_Tooltip">Open the list of favorite wearables</string>
   <string name="Command_RFO_Tooltip">Show only your friends in the viewer, all other avatars will be removed. Once enabled a TP is required to restore visibility of others.</string>
 
   <string name="Toolbar_Bottom_Tooltip">currently in your bottom toolbar</string>
