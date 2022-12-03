@@ -91,6 +91,7 @@
 #include <boost/foreach.hpp>
 
 #include "aoengine.h"			// ## Zi: Animation Overrider
+#include "fsfloaterwearablefavorites.h"
 
 BOOL LLInventoryState::sWearNewClothing = FALSE;
 LLUUID LLInventoryState::sWearNewClothingTransactionID;
@@ -654,8 +655,13 @@ BOOL get_is_item_removable(const LLInventoryModel* model, const LLUUID& id)
 	}
 
 	// ## Zi: Animation Overrider
-	if(model->isObjectDescendentOf(id,AOEngine::instance().getAOFolder())
+	if (
+		(model->isObjectDescendentOf(id,AOEngine::instance().getAOFolder())
 		&& gSavedPerAccountSettings.getBOOL("ProtectAOFolders"))
+		||
+		(model->isObjectDescendentOf(id, FSFloaterWearableFavorites::getFavoritesFolder())
+			&& gSavedPerAccountSettings.getBOOL("LockWearableFavoritesFolders"))
+		)
     {
 		return FALSE;
 	}
@@ -744,8 +750,13 @@ BOOL get_is_category_removable(const LLInventoryModel* model, const LLUUID& id)
 	}
 
 	// ## Zi: Animation Overrider
-	if((id==AOEngine::instance().getAOFolder() || model->isObjectDescendentOf(id,AOEngine::instance().getAOFolder()))
-		&& gSavedPerAccountSettings.getBOOL("ProtectAOFolders"))
+	if(
+		((id==AOEngine::instance().getAOFolder() || model->isObjectDescendentOf(id,AOEngine::instance().getAOFolder()))
+			&& gSavedPerAccountSettings.getBOOL("ProtectAOFolders"))
+		||
+		((id == FSFloaterWearableFavorites::getFavoritesFolder() || model->isObjectDescendentOf(id, FSFloaterWearableFavorites::getFavoritesFolder()))
+			&& gSavedPerAccountSettings.getBOOL("LockWearableFavoritesFolders"))
+	)
 	{
 		return FALSE;
 	}
@@ -789,8 +800,13 @@ BOOL get_is_category_renameable(const LLInventoryModel* model, const LLUUID& id)
 		return FALSE;
 	}
 	// ## Zi: Animation Overrider
-	if((id==AOEngine::instance().getAOFolder() || model->isObjectDescendentOf(id,AOEngine::instance().getAOFolder()))
+	if (
+		((id==AOEngine::instance().getAOFolder() || model->isObjectDescendentOf(id,AOEngine::instance().getAOFolder()))
 		&& gSavedPerAccountSettings.getBOOL("ProtectAOFolders"))
+		||
+		((id == FSFloaterWearableFavorites::getFavoritesFolder() || model->isObjectDescendentOf(id, FSFloaterWearableFavorites::getFavoritesFolder()))
+			&& gSavedPerAccountSettings.getBOOL("LockWearableFavoritesFolders"))
+	)
 	{
 		return FALSE;
 	}

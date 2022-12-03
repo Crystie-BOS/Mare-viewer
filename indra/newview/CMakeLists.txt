@@ -148,6 +148,7 @@ set(viewer_SOURCE_FILES
     fsfloaterimport.cpp
     fsfloaterposestand.cpp
     fsfloatersearch.cpp
+    fsfloaterwearablefavorites.cpp
     fskeywords.cpp
     fsmoneytracker.cpp
     fspanelclassified.cpp
@@ -834,6 +835,7 @@ set(viewer_HEADER_FILES
     fsfloaterimport.h
     fsfloaterposestand.h
     fsfloatersearch.h
+    fsfloaterwearablefavorites.h
     fskeywords.h
     fsmoneytracker.h
     fspanelclassified.h

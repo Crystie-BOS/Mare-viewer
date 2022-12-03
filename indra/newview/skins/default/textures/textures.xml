@@ -744,6 +744,7 @@ with the same filename but different name
 
   <texture name="sound_explorer" file_name="toolbar_icons/sound_explorer.png" preload="true" />
   <texture name="contact_sets" file_name="toolbar_icons/contact_sets.png" preload="true" />
+  <texture name="Wearable_Favorites_Icon" file_name="toolbar_icons/wearable_favorites.png" preload="true" />
   <texture name="Unread_Chiclet" file_name="bottomtray/Unread_Chiclet.png" preload="false" />
 
   <texture name="UpArrow_Off" file_name="icons/UpArrow_Off.png" preload="false" />

@@ -202,6 +202,7 @@
 #include "kokuafloaterstreaminfo.h"
 // NaCl - Sound explorer
 #include "fsfloaterposestand.h"
+#include "fsfloaterwearablefavorites.h"
 #include "llfloatersearchreplace.h"
 #include "NACLfloaterexploresounds.h"
 // NaCl End
@@ -467,6 +468,7 @@ void LLViewerFloaterReg::registerFloaters()
 	LLFloaterReg::add("rlv_worn", "floater_rlv_worn.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<KokuaFloaterRLVWorn>);
 	LLFloaterReg::add("fs_posestand", "floater_fs_posestand.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<FSFloaterPoseStand>);
 	LLFloaterReg::add("search_legacy", "floater_fs_search.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<FSFloaterSearch>);
+	LLFloaterReg::add("fs_wearable_favorites", "floater_fs_wearable_favorites.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<FSFloaterWearableFavorites>);
 	LLFloaterReg::add("kokua_chatbar", "floater_chatbar.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<KokuaChatBar>);
 	LLFloaterReg::add("publish_classified_fs", "floater_publish_classified.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<FSPublishClassifiedFloater>);
 	LLFloaterReg::add("search_replace", "floater_search_replace.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<LLFloaterSearchReplace>);
