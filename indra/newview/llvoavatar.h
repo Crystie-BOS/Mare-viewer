@@ -298,7 +298,7 @@ public:
 	void			addNameTagLineAsLabelWithColorAndEmphasis(const std::string& line, const LLColor4& color, bool useBold);
 	void 			idleUpdateRenderComplexity();
 	void 			idleUpdateDebugInfo();
-    void 			accountRenderComplexityForObject(const LLViewerObject *attached_object,
+    void 			accountRenderComplexityForObject(LLViewerObject *attached_object,
                                                      const F32 max_attachment_complexity,
                                                      LLVOVolume::texture_cost_t& textures,
                                                      U32& cost,
