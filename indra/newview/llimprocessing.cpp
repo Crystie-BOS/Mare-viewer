@@ -55,6 +55,7 @@
 #include "llviewerwindow.h"
 #include "llviewerregion.h"
 #include "llvoavatarself.h"
+#include "llworld.h"
 
 //MK
 #include "llagentui.h"
@@ -629,19 +630,18 @@ void LLIMProcessing::processNewMessage(LLUUID from_id,
                 }
                 // </FS:PP>
 
-			// add to IM panel, but do not bother the user
-			gIMMgr->addMessage(
-				session_id,
-				from_id,
-				name,
-				buffer,
-				IM_OFFLINE == offline,
-				LLStringUtil::null,
-				dialog,
-				parent_estate_id,
-				region_id,
-				position,
-                    true,
+                // add to IM panel, but do not bother the user
+                gIMMgr->addMessage(
+                    session_id,
+                    from_id,
+                    name,
+                    buffer,
+                    IM_OFFLINE == offline,
+                    LLStringUtil::null,
+                    dialog,
+                    parent_estate_id,
+                    region_id,
+                    position,
                     false,
                     keyword_alert_performed);
 
@@ -888,6 +888,16 @@ void LLIMProcessing::processNewMessage(LLUUID from_id,
                     //KKA-674 - this got pulled across in the keywords port but isn't needed here (and reinstates squashed incoming IMs)
 					//buffer = saved + message;
 
+                    bool region_message = false;
+                    if (region_id.isNull())
+                    {
+                        LLViewerRegion* regionp = LLWorld::instance().getRegionFromID(from_id);
+                        if (regionp)
+                        {
+                            region_message = true;
+                        }
+                    }
+
 				gIMMgr->addMessage(
 					session_id,
 					from_id,
@@ -899,9 +909,9 @@ void LLIMProcessing::processNewMessage(LLUUID from_id,
 					parent_estate_id,
 					region_id,
 					position,
-                        true,
                         false,
-                        keyword_alert_performed);
+                        keyword_alert_performed,
+						region_message);
 			}
 			else
 			{
@@ -1513,8 +1523,7 @@ void LLIMProcessing::processNewMessage(LLUUID from_id,
 				IM_SESSION_INVITE,
 				parent_estate_id,
 				region_id,
-				position,
-				true);
+                    position);
 		}
 		else
 		{
@@ -1564,7 +1573,6 @@ void LLIMProcessing::processNewMessage(LLUUID from_id,
 				parent_estate_id,
 				region_id,
 				position,
-                    true,
                     false,
                     keyword_alert_performed);
 		}

@@ -55,7 +55,8 @@
 //mk
 
 extern LLPipeline gPipeline;
-
+// get this from indra_constants.h instead
+// const F32 MAX_ATTACHMENT_DIST = 3.5f; // meters
 
 //-----------------------------------------------------------------------------
 // LLViewerJointAttachment()

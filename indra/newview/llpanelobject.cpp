@@ -101,6 +101,8 @@ enum {
 	MI_HOLE_COUNT
 };
 
+//const F32 MAX_ATTACHMENT_DIST = 3.5f; // meters
+
 //static const std::string LEGACY_FULLBRIGHT_DESC =LLTrans::getString("Fullbright");
 
 BOOL	LLPanelObject::postBuild()
@@ -1696,42 +1698,47 @@ void LLPanelObject::sendPosition(BOOL btn_down)
 
 	LLVector3 newpos(mCtrlPosX->get(), mCtrlPosY->get(), mCtrlPosZ->get());
 	LLViewerRegion* regionp = mObject->getRegion();
+
+	if (!regionp) return;
+
+	if (!mObject->isAttachment())
+	{
+        // Clamp the Z height
+        const F32 height = newpos.mV[VZ];
+        const F32 min_height = LLWorld::getInstance()->getMinAllowedZ(mObject, mObject->getPositionGlobal());
+        const F32 max_height = LLWorld::getInstance()->getRegionMaxHeight();
+
+		if ( height < min_height)
+		{
+			newpos.mV[VZ] = min_height;
+			mCtrlPosZ->set( min_height );
+		}
+		else if ( height > max_height )
+		{
+			newpos.mV[VZ] = max_height;
+			mCtrlPosZ->set( max_height );
+		}
+
+		// Grass is always drawn on the ground, so clamp its position to the ground
+		if (mObject->getPCode() == LL_PCODE_LEGACY_GRASS)
+		{
+			mCtrlPosZ->set(LLWorld::getInstance()->resolveLandHeightAgent(newpos) + 1.f);
+		}
+	}
+    else
+    {
+        if (newpos.length() > MAX_ATTACHMENT_DIST)
+        {
+            newpos.clampLength(MAX_ATTACHMENT_DIST);
+            mCtrlPosX->set(newpos.mV[VX]);
+            mCtrlPosY->set(newpos.mV[VY]);
+            mCtrlPosZ->set(newpos.mV[VZ]);
+        }
+    }
+
 	// Make sure new position is in a valid region, so the object
 	// won't get dumped by the simulator.
 	LLVector3d new_pos_global = regionp->getPosGlobalFromRegion(newpos);
-
-	if (!regionp) return;
-	if (mObject->isAttachment())
-	{
-		newpos.clamp(LLVector3(-MAX_ATTACHMENT_DIST,-MAX_ATTACHMENT_DIST,-MAX_ATTACHMENT_DIST),LLVector3(MAX_ATTACHMENT_DIST,MAX_ATTACHMENT_DIST,MAX_ATTACHMENT_DIST));
-	}
-	else
-	{
-		// Clamp the Z height
-		const F32 height = newpos.mV[VZ];
-		const F32 min_height = LLWorld::getInstance()->getMinAllowedZ(mObject, mObject->getPositionGlobal());
-		const F32 max_height = LLWorld::getInstance()->getRegionMaxHeight();
-		if (!mObject->isAttachment())
-		{
-			if ( height < min_height)
-			{
-				newpos.mV[VZ] = min_height;
-				mCtrlPosZ->set( min_height );
-			}
-			else if ( height > max_height )
-			{
-				newpos.mV[VZ] = max_height;
-				mCtrlPosZ->set( max_height );
-			}
-
-			// Grass is always drawn on the ground, so clamp its position to the ground
-			if (mObject->getPCode() == LL_PCODE_LEGACY_GRASS)
-			{
-				mCtrlPosZ->set(LLWorld::getInstance()->resolveLandHeightAgent(newpos) + 1.f);
-			}
-		}
-	}
-
     bool is_valid_pos = true;
     if (mObject->isAttachment())
     {
@@ -2233,6 +2240,10 @@ void LLPanelObject::onPastePos()
         mClipboardPos.mV[VX] = llclamp(mClipboardPos.mV[VX], 0.f, max_width);
         mClipboardPos.mV[VY] = llclamp(mClipboardPos.mV[VY], 0.f, max_width);
         //height will get properly clamped by sendPosition
+    }
+    else
+    {
+        mClipboardPos.clampLength(MAX_ATTACHMENT_DIST);
     }
 
     mCtrlPosX->set( mClipboardPos.mV[VX] );

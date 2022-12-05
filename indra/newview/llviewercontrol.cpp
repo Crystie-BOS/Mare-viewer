@@ -793,7 +793,7 @@ bool toggle_show_navigation_panel(const LLSD& newvalue)
 	else
 //mk
 	gSavedSettings.setBOOL("ShowMiniLocationPanel", !value);
-
+    gViewerWindow->reshapeStatusBarContainer();
 	return true;
 }
 

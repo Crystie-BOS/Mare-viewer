@@ -98,8 +98,6 @@ public:
                                  const S32 max_image_dimentions = LLViewerFetchedTexture::MAX_IMAGE_SIZE_DEFAULT);
 	static LLPointer<LLImageJ2C> convertToUploadFile(LLPointer<LLImageRaw> raw_image, const S32 max_image_dimentions = LLViewerFetchedTexture::MAX_IMAGE_SIZE_DEFAULT);
 	static void processImageNotInDatabase( LLMessageSystem *msg, void **user_data );
-	static void receiveImageHeader(LLMessageSystem *msg, void **user_data);
-	static void receiveImagePacket(LLMessageSystem *msg, void **user_data);
 
 public:
 	LLViewerTextureList();
@@ -137,7 +135,9 @@ public:
 	static bool canUseDynamicTextureMemory();
 	// </FS:Ansariel>
 	
+    // Local UI images
 	void doPreloadImages();
+    // Network images. Needs caps and cache to work
 	void doPrefetchImages();
 
 	void clearFetchingRequests();
