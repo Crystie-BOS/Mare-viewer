@@ -42,7 +42,7 @@
 #include "llviewermenu.h"			// for gMenuHolder
 //#include "rlvactions.h"
 //#include "rlvlocks.h"
-#include "RRinterface.h"
+#include "RRInterface.h"
 
 #define FS_WEARABLE_FAVORITES_FOLDER "#Wearable Favorites"
 
