@@ -6710,6 +6710,12 @@ static void return_objects(LLObjectsReturnPackage *objectsReturnPackage, const L
 
 void handle_object_return()
 {
+//MK by CA KKA-966 area search can return objects whilst @edit=n
+	if (gRRenabled && gAgent.mRRInterface.mContainsEdit)
+	{
+		return;
+	}
+//mk by ca
 	if (!LLSelectMgr::getInstance()->getSelection()->isEmpty())
 	{
 		LLObjectsReturnPackage *objectsReturnPackage = new LLObjectsReturnPackage();
