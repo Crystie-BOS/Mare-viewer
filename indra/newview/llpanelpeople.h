@@ -35,6 +35,7 @@
 // [FS:CR] Contact sets
 #include "lggcontactsets.h"
 #include <boost/signals2.hpp>
+#include "llworld.h" // KKA-967 for the enum
 
 class LLAvatarList;
 class LLAvatarName;
@@ -90,6 +91,8 @@ private:
 
     void				    removePicker();
 
+	LLWorld::EGetAvatarLimit nearbyAvatarLimit; // KKA-967
+
 	// methods indirectly called by the updaters
 //CA
 	void					giveMessage(const LLUUID& agent_id, const LLAvatarName& av_name, const std::string& postMsg);
@@ -133,6 +136,7 @@ private:
 
 	void					onFriendsViewSortMenuItemClicked(const LLSD& userdata);
 	void					onNearbyViewSortMenuItemClicked(const LLSD& userdata);
+	void					onNearbyViewShowMenuItemClicked(const LLSD& userdata); // KKA-967
 	void					onGroupsViewSortMenuItemClicked(const LLSD& userdata);
 	void					onRecentViewSortMenuItemClicked(const LLSD& userdata);
 
@@ -141,6 +145,7 @@ private:
 	bool					onFriendsViewSortMenuItemCheck(const LLSD& userdata);
 	bool					onRecentViewSortMenuItemCheck(const LLSD& userdata);
 	bool					onNearbyViewSortMenuItemCheck(const LLSD& userdata);
+	bool					onNearbyViewShowMenuItemCheck(const LLSD& userdata); // KKA-967
 
 	void					onViewLoginNamesMenuItemToggle();
 	bool					onViewLoginNamesMenuItemCheck();

@@ -581,12 +581,14 @@ LLPanelPeople::LLPanelPeople()
 	mCommitCallbackRegistrar.add("People.Group.Plus.Action",  boost::bind(&LLPanelPeople::onGroupPlusMenuItemClicked,  this, _2));
 	mCommitCallbackRegistrar.add("People.Friends.ViewSort.Action",  boost::bind(&LLPanelPeople::onFriendsViewSortMenuItemClicked,  this, _2));
 	mCommitCallbackRegistrar.add("People.Nearby.ViewSort.Action",  boost::bind(&LLPanelPeople::onNearbyViewSortMenuItemClicked,  this, _2));
+	mCommitCallbackRegistrar.add("People.Nearby.ViewShow.Action",  boost::bind(&LLPanelPeople::onNearbyViewShowMenuItemClicked,  this, _2)); // KKA-967
 	mCommitCallbackRegistrar.add("People.Groups.ViewSort.Action",  boost::bind(&LLPanelPeople::onGroupsViewSortMenuItemClicked,  this, _2));
 	mCommitCallbackRegistrar.add("People.Recent.ViewSort.Action",  boost::bind(&LLPanelPeople::onRecentViewSortMenuItemClicked,  this, _2));
 
 	mEnableCallbackRegistrar.add("People.Friends.ViewSort.CheckItem",	boost::bind(&LLPanelPeople::onFriendsViewSortMenuItemCheck,	this, _2));
 	mEnableCallbackRegistrar.add("People.Recent.ViewSort.CheckItem",	boost::bind(&LLPanelPeople::onRecentViewSortMenuItemCheck,	this, _2));
 	mEnableCallbackRegistrar.add("People.Nearby.ViewSort.CheckItem",	boost::bind(&LLPanelPeople::onNearbyViewSortMenuItemCheck,	this, _2));
+	mEnableCallbackRegistrar.add("People.Nearby.ViewShow.CheckItem",	boost::bind(&LLPanelPeople::onNearbyViewShowMenuItemCheck,	this, _2)); // KKA=967
 
 	mCommitCallbackRegistrar.add("People.All.ViewSort.ToggleLoginNames",	boost::bind(&LLPanelPeople::onViewLoginNamesMenuItemToggle, this));
 	mEnableCallbackRegistrar.add("People.All.ViewSort.CheckLoginNames",	boost::bind(&LLPanelPeople::onViewLoginNamesMenuItemCheck, this));
@@ -716,6 +718,7 @@ BOOL LLPanelPeople::postBuild()
 	//nearby_tab->setVisibleCallback(boost::bind(&Updater::setActive, mNearbyListUpdater, _2));
 	mNearbyListUpdater->setActive(true); // AO: always keep radar active, for chat and channel integration
 //mk
+	nearbyAvatarLimit = (LLWorld::EGetAvatarLimit)gSavedSettings.getU32("KokuaNearbyPeopleLimit"); // KKA-967
 	mRecentList = getChild<LLPanel>(RECENT_TAB_NAME)->getChild<LLAvatarList>("avatar_list");
 	mRecentList->setNoItemsCommentText(getString("no_recent_people"));
 	mRecentList->setNoItemsMsg(getString("no_recent_people"));
@@ -950,7 +953,10 @@ void LLPanelPeople::updateNearbyList()
 	LLWorld* world = LLWorld::getInstance();		
 //ca
 //MK
-  LLWorld::getInstance()->getAvatars(&mNearbyList->getIDs(), &positions, gAgent.getPositionGlobal(), gSavedSettings.getF32("NearMeRange"));
+	// KKA-967 pass through the limiting setting
+  //LLWorld::getInstance()->getAvatars(&mNearbyList->getIDs(), &positions, gAgent.getPositionGlobal(), gSavedSettings.getF32("NearMeRange"));
+  LLWorld::getInstance()->getAvatars(&mNearbyList->getIDs(), &positions, gAgent.getPositionGlobal(), gSavedSettings.getF32("NearMeRange"),nearbyAvatarLimit);
+	// /KKA-967
 	mNearbyList->setDirty(true,true); // AO: These optional arguements force updating even when we're not a visible window.
 	DISTANCE_COMPARATOR.updateAvatarsPositions(positions, mNearbyList->getIDs());
 
@@ -1776,6 +1782,44 @@ bool LLPanelPeople::onNearbyViewSortMenuItemCheck(const LLSD& userdata)
 
 	return false;
 }
+
+// KKA-967 menu item handlers
+void LLPanelPeople::onNearbyViewShowMenuItemClicked(const LLSD& userdata)
+{
+	std::string chosen_item = userdata.asString();
+
+	if (chosen_item == "show_all")
+	{
+		nearbyAvatarLimit = LLWorld::AVATAR_LIMIT_NONE;
+	}
+	else if (chosen_item == "show_region")
+	{
+		nearbyAvatarLimit = LLWorld::AVATAR_LIMIT_REGION;
+	}
+	else if (chosen_item == "show_parcel")
+	{
+		nearbyAvatarLimit = LLWorld::AVATAR_LIMIT_PARCEL;
+	}
+	gSavedSettings.setU32("KokuaNearbyPeopleLimit",(U32)nearbyAvatarLimit);
+}
+
+bool LLPanelPeople::onNearbyViewShowMenuItemCheck(const LLSD& userdata)
+{
+	std::string item = userdata.asString();
+
+	if (item == "show_all") {
+		return nearbyAvatarLimit == LLWorld::AVATAR_LIMIT_NONE;
+	}
+	else if (item == "show_region") {
+		return nearbyAvatarLimit == LLWorld::AVATAR_LIMIT_REGION;
+	}
+	else if (item == "show_parcel") {
+		return nearbyAvatarLimit == LLWorld::AVATAR_LIMIT_PARCEL;
+	}
+
+	return false;
+}
+// /KKA-967
 
 void LLPanelPeople::onRecentViewSortMenuItemClicked(const LLSD& userdata)
 {

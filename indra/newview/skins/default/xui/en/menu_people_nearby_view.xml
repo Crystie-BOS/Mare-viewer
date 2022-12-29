@@ -44,6 +44,37 @@
          parameter="sort_arrival"/>
   </menu_item_check>
     <menu_item_separator layout="topleft" />
+    <menu_item_check
+       label="Show All"
+       name="show_all">
+      <menu_item_check.on_click
+         function="People.Nearby.ViewShow.Action"
+         parameter="show_all"/>
+      <menu_item_check.on_check
+         function="People.Nearby.ViewShow.CheckItem"
+         parameter="show_all"/>
+    </menu_item_check>
+    <menu_item_check
+       label="This Region"
+       name="show_region">
+      <menu_item_check.on_click
+         function="People.Nearby.ViewShow.Action"
+         parameter="show_region"/>
+      <menu_item_check.on_check
+         function="People.Nearby.ViewShow.CheckItem"
+         parameter="show_region"/>
+    </menu_item_check>
+    <menu_item_check
+       label="This Parcel"
+       name="show_parcel">
+      <menu_item_check.on_click
+         function="People.Nearby.ViewShow.Action"
+         parameter="show_parcel"/>
+      <menu_item_check.on_check
+         function="People.Nearby.ViewShow.CheckItem"
+         parameter="show_parcel"/>
+  </menu_item_check>
+    <menu_item_separator layout="topleft" />
     <menu_item_check label="View Login Names" name="view_login_names">
       <menu_item_check.on_click
          function="People.All.ViewSort.ToggleLoginNames" />
