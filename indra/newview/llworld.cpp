@@ -45,6 +45,7 @@
 #include "llviewertexturelist.h"
 #include "llviewernetwork.h"
 #include "llviewerobjectlist.h"
+#include "llviewerparcelmgr.h" // for KKA-967 limiting to same region or same parcel
 #include "llviewerparceloverlay.h"
 #include "llviewerregion.h"
 #include "llviewerstats.h"
@@ -1387,10 +1388,18 @@ static LLVector3d unpackLocalToGlobalPosition(U32 compact_local, const LLVector3
 	return region_origin + pos_local;
 }
 
-void LLWorld::getAvatars(uuid_vec_t* avatar_ids, std::vector<LLVector3d>* positions, const LLVector3d& relative_to, F32 radius) const
+void LLWorld::getAvatars(uuid_vec_t* avatar_ids, std::vector<LLVector3d>* positions, const LLVector3d& relative_to, F32 radius, EGetAvatarLimit avatar_limit) const
 {
 	F32 radius_squared = radius * radius;
-	
+	// KKA-967 set up for tests
+	LLViewerParcelMgr& parcelmgr = LLViewerParcelMgr::instance();
+	LLViewerRegion* ownRegion = gAgent.getRegion();
+	LLUUID regionSelf;
+	if (ownRegion)
+	{
+		regionSelf = ownRegion->getRegionID();
+	}
+	// /KKA-967
 	if(avatar_ids != NULL)
 	{
 		avatar_ids->clear();
@@ -1411,7 +1420,25 @@ void LLWorld::getAvatars(uuid_vec_t* avatar_ids, std::vector<LLVector3d>* positi
 			LLVector3d pos_global = pVOAvatar->getPositionGlobal();
 			LLUUID uuid = pVOAvatar->getID();
 
+			// KKA-967 is this avatar one to include?
+			LLViewerRegion* region = pVOAvatar->getRegion();
+			LLUUID avRegion;
+			if (region)
+			{
+				avRegion = region->getRegionID();
+			}
+			bool isInSameRegion = (avRegion == regionSelf);
+			bool isOnSameParcel = parcelmgr.inAgentParcel(pos_global);
+			
+			bool include = (avatar_limit == AVATAR_LIMIT_NONE) || 
+				(avatar_limit == AVATAR_LIMIT_REGION && isInSameRegion) || 
+				(avatar_limit == AVATAR_LIMIT_PARCEL && isOnSameParcel);
+			// /KKA-967
+
 			if (!uuid.isNull()
+				// KKA-967 include our filter
+				&& include
+				// /KKA-967
 				&& dist_vec_squared(pos_global, relative_to) <= radius_squared)
 			{
 				if(positions != NULL)
@@ -1430,12 +1457,31 @@ void LLWorld::getAvatars(uuid_vec_t* avatar_ids, std::vector<LLVector3d>* positi
 		iter != LLWorld::getInstance()->getRegionList().end(); ++iter)
 	{
 		LLViewerRegion* regionp = *iter;
+		// KKA-967 is this avatar one to include?
+		LLUUID avRegion = regionp->getRegionID();
+		bool isInSameRegion = (avRegion == regionSelf);
+		bool isOnSameParcel = false;
+		// / KKA-967
+
 		const LLVector3d& origin_global = regionp->getOriginGlobal();
 		S32 count = regionp->mMapAvatars.size();
 		for (S32 i = 0; i < count; i++)
 		{
 			LLVector3d pos_global = unpackLocalToGlobalPosition(regionp->mMapAvatars.at(i), origin_global);
-			if(dist_vec_squared(pos_global, relative_to) <= radius_squared)
+
+			// KKA-967 is this avatar one to include?
+			if (isInSameRegion)
+			{
+				isOnSameParcel = parcelmgr.inAgentParcel(pos_global);
+			}
+			
+			bool include = (avatar_limit == AVATAR_LIMIT_NONE) ||
+				(avatar_limit == AVATAR_LIMIT_REGION && isInSameRegion) ||
+				(avatar_limit == AVATAR_LIMIT_PARCEL && isOnSameParcel);
+
+			// if(dist_vec_squared(pos_global, relative_to) <= radius_squared)
+			if (include && dist_vec_squared(pos_global, relative_to) <= radius_squared)
+			// /KKA-967
 			{
 				LLUUID uuid = regionp->mMapAvatarIDs.at(i);
 				// if this avatar doesn't already exist in the list, add it

@@ -13,6 +13,17 @@
       <key>Value</key>
       <integer>0</integer>
     </map>
+    <key>KokuaNearbyPeopleLimit</key>
+    <map>
+      <key>Comment</key>
+      <string>Limit Nearby people list to all (0), region (1) or parcel (2)</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>U32</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
     <key>KokuaSingularityMouseMovement</key>
     <map>
       <key>Comment</key>

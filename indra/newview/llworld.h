@@ -161,13 +161,19 @@ public:
 	typedef boost::signals2::signal<void(LLViewerRegion*)> region_remove_signal_t;
 	boost::signals2::connection setRegionRemovedCallback(const region_remove_signal_t::slot_type& cb);
 
+	typedef enum e_get_avatar_limit {
+		AVATAR_LIMIT_NONE,
+		AVATAR_LIMIT_REGION,
+		AVATAR_LIMIT_PARCEL
+	} EGetAvatarLimit;
+
 	// Returns lists of avatar IDs and their world-space positions within a given distance of a point.
 	// All arguments are optional. Given containers will be emptied and then filled.
 	// Not supplying origin or radius input returns data on all avatars in the known regions.
 	void getAvatars(
 		uuid_vec_t* avatar_ids = NULL,
 		std::vector<LLVector3d>* positions = NULL, 
-		const LLVector3d& relative_to = LLVector3d(), F32 radius = FLT_MAX) const;
+		const LLVector3d& relative_to = LLVector3d(), F32 radius = FLT_MAX, EGetAvatarLimit avatar_limit = AVATAR_LIMIT_NONE) const;
 
 	// Returns 'true' if the region is in mRegionList,
 	// 'false' if the region has been removed due to region change
