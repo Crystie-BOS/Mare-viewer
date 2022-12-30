@@ -81,7 +81,7 @@
       layout="topleft"
       show_profile_btn="true"
       show_speaking_indicator="false"
-      ignore_online_status="true"
+      show_voice_volume="false"
       show_permissions_granted="true"
       show_icons="true"
       allow_select="true"
