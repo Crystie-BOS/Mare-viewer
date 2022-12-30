@@ -71,6 +71,7 @@
 #include "llwearableitemslist.h"
 #include "llwearabletype.h"
 #include "llweb.h"
+#include "llresmgr.h"
 
 static LLPanelInjector<LLPanelOutfitEdit> t_outfit_edit("panel_outfit_edit");
 
@@ -404,7 +405,10 @@ LLPanelOutfitEdit::LLPanelOutfitEdit()
 	mWearableListManager(NULL),
 	mPlusBtn(NULL),
 	mWearablesGearMenuBtn(NULL),
-	mGearMenuBtn(NULL)
+	mGearMenuBtn(NULL),
+	// <FS:Ansariel> Show avatar complexity in appearance floater
+	mAvatarComplexityLabel(NULL),
+	mAvatarComplexityAddingLabel(NULL)
 {
 	mSavedFolderState = new LLSaveFolderState();
 	mSavedFolderState->setApply(FALSE);
@@ -566,6 +570,10 @@ BOOL LLPanelOutfitEdit::postBuild()
 
 	getChild<LLButton>(SAVE_BTN)->setCommitCallback(boost::bind(&LLPanelOutfitEdit::saveOutfit, this, false));
 	getChild<LLButton>(SAVE_AS_BTN)->setCommitCallback(boost::bind(&LLPanelOutfitEdit::saveOutfit, this, true));
+
+	// <FS:Ansariel> Show avatar complexity in appearance floater
+	mAvatarComplexityLabel = getChild<LLTextBox>("avatar_complexity_label");
+	mAvatarComplexityAddingLabel = getChild<LLTextBox>("avatar_complexity_adding_label");
 
 	onOutfitChanging(gAgentWearables.isCOFChangeInProgress());
 	return TRUE;
@@ -1446,5 +1454,17 @@ void LLPanelOutfitEdit::saveOutfit(bool as_new)
 		panel_outfits_inventory->saveOutfit(as_new);
 	} 	
 }
+
+// <FS:Ansariel> Show avatar complexity in appearance floater
+void LLPanelOutfitEdit::updateAvatarComplexity(U32 complexity)
+{
+	std::string complexity_string;
+	LLLocale locale("");
+	LLResMgr::getInstance()->getIntegerString(complexity_string, complexity);
+
+	mAvatarComplexityLabel->setTextArg("[WEIGHT]", complexity_string);
+	mAvatarComplexityAddingLabel->setTextArg("[WEIGHT]", complexity_string);
+}
+// </FS:Ansariel>
 
 // EOF

@@ -38,6 +38,7 @@ class LLPanelWearing;
 class LLMenuGL;
 class LLSidepanelAppearance;
 class LLTabContainer;
+class LLInventoryCategoriesObserver; // <FS:Ansariel> FIRE-17626: Attachment count in appearance floater
 
 class LLPanelOutfitsInventory : public LLPanel
 {
@@ -68,12 +69,20 @@ public:
 
 	void openApearanceTab(const std::string& tab_name);
 
+	// <FS:Ansariel> Show avatar complexity in appearance floater
+	void updateAvatarComplexity(U32 complexity);
+
 protected:
 	void updateVerbs();
 
 private:
 	LLTabContainer*			mAppearanceTabs;
 	std::string 			mFilterSubString;
+
+	// <FS:Ansariel> FIRE-17626: Attachment count in appearance floater
+	LLInventoryCategoriesObserver* mCategoriesObserver;
+	void onCOFChanged();
+	// </FS:Ansariel>
 
 	//////////////////////////////////////////////////////////////////////////////////
 	// tab panels                                                                   //

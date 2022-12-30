@@ -20,6 +20,14 @@
      name="wear_items_tooltip">
      Wear selected items
    </panel.string>
+   <panel.string
+     name="cof_tab_label">
+     WEARING ([COUNT]/[MAX] Att.)
+   </panel.string>
+   <panel.string
+     name="att_status">
+     [COUNT]/[MAX] Attached
+   </panel.string>
    <tab_container
      follows="all"
      height="539"

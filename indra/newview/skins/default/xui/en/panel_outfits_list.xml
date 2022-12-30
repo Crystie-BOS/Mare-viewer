@@ -61,6 +61,34 @@
        left_pad="1"
        name="dummy_icon"
        width="243"/>
+     <text
+       type="string"
+       length="1"
+       height="25"
+       layout="topleft"
+       left_delta="5"
+       name="avatar_attachment_status"
+       font="SansSerifMedium"
+       follows="bottom|left"
+       v_pad="6"
+       width="100">
+       --/-- Att.
+      </text>
+     <text
+       top_delta="0"
+       type="string"
+       length="1"
+       height="25"
+       layout="topleft"
+       right="-42"
+       name="avatar_complexity_label"
+       font="SansSerifMedium"
+       follows="bottom|right"
+       halign="right"
+       v_pad="6"
+       width="150">
+          Complexity: [WEIGHT]
+      </text>
       <button
        follows="bottom|right"
        height="25"

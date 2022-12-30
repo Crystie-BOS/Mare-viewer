@@ -67,6 +67,9 @@ LLPanelOutfitsInventory::LLPanelOutfitsInventory() :
 	observer.addBOFChangedCallback(boost::bind(&LLPanelOutfitsInventory::updateVerbs, this));
 	observer.addCOFChangedCallback(boost::bind(&LLPanelOutfitsInventory::updateVerbs, this));
 	observer.addOutfitLockChangedCallback(boost::bind(&LLPanelOutfitsInventory::updateVerbs, this));
+
+	// <FS:Ansariel> FIRE-17626: Attachment count in appearance floater
+	mCategoriesObserver = new LLInventoryCategoriesObserver();
 }
 
 LLPanelOutfitsInventory::~LLPanelOutfitsInventory()
@@ -75,6 +78,14 @@ LLPanelOutfitsInventory::~LLPanelOutfitsInventory()
 	{
 		gSavedSettings.setS32("LastAppearanceTab", mAppearanceTabs->getCurrentPanelIndex());
 	}
+
+	// <FS:Ansariel> FIRE-17626: Attachment count in appearance floater
+	if (gInventory.containsObserver(mCategoriesObserver))
+	{
+		gInventory.removeObserver(mCategoriesObserver);
+	}
+	delete mCategoriesObserver;
+	// </FS:Ansariel>
 }
 
 // virtual
@@ -112,13 +123,18 @@ void LLPanelOutfitsInventory::onOpen(const LLSD& key)
 			panel_appearance->refreshCurrentOutfitName();
 		}
 
+		// <FS:Ansariel> FIRE-17626: Attachment count in appearance floater
+		gInventory.addObserver(mCategoriesObserver);
+		mCategoriesObserver->addCategory(LLAppearanceMgr::instance().getCOF(), boost::bind(&LLPanelOutfitsInventory::onCOFChanged, this));
+		onCOFChanged();
+		// </FS:Ansariel>
+
 		if (!mAppearanceTabs->selectTab(gSavedSettings.getS32("LastAppearanceTab")))
 			mAppearanceTabs->selectFirstTab();
 
 		mInitialized = true;
 	}
 
-//	mSaveComboBtn.reset(new LLSaveOutfitComboBtn(this, true));
 	// Make sure we know which tab is selected, update the filter,
 	// and update verbs.
 	onTabChange();
@@ -243,6 +259,32 @@ void LLPanelOutfitsInventory::onSave()
 	
 	LLNotificationsUtil::add("SaveOutfitAs", args, payload, boost::bind(&LLPanelOutfitsInventory::onSaveCommit, this, _1, _2));
 }
+
+// <FS:Ansariel> FIRE-17626: Attachment count in appearance floater
+void LLPanelOutfitsInventory::onCOFChanged()
+{
+	if (!isAgentAvatarValid())
+	{
+		return;
+	}
+
+	const LLUUID cof = LLAppearanceMgr::instance().getCOF();
+	LLInventoryModel::item_array_t obj_items;
+	LLInventoryModel::cat_array_t cats;
+	LLIsType is_of_type(LLAssetType::AT_OBJECT);
+	gInventory.collectDescendentsIf(cof, cats, obj_items, LLInventoryModel::EXCLUDE_TRASH, is_of_type);
+	U32 attachments = obj_items.size();
+
+	LLStringUtil::format_map_t args;
+	args["COUNT"] = llformat("%d", attachments);
+	args["MAX"] = llformat("%d", gAgentAvatarp->getMaxAttachments());
+	std::string title = getString("cof_tab_label", args);
+	mAppearanceTabs->setPanelTitle(mAppearanceTabs->getIndexForPanel(mCurrentOutfitPanel), title);
+
+	std::string attstatus = getString("att_status", args);
+	mMyOutfitsPanel->childSetText("avatar_attachment_status", attstatus);
+}
+// </FS:Ansariel>
 
 //static
 LLPanelOutfitsInventory* LLPanelOutfitsInventory::findInstance()
@@ -390,3 +432,12 @@ void LLPanelOutfitsInventory::saveOutfit(bool as_new)
 
 	onSave();
 }
+
+// <FS:Ansariel> Show avatar complexity in appearance floater
+void LLPanelOutfitsInventory::updateAvatarComplexity(U32 complexity)
+{
+	mOutfitGalleryPanel->updateAvatarComplexity(complexity);
+	mMyOutfitsPanel->updateAvatarComplexity(complexity);
+	mCurrentOutfitPanel->updateAvatarComplexity(complexity);
+}
+// </FS:Ansariel>

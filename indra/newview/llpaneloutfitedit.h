@@ -187,6 +187,9 @@ public:
 									  EAcceptance* accept,
 									  std::string& tooltip_msg);
 
+	// <FS:Ansariel> Show avatar complexity in appearance floater
+	void updateAvatarComplexity(U32 complexity);
+
 private:
 	void onAddMoreButtonClicked();
 	void showFilteredWearablesListView(LLWearableType::EType type);
@@ -219,6 +222,9 @@ private:
 	LLButton*			mListViewBtn;
 	LLButton*			mPlusBtn;
 	LLPanel*			mAddWearablesPanel;
+	// <FS:Ansariel> Show avatar complexity in appearance floater
+	LLTextBox*			mAvatarComplexityLabel;
+	LLTextBox*			mAvatarComplexityAddingLabel;
 	
 	LLComboBox*			mFolderViewFilterCmbBox;
 	LLComboBox*			mListViewFilterCmbBox;

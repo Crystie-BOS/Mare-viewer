@@ -41,6 +41,7 @@ class LLListContextMenu;
 class LLScrollListCtrl;
 class LLWearableItemsList;
 class LLWearingGearMenu;
+class LLTextBox;
 
 /**
  * @class LLPanelWearing
@@ -84,6 +85,9 @@ public:
 	void onEditAttachment();
 	void onRemoveAttachment();
 
+	// <FS:Ansariel> Show avatar complexity in appearance floater
+	void updateAvatarComplexity(U32 complexity);
+
 private:
 	void onWearableItemsListRightClick(LLUICtrl* ctrl, S32 x, S32 y);
 	void onTempAttachmentsListRightClick(LLUICtrl* ctrl, S32 x, S32 y);
@@ -101,6 +105,8 @@ private:
 	LLAccordionCtrlTab* 			mAttachmentsTab;
 	LLAccordionCtrl*				mAccordionCtrl;
 
+	// <FS:Ansariel> Show avatar complexity in appearance floater
+	LLTextBox*						mAvatarComplexityLabel;
 	std::map<LLUUID, LLViewerObject*> mAttachmentsMap;
 
 	std::map<LLUUID, std::string> 	mObjectNames;
