@@ -389,6 +389,21 @@ It is calculated as border_size + 2*UIResizeBarOverlap
                 left_pad="1"
                 name="dummy_right_icon"
                 width="250" />
+        <text
+                top_delta="0"
+                type="string"
+                length="1"
+                height="25"
+                layout="topleft"
+                right="-36"
+                name="avatar_complexity_label"
+                font="SansSerifMedium"
+                follows="bottom|right"
+                halign="right"
+                v_pad="6"
+                width="150">
+                    Complexity: [WEIGHT]
+        </text>
         <button
                 follows="bottom|right"
                 height="25"
@@ -464,6 +479,21 @@ It is calculated as border_size + 2*UIResizeBarOverlap
                 name="dummy_right_icon"
                 width="186" >
         </icon>
+        <text
+                top_delta="0"
+                type="string"
+                length="1"
+                height="25"
+                layout="topleft"
+                right="-36"
+                name="avatar_complexity_adding_label"
+                font="SansSerifMedium"
+                follows="bottom|right"
+                halign="right"
+                v_pad="6"
+                width="150">
+                    Complexity: [WEIGHT]
+        </text>
         <button
                 follows="bottom|right"
                 height="25"

@@ -49,6 +49,8 @@
 #include "llvoavatarself.h"
 #include "llwearableitemslist.h"
 
+#include "llresmgr.h"
+#include "lltextbox.h"
 static bool is_tab_header_clicked(LLAccordionCtrlTab* tab, S32 y);
 
 static const LLOutfitTabNameComparator OUTFIT_TAB_NAME_COMPARATOR;
@@ -784,6 +786,7 @@ bool is_tab_header_clicked(LLAccordionCtrlTab* tab, S32 y)
 LLOutfitListBase::LLOutfitListBase()
     :   LLPanelAppearanceTab()
     ,   mIsInitialized(false)
+	,	mAvatarComplexityLabel(NULL) // <FS:Ansariel> Show avatar complexity in appearance floater
 {
     mCategoriesObserver = new LLInventoryCategoriesObserver();
     mOutfitMenu = new LLOutfitContextMenu(this);
@@ -988,6 +991,9 @@ BOOL LLOutfitListBase::postBuild()
 {
     mGearMenu = createGearMenu();
 
+	// <FS:Ansariel> Show avatar complexity in appearance floater
+	mAvatarComplexityLabel = getChild<LLTextBox>("avatar_complexity_label");
+
     LLMenuButton* menu_gear_btn = getChild<LLMenuButton>("options_gear_btn");
 
     menu_gear_btn->setMouseDownCallback(boost::bind(&LLOutfitListGearMenuBase::updateItemsVisibility, mGearMenu));
@@ -1014,6 +1020,17 @@ void LLOutfitListBase::deselectOutfit(const LLUUID& category_id)
         signalSelectionOutfitUUID(mSelectedOutfitUUID);
     }
 }
+
+// <FS:Ansariel> Show avatar complexity in appearance floater
+void LLOutfitListBase::updateAvatarComplexity(U32 complexity)
+{
+	std::string complexity_string;
+	LLLocale locale("");
+	LLResMgr::getInstance()->getIntegerString(complexity_string, complexity);
+
+	mAvatarComplexityLabel->setTextArg("[WEIGHT]", complexity_string);
+}
+// </FS:Ansariel>
 
 LLContextMenu* LLOutfitContextMenu::createMenu()
 {

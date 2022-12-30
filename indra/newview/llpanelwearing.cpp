@@ -46,6 +46,8 @@
 #include "llwearableitemslist.h"
 #include "llsdserialize.h"
 #include "llclipboard.h"
+#include "lltextbox.h"
+#include "llresmgr.h"
 
 // Context menu and Gear menu helper.
 static void edit_outfit()
@@ -217,6 +219,7 @@ static LLPanelInjector<LLPanelWearing> t_panel_wearing("panel_wearing");
 LLPanelWearing::LLPanelWearing()
 	:	LLPanelAppearanceTab()
 	,	mCOFItemsList(NULL)
+	,	mAvatarComplexityLabel(NULL) // <FS:Ansariel> Show avatar complexity in appearance floater
 	,	mIsInitialized(false)
 	,	mAttachmentsChangedConnection()
 {
@@ -259,6 +262,8 @@ BOOL LLPanelWearing::postBuild()
 	mTempItemsList = getChild<LLScrollListCtrl>("temp_attachments_list");
 	mTempItemsList->setFgUnselectedColor(LLColor4::white);
 	mTempItemsList->setRightMouseDownCallback(boost::bind(&LLPanelWearing::onTempAttachmentsListRightClick, this, _1, _2, _3));
+	// <FS:Ansariel> Show avatar complexity in appearance floater
+	mAvatarComplexityLabel = getChild<LLTextBox>("avatar_complexity_label");
 
 	LLMenuButton* menu_gear_btn = getChild<LLMenuButton>("options_gear_btn");
 
@@ -608,4 +613,14 @@ void LLPanelWearing::copyToClipboard()
 
 	LLClipboard::instance().copyToClipboard(utf8str_to_wstring(text),0,text.size());
 }
+// <FS:Ansariel> Show avatar complexity in appearance floater
+void LLPanelWearing::updateAvatarComplexity(U32 complexity)
+{
+	std::string complexity_string;
+	LLLocale locale("");
+	LLResMgr::getInstance()->getIntegerString(complexity_string, complexity);
+
+	mAvatarComplexityLabel->setTextArg("[WEIGHT]", complexity_string);
+}
+// </FS:Ansariel>
 // EOF

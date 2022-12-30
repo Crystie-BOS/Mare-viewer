@@ -117,6 +117,7 @@
 #include "fscommon.h"
 #include "lggcontactsets.h"
 #include "llnetmap.h"
+#include "llsidepanelappearance.h"
 #include <boost/lexical_cast.hpp>
 
 extern F32 SPEED_ADJUST_MAX;
@@ -11427,6 +11428,12 @@ void LLVOAvatar::calculateUpdateRenderComplexity()
         // HUD complexity
         LLHUDRenderNotifier::getInstance()->updateNotificationHUD(hud_complexity_list);
     }
+        // <FS:Ansariel> Show avatar complexity in appearance floater
+        if (isSelf())
+        {
+            LLSidepanelAppearance::updateAvatarComplexity(mVisualComplexity);
+        }
+        // </FS:Ansariel>
   }
 }
 

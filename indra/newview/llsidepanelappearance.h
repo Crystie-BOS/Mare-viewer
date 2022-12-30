@@ -66,6 +66,8 @@ public:
 	void updateToVisibility( const LLSD& new_visibility );
 	LLPanelEditWearable* getWearable(){ return mEditWearable; }
 
+	// <FS:Ansariel> Show avatar complexity in appearance floater
+	static void updateAvatarComplexity(U32 complexity);
 private:
 	void onFilterEdit(const std::string& search_string);
 	void onVisibilityChanged ( const LLSD& new_visibility );
@@ -95,6 +97,9 @@ private:
 
 	// Gets set to true when we're opened for the first time.
 	bool mOpened;
+
+	// <FS:Ansariel> Show avatar complexity in appearance floater
+	U32 mLastAvatarComplexity;
 };
 
 #endif //LL_LLSIDEPANELAPPEARANCE_H
