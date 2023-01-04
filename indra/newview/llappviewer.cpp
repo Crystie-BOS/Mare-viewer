@@ -1311,13 +1311,10 @@ bool LLAppViewer::init()
     {
         LL_WARNS("InitInfo") << "Skipping updater check." << LL_ENDL;
     }
+#endif //!LL_LINUX
+#endif //LL_RELEASE_FOR_DOWNLOAD
 
 
-    if (mUpdaterNotFound)
-    {
-        LL_WARNS("InitInfo") << "Failed to launch updater. Skipping Leap commands." << LL_ENDL;
-    }
-    else
     {
         // Iterate over --leap command-line options. But this is a bit tricky: if
         // there's only one, it won't be an array at all.
@@ -1343,14 +1340,13 @@ bool LLAppViewer::init()
             LLLeap::create("", leap, false); // exception=false
         }
     }
-#endif //!LL_LINUX
+
     if (gSavedSettings.getBOOL("QAMode") && gSavedSettings.getS32("QAModeEventHostPort") > 0)
     {
         LL_WARNS("InitInfo") << "QAModeEventHostPort DEPRECATED: "
                              << "lleventhost no longer supported as a dynamic library"
                              << LL_ENDL;
     }
-#endif // LL_RELEASE_FOR_DOWNLOAD in LL or 0 for Kokua
 
 	LLTextUtil::TextHelpers::iconCallbackCreationFunction = create_text_segment_icon_from_url_match;
 
@@ -3451,17 +3447,18 @@ LLSD LLAppViewer::getViewerInfo() const
 	// LLFloaterAbout.
 	LLSD info;
 	auto& versionInfo(LLVersionInfo::instance());
-	info["VIEWER_VERSION"] = LLSDArray(versionInfo.getMajor())(versionInfo.getMinor())(versionInfo.getPatch())(versionInfo.getBuild());
+	info["VIEWER_VERSION"] = llsd::array(versionInfo.getMajor(), versionInfo.getMinor(),
+										 versionInfo.getPatch(), versionInfo.getBuild());
 	info["VIEWER_VERSION_STR"] = versionInfo.getVersion();
 	info["CHANNEL"] = versionInfo.getChannel();
 	info["BUILD_DATE"] = __DATE__;
 	info["BUILD_TIME"] = __TIME__;
-    info["ADDRESS_SIZE"] = ADDRESS_SIZE;
-    std::string build_config = versionInfo.getBuildConfig();
-    if (build_config != "Release")
-    {
-        info["BUILD_CONFIG"] = build_config;
-    }
+	info["ADDRESS_SIZE"] = ADDRESS_SIZE;
+	std::string build_config = versionInfo.getBuildConfig();
+	if (build_config != "Release")
+	{
+		info["BUILD_CONFIG"] = build_config;
+	}
 
 	// return a URL to the release notes for this viewer, such as:
 	// http://wiki.secondlife.com/wiki/Release_Notes/Second Life Beta Viewer/2.1.0.123456
