@@ -572,6 +572,71 @@ width="120">
     top_delta="18"
     width="430">
   </slider>
+  <check_box
+    control_name="RenderGlow"
+    height="16"
+    initial_value="true"
+    label="Render glow"
+    layout="topleft"
+    left="26"
+    top_delta="18"
+    name="renderglow"
+    tool_tip="Controls rendering of glow. Default setting: on"
+    width="315" />
+  <slider
+    control_name="RenderGlowIterations"
+    decimal_digits="0"
+    follows="left|top"
+    height="16"
+    increment="1"
+    initial_value="0"
+    label="Glow iterations (default 2)"
+    label_width="185"
+    layout="topleft"
+    left="30"
+    min_val="0"
+    max_val="200"
+    name="RenderGlowIterations"
+    show_text="true"
+    top_delta="18"
+    width="430">
+  </slider>
+  <slider
+    control_name="RenderGlowStrength"
+    decimal_digits="2"
+    follows="left|top"
+    height="16"
+    increment="0.05"
+    initial_value="0"
+    label="Glow strength (default 0.35)"
+    label_width="185"
+    layout="topleft"
+    left="30"
+    min_val="0.00"
+    max_val="0.50"
+    name="RenderGlowStrength"
+    show_text="true"
+    top_delta="18"
+    width="430">
+  </slider>
+  <slider
+    control_name="RenderGlowResolutionPow"
+    decimal_digits="0"
+    follows="left|top"
+    height="16"
+    increment="1"
+    initial_value="0"
+    label="Glow resolution (default 8 or 9)"
+    label_width="185"
+    layout="topleft"
+    left="30"
+    min_val="8"
+    max_val="10"
+    name="RenderGlowResolutionPow"
+    show_text="true"
+    top_delta="18"
+    width="430">
+  </slider>
   <text
     type="string"
     length="1"
