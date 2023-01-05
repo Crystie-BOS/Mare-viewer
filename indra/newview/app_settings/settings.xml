@@ -1249,6 +1249,17 @@
       <key>Value</key>
       <integer>1</integer>
     </map>
+    <key>RestrainedLoveDoNotQueueVersionRequests</key>
+    <map>
+      <key>Comment</key>
+      <string>Enables early replies to @version* queries during login. This will help with RLV detection failures but may cause other side effects arising from delays between detection reply and other commands being processed</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
     <key>RestrainedLoveDebug</key>
     <map>
       <key>Comment</key>

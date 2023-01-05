@@ -1803,6 +1803,7 @@ BOOL RRInterface::handleCommand (LLUUID uuid, std::string command)
 
 BOOL RRInterface::reallyHandleCommand (LLUUID uuid, std::string command)
 {
+	static LLCachedControl<bool> doNotQueueVersionRequests(gSavedSettings, "RestrainedLoveDoNotQueueVersionRequests", TRUE);
 	// 1. check the command is actually a single one or a list of commands separated by ","
 	if (command.find (",")!=-1) {
 		BOOL res=TRUE;
@@ -1811,6 +1812,29 @@ BOOL RRInterface::reallyHandleCommand (LLUUID uuid, std::string command)
 			if (!reallyHandleCommand (uuid, list_of_commands.at(i))) res=FALSE;
 		}
 		return res;
+	}
+	
+	// 1.5 As an experimental feature we will reply to @version/versionnew/versionnum/versionnumbl
+	// always instead of queuing them during startup. This will help scripts that are running a 
+	// timeout awaiting RLV's response but may cause new issues with other commands being queued
+	// longer if a script awaits the response then fires off a bunch of further commands and has a timeout
+	// on them (eg checking a forcesit has worked)
+	std::string behav;
+	std::string option;
+	std::string param;
+	LLStringUtil::toLower(command);
+	BOOL parsed = parseCommand (command, behav, option, param); // detach=n, recvchat=n, recvim=n, unsit=n, recvim:<uuid>=add, clear=tplure:
+	
+	if (parsed && behav.find("version") == 0 && doNotQueueVersionRequests)
+	{
+		if (sRestrainedLoveLogging || sRestrainedLoveCommandLogging) {
+			LL_INFOS() << "Early processing [" << uuid.asString() << "]  [" << behav << "]  [" << option << "] [" << param << "]" << LL_ENDL;
+		}
+		if (behav=="version") return answerOnChat (param, getVersion ());
+		else if (behav=="versionnew") return answerOnChat (param, getVersion2 ());
+		else if (behav=="versionnum") return answerOnChat (param, RR_VERSION_NUM);
+		else if (behav=="versionnumbl") return answerOnChat (param, getVersionNum());
+    else return FALSE;	// unknown version* command
 	}
 	
 	// 2. this is a single command, possibly inside a 1-level recursive call (unimportant)
@@ -1848,19 +1872,26 @@ BOOL RRInterface::reallyHandleCommand (LLUUID uuid, std::string command)
 	// 3. parse the command, which is of one of these forms :
 	// behav=param
 	// behav:option=param
-	std::string behav;
-	std::string option;
-	std::string param;
-	LLStringUtil::toLower(command);
-	if (parseCommand (command, behav, option, param)) // detach=n, recvchat=n, recvim=n, unsit=n, recvim:<uuid>=add, clear=tplure:
+	
+	//This is now done earlier - see 1.5
+	//std::string behav;
+	//std::string option;
+	//std::string param;
+	//LLStringUtil::toLower(command);
+	//if (parseCommand (command, behav, option, param)) // detach=n, recvchat=n, recvim=n, unsit=n, recvim:<uuid>=add, clear=tplure:
+  if (parsed)
 	{
 		if (sRestrainedLoveLogging) {
 			LL_INFOS() << "[" << uuid.asString() << "]  [" << behav << "]  [" << option << "] [" << param << "]" << LL_ENDL;
 		}
-		if (behav=="version") return answerOnChat (param, getVersion ());
-		else if (behav=="versionnew") return answerOnChat (param, getVersion2 ());
-		else if (behav=="versionnum") return answerOnChat (param, RR_VERSION_NUM);
-		else if (behav=="versionnumbl") return answerOnChat (param, getVersionNum());
+		if (!doNotQueueVersionRequests && behav.find("version")==0) {
+  		if (behav=="version") return answerOnChat (param, getVersion ());
+  		else if (behav=="versionnew") return answerOnChat (param, getVersion2 ());
+  		else if (behav=="versionnum") return answerOnChat (param, RR_VERSION_NUM);
+  		else if (behav=="versionnumbl") return answerOnChat (param, getVersionNum());
+  		else return FALSE; // unknown version* command
+  	}
+  	else if (behav=="rlvstarted") return answerOnChat (param, "started");
 		else if (behav=="getblacklist") return answerOnChat (param, dumpList2String (getBlacklist(option), ","));
 		else if (behav=="getoutfit") return answerOnChat (param, getOutfit (option));
 		else if (behav=="getattach") return answerOnChat (param, getAttachments (option));
