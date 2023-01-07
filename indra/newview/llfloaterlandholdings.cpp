@@ -93,7 +93,7 @@ BOOL LLFloaterLandHoldings::postBuild()
 						"font", "SANSSERIF"),
 					llsd::map(
 						"column", "area",
-						"value", areastr,
+						"value", areastr.getString(),
 						"font", "SANSSERIF"))));
 	}
 
