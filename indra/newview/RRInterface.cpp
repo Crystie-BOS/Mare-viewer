@@ -1804,6 +1804,19 @@ BOOL RRInterface::handleCommand (LLUUID uuid, std::string command)
 BOOL RRInterface::reallyHandleCommand (LLUUID uuid, std::string command)
 {
 	static LLCachedControl<bool> doNotQueueVersionRequests(gSavedSettings, "RestrainedLoveDoNotQueueVersionRequests", TRUE);
+	BOOL inStartup = LLStartUp::getStartupState() < STATE_CLEANUP || (!mAssetsToReattach.empty() && !mReattachTimeout);
+
+  // 0. Do this early so we only do it once (used for debugging messages)
+	std::string name = "(unknown)";
+	if (sRestrainedLoveLogging || sRestrainedLoveCommandLogging)	{
+	  name = KokuaRLVFloaterSupport::getNameFromUUID(uuid,true); // pick up Viewer Startup uuid if possible and additional info like attach points
+	}
+
+  // do this before the recursion so we accurately report on multi-operation commands
+	if (sRestrainedLoveLogging || sRestrainedLoveCommandLogging) {
+		LL_INFOS("RLV") << "Called with [" << name << "] [" << uuid.asString() << "]  [" << command << "]" << LL_ENDL;
+	}
+
 	// 1. check the command is actually a single one or a list of commands separated by ","
 	if (command.find (",")!=-1) {
 		BOOL res=TRUE;
@@ -1825,16 +1838,16 @@ BOOL RRInterface::reallyHandleCommand (LLUUID uuid, std::string command)
 	LLStringUtil::toLower(command);
 	BOOL parsed = parseCommand (command, behav, option, param); // detach=n, recvchat=n, recvim=n, unsit=n, recvim:<uuid>=add, clear=tplure:
 	
-	if (parsed && behav.find("version") == 0 && doNotQueueVersionRequests)
+	if (inStartup && parsed && behav.find("version") == 0 && doNotQueueVersionRequests)
 	{
 		if (sRestrainedLoveLogging || sRestrainedLoveCommandLogging) {
-			LL_INFOS() << "Early processing [" << uuid.asString() << "]  [" << behav << "]  [" << option << "] [" << param << "]" << LL_ENDL;
+			LL_INFOS("RLV") << "Early processing [" << name << "] [" << uuid.asString() << "]  [" << behav << "]  [" << option << "] [" << param << "]" << LL_ENDL;
 		}
 		if (behav=="version") return answerOnChat (param, getVersion ());
 		else if (behav=="versionnew") return answerOnChat (param, getVersion2 ());
 		else if (behav=="versionnum") return answerOnChat (param, RR_VERSION_NUM);
 		else if (behav=="versionnumbl") return answerOnChat (param, getVersionNum());
-    else return FALSE;	// unknown version* command
+		else return FALSE;	// unknown version* command
 	}
 	
 	// 2. this is a single command, possibly inside a 1-level recursive call (unimportant)
@@ -1844,30 +1857,19 @@ BOOL RRInterface::reallyHandleCommand (LLUUID uuid, std::string command)
 	// as well to avoid an infinite loop if the one it will kick off is also locked.
 	// This is valid as the object that would possibly be kicked off by the one to reattach, will have
 	// its restrictions wiped out by the garbage collector
-	if (LLStartUp::getStartupState() < STATE_CLEANUP
-		|| (!mAssetsToReattach.empty() && !mReattachTimeout)) {
+	if (inStartup) {
 		Command cmd;
 		cmd.uuid=uuid;
 		cmd.command=command;
 		if (sRestrainedLoveLogging || sRestrainedLoveCommandLogging) {
-			LLInventoryItem* item = getItem(uuid);
-			std::string name = "(unknown)";
-			if (item)	{
-				name = item->getName();
-			}
-			LL_INFOS("RLV") << "Retaining " << name << " uuid " << uuid.asString() <<" : " << command << LL_ENDL;
+			LL_INFOS("RLV") << "Retaining [" << name << "] [" << uuid.asString() << "]  [" << command << "]" << LL_ENDL;
 		}
 		mRetainedCommands.push_back (cmd);
 
 		return TRUE;
 	}
-	else if (sRestrainedLoveCommandLogging)	{
-		LLInventoryItem* item = getItem(uuid);
-		std::string name = "(unknown)";
-		if (item)	{
-			name = item->getName();
-		}
-		LL_INFOS("RLV") << "Processing " << name << " uuid " << uuid.asString() <<" : " << command << LL_ENDL;		
+	else if (sRestrainedLoveLogging || sRestrainedLoveCommandLogging)	{
+		LL_INFOS("RLV") << "Processing [" << name << "] [" << uuid.asString() << "]  [" << behav << "]  [" << option << "] [" << param << "]" << LL_ENDL;
 	}	
 	// 3. parse the command, which is of one of these forms :
 	// behav=param
@@ -1881,10 +1883,7 @@ BOOL RRInterface::reallyHandleCommand (LLUUID uuid, std::string command)
 	//if (parseCommand (command, behav, option, param)) // detach=n, recvchat=n, recvim=n, unsit=n, recvim:<uuid>=add, clear=tplure:
   if (parsed)
 	{
-		if (sRestrainedLoveLogging) {
-			LL_INFOS() << "[" << uuid.asString() << "]  [" << behav << "]  [" << option << "] [" << param << "]" << LL_ENDL;
-		}
-		if (!doNotQueueVersionRequests && behav.find("version")==0) {
+		if ((!doNotQueueVersionRequests || !inStartup) && behav.find("version")==0) {
   		if (behav=="version") return answerOnChat (param, getVersion ());
   		else if (behav=="versionnew") return answerOnChat (param, getVersion2 ());
   		else if (behav=="versionnum") return answerOnChat (param, RR_VERSION_NUM);
@@ -1983,8 +1982,8 @@ BOOL RRInterface::reallyHandleCommand (LLUUID uuid, std::string command)
 	}
 	else // clear
 	{
-		if (sRestrainedLoveLogging) {
-			LL_INFOS() << uuid.asString() << "       " << behav << LL_ENDL;
+		if (sRestrainedLoveLogging || sRestrainedLoveCommandLogging) {
+		  LL_INFOS("RLV") << "Clear all [" << name << "] [" << uuid.asString() << "]  [" << behav << "]" << LL_ENDL;
 		}
 		if (behav=="clear") clear (uuid);
 		else return FALSE;
@@ -1997,7 +1996,7 @@ BOOL RRInterface::fireCommands ()
 	BOOL ok=TRUE;
 	if (mRetainedCommands.size ()) {
 		if (sRestrainedLoveLogging || sRestrainedLoveCommandLogging) {
-			LL_INFOS("RLV") << "Firing commands : " << mRetainedCommands.size () << LL_ENDL;
+			LL_INFOS("RLV") << "Firing retained commands : " << mRetainedCommands.size () << LL_ENDL;
 		}
 		Command cmd;
 		while (!mRetainedCommands.empty ()) {
