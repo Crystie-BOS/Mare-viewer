@@ -900,7 +900,7 @@
              left="7"
              name="checkbox planar align"
              tool_tip="Align textures on all selected faces with the last selected face. Requires Planar texture mapping."
-             top_delta="16"
+             top_delta="0"
              width="260" />
 			<button
        follows="left|top"
