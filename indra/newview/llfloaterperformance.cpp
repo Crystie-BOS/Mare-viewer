@@ -133,6 +133,7 @@ BOOL LLFloaterPerformance::postBuild()
     mObjectList->setIconClickedCallback(boost::bind(&LLFloaterPerformance::detachItem, this, _1));
 
     mSettingsPanel->getChild<LLButton>("advanced_btn")->setCommitCallback(boost::bind(&LLFloaterPerformance::onClickAdvanced, this));
+    mSettingsPanel->getChild<LLButton>("defaults_btn")->setCommitCallback(boost::bind(&LLFloaterPerformance::onClickDefaults, this));
     mSettingsPanel->getChild<LLRadioGroup>("graphics_quality")->setCommitCallback(boost::bind(&LLFloaterPerformance::onChangeQuality, this, _2));
     mSettingsPanel->getChild<LLCheckBoxCtrl>("advanced_lighting_model")->setMouseDownCallback(boost::bind(&LLFloaterPerformance::onClickAdvancedLighting, this));
     mSettingsPanel->getChild<LLComboBox>("ShadowDetail")->setMouseDownCallback(boost::bind(&LLFloaterPerformance::onClickShadows, this));
@@ -488,6 +489,15 @@ void LLFloaterPerformance::onClickAdvanced()
 				tabcontainer->selectTabPanel(graphicspanel);
 			}
 		}
+}
+
+void LLFloaterPerformance::onClickDefaults()
+{
+    LLFloaterPreference* instance = LLFloaterReg::getTypedInstance<LLFloaterPreference>("preferences");
+    if (instance)
+    {
+        instance->setRecommendedSettings();
+    }
 }
 
 void LLFloaterPerformance::onChangeQuality(const LLSD& data)

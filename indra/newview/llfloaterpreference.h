@@ -242,6 +242,8 @@ public:
   void onAdvancedAtmosphericsEnableAdvanced();
 //End Advanced section
 
+    void setRecommendedSettings();
+
 private:
 
 	void onDeleteTranscripts();
