@@ -883,7 +883,11 @@ LLVOAvatar::~LLVOAvatar()
 		debugAvatarRezTime("AvatarRezLeftNotification","left sometime after declouding");
 	}
 
-	// <FS:ND> only call logPendingPhases if we're still alive. Otherwise this can lead to shutdown crashes 
+    if(mTuned)
+    {
+        LLPerfStats::tunedAvatars--;
+        mTuned = false;
+    }
 
 	// logPendingPhases();
 	if (isAgentAvatarValid())
@@ -8861,9 +8865,15 @@ void LLVOAvatar::updateTooSlow()
         mTooSlow = false;
         mTooSlowWithoutShadows = false;	
     }
-    if(mTooSlow)
+    if(mTooSlow && !mTuned)
     {
         LLPerfStats::tunedAvatars++; // increment the number of avatars that have been tweaked.
+        mTuned = true;
+    }
+    else if(!mTooSlow && mTuned)
+    {
+        LLPerfStats::tunedAvatars--;
+        mTuned = false;
     }
 }
 
