@@ -277,6 +277,8 @@ void display(BOOL rebuild, F32 zoom_factor, int subfield, BOOL for_snapshot)
 {
 	LL_RECORD_BLOCK_TIME(FTM_RENDER);
 
+	LLViewerCamera& camera = LLViewerCamera::instance(); // <FS:Ansariel> Factor out calls to getInstance
+
 	if (gWindowResized)
 	{ //skip render on frames where window has been resized
 		LL_DEBUGS("Window") << "Resizing window" << LL_ENDL;
@@ -465,6 +467,23 @@ void display(BOOL rebuild, F32 zoom_factor, int subfield, BOOL for_snapshot)
 		case LLAgent::TELEPORT_START:
 			// Transition to REQUESTED.  Viewer has sent some kind
 			// of TeleportRequest to the source simulator
+
+			// Reset view angle if in mouselook. Fixes camera angle getting stuck on teleport. -Zi
+			if(gAgentCamera.cameraMouselook())
+			{
+				// If someone knows how to call "View.ZoomDefault" by hand, we should do that instead of
+				// replicating the behavior here. -Zi
+				camera.setDefaultFOV(DEFAULT_FIELD_OF_VIEW);
+				if(gSavedSettings.getBOOL("FSResetCameraOnTP"))
+				{
+					gSavedSettings.setF32("CameraAngle", camera.getView()); // FS:LO Dont reset rightclick zoom when we teleport however. Fixes FIRE-6246.
+				}
+				// also, reset the marker for "currently zooming" in the mouselook zoom settings. -Zi
+				LLVector3 vTemp=gSavedSettings.getVector3("_NACL_MLFovValues");
+				vTemp.mV[2]=0.0f;
+				gSavedSettings.setVector3("_NACL_MLFovValues",vTemp);
+			}
+
 			gTeleportDisplayTimer.reset();
 			gViewerWindow->setShowProgress(TRUE);
 			gViewerWindow->setProgressPercent(llmin(teleport_percent, 0.0f));
