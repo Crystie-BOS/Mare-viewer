@@ -243,6 +243,7 @@ public:
 //End Advanced section
 
     void setRecommendedSettings();
+    void resetAutotuneSettings();
 
 private:
 
