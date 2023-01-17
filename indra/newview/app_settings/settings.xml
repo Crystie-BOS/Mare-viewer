@@ -21060,6 +21060,17 @@
 	    <key>Value</key>
 	    <integer>1</integer>
 	  </map>
+    <key>FSScrollWheelExitsMouselook</key>
+    <map>
+      <key>Comment</key>
+      <string>If enabled, mouselook can be left by turning the scroll wheel</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
     <key>FSDisableWMIProbing</key>
     <map>
       <key>Comment</key>
