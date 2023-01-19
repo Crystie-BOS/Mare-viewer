@@ -2666,6 +2666,8 @@ bool idle_startup()
 
 		LLUIUsage::instance().clear();
 
+        LLPerfStats::StatsRecorder::setAutotuneInit();
+
 		// <FS:PP>
 		if (gSavedSettings.getBOOL("AutoQueryGridStatus"))
 		{
