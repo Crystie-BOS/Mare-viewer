@@ -374,7 +374,10 @@ BOOL LLInvFVBridge::perform_cutToClipboard()
 BOOL LLInvFVBridge::copyToClipboard() const
 {
 	const LLInventoryObject* obj = gInventory.getObject(mUUID);
-	if (obj && isItemCopyable())
+//	if (obj && isItemCopyable())
+// [SL:KB] - Patch: Inventory-Links | Checked: 2013-09-19 (Catznip-3.6)
+	if (obj && (isItemCopyable() || isItemLinkable()))
+// [/SL:KB]
 	{
 		return LLClipboard::instance().addToClipboard(mUUID);
 	}
@@ -809,7 +812,7 @@ void LLInvFVBridge::getClipboardEntries(bool show_asset_id,
 		}
 
 		items.push_back(std::string("Copy"));
-		if (!isItemCopyable())
+		if (!isItemCopyable() && !isItemLinkable())
 		{
 			disabled_items.push_back(std::string("Copy"));
 		}
@@ -2146,8 +2149,11 @@ BOOL LLItemBridge::removeItem()
 	// we can't do this check because we may have items in a folder somewhere that is
 	// not yet in memory, so we don't want false negatives.  (If disabled, then we 
 	// know we only have links in the Outfits folder which we explicitly fetch.)
-    static LLCachedControl<bool> inventory_linking(gSavedSettings, "InventoryLinking", true);
-	if (!inventory_linking)
+// [SL:KB] - Patch: Inventory-Links | Checked: 2010-06-01 (Catznip-2.2.0a) | Added: Catznip-2.0.1a
+	// Users move folders around and reuse links that way... if we know something has links then it's just bad not to warn them :|
+// [/SL:KB]
+//    static LLCachedControl<bool> inventory_linking(gSavedSettings, "InventoryLinking", true);
+//	if (!inventory_linking)
 	{
 		if (!item->getIsLinkType())
 		{
@@ -2197,6 +2203,7 @@ bool LLItemBridge::isItemCopyable(bool can_copy_as_link) const
     {
         return false;
     }
+/*
     // Can't copy worn objects.
     // Worn objects are tied to their inworld conterparts
     // Copy of modified worn object will return object with obsolete asset and inventory
@@ -2204,11 +2211,36 @@ bool LLItemBridge::isItemCopyable(bool can_copy_as_link) const
     {
         return false;
     }
+*/
 
-    static LLCachedControl<bool> inventory_linking(gSavedSettings, "InventoryLinking", true);
-    return (can_copy_as_link && inventory_linking)
-        || item->getPermissions().allowCopyBy(gAgent.getID());
+// [SL:KB] - Patch: Inventory-Links | Checked: 2010-04-12 (Catznip-2.2.0a) | Added: Catznip-2.0.0a
+    // We'll allow copying a link if:
+    //   - its target is available
+    //   - it doesn't point to another link [see LLViewerInventoryItem::getLinkedItem() which returns NULL in that case]
+    if (item->getIsLinkType())
+    {
+        return (NULL != item->getLinkedItem());
+    }
+
+    // User can copy the item if:
+    //   - the item (or its target in the case of a link) is "copy"
+    
+    // NOTE: we do *not* want to return TRUE on everything like LL seems to do in SL-2.1.0 because not all types are "linkable"
+    return (item->getPermissions().allowCopyBy(gAgent.getID()));
+// [/SL:KB]
+//    static LLCachedControl<bool> inventory_linking(gSavedSettings, "InventoryLinking", true);
+//    return (can_copy_as_link && inventory_linking)
+//        || item->getPermissions().allowCopyBy(gAgent.getID());
+
 }
+
+// [SL:KB] - Patch: Inventory-Links | Checked: 2013-09-19 (Catznip-3.6)
+bool LLItemBridge::isItemLinkable() const
+{
+	LLViewerInventoryItem* item = getItem();
+	return (item && LLAssetType::lookupCanLink(item->getType()));
+}
+// [/SL:KB]
 
 LLViewerInventoryItem* LLItemBridge::getItem() const
 {
@@ -2449,6 +2481,14 @@ bool LLFolderBridge::isItemCopyable(bool can_copy_as_link) const
 
     return true;
 }
+
+// [SL:KB] - Patch: Inventory-Links | Checked: 2013-09-19 (Catznip-3.6)
+bool LLFolderBridge::isItemLinkable() const
+{
+	LLFolderType::EType ftType = getPreferredType();
+	return (LLFolderType::FT_NONE == ftType || LLFolderType::FT_OUTFIT == ftType);
+}
+// [/SL:KB]
 
 BOOL LLFolderBridge::isClipboardPasteable() const
 {
@@ -3891,7 +3931,7 @@ void LLFolderBridge::perform_pasteFromClipboard()
 
 		const BOOL move_is_into_current_outfit = (mUUID == current_outfit_id);
 		const BOOL move_is_into_my_outfits = (mUUID == my_outifts_id) || model->isObjectDescendentOf(mUUID, my_outifts_id);
-		const BOOL move_is_into_outfit = move_is_into_my_outfits || (getCategory() && getCategory()->getPreferredType()==LLFolderType::FT_OUTFIT);
+		const BOOL move_is_into_outfit = /*move_is_into_my_outfits ||*/ (getCategory() && getCategory()->getPreferredType()==LLFolderType::FT_OUTFIT); // <FS:Ansariel> Unable to copy&paste into outfits anymore
         const BOOL move_is_into_marketplacelistings = model->isObjectDescendentOf(mUUID, marketplacelistings_id);
 		const BOOL move_is_into_favorites = (mUUID == favorites_id);
 		const BOOL move_is_into_lost_and_found = model->isObjectDescendentOf(mUUID, lost_and_found_id);
@@ -3969,13 +4009,19 @@ void LLFolderBridge::perform_pasteFromClipboard()
 						return;
 					}
 				}
-				if (move_is_into_outfit)
+				// <FS:Ansariel> Unable to copy&paste into outfits anymore
+				//if (move_is_into_outfit)
+				if (move_is_into_my_outfits)
+				// </FS:Ansariel>
 				{
-					if (!move_is_into_my_outfits && item && can_move_to_outfit(item, move_is_into_current_outfit))
+					// <FS:Ansariel> Unable to copy&paste into outfits anymore
+					//if (!move_is_into_my_outfits && item && can_move_to_outfit(item, move_is_into_current_outfit))
+					if (move_is_into_outfit && item && can_move_to_outfit(item, move_is_into_current_outfit))
+					// </FS:Ansariel>
 					{
 						dropToOutfit(item, move_is_into_current_outfit);
 					}
-					else if (move_is_into_my_outfits && LLAssetType::AT_CATEGORY == obj->getType())
+					else if (/*move_is_into_my_outfits &&*/ LLAssetType::AT_CATEGORY == obj->getType()) // <FS:Ansariel> Unable to copy&paste into outfits anymore
 					{
 						LLInventoryCategory* cat = model->getCategory(item_id);
 						U32 max_items_to_wear = gSavedSettings.getU32("WearFolderLimit");
