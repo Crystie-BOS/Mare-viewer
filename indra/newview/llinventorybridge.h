@@ -120,6 +120,9 @@ public:
 	virtual void removeBatch(std::vector<LLFolderViewModelItem*>& batch);
 	virtual void move(LLFolderViewModelItem* new_parent_bridge) {}
     virtual bool isItemCopyable(bool can_copy_as_link = true) const { return false; }
+// [SL:KB] - Patch: Inventory-Links | Checked: 2013-09-19 (Catznip-3.6)
+	virtual bool isItemLinkable() const { return FALSE; }
+// [/SL:KB]
 	virtual BOOL copyToClipboard() const;
 	virtual BOOL cutToClipboard();
 	virtual bool isCutToClipboard();
@@ -253,6 +256,9 @@ public:
 	virtual BOOL renameItem(const std::string& new_name);
 	virtual BOOL removeItem();
     virtual bool isItemCopyable(bool can_copy_as_link = true) const;
+// [SL:KB] - Patch: Inventory-Links | Checked: 2013-09-19 (Catznip-3.6)
+	/*virtual*/ bool isItemLinkable() const;
+// [/SL:KB]
 	virtual bool hasChildren() const { return FALSE; }
 	virtual BOOL isUpToDate() const { return TRUE; }
 	virtual LLUIImagePtr getIconOverlay() const;
@@ -326,6 +332,9 @@ public:
 	virtual BOOL isItemMovable() const ;
 	virtual BOOL isUpToDate() const;
     virtual bool isItemCopyable(bool can_copy_as_link = true) const;
+// [SL:KB] - Patch: Inventory-Links | Checked: 2013-09-19 (Catznip-3.6)
+	/*virtual*/ bool isItemLinkable() const;
+// [/SL:KB]
 	virtual BOOL isClipboardPasteable() const;
 	virtual BOOL isClipboardPasteableAsLink() const;
 	
