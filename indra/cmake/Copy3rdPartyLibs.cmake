@@ -65,7 +65,7 @@ if(WINDOWS)
 
     set(release_src_dir "${ARCH_PREBUILT_DIRS_RELEASE}")
     set(release_files
-        openjpeg.dll
+        openjp2.dll
         libapr-1.dll
         libaprutil-1.dll
         libapriconv-1.dll
@@ -294,7 +294,7 @@ elseif(LINUX)
         libgmodule-2.0.so
         libgobject-2.0.so
         libhunspell-1.3.so.0.0.0
-        libopenjpeg.so
+        libopenjp2.so
         libuuid.so.16
         libuuid.so.16.0.22
         libfontconfig.so.1.8.0
