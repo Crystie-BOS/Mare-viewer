@@ -33,6 +33,7 @@
     <command name="web_browser"/>
     <command name="twitter"/>
     <command name="flickr"/>
+    <command name="performance"/>
   </left_toolbar>
   <right_toolbar
     button_display_mode="icons_only">

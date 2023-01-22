@@ -33,6 +33,7 @@
 #include "lluistring.h"
 #include "v4color.h"
 #include "llui.h"
+#include "llgltexture.h"
 // [SL:KB] - Patch: Control-ScrollList | Checked: Catznip-5.2
 #include "lluictrl.h"
 // [/SL:KB]
@@ -180,6 +181,7 @@ public:
 
 	void			setText(const LLStringExplicit& text);
 	void			setFontStyle(const U8 font_style);
+    void			setAlignment(LLFontGL::HAlign align) { mFontAlignment = align; }
 
 protected:
 	LLUIString		mText;
@@ -220,6 +222,26 @@ private:
 	LLFontGL::HAlign		mAlignment;
 };
 
+
+class LLScrollListBar : public LLScrollListCell
+{
+public:
+    LLScrollListBar(const LLScrollListCell::Params& p);
+    /*virtual*/ ~LLScrollListBar();
+    /*virtual*/ void	draw(const LLColor4& color, const LLColor4& highlight_color) const;
+    /*virtual*/ S32		getWidth() const;
+    /*virtual*/ S32		getHeight() const;
+    /*virtual*/ const LLSD		getValue() const;
+    /*virtual*/ void	setColor(const LLColor4&);
+    /*virtual*/ void	setValue(const LLSD& value);
+
+private:
+    LLColor4                    mColor;
+    F32                         mRatio;
+    S32                         mBottom;
+    S32                         mRightPad;
+    S32                         mLeftPad;
+};
 /*
  * An interactive cell containing a check box.
  */

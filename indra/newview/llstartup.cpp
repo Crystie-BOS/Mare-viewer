@@ -217,6 +217,7 @@
 #include "llstacktrace.h"
 
 #include "threadpool.h"
+#include "llperfstats.h"
 
 
 #if LL_WINDOWS
@@ -1754,6 +1755,8 @@ bool idle_startup()
 			LLViewerParcelAskPlay::getInstance()->loadSettings();
 		}
 
+		gAgent.addRegionChangedCallback(boost::bind(&LLPerfStats::StatsRecorder::clearStats));
+
 		// *Note: this is where gWorldMap used to be initialized.
 
 		// <FS:KC> FIRE-18250: Option to disable default eye movement
@@ -2564,6 +2567,10 @@ bool idle_startup()
 
 	if (STATE_CLEANUP == LLStartUp::getStartupState())
 	{
+        if (gAgent.isFirstLogin())
+        {
+            gSavedSettings.setBOOL("AutoTuneFPS", TRUE);
+        }
 		if (gSavedSettings.getBOOL("KokuaReopenChatBarAtLogin")) LLFloaterReg::showInstance("kokua_chatbar", LLSD(), FALSE);
 		// KKA-708, ported from Marine's viewer
 		// Quickly show and hide the Hover Height floater, to make it bind AvatarHoverOffsetZ to its callback.
@@ -3757,6 +3764,9 @@ bool process_login_success_response()
 	}
 // [/SL:KB]
 	
+	LLPerfStats::StatsRecorder::setEnabled(gSavedSettings.getBOOL("PerfStatsCaptureEnabled"));
+	LLPerfStats::StatsRecorder::setFocusAv(gAgentID);
+
 	// Agent id needed for parcel info request in LLUrlEntryParcel
 	// to resolve parcel name.
 	LLUrlEntryParcel::setAgentID(gAgentID);

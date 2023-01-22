@@ -4238,6 +4238,7 @@ name="Command_360_Capture_Label">360 snapshot</string>
   <string name="Command_Move_Label">Walk / run / fly</string>
   <string name="Command_NowPlaying_Label">Now Playing</string>
   <string name="Command_People_Label">People</string>
+  <string name="Command_Performance_Label">Graphics speed</string>
   <string name="Command_PersonalLighting_Label">Personal Lighting</string>
   <string name="Command_Picks_Label">Picks</string>
   <string name="Command_Places_Label">Places</string>
@@ -4279,6 +4280,7 @@ name="Command_360_Capture_Label">360 snapshot</string>
   <string name="Command_Move_Tooltip">Moving your avatar</string>
   <string name="Command_NowPlaying_Tooltip">Now playing on the parcel audio stream</string>
   <string name="Command_People_Tooltip">Friends, groups, and nearby people</string>
+  <string name="Command_Performance_Tooltip">Improve graphics speed</string>
   <string name="Command_PersonalLighting_Tooltip">Adjust personal lighting settings</string>
   <string name="Command_Picks_Tooltip">Places to show as favorites in your profile</string>
   <string name="Command_Places_Tooltip">Places you've saved</string>
@@ -4406,7 +4408,7 @@ name="Command_360_Capture_Label">360 snapshot</string>
   <string name="preset_combo_label">-Empty list-</string>
   <string name="Default">Default</string>
   <string name="none_paren_cap">(None)</string>
-  <string name="no_limit">No Limit</string>
+  <string name="no_limit">No limit</string>
   
   <string name="Mav_Details_MAV_FOUND_DEGENERATE_TRIANGLES">
       The physics shape contains triangles which are too small. Try simplifying the physics model.

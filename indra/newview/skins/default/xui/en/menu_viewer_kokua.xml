@@ -1215,7 +1215,16 @@
              parameter="ShowNavbarFavoritesPanel" />
         </menu_item_check>
         <menu_item_separator/>-->
-
+        <menu_item_check
+          label="Improve graphics speed..."
+          name="Performance">
+          <menu_item_check.on_click
+           function="Floater.Toggle"
+           parameter="performance" />
+          <menu_item_check.on_check
+           function="Floater.Visible"
+           parameter="performance" />
+        </menu_item_check>
         <menu
          create_jump_keys="true"
          label="Environment"

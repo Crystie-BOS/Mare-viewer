@@ -4257,6 +4257,7 @@ void LLAgent::handleTeleportFinished()
             mRegionp->setCapabilitiesReceivedCallback(boost::bind(&LLAgent::onCapabilitiesReceivedAfterTeleport));
         }
     }
+
 }
 
 void LLAgent::handleTeleportFailed()
@@ -4288,6 +4289,7 @@ void LLAgent::handleTeleportFailed()
 	}
 
     mTPNeedsNeabyChatSeparator = false;
+
 }
 
 /*static*/

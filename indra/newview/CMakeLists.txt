@@ -341,6 +341,7 @@ set(viewer_SOURCE_FILES
     llfloaterpathfindinglinksets.cpp
     llfloaterpathfindingobjects.cpp
     llfloaterpay.cpp
+    llfloaterperformance.cpp
     llfloaterperms.cpp
     llfloaterpostprocess.cpp
     llfloaterprofile.cpp
@@ -1026,6 +1027,7 @@ set(viewer_HEADER_FILES
     llfloaterpathfindinglinksets.h
     llfloaterpathfindingobjects.h
     llfloaterpay.h
+    llfloaterperformance.h
     llfloaterperms.h
     llfloaterpostprocess.h
     llfloaterprofile.h
@@ -1489,6 +1491,9 @@ configure_file(
     @ONLY
 )
 list(APPEND viewer_HEADER_FILES ${CMAKE_CURRENT_BINARY_DIR}/kokuabuildversion.h)
+
+  list(APPEND viewer_SOURCE_FILES llperfstats.cpp)
+  list(APPEND viewer_HEADER_FILES llperfstats.h)
 
 source_group("CMake Rules" FILES ViewerInstall.cmake)
 

@@ -260,6 +260,7 @@
     left="10"
     name="WindLightUseAtmosShaders"
     top_delta="24"
+    follows="left|top"
     width="280">
     <check_box.commit_callback
       function="Pref.RenderOptionUpdate" />
@@ -274,25 +275,36 @@
     left="10"
     name="UseLightShaders"
     top_delta="20"
+    follows="left|top"
     width="256">
     <check_box.commit_callback
       function="Pref.RenderOptionUpdate" />
   </check_box>
-  
+  <button
+  height="23"
+  label="Automatic adjustments settings"
+  layout="topleft"
+  left="10"
+  name="AutoAdjustmentsButton"
+  top_delta="18"
+  follows="left|top"
+  width="200">
+    <button.commit_callback
+      function="Pref.AutoAdjustments"/>
+  </button>  
   <check_box
     control_name="RenderGeometryOverloadProtection"
     initial_value="true"
     label="Geometry Overload Protection"
     height="16"
     layout="topleft"
+    follows="left|top"
     left="10"
     name="RenderGeometryOverloadProtection"
     tool_tip="Protect against excessive geometry overloading your graphics card"
-    top_delta="20"
+    top_delta="26"
     width="256">
   </check_box>
-  
-  
   <slider
     control_name="IndirectMaxComplexity"
     tool_tip="Controls at what point a visually complex avatar is drawn as a JellyDoll"
@@ -303,12 +315,12 @@
     label="Avatar Maximum Complexity:"
     label_width="165"
     layout="topleft"
-    left="10"
+    left="14"
     min_val="1"
     max_val="101"
     name="IndirectMaxComplexity"
     show_text="false"
-    top_delta="22"
+    top_delta="18"
     width="300">
     <slider.commit_callback
       function="Pref.UpdateIndirectMaxComplexity"
