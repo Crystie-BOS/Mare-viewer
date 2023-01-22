@@ -769,7 +769,7 @@ void LLAvatarTracker::processNotify(LLMessageSystem* msg, bool online)
 				// we were tracking someone who went offline
 				deleteTrackingData();
 			}
-		}
+
 		//[FIX FIRE-3522 : SJ] Notify Online/Offline to Nearby Chat even if chat_notify isnt true
 		
 		// <FS:PP> Attempt to speed up things a little
@@ -777,9 +777,10 @@ void LLAvatarTracker::processNotify(LLMessageSystem* msg, bool online)
 		static LLCachedControl<bool> OnlineOfflinetoNearbyChat(gSavedSettings, "OnlineOfflinetoNearbyChat");
 		if(chat_notify || LGGContactSets::getInstance()->notifyForFriend(agent_id) || OnlineOfflinetoNearbyChat)
 		// </FS:PP>
-		{
-			// Look up the name of this agent for the notification
-			LLAvatarNameCache::get(agent_id,boost::bind(&on_avatar_name_cache_notify,_1, _2, online, payload));
+            {
+                // Look up the name of this agent for the notification
+                LLAvatarNameCache::get(agent_id,boost::bind(&on_avatar_name_cache_notify,_1, _2, online, payload));
+            }
 		}
 
 		mModifyMask |= LLFriendObserver::ONLINE;
