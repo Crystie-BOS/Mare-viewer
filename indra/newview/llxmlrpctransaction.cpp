@@ -44,7 +44,12 @@
 #include "llviewercontrol.h"
 
 // Have to include these last to avoid queue redefinition!
+
+#ifdef LL_USESYSTEMLIBS
+#include <xmlrpc.h>
+#else
 #include <xmlrpc-epi/xmlrpc.h>
+#endif
 
 #include "llappviewer.h"
 #include "lltrans.h"
@@ -508,14 +513,12 @@ void LLXMLRPCTransaction::Impl::setHttpStatus(const LLCore::HttpStatus &status)
 		message = LLTrans::getString("couldnt_resolve_host", args);
 		break;
 
+#if CURLE_SSL_PEER_CERTIFICATE != CURLE_SSL_CACERT
 	case CURLE_SSL_PEER_CERTIFICATE:
 		message = LLTrans::getString("ssl_peer_certificate");
 		break;
-
-// <FS:ND/> CURLE_SSL_CACERT has been deprecated, the LIBCURL-VERSION_NUM check is probably no checking for the lowest curl vesion this did happen
-#if LIBCURL_VERSION_NUM < 0x075100
-	case CURLE_SSL_CACERT:
 #endif
+	case CURLE_SSL_CACERT:
 	case CURLE_SSL_CONNECT_ERROR:		
 		message = LLTrans::getString("ssl_connect_error");
 		break;

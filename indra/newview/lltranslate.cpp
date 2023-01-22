@@ -36,11 +36,7 @@
 #include "llversioninfo.h"
 #include "llviewercontrol.h"
 #include "llcoros.h"
-#if LL_USESYSTEMLIBS
-#include "jsoncpp/reader.h"
-#else
-#include "reader.h"
-#endif
+#include "json/reader.h"
 #include "llcorehttputil.h"
 #include "llurlregistry.h"
 

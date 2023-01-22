@@ -6,6 +6,8 @@
 
 include(CMakeCopyIfDifferent)
 include(Linking)
+include(OPENAL)
+include(FMODSTUDIO)
 
 # When we copy our dependent libraries, we almost always want to copy them to
 # both the Release and the RelWithDebInfo staging directories. This has
@@ -13,27 +15,27 @@ include(Linking)
 # copy_if_different commands. Encapsulate that usage.
 # Pass FROM_DIR, TARGETS and the files to copy. TO_DIR is implicit.
 # to_staging_dirs diverges from copy_if_different in that it appends to TARGETS.
-MACRO(to_staging_dirs from_dir targets)
-  foreach(staging_dir
-          "${SHARED_LIB_STAGING_DIR_RELEASE}"
-          "${SHARED_LIB_STAGING_DIR_RELWITHDEBINFO}")
-    copy_if_different("${from_dir}" "${staging_dir}" out_targets ${ARGN})
+macro(to_staging_dirs from_dir targets)
+    set( targetDir "${SHARED_LIB_STAGING_DIR}")
+    copy_if_different("${from_dir}" "${targetDir}" out_targets ${ARGN})
+
     list(APPEND "${targets}" "${out_targets}")
-  endforeach()
-ENDMACRO(to_staging_dirs from_dir to_dir targets)
+endmacro()
 
 ###################################################################
 # set up platform specific lists of files that need to be copied
 ###################################################################
 if(WINDOWS)
-    set(SHARED_LIB_STAGING_DIR_DEBUG            "${SHARED_LIB_STAGING_DIR}/Debug")
-    set(SHARED_LIB_STAGING_DIR_RELWITHDEBINFO   "${SHARED_LIB_STAGING_DIR}/RelWithDebInfo")
-    set(SHARED_LIB_STAGING_DIR_RELEASE          "${SHARED_LIB_STAGING_DIR}/Release")
-
     #*******************************
     # VIVOX - *NOTE: no debug version
     set(vivox_lib_dir "${ARCH_PREBUILT_DIRS_RELEASE}")
-    set(slvoice_src_dir "${ARCH_PREBUILT_BIN_RELEASE}")    
+
+    # ND, it seems there is no such thing defined. At least when building a viewer
+    # Does this maybe matter on some LL buildserver? Otherwise this and the snippet using slvoice_src_dir
+    # can all go
+    if( ARCH_PREBUILT_BIN_RELEASE )
+        set(slvoice_src_dir "${ARCH_PREBUILT_BIN_RELEASE}")
+    endif()
     set(slvoice_files SLVoice.exe )
     if (ADDRESS_SIZE EQUAL 64)
         list(APPEND vivox_libs
@@ -42,26 +44,13 @@ if(WINDOWS)
             )
     else (ADDRESS_SIZE EQUAL 64)
         list(APPEND vivox_libs
-        vivoxsdk.dll
-        ortp.dll
-        )
+            vivoxsdk.dll
+            ortp.dll
+            )
     endif (ADDRESS_SIZE EQUAL 64)
 
     #*******************************
     # Misc shared libs 
-
-    set(debug_src_dir "${ARCH_PREBUILT_DIRS_DEBUG}")
-    set(debug_files
-        libapr-1.dll
-        libaprutil-1.dll
-        libapriconv-1.dll
-        ssleay32.dll
-        libeay32.dll
-        glod.dll
-        libhunspell.dll
-        )
-
-
 
     set(release_src_dir "${ARCH_PREBUILT_DIRS_RELEASE}")
     set(release_files
@@ -97,25 +86,15 @@ if(WINDOWS)
       endif(ADDRESS_SIZE EQUAL 32)
     endif (USE_BUGSPLAT)
 
-    if (FMODSTUDIO)
-       set(debug_files ${debug_files} fmodL.dll)
-       set(release_files ${release_files} fmod.dll)
-    endif (FMODSTUDIO)
+    if (TARGET ll::fmodstudio)
+        set(debug_files ${debug_files} fmodL.dll)
+        set(release_files ${release_files} fmod.dll)
+    endif ()
 
-    if (FMODEX)
-        if( ADDRESS_SIZE EQUAL 32 )
-            set(release_files ${release_files} fmodex.dll)
-        set(debug_files ${debug_files} fmodexL.dll)
-      else( ADDRESS_SIZE EQUAL 32 )
-            set(release_files ${release_files} fmodex64.dll)
-        set(debug_files ${debug_files} fmodexL64.dll)
-        endif(ADDRESS_SIZE EQUAL 32)
-    endif(FMODEX)
- 
-    if (OPENAL)
+    if (TARGET ll::openal)
         list(APPEND release_files openal32.dll alut.dll)
-    endif (OPENAL)
-   
+    endif ()
+
     #*******************************
     # Copy MS C runtime dlls, required for packaging.
     if (MSVC80)
@@ -128,27 +107,31 @@ if(WINDOWS)
         set(MSVC_VER 140)
     elseif (MSVC_VERSION GREATER_EQUAL 1920 AND MSVC_VERSION LESS 1930) # Visual Studio 2019
         set(MSVC_VER 140)
+    elseif (MSVC_VERSION GREATER_EQUAL 1930 AND MSVC_VERSION LESS 1940) # Visual Studio 2022
+        set(MSVC_VER 140)
     else (MSVC80)
         MESSAGE(WARNING "New MSVC_VERSION ${MSVC_VERSION} of MSVC: adapt Copy3rdPartyLibs.cmake")
     endif (MSVC80)
 
-# harvesting the VS runtimes from the Windows folder allows for the possibility of them being out of step with the SDK being used to build
-#    if(ADDRESS_SIZE EQUAL 32)
-#        # this folder contains the 32bit DLLs.. (yes really!)
-#        set(registry_find_path "[HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Windows;Directory]/SysWOW64")
-#    else(ADDRESS_SIZE EQUAL 32)
-#        # this folder contains the 64bit DLLs.. (yes really!)
-#        set(registry_find_path "[HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Windows;Directory]/System32")
-#    endif(ADDRESS_SIZE EQUAL 32)
+    # <FS:Ansariel> Try using the VC runtime redistributables that came with the VS installation first
+    if (MSVC_TOOLSET_VER AND DEFINED ENV{VCTOOLSREDISTDIR})
+        if(ADDRESS_SIZE EQUAL 32)
+            set(redist_find_path "$ENV{VCTOOLSREDISTDIR}x86\\Microsoft.VC${MSVC_TOOLSET_VER}.CRT")
+        else(ADDRESS_SIZE EQUAL 32)
+            set(redist_find_path "$ENV{VCTOOLSREDISTDIR}x64\\Microsoft.VC${MSVC_TOOLSET_VER}.CRT")
+        endif(ADDRESS_SIZE EQUAL 32)
+        get_filename_component(redist_path "${redist_find_path}" ABSOLUTE)
+        MESSAGE(STATUS "VC Runtime redist path: ${redist_path}")
+    endif (MSVC_TOOLSET_VER AND DEFINED ENV{VCTOOLSREDISTDIR})
+    # </FS:Ansariel>
 
-# Alternative version grabbing the right files to go with the build tools
     if(ADDRESS_SIZE EQUAL 32)
-        # grab the right redist
-        set(registry_find_path "$ENV{VCTOOLSREDISTDIR}\\x86\\Microsoft.VC141.CRT")
+        # this folder contains the 32bit DLLs.. (yes really!)
+        set(registry_find_path "[HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Windows;Directory]/SysWOW64")
     else(ADDRESS_SIZE EQUAL 32)
-        set(registry_find_path "$ENV{VCTOOLSREDISTDIR}\\x64\\Microsoft.VC141.CRT")
+        # this folder contains the 64bit DLLs.. (yes really!)
+        set(registry_find_path "[HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Windows;Directory]/System32")
     endif(ADDRESS_SIZE EQUAL 32)
-		MESSAGE(STATUS "Path for redist libs: ${registry_find_path}")
 
     # Having a string containing the system registry path is a start, but to
     # get CMake to actually read the registry, we must engage some other
@@ -181,16 +164,6 @@ if(WINDOWS)
     endforeach()
 
 elseif(DARWIN)
-    set(SHARED_LIB_STAGING_DIR_DEBUG            "${SHARED_LIB_STAGING_DIR}/Debug/Resources")
-    set(SHARED_LIB_STAGING_DIR_RELWITHDEBINFO   "${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/Resources")
-    set(SHARED_LIB_STAGING_DIR_RELEASE          "${SHARED_LIB_STAGING_DIR}/Release/Resources")
-    file(MAKE_DIRECTORY "${SHARED_LIB_STAGING_DIR}")
-    # Support our "@executable_path/../Resources" load path for executables
-    # that end up in any of the above SHARED_LIB_STAGING_DIR_MUMBLE
-    # directories.
-    file(CREATE_LINK "Release/Resources" "${SHARED_LIB_STAGING_DIR}/Resources"
-         SYMBOLIC)
-
     set(vivox_lib_dir "${ARCH_PREBUILT_DIRS_RELEASE}")
     set(slvoice_files SLVoice)
     set(vivox_libs
@@ -216,15 +189,11 @@ elseif(DARWIN)
         liburiparser.1.dylib
         liburiparser.1.0.27.dylib
        )
-    if (FMODSTUDIO)
-      set(debug_files ${debug_files} libfmodstudioL.dylib)
-      set(release_files ${release_files} libfmodstudio.dylib)
-    endif (FMODSTUDIO)
 
-    if (FMODEX)
-      set(debug_files ${debug_files} libfmodexL.dylib)
-      set(release_files ${release_files} libfmodex.dylib)
-    endif (FMODEX)
+    if (TARGET ll::fmodstudio)
+      set(debug_files ${debug_files} libfmodL.dylib)
+      set(release_files ${release_files} libfmod.dylib)
+    endif ()
 
 elseif(LINUX)
     # linux is weird, multiple side by side configurations aren't supported
@@ -244,80 +213,38 @@ elseif(LINUX)
 
     # *TODO - update this to use LIBS_PREBUILT_DIR and LL_ARCH_DIR variables
     # or ARCH_PREBUILT_DIRS
-
     set(debug_src_dir "${ARCH_PREBUILT_DIRS_DEBUG}")
     set(debug_files
        )
     # *TODO - update this to use LIBS_PREBUILT_DIR and LL_ARCH_DIR variables
     # or ARCH_PREBUILT_DIRS
-
     set(release_src_dir "${ARCH_PREBUILT_DIRS_RELEASE}")
-
     # *FIX - figure out what to do with duplicate libalut.so here -brad
-
-    if(${ARCH} STREQUAL "x86_64")
-      set(vivox_src_dir "${ARCH_PREBUILT_DIRS_RELEASE}")
-      set(vivox_files
-          libortp.so
-          libvivoxsdk.so
-          SLVoice
-        )
-      set(release_files
-          libapr-1.so.0
-          libaprutil-1.so.0
-          libatk-1.0.so.0 
-          libdb-5.1.so
-          libexpat.so
-          libexpat.so.1
-          libgmodule-2.0.so.0 
-          libgobject-2.0.so 
-          libopenjpeg.so
-          libopenjpeg.so.1.4.0
-         )
-    else(${ARCH} STREQUAL "x86_64")
-      set(vivox_src_dir "${ARCH_PREBUILT_DIRS_RELEASE}")
-      set(vivox_files
-          libsndfile.so.1
-          libortp.so
-          libvivoxoal.so.1
-          libvivoxplatform.so
-          libvivoxsdk.so
-          SLVoice
-          )
     set(release_files
-        libapr-1.so.0
-        libaprutil-1.so.0
-        libatk-1.0.so
-        libdb-5.1.so
-        ${EXPAT_COPY}
-        libfreetype.so.6.6.2
-        libgmodule-2.0.so
-        libgobject-2.0.so
-        libhunspell-1.3.so.0.0.0
-        libopenjpeg.so
-        libuuid.so.16
-        libuuid.so.16.0.22
-        libfontconfig.so.1.8.0
-        libfontconfig.so.1
-        )
-    if (OPENAL)
-           set(release_files ${release_files} "libopenal.so")
-    endif (OPENAL)
-    endif(${ARCH} STREQUAL "x86_64")
-    if (FMODSTUDIO)
-        set(debug_files ${debug_files} "libfmodstudioL.so")
-        set(release_files ${release_files} "libfmodstudio.so")
-    endif (FMODSTUDIO)
+            ${EXPAT_COPY}
+            )
 
-        if (FMODEX)
-            if(ADDRESS_SIZE EQUAL 32)
-                set(debug_files ${debug_files} "libfmodexL.so")
-                set(release_files ${release_files} "libfmodex.so")
-            else(ADDRESS_SIZE EQUAL 32)
-                set(debug_files ${debug_files} "libfmodexL64.so")
-                set(release_files ${release_files} "libfmodex64.so")
-        endif(ADDRESS_SIZE EQUAL 32)
-    endif (FMODEX)
+     if( USE_AUTOBUILD_3P )
+         list( APPEND release_files
+                 libapr-1.so.0
+                 libaprutil-1.so.0
+                 libatk-1.0.so
+                 libfreetype.so.6.6.2
+                 libfreetype.so.6
+                 libhunspell-1.3.so.0.0.0
+                 libuuid.so.16
+                 libuuid.so.16.0.22
+                 libfontconfig.so.1.8.0
+                 libfontconfig.so.1
+                 libgmodule-2.0.so
+                 libgobject-2.0.so
+                 )
+     endif()
+
+    if (TARGET ll::fmodstudio)
+      set(debug_files ${debug_files} "libfmodL.so")
+      set(release_files ${release_files} "libfmod.so")
+    endif ()
 
 else(WINDOWS)
     message(STATUS "WARNING: unrecognized platform for staging 3rd party libs, skipping...")
@@ -325,11 +252,11 @@ else(WINDOWS)
     set(vivox_libs "")
     # *TODO - update this to use LIBS_PREBUILT_DIR and LL_ARCH_DIR variables
     # or ARCH_PREBUILT_DIRS
-    set(debug_src_dir "${CMAKE_SOURCE_DIR}/../libraries/${ARCH}-linux/lib/debug")
+    set(debug_src_dir "${CMAKE_SOURCE_DIR}/../libraries/i686-linux/lib/debug")
     set(debug_files "")
     # *TODO - update this to use LIBS_PREBUILT_DIR and LL_ARCH_DIR variables
     # or ARCH_PREBUILT_DIRS
-    set(release_src_dir "${CMAKE_SOURCE_DIR}/../libraries/${ARCH}-linux/lib/release")
+    set(release_src_dir "${CMAKE_SOURCE_DIR}/../libraries/i686-linux/lib/release")
     set(release_files "")
 
     set(debug_llkdu_src "")
@@ -347,13 +274,16 @@ endif(WINDOWS)
 # Curiously, slvoice_files are only copied to SHARED_LIB_STAGING_DIR_RELEASE.
 # It's unclear whether this is oversight or intentional, but anyway leave the
 # single copy_if_different command rather than using to_staging_dirs.
-copy_if_different(
-    ${slvoice_src_dir}
-    "${SHARED_LIB_STAGING_DIR_RELEASE}"
-    out_targets
-    ${slvoice_files}
+
+if( slvoice_src_dir )
+    copy_if_different(
+            ${slvoice_src_dir}
+            "${SHARED_LIB_STAGING_DIR_RELEASE}"
+            out_targets
+            ${slvoice_files}
     )
-list(APPEND third_party_targets ${out_targets})
+    list(APPEND third_party_targets ${out_targets})
+endif()
 
 to_staging_dirs(
     ${vivox_lib_dir}
@@ -367,9 +297,16 @@ to_staging_dirs(
     ${release_files}
     )
 
-if(NOT USESYSTEMLIBS)
-  add_custom_target(
-      stage_third_party_libs ALL
-      DEPENDS ${third_party_targets}
-      )
-endif(NOT USESYSTEMLIBS)
+add_custom_target(
+        stage_third_party_libs ALL
+        DEPENDS ${third_party_targets}
+)
+
+if(DARWIN)
+    # Support our "@executable_path/../Resources" load path for executables
+    # that end up in any of the above SHARED_LIB_STAGING_DIR_MUMBLE
+    # directories.
+    add_custom_command( TARGET stage_third_party_libs POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E create_symlink ${SHARED_LIB_STAGING_DIR} ${CMAKE_BINARY_DIR}/sharedlibs/Resources
+            )
+endif()

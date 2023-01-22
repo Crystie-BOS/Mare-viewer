@@ -10,6 +10,9 @@ if (INSTALL_PROPRIETARY)
    set(HAVOK ON CACHE BOOL "Use Havok physics library")
 endif (INSTALL_PROPRIETARY)
 
+include_guard()
+add_library( llphysicsextensions_impl INTERFACE IMPORTED )
+
 
 # Note that the use_prebuilt_binary macros below do not in fact include binaries;
 # the llphysicsextensions_* packages are source only and are built here.
@@ -19,12 +22,10 @@ if (HAVOK)
    include(Havok)
    use_prebuilt_binary(llphysicsextensions_source)
    set(LLPHYSICSEXTENSIONS_SRC_DIR ${LIBS_PREBUILT_DIR}/llphysicsextensions/src)
-   set(LLPHYSICSEXTENSIONS_LIBRARIES    llphysicsextensions)
-
+   target_link_libraries( llphysicsextensions_impl INTERFACE llphysicsextensions)
 elseif (HAVOK_TPV)
    use_prebuilt_binary(llphysicsextensions_tpv)
-   set(LLPHYSICSEXTENSIONS_LIBRARIES    llphysicsextensions_tpv)
-
+   target_link_libraries( llphysicsextensions_impl INTERFACE llphysicsextensions_tpv)
    # <FS:ND> include paths for LLs version and ours are different.
    set(LLPHYSICSEXTENSIONS_INCLUDE_DIRS ${LIBS_PREBUILT_DIR}/include/llphysicsextensions)
    # </FS:ND>
@@ -32,22 +33,10 @@ elseif (HAVOK_TPV)
    # <FS:ND> havok lib get installed to packages/lib
    link_directories( ${LIBS_PREBUILT_DIR}/lib )
    # </FS:ND>
-
 else (HAVOK)
-   use_prebuilt_binary( ndPhysicsStub )
-
-# <FS:ND> Don't set this variable, there is no need to build any stub source if using ndPhysicsStub
-#   set(LLPHYSICSEXTENSIONS_SRC_DIR ${LIBS_PREBUILT_DIR}/llphysicsextensions/stub)
-# </FS:ND>
-
-   set(LLPHYSICSEXTENSIONS_LIBRARIES nd_hacdConvexDecomposition hacd nd_Pathing )
-
-   # <FS:ND> include paths for LLs version and ours are different.
-   set(LLPHYSICSEXTENSIONS_INCLUDE_DIRS ${LIBS_PREBUILT_DIR}/include/ )
-   # </FS:ND>
-
+   use_prebuilt_binary(llphysicsextensions_stub)
+   set(LLPHYSICSEXTENSIONS_SRC_DIR ${LIBS_PREBUILT_DIR}/llphysicsextensions/stub)
+   target_link_libraries( llphysicsextensions_impl INTERFACE llphysicsextensionsstub)
 endif (HAVOK)
 
-# <FS:ND> include paths for LLs version and ours are different.
-#set(LLPHYSICSEXTENSIONS_INCLUDE_DIRS ${LIBS_PREBUILT_DIR}/include/llphysicsextensions) 
-# </FS:ND>
+target_include_directories( llphysicsextensions_impl INTERFACE   ${LIBS_PREBUILT_DIR}/include/llphysicsextensions)
