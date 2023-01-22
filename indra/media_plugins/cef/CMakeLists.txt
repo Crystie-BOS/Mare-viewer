@@ -2,40 +2,14 @@
 
 project(media_plugin_cef)
 
-#include(Boost)
+include(Boost)
 include(00-Common)
 include(LLCommon)
-include(LLPlugin)
-include(LLMath)
-include(LLRender)
 include(LLWindow)
-include(UI)
 include(Linking)
 include(PluginAPI)
-include(MediaPluginBase)
 
 include(CEFPlugin)
-
-if (!DARWIN)
-# We don't want PulseAudio on DARWIN. Geir Nøklebye
-# <FS:ND> Linux volume catcher
-include(PulseAudio)
-include_directories( ${PULSEAUDIO_INCLUDE_DIRS} )
-# </FS:ND>
-endif (!DARWIN)
-
-include_directories(
-    ${LLPLUGIN_INCLUDE_DIRS}
-    ${MEDIA_PLUGIN_BASE_INCLUDE_DIRS}
-    ${LLCOMMON_INCLUDE_DIRS}
-    ${LLMATH_INCLUDE_DIRS}
-    ${LLRENDER_INCLUDE_DIRS}
-    ${LLWINDOW_INCLUDE_DIRS}
-    ${CEF_INCLUDE_DIR}
-)
-include_directories(SYSTEM
-    ${LLCOMMON_SYSTEM_INCLUDE_DIRS}
-    )
 
 
 ### media_plugin_cef
@@ -56,13 +30,6 @@ set(media_plugin_cef_HEADER_FILES
     volume_catcher.h
     )
 
-set (media_plugin_cef_LINK_LIBRARIES
-  ${LLPLUGIN_LIBRARIES}
-  ${MEDIA_PLUGIN_BASE_LIBRARIES}
-  ${CEF_PLUGIN_LIBRARIES}
-  ${LLCOMMON_LIBRARIES}
-  ${PLUGIN_API_WINDOWS_LIBRARIES})
-
 # Select which VolumeCatcher implementation to use
 if (LINUX)
 #  message(FATAL_ERROR "CEF plugin has been enabled for a Linux compile.\n"
@@ -73,16 +40,13 @@ elseif (DARWIN)
   list(APPEND media_plugin_cef_SOURCE_FILES mac_volume_catcher_null.cpp)
   find_library(CORESERVICES_LIBRARY CoreServices)
   find_library(AUDIOUNIT_LIBRARY AudioUnit)
-  list(APPEND media_plugin_cef_LINK_LIBRARIES
+  set( media_plugin_cef_LINK_LIBRARIES
        ${CORESERVICES_LIBRARY}     # for Component Manager calls
        ${AUDIOUNIT_LIBRARY}        # for AudioUnit calls
        )
 elseif (WINDOWS)
   list(APPEND media_plugin_cef_SOURCE_FILES windows_volume_catcher.cpp)
 endif (LINUX)
-
-set_source_files_properties(${media_plugin_cef_HEADER_FILES}
-                            PROPERTIES HEADER_FILE_ONLY TRUE)
 
 list(APPEND media_plugin_cef_SOURCE_FILES ${media_plugin_cef_HEADER_FILES})
 
@@ -96,7 +60,8 @@ add_library(media_plugin_cef
 #)
 
 target_link_libraries(media_plugin_cef
-  ${media_plugin_cef_LINK_LIBRARIES}
+        media_plugin_base
+        ll::cef
 )
 
 if (WINDOWS)
@@ -104,7 +69,6 @@ if (WINDOWS)
     media_plugin_cef
     PROPERTIES
     LINK_FLAGS "/MANIFEST:NO /SAFESEH:NO /NODEFAULTLIB:LIBCMT /IGNORE:4099"
-    LINK_FLAGS_DEBUG "/MANIFEST:NO /SAFESEH:NO /NODEFAULTLIB:LIBCMTD /IGNORE:4099"
     )
 endif (WINDOWS)
 
@@ -114,12 +78,9 @@ if (DARWIN)
     media_plugin_cef
     PROPERTIES
     PREFIX ""
-    # CA: The directive below invokes a CMP0068 warning on later CMAKE versions and appears to have
-    # no actual effect on the output, so comment it
-    # BUILD_WITH_INSTALL_RPATH 1
+    BUILD_WITH_INSTALL_RPATH 1
     INSTALL_NAME_DIR "@executable_path"
-    CXX_FLAGS "-std=c++11 -stdlib=libc++"
-    LINK_FLAGS "-stdlib=libc++ -exported_symbols_list ${CMAKE_CURRENT_SOURCE_DIR}/../base/media_plugin_base.exp"
+    LINK_FLAGS "-exported_symbols_list ${CMAKE_CURRENT_SOURCE_DIR}/../base/media_plugin_base.exp"
   )
 
   add_custom_command(TARGET media_plugin_cef
