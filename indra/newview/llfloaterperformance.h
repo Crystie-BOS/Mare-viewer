@@ -63,6 +63,7 @@ private:
     void setFPSText();
 
     void onClickAdvanced();
+    void onClickDefaults();
     void onChangeQuality(const LLSD& data);
     void onClickHideAvatars();
     void onClickExceptions();
