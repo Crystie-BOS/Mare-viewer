@@ -2567,6 +2567,8 @@ bool idle_startup()
 	{
         if (gAgent.isFirstLogin())
         {
+            gSavedSettings.setBOOL("AutoTuneLock", TRUE);
+            gSavedSettings.setBOOL("KeepAutoTuneLock", TRUE);
             gSavedSettings.setBOOL("AutoTuneFPS", TRUE);
         }
 		if (gSavedSettings.getBOOL("KokuaReopenChatBarAtLogin")) LLFloaterReg::showInstance("kokua_chatbar", LLSD(), FALSE);
