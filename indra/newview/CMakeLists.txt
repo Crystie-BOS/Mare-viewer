@@ -1984,35 +1984,35 @@ if (WINDOWS)
       # The following commented dependencies are determined at variably at build time. Can't do this here.
       ${CMAKE_SOURCE_DIR}/../etc/message.xml
       ${CMAKE_SOURCE_DIR}/../scripts/messages/message_template.msg
-      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/llcommon.dll
+#      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/llcommon.dll
       ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/libapr-1.dll
       ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/libaprutil-1.dll
       ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/libapriconv-1.dll
-      ${SHARED_LIB_STAGING_DIR}/Release/libcollada14dom22.dll
-      ${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/libcollada14dom22.dll
-      ${SHARED_LIB_STAGING_DIR}/Debug/libcollada14dom22-d.dll
+#      ${SHARED_LIB_STAGING_DIR}/Release/libcollada14dom22.dll
+#      ${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/libcollada14dom22.dll
+#      ${SHARED_LIB_STAGING_DIR}/Debug/libcollada14dom22-d.dll
       ${SHARED_LIB_STAGING_DIR}/Release/openjp2.dll
       ${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/openjp2.dll
-      ${SHARED_LIB_STAGING_DIR}/Debug/openjp2.dll
-      ${SHARED_LIB_STAGING_DIR}/Release/libhunspell.dll
-      ${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/libhunspell.dll
-      ${SHARED_LIB_STAGING_DIR}/Debug/libhunspell.dll
+#      ${SHARED_LIB_STAGING_DIR}/Debug/openjp2.dll
+#      ${SHARED_LIB_STAGING_DIR}/Release/libhunspell.dll
+#      ${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/libhunspell.dll
+#      ${SHARED_LIB_STAGING_DIR}/Debug/libhunspell.dll
       ${SHARED_LIB_STAGING_DIR}/Release/uriparser.dll
       ${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/uriparser.dll
-      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/SLVoice.exe
-      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/libsndfile-1.dll
-      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/vivoxoal.dll
-      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/ca-bundle.crt
+#      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/SLVoice.exe
+#      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/libsndfile-1.dll
+#      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/vivoxoal.dll
+#      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/ca-bundle.crt
       ${GOOGLE_PERF_TOOLS_SOURCE}
       ${CMAKE_CURRENT_SOURCE_DIR}/licenses-win32.txt
       ${CMAKE_CURRENT_SOURCE_DIR}/featuretable.txt
-      ${CMAKE_CURRENT_SOURCE_DIR}/featuretable_xp.txt
+#      ${CMAKE_CURRENT_SOURCE_DIR}/featuretable_xp.txt
       ${viewer_APPSETTINGS_FILES}
       SLPlugin
       media_plugin_cef
       media_plugin_libvlc
       media_plugin_example
-      winmm_shim
+#      winmm_shim
       )
 
     if (ADDRESS_SIZE EQUAL 64)
@@ -2033,9 +2033,9 @@ if (WINDOWS)
 
     if (FMODSTUDIO)
       list(APPEND COPY_INPUT_DEPENDENCIES
-           ${SHARED_LIB_STAGING_DIR}/Release/fmodstudio.dll
-           ${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/fmodstudio.dll
-           ${SHARED_LIB_STAGING_DIR}/Debug/fmodstudioL.dll
+#           ${SHARED_LIB_STAGING_DIR}/Release/fmodstudio.dll
+#           ${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/fmodstudio.dll
+#           ${SHARED_LIB_STAGING_DIR}/Debug/fmodstudioL.dll
           )
     endif (FMODSTUDIO)
 
