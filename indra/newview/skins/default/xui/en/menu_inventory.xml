@@ -120,6 +120,54 @@
          parameter="rename" />
     </menu_item_call>
     <menu_item_call
+     label="Add Next:Mod"
+     layout="topleft"
+     name="Next M">
+        <menu_item_call.on_click
+         function="Inventory.DoToSelected"
+         parameter="next_M" />
+    </menu_item_call>
+    <menu_item_call
+     label="Remove Next:Mod"
+     layout="topleft"
+     name="Next m">
+        <menu_item_call.on_click
+         function="Inventory.DoToSelected"
+         parameter="next_m" />
+    </menu_item_call>
+    <menu_item_call
+     label="Add Next:Copy"
+     layout="topleft"
+     name="Next C">
+        <menu_item_call.on_click
+         function="Inventory.DoToSelected"
+         parameter="next_C" />
+    </menu_item_call>
+    <menu_item_call
+     label="Remove Next:Copy"
+     layout="topleft"
+     name="Next c">
+        <menu_item_call.on_click
+         function="Inventory.DoToSelected"
+         parameter="next_c" />
+    </menu_item_call>
+    <menu_item_call
+     label="Add Next:Transfer"
+     layout="topleft"
+     name="Next T">
+        <menu_item_call.on_click
+         function="Inventory.DoToSelected"
+         parameter="next_T" />
+    </menu_item_call>
+    <menu_item_call
+     label="Remove Next:Transfer"
+     layout="topleft"
+     name="Next t">
+        <menu_item_call.on_click
+         function="Inventory.DoToSelected"
+         parameter="next_t" />
+    </menu_item_call>
+    <menu_item_call
      label="Delete"
      layout="topleft"
      name="Task Remove">
