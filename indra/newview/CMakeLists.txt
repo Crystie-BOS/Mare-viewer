@@ -1812,20 +1812,35 @@ if (WINDOWS)
       # The following commented dependencies are determined at variably at build time. Can't do this here.
       ${CMAKE_SOURCE_DIR}/../etc/message.xml
       ${CMAKE_SOURCE_DIR}/../scripts/messages/message_template.msg
-      ${SHARED_LIB_STAGING_DIR}/openjpeg.dll
-      ${SHARED_LIB_STAGING_DIR}/libhunspell.dll
-      ${SHARED_LIB_STAGING_DIR}/uriparser.dll
-      #${SHARED_LIB_STAGING_DIR}/${LL_INTDIR}/SLVoice.exe
-      #${SHARED_LIB_STAGING_DIR}/${LL_INTDIR}/libsndfile-1.dll
-      #${SHARED_LIB_STAGING_DIR}/${LL_INTDIR}/vivoxoal.dll
-      ${AUTOBUILD_INSTALL_DIR}/ca-bundle.crt
+#      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/llcommon.dll
+      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/libapr-1.dll
+      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/libaprutil-1.dll
+      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/libapriconv-1.dll
+#      ${SHARED_LIB_STAGING_DIR}/Release/libcollada14dom22.dll
+#      ${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/libcollada14dom22.dll
+#      ${SHARED_LIB_STAGING_DIR}/Debug/libcollada14dom22-d.dll
+      ${SHARED_LIB_STAGING_DIR}/Release/openjpeg.dll
+      ${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/openjpeg.dll
+#      ${SHARED_LIB_STAGING_DIR}/Debug/openjpegd.dll
+#      ${SHARED_LIB_STAGING_DIR}/Release/libhunspell.dll
+#      ${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/libhunspell.dll
+#      ${SHARED_LIB_STAGING_DIR}/Debug/libhunspell.dll
+      ${SHARED_LIB_STAGING_DIR}/Release/uriparser.dll
+      ${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/uriparser.dll
+#      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/SLVoice.exe
+#      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/libsndfile-1.dll
+#      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/vivoxoal.dll
+#      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/ca-bundle.crt
+      ${GOOGLE_PERF_TOOLS_SOURCE}
       ${CMAKE_CURRENT_SOURCE_DIR}/licenses-win32.txt
       ${CMAKE_CURRENT_SOURCE_DIR}/featuretable.txt
+#      ${CMAKE_CURRENT_SOURCE_DIR}/featuretable_xp.txt
       ${viewer_APPSETTINGS_FILES}
       SLPlugin
       media_plugin_cef
       media_plugin_libvlc
       media_plugin_example
+#      winmm_shim
       )
 
     if (ADDRESS_SIZE EQUAL 64)
@@ -1844,19 +1859,36 @@ if (WINDOWS)
                )
     endif (ADDRESS_SIZE EQUAL 64)
 
-    if (TARGET ll::fmodstudio)
+    if (FMODSTUDIO)
       list(APPEND COPY_INPUT_DEPENDENCIES
-           ${SHARED_LIB_STAGING_DIR}/fmod.dll
-           ${SHARED_LIB_STAGING_DIR}/Debug/fmodL.dll
+#           ${SHARED_LIB_STAGING_DIR}/Release/fmodstudio.dll
+#           ${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/fmodstudio.dll
+#           ${SHARED_LIB_STAGING_DIR}/Debug/fmodstudioL.dll
           )
-    endif ()
+    endif (FMODSTUDIO)
 
-    if (TARGET ll::openal)
+    if (FMODEX)
+        if ( ADDRESS_SIZE EQUAL 32 )
       list(APPEND COPY_INPUT_DEPENDENCIES
-           ${SHARED_LIB_STAGING_DIR}/OpenAL32.dll
-           ${SHARED_LIB_STAGING_DIR}/alut.dll
+           ${SHARED_LIB_STAGING_DIR}/Release/fmodex.dll
+           ${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/fmodex.dll
+           ${SHARED_LIB_STAGING_DIR}/Debug/fmodexL.dll
           )
-    endif ()
+        elseif( ADDRESS_SIZE EQUAL 64 )
+                list(APPEND COPY_INPUT_DEPENDENCIES
+                   ${SHARED_LIB_STAGING_DIR}/Release/fmodex64.dll
+                   ${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/fmodex64.dll
+                   ${SHARED_LIB_STAGING_DIR}/Debug/fmodexL64.dll
+                  )
+        endif ( ADDRESS_SIZE EQUAL 32 )
+    endif (FMODEX)
+
+    if (OPENAL)
+      list(APPEND COPY_INPUT_DEPENDENCIES
+           ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/OpenAL32.dll
+           ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/alut.dll
+          )
+    endif (OPENAL)
 
     add_custom_command(
       OUTPUT  ${CMAKE_CFG_INTDIR}/copy_touched.bat

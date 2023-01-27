@@ -147,7 +147,7 @@ public:
     virtual LLSettingsType::type_e getSettingsType() const { return LLSettingsType::ST_NONE; }
 	virtual EInventorySortGroup getSortGroup() const { return SG_ITEM; }
 	virtual LLInventoryObject* getInventoryObject() const { return findInvObject(); }
-
+	virtual void nextOwnerPermissions(LLInventoryItem* item, std::vector<std::string> &items, std::vector<std::string> &disabled_items); // KKA-976
 
 	// LLDragAndDropBridge functionality
 	virtual LLToolDragAndDrop::ESource getDragSource() const { return LLToolDragAndDrop::SOURCE_WORLD; }
@@ -249,6 +249,46 @@ const std::string& LLTaskInvFVBridge::getDisplayName() const
 		if(!xfer)
 		{
 			mDisplayName.append(LLTrans::getString("no_transfer"));
+		}
+
+		// KKA-976
+		if (gSavedSettings.getBOOL("DebugPermissions"))
+		{
+			const U32 nextperm = item->getPermissions().getMaskNextOwner();
+			mDisplayName.append(" ( N:");
+			if (nextperm & PERM_MOVE)
+			{
+				mDisplayName.append("V");
+			}
+			else 
+			{
+				mDisplayName.append(" ");
+			}
+			if (nextperm & PERM_MODIFY)
+			{
+				mDisplayName.append("M");
+			}
+			else 
+			{
+				mDisplayName.append(" ");
+			}
+			if (nextperm & PERM_COPY)
+			{
+				mDisplayName.append("C");
+			}
+			else 
+			{
+				mDisplayName.append(" ");
+			}
+			if (nextperm & PERM_TRANSFER)
+			{
+				mDisplayName.append("T");
+			}
+			else 
+			{
+				mDisplayName.append(" ");
+			}
+			mDisplayName.append(" )");
 		}
 	}
 
@@ -529,8 +569,150 @@ void LLTaskInvFVBridge::performAction(LLInventoryModel* model, std::string actio
 	{
 		showProperties();
 	}
+	else if (action.substr(0,5) == "next_") // KKA-976
+	{
+		std::string perm_action = action.substr(5,1);
+		LLInventoryItem* item = findItem();
+		if (item)
+		{
+			LLPermissions perm(item->getPermissions());
+			U32 next_perm = perm.getMaskNextOwner();
+			if (perm_action == "M")
+			{
+				next_perm |= PERM_MODIFY;
+			}
+			else if (perm_action == "m")
+			{
+				next_perm &= ~PERM_MODIFY;
+			}
+			else if (perm_action == "C")
+			{
+				next_perm |= PERM_COPY;
+			}
+			else if (perm_action == "c")
+			{
+				next_perm &= ~PERM_COPY;
+			}
+			else if (perm_action == "T")
+			{
+				next_perm |= PERM_TRANSFER;
+			}
+			else if (perm_action == "t")
+			{
+				next_perm &= ~PERM_TRANSFER;
+			}
+			// if next copy is not set, force next transfer to on
+			// (we won't be here if we don't have transfer ourselves)
+			if (!(next_perm & PERM_COPY))
+			{
+				next_perm |= PERM_TRANSFER;
+			}
+			perm.setMaskNext(next_perm);
+			item->setPermissions(perm);
+			// adapted from llsidepaneliteminfo's logic
+			LLViewerObject* object = gObjectList.findObject(mPanel->getTaskUUID());
+			if(object)
+			{
+				LLViewerInventoryItem* vitem = (LLViewerInventoryItem*)item;
+
+				const BOOL non_root_ok = TRUE;
+				LLUUID group_id;
+				LLSelectMgr::getInstance()->selectGetGroup(group_id);
+				LLUUID owner_id;
+				std::string owner_name;
+				LLSelectMgr::getInstance()->selectGetOwner(owner_id, owner_name);
+				LLObjectSelectionHandle selection = LLSelectMgr::getInstance()->getSelection();
+				LLSelectNode* node = selection->getFirstRootNode(NULL, non_root_ok);
+				const BOOL is_nonpermanent_enforced = (node && LLSelectMgr::getInstance()->selectGetRootsNonPermanentEnforced()) ||
+					LLSelectMgr::getInstance()->selectGetNonPermanentEnforced();
+				const BOOL self_owned = (gAgent.getID() == owner_id);
+				const BOOL group_owned = LLSelectMgr::getInstance()->selectIsGroupOwned() ;
+
+				if (is_nonpermanent_enforced &&
+					(self_owned || (group_owned && gAgent.hasPowerInGroup(group_id, GP_OBJECT_MANIPULATE))))
+				{
+					object->updateInventory(
+						vitem,
+						TASK_INVENTORY_ITEM_KEY,
+						false);
+				}
+			}
+		}
+	}
 }
 
+void LLTaskInvFVBridge::nextOwnerPermissions(LLInventoryItem* item, std::vector<std::string> &items, std::vector<std::string> &disabled_items) // KKA-976
+{
+	if (gSavedSettings.getBOOL("DebugPermissions"))
+	{
+		const LLPermissions& perm(item->getPermissions());
+		BOOL copy = gAgent.allowOperation(PERM_COPY, perm, GP_OBJECT_MANIPULATE);
+		BOOL mod  = gAgent.allowOperation(PERM_MODIFY, perm, GP_OBJECT_MANIPULATE);
+		BOOL xfer = gAgent.allowOperation(PERM_TRANSFER, perm, GP_OBJECT_MANIPULATE);
+		const U32 nextperm = item->getPermissions().getMaskNextOwner();
+
+		// if we don't have xfer, don't allow anything
+		const BOOL non_root_ok = TRUE;
+		LLUUID group_id;
+		LLSelectMgr::getInstance()->selectGetGroup(group_id);
+		LLUUID owner_id;
+		std::string owner_name;
+		LLSelectMgr::getInstance()->selectGetOwner(owner_id, owner_name);
+		LLObjectSelectionHandle selection = LLSelectMgr::getInstance()->getSelection();
+		LLSelectNode* node = selection->getFirstRootNode(NULL, non_root_ok);
+		const BOOL is_nonpermanent_enforced = (node && LLSelectMgr::getInstance()->selectGetRootsNonPermanentEnforced()) ||
+			LLSelectMgr::getInstance()->selectGetNonPermanentEnforced();
+		const BOOL self_owned = (gAgent.getID() == owner_id);
+		const BOOL group_owned = LLSelectMgr::getInstance()->selectIsGroupOwned() ;
+
+		BOOL has_change_perm_ability = FALSE;
+
+		if (is_nonpermanent_enforced &&
+			(self_owned || (group_owned && gAgent.hasPowerInGroup(group_id, GP_OBJECT_MANIPULATE))))
+		{
+			has_change_perm_ability = TRUE;
+		}
+
+		if(xfer && has_change_perm_ability)
+		{
+			if (mod)
+			{
+				if (nextperm & PERM_MODIFY)
+				{
+					items.push_back(std::string("Next m"));
+				}
+				else
+				{
+					items.push_back(std::string("Next M"));
+				}
+			}
+			if(copy)
+			{
+				if (nextperm & PERM_COPY)
+				{
+					items.push_back(std::string("Next c"));
+				}
+				else
+				{
+					items.push_back(std::string("Next C"));
+				}
+			}
+			if(xfer && copy && (nextperm & PERM_COPY))
+			{
+				if (nextperm & PERM_TRANSFER)
+				{
+					items.push_back(std::string("Next t"));
+				}
+				else
+				{
+					items.push_back(std::string("Next T"));
+				}
+			}
+		}
+	}
+}
+
+// KKA-976 The flags are unused by LL. Bit 0 is now used for a landmark (don't show permissions options)
 void LLTaskInvFVBridge::buildContextMenu(LLMenuGL& menu, U32 flags)
 {
 	LLInventoryItem* item = findItem();
@@ -564,7 +746,11 @@ void LLTaskInvFVBridge::buildContextMenu(LLMenuGL& menu, U32 flags)
 	{
 		items.push_back(std::string("Task Remove"));
 	}
-
+	
+	if (!(flags & 1)) // KKA-976 not for landmarks
+	{
+		LLTaskInvFVBridge::nextOwnerPermissions(item, items, disabled_items);
+	}
 	hide_context_entries(menu, items, disabled_items);
 }
 
@@ -873,6 +1059,7 @@ void LLTaskSoundBridge::buildContextMenu(LLMenuGL& menu, U32 flags)
 
 	items.push_back(std::string("Task Play"));
 
+	LLTaskInvFVBridge::nextOwnerPermissions(item, items, disabled_items); // KKA-976
 
 	hide_context_entries(menu, items, disabled_items);
 }
@@ -888,7 +1075,15 @@ public:
 						 const LLUUID& uuid,
 						 const std::string& name) :
 		LLTaskInvFVBridge(panel, uuid, name) {}
+	virtual void buildContextMenu(LLMenuGL& menu, U32 flags); // KKA-976
 };
+
+// virtual
+void LLTaskLandmarkBridge::buildContextMenu(LLMenuGL& menu, U32 flags) // KKA-976
+{
+	flags |= 1; // bit 0 hijacked to signal that this is a landmark
+	LLTaskInvFVBridge::buildContextMenu(menu, flags);
+}
 
 ///----------------------------------------------------------------------------
 /// Class LLTaskCallingCardBridge
@@ -981,6 +1176,7 @@ void LLTaskScriptBridge::buildContextMenu(LLMenuGL& menu, U32 flags)
 		items.push_back(std::string("Task Remove"));
 		items.push_back(std::string("Task Remove All"));
 	}
+	LLTaskInvFVBridge::nextOwnerPermissions(item, items, disabled_items); // KKA-976
 
 	hide_context_entries(menu, items, disabled_items);
 }

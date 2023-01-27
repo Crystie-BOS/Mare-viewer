@@ -105,10 +105,13 @@ if(WINDOWS)
         set(MSVC_VER 120)
     elseif (MSVC_VERSION GREATER_EQUAL 1910 AND MSVC_VERSION LESS 1920) # Visual Studio 2017
         set(MSVC_VER 140)
+        set(MSVC_TOOLSET_VER 141)
     elseif (MSVC_VERSION GREATER_EQUAL 1920 AND MSVC_VERSION LESS 1930) # Visual Studio 2019
         set(MSVC_VER 140)
+        set(MSVC_TOOLSET_VER 142)
     elseif (MSVC_VERSION GREATER_EQUAL 1930 AND MSVC_VERSION LESS 1940) # Visual Studio 2022
         set(MSVC_VER 140)
+        set(MSVC_TOOLSET_VER 143)
     else (MSVC80)
         MESSAGE(WARNING "New MSVC_VERSION ${MSVC_VERSION} of MSVC: adapt Copy3rdPartyLibs.cmake")
     endif (MSVC80)
@@ -143,11 +146,20 @@ if(WINDOWS)
     # Check each of them.
     foreach(release_msvc_file
             msvcp${MSVC_VER}.dll
-            msvcr${MSVC_VER}.dll
+            #msvcr${MSVC_VER}.dll # <FS:Ansariel> Can't build with older VS versions anyway - no need trying to copy this file
             vcruntime${MSVC_VER}.dll
             vcruntime${MSVC_VER}_1.dll
             )
-        if(EXISTS "${registry_path}/${release_msvc_file}")
+        # <FS:Ansariel> Try using the VC runtime redistributables that came with the VS installation first
+        if(redist_path AND EXISTS "${redist_path}/${release_msvc_file}")
+            MESSAGE(STATUS "Copying redist file from ${redist_path}/${release_msvc_file}")
+            to_staging_dirs(
+                ${redist_path}
+                third_party_targets
+                ${release_msvc_file})
+        # </FS:Ansariel>
+        elseif(EXISTS "${registry_path}/${release_msvc_file}")
+            MESSAGE(STATUS "Copying redist file from ${registry_path}/${release_msvc_file}")
             to_staging_dirs(
                 ${registry_path}
                 third_party_targets
