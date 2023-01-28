@@ -334,6 +334,13 @@ target_link_libraries(
     ${TRACY_LIBRARY}
     )
 
+if (DARWIN)
+  include(CMakeFindFrameworks)
+  find_library(CARBON_LIBRARY Carbon)
+  find_library(AVFOUNDATION_LIBRARY AVFoundation)
+  target_link_libraries(llcommon ${CARBON_LIBRARY} ${AVFOUNDATION_LIBRARY})
+endif (DARWIN)
+
 add_dependencies(llcommon stage_third_party_libs)
 
 if (LL_TESTS)
