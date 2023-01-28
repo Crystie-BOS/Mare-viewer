@@ -126,6 +126,7 @@ LLWindowMacOSX::LLWindowMacOSX(LLWindowCallbacks* callbacks,
 
 	// Voodoo for calling cocoa from carbon (see llwindowmacosx-objc.mm).
 	setupCocoa();
+	osxRequestMicrophonePermissionIfNeeded();
 
 	// Initialize the keyboard
 	gKeyboard = new LLKeyboardMacOSX();
@@ -1734,6 +1735,10 @@ void LLSplashScreenMacOSX::hideImpl()
 	{
 		mWindow = NULL;
 	}
+}
+
+bool hasMicrophonePermission() {
+       return osxHasMicrophonePermission();
 }
 
 S32 OSMessageBoxMacOSX(const std::string& text, const std::string& caption, U32 type)

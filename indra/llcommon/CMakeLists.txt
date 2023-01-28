@@ -277,6 +277,13 @@ target_link_libraries(
 target_include_directories(llcommon INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(llcommon PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
+if (DARWIN)
+  include(CMakeFindFrameworks)
+  find_library(CARBON_LIBRARY Carbon)
+  find_library(AVFOUNDATION_LIBRARY AVFoundation)
+  target_link_libraries(llcommon ${CARBON_LIBRARY} ${AVFOUNDATION_LIBRARY})
+endif (DARWIN)
+
 add_dependencies(llcommon stage_third_party_libs)
 
 if (LL_TESTS)
