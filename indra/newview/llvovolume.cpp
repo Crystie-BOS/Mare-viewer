@@ -240,6 +240,9 @@ LLVOVolume::LLVOVolume(const LLUUID &id, const LLPCode pcode, LLViewerRegion *re
     mColorChanged = FALSE;
 	mSpotLightPriority = 0.f;
 
+	mSkinInfoFailed = false;
+	mSkinInfo = NULL;
+
 	mMediaImplList.resize(getNumTEs());
 	mLastFetchedMediaVersion = -1;
     mServerDrawableUpdateCount = 0;
@@ -255,6 +258,8 @@ LLVOVolume::~LLVOVolume()
 	mTextureAnimp = NULL;
 	delete mVolumeImpl;
 	mVolumeImpl = NULL;
+
+	gMeshRepo.unregisterMesh(this);
 
 	if(!mMediaImplList.empty())
 	{
@@ -963,10 +968,7 @@ void LLVOVolume::updateTextureVirtualSize(bool forced)
 	
 	if (isSculpted())
 	{
-		LLSculptParams *sculpt_params = (LLSculptParams *)getParameterEntry(LLNetworkData::PARAMS_SCULPT);
-		LLUUID id =  sculpt_params->getSculptTexture();
-		
-		updateSculptTexture();
+        updateSculptTexture();
 		
 		
 
@@ -1236,10 +1238,15 @@ BOOL LLVOVolume::setVolume(const LLVolumeParams &params_in, const S32 detail, bo
 			// if it's a mesh
 			if ((volume_params.getSculptType() & LL_SCULPT_TYPE_MASK) == LL_SCULPT_TYPE_MESH)
 			{
+				if (mSkinInfo && mSkinInfo->mMeshID != volume_params.getSculptID())
+				{
+					mSkinInfo = NULL;
+					mSkinInfoFailed = false;
+				}
+
 				if (!getVolume()->isMeshAssetLoaded())
 				{ 
 					//load request not yet issued, request pipeline load this mesh
-					LLUUID asset_id = volume_params.getSculptID();
 					S32 available_lod = gMeshRepo.loadMesh(this, volume_params, lod, last_lod);
 					if (available_lod != lod)
 					{
@@ -1247,6 +1254,14 @@ BOOL LLVOVolume::setVolume(const LLVolumeParams &params_in, const S32 detail, bo
 					}
 				}
 				
+				if (!mSkinInfo && !mSkinInfoFailed)
+				{
+					const LLMeshSkinInfo* skin_info = gMeshRepo.getSkinInfo(volume_params.getSculptID(), this);
+					if (skin_info)
+					{
+						notifySkinInfoLoaded(skin_info);
+					}
+				}
 			}
 			else // otherwise is sculptie
 			{
@@ -1299,6 +1314,9 @@ void LLVOVolume::updateSculptTexture()
 		{
 			mSculptTexture = LLViewerTextureManager::getFetchedTexture(id, FTT_DEFAULT, TRUE, LLGLTexture::BOOST_NONE, LLViewerTexture::LOD_TEXTURE);
 		}
+
+		mSkinInfoFailed = false;
+		mSkinInfo = NULL;
 	}
 	else
 	{
@@ -1351,6 +1369,20 @@ void LLVOVolume::notifyMeshLoaded()
         cav->notifyAttachmentMeshLoaded();
     }
     updateVisualComplexity();
+}
+
+void LLVOVolume::notifySkinInfoLoaded(const LLMeshSkinInfo* skin)
+{
+	mSkinInfoFailed = false;
+	mSkinInfo = skin;
+
+	notifyMeshLoaded();
+}
+
+void LLVOVolume::notifySkinInfoUnavailable()
+{
+	mSkinInfoFailed = true;
+	mSkinInfo = nullptr;
 }
 
 // sculpt replaces generate() for sculpted surfaces
@@ -3822,7 +3854,7 @@ const LLMeshSkinInfo* LLVOVolume::getSkinInfo() const
 {
     if (getVolume())
     {
-        return gMeshRepo.getSkinInfo(getMeshID(), this);
+         return mSkinInfo;
     }
     else
     {

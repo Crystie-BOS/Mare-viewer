@@ -235,6 +235,7 @@ public:
 	bool showItemLinkOverlays() { return mShowItemLinkOverlays; }
 
 	void setCallbackRegistrar(LLUICtrl::CommitCallbackRegistry::ScopedRegistrar* registrar) { mCallbackRegistrar = registrar; }
+	void setEnableRegistrar(LLUICtrl::EnableCallbackRegistry::ScopedRegistrar* registrar) { mEnableRegistrar = registrar; }
 // [SL:KB] - Patch: MultiWearables-WearOn | Checked: 2010-05-13 (Catznip-2.0)
 	void setEnableCallbackRegistrar(LLUICtrl::EnableCallbackRegistry::ScopedRegistrar* registrar) { mEnableCallbackRegistrar = registrar; }
 // [/SL:KB]
@@ -275,6 +276,7 @@ protected:
 
 protected:
 	LLHandle<LLView>					mPopupMenuHandle;
+	std::string						mMenuFileName;
 	
 	selected_items_t				mSelectedItems;
 	bool							mKeyboardSelection,
@@ -330,6 +332,7 @@ protected:
 	LLFolderViewItem*				mDraggingOverItem; // See EXT-719
 
 	LLUICtrl::CommitCallbackRegistry::ScopedRegistrar* mCallbackRegistrar;
+	LLUICtrl::EnableCallbackRegistry::ScopedRegistrar* mEnableRegistrar;
 // [SL:KB] - Patch: MultiWearables-WearOn | Checked: 2010-05-13 (Catznip-2.0)
 	LLUICtrl::EnableCallbackRegistry::ScopedRegistrar* mEnableCallbackRegistrar;
 // [/SL:KB]

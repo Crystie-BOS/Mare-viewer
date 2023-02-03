@@ -57,7 +57,6 @@ public:
 	explicit LLUUID(const std::string& in_string); // Convert from string.
 	LLUUID(const LLUUID &in);
 	LLUUID &operator=(const LLUUID &rhs);
-
 	~LLUUID();
 
 	//
