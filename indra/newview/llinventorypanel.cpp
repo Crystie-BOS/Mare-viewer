@@ -214,7 +214,11 @@ LLFolderView * LLInventoryPanel::createFolderRoot(LLUUID root_id )
     p.allow_drop = mParams.allow_drop_on_root;
     p.options_menu = "menu_inventory.xml";
 
-    return LLUICtrlFactory::create<LLFolderView>(p);
+	LLFolderView* fv = LLUICtrlFactory::create<LLFolderView>(p);
+	fv->setCallbackRegistrar(&mCommitCallbackRegistrar);
+	fv->setEnableRegistrar(&mEnableCallbackRegistrar);
+
+	return fv;
 }
 
 void LLInventoryPanel::clearFolderRoot()
@@ -270,6 +274,7 @@ void LLInventoryPanel::initFromParams(const LLInventoryPanel::Params& params)
 	}
 	mCommitCallbackRegistrar.popScope();
 	mFolderRoot.get()->setCallbackRegistrar(&mCommitCallbackRegistrar);
+	mFolderRoot.get()->setEnableRegistrar(&mEnableCallbackRegistrar);
 // [SL:KB] - Patch: MultiWearables-WearOn | Checked: 2010-05-13 (Catznip-2.0)
 	mEnableCallbackRegistrar.popScope();
 	mFolderRoot.get()->setEnableCallbackRegistrar(&mEnableCallbackRegistrar);

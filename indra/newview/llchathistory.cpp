@@ -160,6 +160,18 @@ public:
 		{
 			mAvatarNameCacheConnection.disconnect();
 		}
+		auto menu = mPopupMenuHandleAvatar.get();
+		if (menu)
+		{
+			menu->die();
+			mPopupMenuHandleAvatar.markDead();
+		}
+		menu = mPopupMenuHandleObject.get();
+		if (menu)
+		{
+			menu->die();
+			mPopupMenuHandleObject.markDead();
+		}
 	}
 
 	BOOL handleMouseUp(S32 x, S32 y, MASK mask)
@@ -794,45 +806,6 @@ public:
 
 	BOOL postBuild()
 	{
-		LLUICtrl::CommitCallbackRegistry::ScopedRegistrar registrar;
-		LLUICtrl::EnableCallbackRegistry::ScopedRegistrar registrar_enable;
-
-		registrar.add("AvatarIcon.Action", boost::bind(&LLChatHistoryHeader::onAvatarIconContextMenuItemClicked, this, _2));
-		registrar_enable.add("AvatarIcon.Check", boost::bind(&LLChatHistoryHeader::onAvatarIconContextMenuItemChecked, this, _2));
-		registrar_enable.add("AvatarIcon.Enable", boost::bind(&LLChatHistoryHeader::onAvatarIconContextMenuItemEnabled, this, _2));
-		registrar_enable.add("AvatarIcon.Visible", boost::bind(&LLChatHistoryHeader::onAvatarIconContextMenuItemVisible, this, _2));
-		registrar.add("ObjectIcon.Action", boost::bind(&LLChatHistoryHeader::onObjectIconContextMenuItemClicked, this, _2));
-		registrar_enable.add("ObjectIcon.Visible", boost::bind(&LLChatHistoryHeader::onObjectIconContextMenuItemVisible, this, _2));
-		registrar.add("AudioStreamIcon.Clipboard", boost::bind(&LLChatHistoryHeader::onAudioStreamIconContextMenuItemClipboard, this, _2));
-		registrar.add("AudioStreamIcon.VisitWebsite", boost::bind(&LLChatHistoryHeader::onAudioStreamIconContextMenuItemVisitWebsite, this, _2));
-		registrar.add("AudioStreamIcon.StopStream", boost::bind(&LLChatHistoryHeader::onAudioStreamIconContextMenuItemStopStream, this, _2));
-		registrar.add("AudioStreamIcon.StartStream", boost::bind(&LLChatHistoryHeader::onAudioStreamIconContextMenuItemStartStream, this, _2));
-		registrar.add("AudioStreamIcon.ViewerSound", boost::bind(&LLChatHistoryHeader::onAudioStreamIconContextMenuItemViewerSound, this, _2));
-		registrar.add("AudioStreamIcon.ParcelSound", boost::bind(&LLChatHistoryHeader::onAudioStreamIconContextMenuItemParcelSound, this, _2));
-
-		LLMenuGL* menu = LLUICtrlFactory::getInstance()->createFromFile<LLMenuGL>("menu_avatar_icon.xml", gMenuHolder, LLViewerMenuHolderGL::child_registry_t::instance());
-		if (menu)
-		{
-			mPopupMenuHandleAvatar = menu->getHandle();
-		}
-		else
-		{
-			LL_WARNS() << " Failed to create menu_avatar_icon.xml" << LL_ENDL;
-		}
-
-		menu = LLUICtrlFactory::getInstance()->createFromFile<LLMenuGL>("menu_object_icon.xml", gMenuHolder, LLViewerMenuHolderGL::child_registry_t::instance());
-		if (menu)
-		{
-			mPopupMenuHandleObject = menu->getHandle();
-		}
-		else
-		{
-			LL_WARNS() << " Failed to create menu_object_icon.xml" << LL_ENDL;
-		}
-
-		menu = LLUICtrlFactory::getInstance()->createFromFile<LLMenuGL>("menu_audio_stream_icon.xml", gMenuHolder, LLViewerMenuHolderGL::child_registry_t::instance());
-		mPopupMenuHandleAudioStream = menu->getHandle();
-
 		setDoubleClickCallback(boost::bind(&LLChatHistoryHeader::showInspector, this));
 
 		setMouseEnterCallback(boost::bind(&LLChatHistoryHeader::showInfoCtrl, this));
@@ -1205,46 +1178,63 @@ protected:
 	void showSystemContextMenu(S32 x, S32 y)
 	{
 	}
-
-	void showObjectContextMenu(S32 x, S32 y)
+	
+	void showObjectContextMenu(S32 x,S32 y)
 	{
-		LLMenuGL *menu = (LLMenuGL *)mPopupMenuHandleObject.get();
+		LLMenuGL* menu = (LLMenuGL*)mPopupMenuHandleObject.get();
+		if (!menu)
+		{
+			LLUICtrl::CommitCallbackRegistry::ScopedRegistrar registrar;
+			LLUICtrl::EnableCallbackRegistry::ScopedRegistrar registrar_enable;
+			registrar.add("ObjectIcon.Action", boost::bind(&LLChatHistoryHeader::onObjectIconContextMenuItemClicked, this, _2));
+			registrar_enable.add("ObjectIcon.Visible", boost::bind(&LLChatHistoryHeader::onObjectIconContextMenuItemVisible, this, _2));
 
-		if (menu) {
-			LLViewerObject *object = gObjectList.findObject(mObjectData["object_id"]);
-
-			mZoomIntoID.setNull();
-
-			if (object) {
-				//
-				//	can't zoom in on your own HUD
-				//
-				if (!(object->isHUDAttachment() && object->flagObjectYouOwner())) {
-					mZoomIntoID = mObjectData["object_id"];
-				}
+			menu = LLUICtrlFactory::getInstance()->createFromFile<LLMenuGL>("menu_object_icon.xml", gMenuHolder, LLViewerMenuHolderGL::child_registry_t::instance());
+			if (menu)
+			{
+				mPopupMenuHandleObject = menu->getHandle();
+				menu->updateParent(LLMenuGL::sMenuContainer);
+				LLMenuGL::showPopup(this, menu, x, y);
 			}
-			else {
-				//
-				//	can't find the object nearby, but if
-				//	the owner is nearby then the object
-				//	is most likely worn as a HUD
-				//	(either that or they only just deleted
-				//	the object)
-				//
-				if (gObjectList.findObject(mObjectData["owner_id"])) {
-					mZoomIntoID = mObjectData["owner_id"];
-				}
+			else
+			{
+				LL_WARNS() << " Failed to create menu_object_icon.xml" << LL_ENDL;
 			}
-
-			menu->setItemEnabled("zoom_in", mZoomIntoID.notNull());
-
+		}
+		else
+		{
 			LLMenuGL::showPopup(this, menu, x, y);
 		}
 	}
-
-	void showAvatarContextMenu(S32 x, S32 y)
+	
+	void showAvatarContextMenu(S32 x,S32 y)
 	{
 		LLMenuGL* menu = (LLMenuGL*)mPopupMenuHandleAvatar.get();
+		if (!menu)
+		{
+			LLUICtrl::CommitCallbackRegistry::ScopedRegistrar registrar;
+			LLUICtrl::EnableCallbackRegistry::ScopedRegistrar registrar_enable;
+			registrar.add("AvatarIcon.Action", boost::bind(&LLChatHistoryHeader::onAvatarIconContextMenuItemClicked, this, _2));
+			registrar_enable.add("AvatarIcon.Check", boost::bind(&LLChatHistoryHeader::onAvatarIconContextMenuItemChecked, this, _2));
+			registrar_enable.add("AvatarIcon.Enable", boost::bind(&LLChatHistoryHeader::onAvatarIconContextMenuItemEnabled, this, _2));
+			registrar_enable.add("AvatarIcon.Visible", boost::bind(&LLChatHistoryHeader::onAvatarIconContextMenuItemVisible, this, _2));
+			registrar.add("AudioStreamIcon.Clipboard", boost::bind(&LLChatHistoryHeader::onAudioStreamIconContextMenuItemClipboard, this, _2));
+			registrar.add("AudioStreamIcon.VisitWebsite", boost::bind(&LLChatHistoryHeader::onAudioStreamIconContextMenuItemVisitWebsite, this, _2));
+			registrar.add("AudioStreamIcon.StopStream", boost::bind(&LLChatHistoryHeader::onAudioStreamIconContextMenuItemStopStream, this, _2));
+			registrar.add("AudioStreamIcon.StartStream", boost::bind(&LLChatHistoryHeader::onAudioStreamIconContextMenuItemStartStream, this, _2));
+			registrar.add("AudioStreamIcon.ViewerSound", boost::bind(&LLChatHistoryHeader::onAudioStreamIconContextMenuItemViewerSound, this, _2));
+			registrar.add("AudioStreamIcon.ParcelSound", boost::bind(&LLChatHistoryHeader::onAudioStreamIconContextMenuItemParcelSound, this, _2));
+
+			menu = LLUICtrlFactory::getInstance()->createFromFile<LLMenuGL>("menu_avatar_icon.xml", gMenuHolder, LLViewerMenuHolderGL::child_registry_t::instance());
+			if (menu)
+			{
+				mPopupMenuHandleAvatar = menu->getHandle();
+			}
+			else
+			{
+				LL_WARNS() << " Failed to create menu_avatar_icon.xml" << LL_ENDL;
+			}
+		}
 
 		if (menu)
 		{
@@ -1507,10 +1497,7 @@ LLChatHistory::LLChatHistory(const LLChatHistory::Params& p)
 
 LLSD LLChatHistory::getValue() const
 {
-	LLSD* text = new LLSD();
-	text->assign(mEditor->getText());
-	return *text;
-
+	return LLSD(mEditor->getText());
 }
 
 LLChatHistory::~LLChatHistory()
