@@ -2,9 +2,9 @@
  * @file llfloatersettingsdebug.h
  * @brief floater for debugging internal viewer settings
  *
- * $LicenseInfo:firstyear=2001&license=viewerlgpl$
+ * $LicenseInfo:firstyear=2022&license=viewerlgpl$
  * Second Life Viewer Source Code
- * Copyright (C) 2010, Linden Research, Inc.
+ * Copyright (C) 2022, Linden Research, Inc.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,17 +29,8 @@
 
 #include "llcontrol.h"
 #include "llfloater.h"
-#include "llmath.h"
 
-class LLTextEditor;
-class LLSpinCtrl;
-class LLColorSwatchCtrl;
-class LLLineEditor;
-class LLRadioGroup;
-class LLButton;
 class LLScrollListCtrl;
-class LLControlVariable;
-class LLSearchEditor;
 
 //MK
 #include "llagent.h"
@@ -55,17 +46,13 @@ public:
 	virtual BOOL postBuild();
 	virtual void draw();
 
-	void updateControl();
+	void updateControl(LLControlVariable* control);
 
-	// updates control filter to display in the controls list on keytroke
-	void onUpdateFilter();
-	void onSettingSelect();
 	void onCommitSettings();
 	void onClickDefault();
-	void onCopyToClipboard();
-	void onSanityCheck();
-	void onClickSanityWarning();
-	static void showControl(const std::string& control);
+
+    bool matchesSearchFilter(std::string setting_name);
+    bool isSettingHidden(LLControlVariable* control);
 
 private:
 	// key - selects which settings to show, one of:
@@ -73,32 +60,20 @@ private:
 	LLFloaterSettingsDebug(const LLSD& key);
 	virtual ~LLFloaterSettingsDebug();
 
-	// returns a pointer to the currently selected control variable, or NULL
-	LLControlVariable* getControlVariable();
+    void updateList(bool skip_selection = false);
+    void onSettingSelect();
+    void setSearchFilter(const std::string& filter);
+
+    void updateDefaultColumn(LLControlVariable* control);
+    void hideUIControls();
+
+    LLScrollListCtrl* mSettingList;
 	
 protected:
-	typedef std::map<std::string,LLControlVariable*> settings_map_t;
+	class LLTextEditor* mComment;
 
-	settings_map_t mSettingsMap;
-
-	std::string mOldSearchTerm;
-	LLControlVariable* mCurrentControlVariable;
-	LLControlVariable* mOldControlVariable;
-	bool mOldVisibility;
-
-	LLSearchEditor* mSearchSettingsInput;
-	LLScrollListCtrl* mSettingsScrollList;
-	LLTextEditor* mComment;
-	LLSpinCtrl* mSpinner1;
-	LLSpinCtrl* mSpinner2;
-	LLSpinCtrl* mSpinner3;
-	LLSpinCtrl* mSpinner4;
-	LLColorSwatchCtrl* mColorSwatch;
-	LLLineEditor* mValText;
-	LLRadioGroup* mBooleanCombo;
-	LLButton* mCopyButton;
-	LLButton* mDefaultButton;
-	LLButton* mSanityButton;
+    std::string mSearchFilter;
 };
 
 #endif //LLFLOATERDEBUGSETTINGS_H
+
