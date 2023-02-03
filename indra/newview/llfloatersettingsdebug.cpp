@@ -33,6 +33,14 @@
 #include "llspinctrl.h"
 #include "llcolorswatch.h"
 #include "llviewercontrol.h"
+// [RLVa:KB] - Checked: 2010-03-18 (RLVa-1.2.0a)
+#include "llsdserialize.h"
+#include "sanitycheck.h"
+//#include "stdenums.h"		// for ADD_BOTTOM
+// [/RLVa:KB]
+#include "llnotificationsutil.h"
+#include "llwindow.h"
+#include "llfloaterreg.h"
 #include "lltexteditor.h"
 
 
@@ -42,6 +50,8 @@ LLFloaterSettingsDebug::LLFloaterSettingsDebug(const LLSD& key)
 {
 	mCommitCallbackRegistrar.add("CommitSettings",	boost::bind(&LLFloaterSettingsDebug::onCommitSettings, this));
 	mCommitCallbackRegistrar.add("ClickDefault",	boost::bind(&LLFloaterSettingsDebug::onClickDefault, this));
+	mCommitCallbackRegistrar.add("ClickCopy",		boost::bind(&LLFloaterSettingsDebug::onCopyToClipboard, this));
+	mCommitCallbackRegistrar.add("ClickSanityIcon",	boost::bind(&LLFloaterSettingsDebug::onClickSanityWarning, this));
 }
 
 LLFloaterSettingsDebug::~LLFloaterSettingsDebug()
@@ -159,6 +169,10 @@ void LLFloaterSettingsDebug::onCommitSettings()
 	  default:
 		break;
 	}
+	if (!controlp->isSane())
+	{
+		onSanityCheck();
+	}
     updateDefaultColumn(controlp);
 }
 
@@ -207,6 +221,8 @@ void LLFloaterSettingsDebug::updateControl(LLControlVariable* controlp)
         getChild<LLTextBox>("setting_name_txt")->setText(controlp->getName());
         getChild<LLTextBox>("setting_name_txt")->setToolTip(controlp->getName());
         mComment->setVisible(true);
+		getChildView("copy_btn")->setVisible(TRUE);
+		getChildView("sanity_warning_btn")->setVisible(!controlp->isSane());
 
         std::string old_text = mComment->getText();
         std::string new_text = controlp->getComment();
@@ -562,6 +578,47 @@ void LLFloaterSettingsDebug::updateList(bool skip_selection)
     }
 }
 
+void LLFloaterSettingsDebug::onSanityCheck()
+{
+    LLScrollListItem* first_selected = mSettingList->getFirstSelected();
+    if (first_selected)
+    {
+        LLControlVariable* controlp = (LLControlVariable*)first_selected->getUserdata();
+        if (controlp)
+		{
+			SanityCheck::instance().onSanity(controlp);
+		}
+	}
+}
+
+void LLFloaterSettingsDebug::onClickSanityWarning()
+{
+    LLScrollListItem* first_selected = mSettingList->getFirstSelected();
+    if (first_selected)
+    {
+        LLControlVariable* controlp = (LLControlVariable*)first_selected->getUserdata();
+        if (controlp)
+		{
+			// pass "true" to tell the sanity checker to pop up the warning, even when
+			// it was shown before and would be suppressed otherwise
+			SanityCheck::instance().onSanity(controlp, true);
+		}
+	}
+}
+void LLFloaterSettingsDebug::onCopyToClipboard()
+{
+    LLScrollListItem* first_selected = mSettingList->getFirstSelected();
+    if (first_selected)
+    {
+        LLControlVariable* controlp = (LLControlVariable*)first_selected->getUserdata();
+		if (controlp)
+		{
+			getWindow()->copyTextToClipboard(utf8str_to_wstring(controlp->getName()));
+			LLNotificationsUtil::add("ControlNameCopiedToClipboard");
+		}
+	}
+}
+
 void LLFloaterSettingsDebug::onSettingSelect()
 {
     LLScrollListItem* first_selected = mSettingList->getFirstSelected();
@@ -633,6 +690,8 @@ void LLFloaterSettingsDebug::hideUIControls()
     getChildView("default_btn")->setVisible(false);
     getChildView("boolean_combo")->setVisible(false);
     getChildView("setting_name_txt")->setVisible(false);
+    getChildView("copy_btn")->setVisible(false);
+    getChildView("sanity_warning_btn")->setVisible(false);	
     mComment->setVisible(false);
 }
 

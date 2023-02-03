@@ -46,7 +46,9 @@ public:
 
 	void onCommitSettings();
 	void onClickDefault();
-
+	void onCopyToClipboard();
+	void onSanityCheck();
+	void onClickSanityWarning();
     bool matchesSearchFilter(std::string setting_name);
     bool isSettingHidden(LLControlVariable* control);
 
