@@ -142,6 +142,10 @@
 #include "llwindowmacosx.h"
 #endif
 
+#if LL_DARWIN
+#include "llwindowmacosx.h"
+#endif
+
 // Third party library includes
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
