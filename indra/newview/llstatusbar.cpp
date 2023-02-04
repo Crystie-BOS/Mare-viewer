@@ -614,6 +614,7 @@ void LLStatusBar::setBalance(S32 balance)
 		mBalanceTimer->reset();
 		mBalanceTimer->setTimerExpirySec( ICON_TIMER_EXPIRY );
 		mBalance = balance;
+		hideBalance(gSavedSettings.getBOOL("KokuaAlwaysHideBalance")); // KKA-980
 	}
 }
 
@@ -674,7 +675,7 @@ void LLStatusBar::setHealth(S32 health)
 
 void LLStatusBar::hideBalance(bool hide)
 {
-	mBoxBalance->setVisible(!hide);
+	mBoxBalance->setVisible(!hide && !gSavedSettings.getBOOL("KokuaAlwaysHideBalance")); // KKA-980
 }
 
 S32 LLStatusBar::getBalance() const
