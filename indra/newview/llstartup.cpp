@@ -288,12 +288,10 @@ void show_first_run_dialog();
 bool first_run_dialog_callback(const LLSD& notification, const LLSD& response);
 void set_startup_status(const F32 frac, const std::string& string, const std::string& msg);
 bool login_alert_status(const LLSD& notification, const LLSD& response);
-void login_packet_failed(void**, S32 result);
 void use_circuit_callback(void**, S32 result);
 void register_viewer_callbacks(LLMessageSystem* msg);
 void asset_callback_nothing(const LLUUID&, LLAssetType::EType, void*, S32);
 bool callback_choose_gender(const LLSD& notification, const LLSD& response);
-void init_start_screen(S32 location_id);
 void release_start_screen();
 void reset_login();
 LLSD transform_cert_args(LLPointer<LLCertificate> cert);
@@ -2569,6 +2567,8 @@ bool idle_startup()
 	{
         if (gAgent.isFirstLogin())
         {
+            gSavedSettings.setBOOL("AutoTuneLock", TRUE);
+            gSavedSettings.setBOOL("KeepAutoTuneLock", TRUE);
             gSavedSettings.setBOOL("AutoTuneFPS", TRUE);
         }
 		if (gSavedSettings.getBOOL("KokuaReopenChatBarAtLogin")) LLFloaterReg::showInstance("kokua_chatbar", LLSD(), FALSE);

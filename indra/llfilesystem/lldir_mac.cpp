@@ -71,16 +71,16 @@ LLDir_Mac::LLDir_Mac()
 
     const std::string     secondLifeString = "Kokua";
     
-    std::string *executablepathstr = getSystemExecutableFolder();
+    std::string executablepathstr = getSystemExecutableFolder();
 
     //NOTE:  LLINFOS/LLERRS will not output to log here.  The streams are not initialized.
     
-	if (executablepathstr)
+	if (!executablepathstr.empty())
 	{
 		// mExecutablePathAndName
-		mExecutablePathAndName = *executablepathstr;
+		mExecutablePathAndName = executablepathstr;
         
-        boost::filesystem::path executablepath(*executablepathstr);
+        boost::filesystem::path executablepath(executablepathstr);
         
 # ifndef BOOST_SYSTEM_NO_DEPRECATED
 #endif
@@ -88,8 +88,8 @@ LLDir_Mac::LLDir_Mac()
         mExecutableDir = executablepath.parent_path().string();
 		
 		// mAppRODataDir
-        std::string *resourcepath = getSystemResourceFolder();
-        mAppRODataDir = *resourcepath;
+        std::string resourcepath = getSystemResourceFolder();
+        mAppRODataDir = resourcepath;
 		
 		// *NOTE: When running in a dev tree, use the copy of
 		// skins in indra/newview/ rather than in the application bundle.  This
@@ -133,11 +133,11 @@ LLDir_Mac::LLDir_Mac()
 #endif
 		
 		// mOSUserDir
-        std::string *appdir = getSystemApplicationSupportFolder();
+        std::string appdir = getSystemApplicationSupportFolder();
         std::string rootdir;
 
         //Create root directory
-        if (CreateDirectory(*appdir, secondLifeString, &rootdir))
+        if (CreateDirectory(appdir, secondLifeString, &rootdir))
         {
             
             // Save the full path to the folder
@@ -151,12 +151,10 @@ LLDir_Mac::LLDir_Mac()
         }
     
 		//mOSCacheDir
-        std::string *cachedir =  getSystemCacheFolder();
-
-        if (cachedir)
-		
+        std::string cachedir =  getSystemCacheFolder();
+        if (!cachedir.empty())
 		{
-            mOSCacheDir = *cachedir;
+            mOSCacheDir = cachedir;
             //TODO:  This changes from ~/Library/Cache/Secondlife to ~/Library/Cache/com.app.secondlife/Secondlife.  Last dir level could go away.
             CreateDirectory(mOSCacheDir, secondLifeString, NULL);
 		}
@@ -166,12 +164,10 @@ LLDir_Mac::LLDir_Mac()
 		
 		// mTempDir
         //Aura 120920 boost::filesystem::temp_directory_path() not yet implemented on mac. :(
-        std::string *tmpdir = getSystemTempFolder();
-        if (tmpdir)
+        std::string tmpdir = getSystemTempFolder();
+        if (!tmpdir.empty())
         {
-            
-            CreateDirectory(*tmpdir, secondLifeString, &mTempDir);
-            if (tmpdir) delete tmpdir;
+            CreateDirectory(tmpdir, secondLifeString, &mTempDir);
         }
 		
 		mWorkingDir = getCurPath();

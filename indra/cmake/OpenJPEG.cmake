@@ -8,4 +8,5 @@ use_system_binary(openjpeg)
 use_prebuilt_binary(openjpeg)
 
 target_link_libraries(ll::openjpeg INTERFACE openjpeg )
+  set(OPENJPEG_LIBRARIES openjp2)
 target_include_directories( ll::openjpeg SYSTEM INTERFACE ${LIBS_PREBUILT_DIR}/include/openjpeg)

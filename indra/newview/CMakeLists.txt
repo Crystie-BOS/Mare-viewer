@@ -1813,20 +1813,20 @@ if (WINDOWS)
       ${CMAKE_SOURCE_DIR}/../etc/message.xml
       ${CMAKE_SOURCE_DIR}/../scripts/messages/message_template.msg
 #      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/llcommon.dll
-      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/libapr-1.dll
-      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/libaprutil-1.dll
-      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/libapriconv-1.dll
+#      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/libapr-1.dll
+#      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/libaprutil-1.dll
+#      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/libapriconv-1.dll
 #      ${SHARED_LIB_STAGING_DIR}/Release/libcollada14dom22.dll
 #      ${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/libcollada14dom22.dll
 #      ${SHARED_LIB_STAGING_DIR}/Debug/libcollada14dom22-d.dll
-      ${SHARED_LIB_STAGING_DIR}/Release/openjpeg.dll
-      ${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/openjpeg.dll
-#      ${SHARED_LIB_STAGING_DIR}/Debug/openjpegd.dll
+#      ${SHARED_LIB_STAGING_DIR}/Release/openjp2.dll
+#      ${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/openjp2.dll
+#      ${SHARED_LIB_STAGING_DIR}/Debug/openjp2.dll
 #      ${SHARED_LIB_STAGING_DIR}/Release/libhunspell.dll
 #      ${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/libhunspell.dll
 #      ${SHARED_LIB_STAGING_DIR}/Debug/libhunspell.dll
-      ${SHARED_LIB_STAGING_DIR}/Release/uriparser.dll
-      ${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/uriparser.dll
+#      ${SHARED_LIB_STAGING_DIR}/Release/uriparser.dll
+#      ${SHARED_LIB_STAGING_DIR}/RelWithDebInfo/uriparser.dll
 #      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/SLVoice.exe
 #      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/libsndfile-1.dll
 #      ${SHARED_LIB_STAGING_DIR}/${CMAKE_CFG_INTDIR}/vivoxoal.dll

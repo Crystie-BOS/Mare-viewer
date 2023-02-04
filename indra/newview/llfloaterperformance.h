@@ -70,6 +70,10 @@ private:
     void onClickShadows();
     void onClickAdvancedLighting();
 
+    void startAutotune();
+    void stopAutotune();
+    void updateAutotuneCtrls(bool autotune_enabled);
+
     void updateMaxRenderTime();
 
     static void changeQualityLevel(const std::string& notif);
@@ -83,6 +87,9 @@ private:
     LLNameListCtrl* mHUDList;
     LLNameListCtrl* mObjectList;
     LLNameListCtrl* mNearbyList;
+
+    LLButton* mStartAutotuneBtn;
+    LLButton* mStopAutotuneBtn;
 
     LLListContextMenu* mContextMenu;
 

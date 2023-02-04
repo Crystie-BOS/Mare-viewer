@@ -154,6 +154,16 @@ BOOL LLFloaterPerformance::postBuild()
         gSavedSettings.setF32("AutoTuneRenderFarClipTarget", LLPipeline::RenderFarClip);
     }
 
+    LLStringExplicit fps_limit(llformat("%d", gViewerWindow->getWindow()->getRefreshRate()));
+    mAutoadjustmentsPanel->getChild<LLTextBox>("vsync_desc_limit")->setTextArg("[FPS_LIMIT]", fps_limit);
+    mAutoadjustmentsPanel->getChild<LLTextBox>("display_desc")->setTextArg("[FPS_LIMIT]", fps_limit);
+    mAutoadjustmentsPanel->getChild<LLButton>("defaults_btn")->setCommitCallback(boost::bind(&LLFloaterPerformance::onClickDefaults, this));
+
+    mStartAutotuneBtn = mAutoadjustmentsPanel->getChild<LLButton>("start_autotune");
+    mStopAutotuneBtn = mAutoadjustmentsPanel->getChild<LLButton>("stop_autotune");
+    mStartAutotuneBtn->setCommitCallback(boost::bind(&LLFloaterPerformance::startAutotune, this));
+    mStopAutotuneBtn->setCommitCallback(boost::bind(&LLFloaterPerformance::stopAutotune, this));
+
     return TRUE;
 }
 
@@ -201,14 +211,10 @@ void LLFloaterPerformance::draw()
             populateObjectList();
         }
 
-        auto button = getChild<LLButton>("AutoTuneFPS");
-        if((bool)button->getToggleState() != LLPerfStats::tunables.userAutoTuneEnabled)
-        {
-            button->toggleState();
-        }
-
         mUpdateTimer->setTimerExpirySec(REFRESH_INTERVAL);
     }
+    updateAutotuneCtrls(LLPerfStats::tunables.userAutoTuneEnabled);
+
     LLFloater::draw();
 }
 
@@ -697,5 +703,26 @@ void LLFloaterPerformance::onClickShadows()
         changeQualityLevel("ShadowsConfirm");
     }
 
+}
+
+void LLFloaterPerformance::startAutotune()
+{
+    LLPerfStats::tunables.userAutoTuneEnabled = true;
+}
+
+void LLFloaterPerformance::stopAutotune()
+{
+    LLPerfStats::tunables.userAutoTuneEnabled = false;
+}
+
+void LLFloaterPerformance::updateAutotuneCtrls(bool autotune_enabled)
+{
+    static LLCachedControl<bool> auto_tune_locked(gSavedSettings, "AutoTuneLock");
+    mStartAutotuneBtn->setEnabled(!autotune_enabled && !auto_tune_locked);
+    mStopAutotuneBtn->setEnabled(autotune_enabled && !auto_tune_locked);
+    getChild<LLCheckBoxCtrl>("AutoTuneContinuous")->setEnabled(!autotune_enabled || (autotune_enabled && auto_tune_locked));
+
+    getChild<LLTextBox>("wip_desc")->setVisible(autotune_enabled && !auto_tune_locked);
+    getChild<LLTextBox>("display_desc")->setVisible(LLPerfStats::tunables.vsyncEnabled);
 }
 // EOF
