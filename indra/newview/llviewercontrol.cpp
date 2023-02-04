@@ -567,6 +567,15 @@ bool handleEffectColorChanged(const LLSD& newvalue)
 	return true;
 }
 
+bool handleKokuaAlwaysHideBalance(const LLSD& newvalue) // KKA-980
+{
+	if (gStatusBar)
+	{
+		gStatusBar->hideBalance(newvalue.asBoolean());
+	}
+	return true;
+}
+
 bool handleHighResSnapshotChanged(const LLSD& newvalue)
 {
 	// High Res Snapshot active, must uncheck RenderUIInSnapshot
@@ -1007,6 +1016,7 @@ void settings_setup_listeners()
     setting_setup_signal_listener(gSavedSettings, "LoginLocation", handleLoginLocationChanged);
     setting_setup_signal_listener(gSavedSettings, "DebugAvatarJoints", handleDebugAvatarJointsChanged);
     setting_setup_signal_listener(gSavedSettings, "RenderAutoMuteByteLimit", handleRenderAutoMuteByteLimitChanged);
+	setting_setup_signal_listener(gSavedSettings, "KokuaAlwaysHideBalance", handleKokuaAlwaysHideBalance); // KKA-980
 
     setting_setup_signal_listener(gSavedSettings, "TargetFPS", handleTargetFPSChanged);
     setting_setup_signal_listener(gSavedSettings, "AutoTuneFPS", handleAutoTuneFPSChanged);
