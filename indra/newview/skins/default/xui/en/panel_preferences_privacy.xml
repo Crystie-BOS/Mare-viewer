@@ -131,6 +131,15 @@
      name="show_new_inventory"
      top_pad="10"
      width="350" />
+    <check_box
+     control_name="KokuaAlwaysHideBalance"
+     height="16"
+     label="Always hide L$ balance"
+     layout="topleft"
+     left="30"
+     name="kokua_always_hide_balance"
+     top_pad="10"
+     width="350" />
     <button
      follows="left|top"
      height="23"
