@@ -654,7 +654,18 @@ bool idle_startup()
 		//gErrorStream.setTime(gSavedSettings.getBOOL("LogTimestamps"));
 
 		// Load the throttle settings
-		gViewerThrottle.load();
+		// KKA-971 if we've got a bandwidth configured > 3000 force it to 1500
+		F32 bandwidthKbps = gSavedSettings.getF32("ThrottleBandwidthKBPS");
+		if (bandwidthKbps > 3000)
+		{
+			gSavedSettings.setF32("ThrottleBandwidthKBPS",1500.0);
+			LL_INFOS() << "Forced bandwidth to 1500" << LL_ENDL;
+		}
+		else
+		{
+			gViewerThrottle.load();
+			LL_INFOS() << "No change to bandwidth, retaining " << bandwidthKbps << LL_ENDL;
+		}
 
 		//
 		// Initialize messaging system
