@@ -80,6 +80,7 @@
 #include "llfloaterreg.h"
 #include "llviewerobjectlist.h"
 #include "llviewerregion.h"
+#include "llstatusbar.h"
 
 // Third party library includes
 #include <boost/algorithm/string.hpp>
