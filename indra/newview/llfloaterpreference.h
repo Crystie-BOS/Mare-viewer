@@ -153,6 +153,9 @@ protected:
 	void onClickActionChange();
 	// updates click/double-click action keybindngs depending on view values
 	void updateClickActionControls();
+
+    void onAtmosShaderChange();
+
 	//<FS:Kadah> Font Selection
 	void populateFontSelectionCombo();
 	void loadFontPresetsFromDir(const std::string& dir, LLComboBox* font_selection_combo);
