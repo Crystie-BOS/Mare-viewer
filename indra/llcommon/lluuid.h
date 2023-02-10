@@ -55,9 +55,7 @@ public:
 	LLUUID();
 	explicit LLUUID(const char *in_string); // Convert from string.
 	explicit LLUUID(const std::string& in_string); // Convert from string.
-	LLUUID(const LLUUID &in);
-	LLUUID &operator=(const LLUUID &rhs);
-	~LLUUID();
+	~LLUUID() = default;
 
 	//
 	// MANIPULATORS
@@ -130,6 +128,9 @@ public:
 
 	U8 mData[UUID_BYTES];
 };
+static_assert(std::is_trivially_copyable<LLUUID>::value, "LLUUID must be trivial copy");
+static_assert(std::is_trivially_move_assignable<LLUUID>::value, "LLUUID must be trivial move");
+static_assert(std::is_standard_layout<LLUUID>::value, "LLUUID must be a standard layout type");
 
 typedef std::vector<LLUUID> uuid_vec_t;
 typedef std::set<LLUUID> uuid_set_t;
@@ -165,12 +166,8 @@ public:
 };
 
 // Generate a hash of an LLUUID object using the boost hash templates. 
-
-// <FS:ND> GCC 4.9 does not like the specialization in form of boost::hash but rather wants a namespace
-// template <>
-// struct boost::hash<LLUUID>
-namespace boost { template <> struct hash<LLUUID>
-// </FS:ND>
+template <>
+struct boost::hash<LLUUID>
 {
     typedef LLUUID argument_type;
     typedef std::size_t result_type;
@@ -186,7 +183,6 @@ namespace boost { template <> struct hash<LLUUID>
         return seed;
     }
 };
-} // <FS:ND/> close namespace
 
 // Adapt boost hash to std hash
 namespace std
@@ -210,5 +206,3 @@ struct FSUUIDHash
 };
 // </FS:Ansariel> UUID hash calculation
 #endif
-
-
