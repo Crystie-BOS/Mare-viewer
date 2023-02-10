@@ -1419,7 +1419,6 @@ void LLAgentWearables::findAttachmentsAddRemoveInfo(LLInventoryModel::item_array
 						}
 					}
 				}
-				LLUUID item_id(inv_item->getUUID());
 			}
 			return;
         }
