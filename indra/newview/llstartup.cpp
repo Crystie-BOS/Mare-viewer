@@ -2576,12 +2576,6 @@ bool idle_startup()
 
 	if (STATE_CLEANUP == LLStartUp::getStartupState())
 	{
-        if (gAgent.isFirstLogin())
-        {
-            gSavedSettings.setBOOL("AutoTuneLock", TRUE);
-            gSavedSettings.setBOOL("KeepAutoTuneLock", TRUE);
-            gSavedSettings.setBOOL("AutoTuneFPS", TRUE);
-        }
 		if (gSavedSettings.getBOOL("KokuaReopenChatBarAtLogin")) LLFloaterReg::showInstance("kokua_chatbar", LLSD(), FALSE);
 		// KKA-708, ported from Marine's viewer
 		// Quickly show and hide the Hover Height floater, to make it bind AvatarHoverOffsetZ to its callback.
