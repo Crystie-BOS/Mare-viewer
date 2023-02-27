@@ -614,7 +614,18 @@ void LLStatusBar::setBalance(S32 balance)
 		mBalanceTimer->reset();
 		mBalanceTimer->setTimerExpirySec( ICON_TIMER_EXPIRY );
 		mBalance = balance;
-		hideBalance(gSavedSettings.getBOOL("KokuaAlwaysHideBalance")); // KKA-980
+	}
+	
+	// KKA-985, make the KKA-981 hiding of the balance check every time, not just on new balances
+	BOOL isVisible = mBoxBalance->getVisible();
+	BOOL hiddenBalance = gSavedSettings.getBOOL("KokuaAlwaysHideBalance");
+	if (isVisible && hiddenBalance)
+	{
+		hideBalance(true);
+	}
+	else if ( !isVisible && !hiddenBalance)
+	{
+		hideBalance(false);
 	}
 }
 
