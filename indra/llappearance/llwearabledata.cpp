@@ -104,14 +104,27 @@ void LLWearableData::pushWearable(const LLWearableType::EType type,
 	if (canAddWearable(type))
 	{
 // [RLVa:KB] - Checked: 2010-06-08 (RLVa-1.2.0)
-		// Don't add the same wearable twice
-		U32 idxWearable = 0;
-		if (!getWearableIndex(wearable, idxWearable))
+		// If there are none of this type avoid generating a warning in getWearableIndex
+		wearableentry_map_t::const_iterator wearable_iter = mWearableDatas.find(type);
+		if (wearable_iter == mWearableDatas.end())
+		{
 			mWearableDatas[type].push_back(wearable);
+		}
 		else
-			llassert(false); // pushWearable() on an already added wearable is a bug *somewhere*
+		{
+			// Don't add the same wearable twice
+			U32 idxWearable = 0;
+			if (!getWearableIndex(wearable, idxWearable))
+			{
+				mWearableDatas[type].push_back(wearable);
+			}
+			else
+			{
+				llassert(false); // pushWearable() on an already added wearable is a bug *somewhere*
+			}
+		}
 // [/RLVa:KB]
-//		mWearableDatas[type].push_back(wearable);		mWearableDatas[type].push_back(wearable);
+//		mWearableDatas[type].push_back(wearable);
 		if (trigger_updated)
 		{
 			const BOOL removed = FALSE;
@@ -220,7 +233,7 @@ BOOL LLWearableData::getWearableIndex(const LLWearable *wearable, U32& index_fou
 	wearableentry_map_t::const_iterator wearable_iter = mWearableDatas.find(type);
 	if (wearable_iter == mWearableDatas.end())
 	{
-		LL_WARNS() << "tried to get wearable index with an invalid type!" << LL_ENDL;
+		LL_WARNS() << "tried to get wearable index with an invalid type! Type = " << type << " Name = " << wearable->getName() << LL_ENDL;
 		return FALSE;
 	}
 	const wearableentry_vec_t& wearable_vec = wearable_iter->second;
