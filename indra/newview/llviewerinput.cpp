@@ -47,6 +47,7 @@
 #include "llfloatercamera.h"
 #include "llinitparam.h"
 #include "llselectmgr.h"
+#include "kokuachatbar.h"
 
 //
 // Constants
@@ -673,7 +674,7 @@ bool start_chat( EKeystate s )
     if (KEYSTATE_DOWN != s) return true;
 
 	// start chat
-	LLFloaterIMNearbyChat::startChat(NULL);
+	gViewerInput.startChosenChat(NULL); // KKA=990 pass this through chat bar preference logic
 	return true;
 }
 
@@ -683,15 +684,15 @@ bool start_gesture( EKeystate s )
 	if (KEYSTATE_UP == s &&
 		! (focus_ctrlp && focus_ctrlp->acceptsTextInput()))
 	{
- 		if ((LLFloaterReg::getTypedInstance<LLFloaterIMNearbyChat>("nearby_chat"))->getCurrentChat().empty())
+		if (gViewerInput.chosenChatIsEmpty())
  		{
  			// No existing chat in chat editor, insert '/'
- 			LLFloaterIMNearbyChat::startChat("/");
+ 			gViewerInput.startChosenChat("/"); // KKA-990 pass this through chat bar preference logic
  		}
  		else
  		{
  			// Don't overwrite existing text in chat editor
- 			LLFloaterIMNearbyChat::startChat(NULL);
+ 			gViewerInput.startChosenChat(NULL); // KKA-990 pass this through chat bar preference logic
  		}
 	}
 	return true;
@@ -1050,6 +1051,62 @@ BOOL LLViewerInput::modeFromString(const std::string& string, S32 *mode)
 		*mode = MODE_THIRD_PERSON;
 		return FALSE;
 	}
+}
+
+BOOL LLViewerInput::chosenChatIsEmpty() // KKA-990 check the chosen chat floater
+{
+	bool prefer_kokua_chatbar = gSavedSettings.getBOOL("KokuaUseChatBarWhenStartingLocalChat");
+	KokuaChatBar* chat_bar = LLFloaterReg::findTypedInstance<KokuaChatBar>("kokua_chatbar");
+
+	if (prefer_kokua_chatbar && chat_bar)
+	{
+		return chat_bar->getCurrentChat().empty();
+	}
+	
+	return LLFloaterReg::getTypedInstance<LLFloaterIMNearbyChat>("nearby_chat")->getCurrentChat().empty();
+}
+
+BOOL LLViewerInput::startChosenChat(const char* line) // KKA-990 moved here from viewerwindow to avoid duplication
+{
+	bool prefer_kokua_chatbar = gSavedSettings.getBOOL("KokuaUseChatBarWhenStartingLocalChat");
+	KokuaChatBar* chat_bar = LLFloaterReg::findTypedInstance<KokuaChatBar>("kokua_chatbar");
+
+	if (chat_bar && chat_bar->getVisible() && prefer_kokua_chatbar)
+	{
+		chat_bar->startChat(line);
+		return TRUE;
+	}
+	else
+	{
+		// Initialize nearby chat if it's missing
+		LLFloaterIMNearbyChat* nearby_chat = LLFloaterReg::findTypedInstance<LLFloaterIMNearbyChat>("nearby_chat");
+		if (!nearby_chat)
+		{	
+			LLSD name("im_container");
+			LLFloaterReg::toggleInstanceOrBringToFront(name);
+		}
+
+		// KKA-886 BugSplat #48 Make sure nearby_chat is valid			
+		if ((!nearby_chat || !nearby_chat->getVisible()) && prefer_kokua_chatbar)
+		{
+			LLSD name("kokua_chatbar");
+			LLFloaterReg::toggleInstanceOrBringToFront(name);
+			chat_bar->startChat(line);
+			return TRUE;
+		}
+		else
+		{
+			LLChatEntry* chat_editor = LLFloaterReg::findTypedInstance<LLFloaterIMNearbyChat>("nearby_chat")->getChatBox();
+			// KKA-889 Additional fix for KKA-886
+			if (nearby_chat && chat_editor)
+			{
+				// passing NULL here, character will be added later when it is handled by character handler.
+				nearby_chat->startChat(line);
+				return TRUE;
+			}
+		}
+	}
+	return FALSE;
 }
 
 // static

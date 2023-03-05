@@ -41,7 +41,7 @@ public:
 	virtual BOOL handleKeyHere( KEY key, MASK mask );
 	static void startChat(const char* line);
 	void show();
-		
+	std::string getCurrentChat(); //KKA-990
 	// virtual
 	BOOL postBuild();
 

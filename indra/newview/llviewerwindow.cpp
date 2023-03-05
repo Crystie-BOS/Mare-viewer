@@ -216,7 +216,6 @@
 #include "llpaneltopinfobar.h"
 #include "llcleanup.h"
 #include "utilitybar.h"
-#include "kokuachatbar.h"
 #if LL_WINDOWS
 #include <tchar.h> // For Unicode conversion methods
 #include "llwindowwin32.h" // For AltGr handling
@@ -3202,44 +3201,7 @@ BOOL LLViewerWindow::handleKey(KEY key, MASK mask)
 		!keyboard_focus && key < 0x80 && (mask == MASK_NONE || mask == MASK_SHIFT) )
 //mk
 	{
-		bool prefer_kokua_chatbar = gSavedSettings.getBOOL("KokuaUseChatBarWhenStartingLocalChat");
-		KokuaChatBar* chat_bar = LLFloaterReg::findTypedInstance<KokuaChatBar>("kokua_chatbar");
-
-		if (chat_bar && chat_bar->getVisible() && prefer_kokua_chatbar)
-		{
-			chat_bar->startChat(NULL);
-			return TRUE;
-		}
-		else
-		{
-			// Initialize nearby chat if it's missing
-			LLFloaterIMNearbyChat* nearby_chat = LLFloaterReg::findTypedInstance<LLFloaterIMNearbyChat>("nearby_chat");
-			if (!nearby_chat)
-			{	
-				LLSD name("im_container");
-				LLFloaterReg::toggleInstanceOrBringToFront(name);
-			}
-
-			// KKA-886 BugSplat #48 Make sure nearby_chat is valid			
-			if ((!nearby_chat || !nearby_chat->getVisible()) && prefer_kokua_chatbar)
-			{
-				LLSD name("kokua_chatbar");
-				LLFloaterReg::toggleInstanceOrBringToFront(name);
-				chat_bar->startChat(NULL);
-				return TRUE;
-			}
-			else
-			{
-				LLChatEntry* chat_editor = LLFloaterReg::findTypedInstance<LLFloaterIMNearbyChat>("nearby_chat")->getChatBox();
-				// KKA-889 Additional fix for KKA-886
-				if (nearby_chat && chat_editor)
-				{
-					// passing NULL here, character will be added later when it is handled by character handler.
-					nearby_chat->startChat(NULL);
-					return TRUE;
-				}
-			}
-		}
+		if (gViewerInput.startChosenChat(NULL)) return TRUE; // KKA-990 centralise this in viewerinput where it's needed too
 	}
 
 	// give menus a chance to handle unmodified accelerator keys

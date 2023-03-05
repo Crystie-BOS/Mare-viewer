@@ -136,6 +136,9 @@ public:
     bool            isMouseBindUsed(const EMouseClickType mouse, const MASK mask, const S32 mode) const;
     bool            isLMouseHandlingDefault(const S32 mode) const { return mLMouseDefaultHandling[mode]; }
 
+    BOOL startChosenChat(const char* line); // KKA-990 called from viewerwindow to avoid duplication of chat bar/conversation floater selection logic
+    BOOL chosenChatIsEmpty(); // KKA-990 added to check the chosen chat floater
+
 private:
     bool            scanKey(const std::vector<LLKeyboardBinding> &binding,
                             S32 binding_count,
