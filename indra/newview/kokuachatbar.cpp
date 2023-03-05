@@ -72,6 +72,12 @@ BOOL KokuaChatBar::postBuild()
 	return TRUE;
 }
 
+//added for KKA-990
+std::string KokuaChatBar::getCurrentChat()
+{
+	return mInputEditor ? mInputEditor->getText() : LLStringUtil::null;
+}
+
 void KokuaChatBar::handleReshape(const LLRect& new_rect, bool by_user)
 {
 	// The floater is being resized. This keeps the input area to the same size. Note that oversize input areas won't persist
