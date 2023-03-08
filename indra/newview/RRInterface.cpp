@@ -1736,6 +1736,9 @@ void RRInterface::notify (LLUUID object_uuid, std::string action, std::string su
 	{
 		KokuaFloaterRLVWorn::getBase()->refreshWornStatus();
 	}
+	if (sRestrainedLoveLogging) {
+		LL_INFOS("RLV") << "Notification raised [" << object_uuid << "] [" << action << "]  [" << suffix << "]" << LL_ENDL;
+	}
 }
 
 
