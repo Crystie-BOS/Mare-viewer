@@ -943,6 +943,12 @@ void LLAgent::movePitch(F32 mag)
 	}
 }
 
+BOOL LLAgent::isMovementLocked() const
+{
+		if (gRRenabled && !gAgent.mRRInterface.mGarbageCollectorCalledOnce) return TRUE;
+		return mMovementKeysLocked;
+}
+
 
 // Does this parcel allow you to fly?
 BOOL LLAgent::canFly()

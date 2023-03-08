@@ -3451,13 +3451,14 @@ void LLAppearanceMgr::onFirstFullyVisible()
 
 	LLInventoryModel::item_array_t dedup_cof_items = cof_items;
 	removeDuplicateItems(dedup_cof_items);
-	LL_INFOS() << "COF current size: " << cof_items.size() << " without duplicates: " << dedup_cof_items.size() << LL_ENDL;
+	LL_INFOS() << "First Fully Visible at " << gFrameTimeSeconds << ". COF current size: " << cof_items.size() << " without duplicates: " << dedup_cof_items.size() << LL_ENDL;
 	if (cof_items.size() != dedup_cof_items.size())
 	{
 		LL_WARNS() << "Reloading base outfit to clean up COF duplicates" << LL_ENDL;
 		wearBaseOutfit();
 		syncCofVersionAndRefresh();
 	}
+	gAgent.mRRInterface.mFirstFullyVisibleAt = gFrameTimeSeconds;
 }
 
 // update "dirty" state - defined outside class to allow for calling

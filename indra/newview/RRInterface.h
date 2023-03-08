@@ -345,6 +345,7 @@ public:
 	F32 mSetsphereDistMax; // KKA-835 added
 	F32 mSetsphereValueMax; // KKA-835 added
 	F32 mLeastDistMaxSquared; // KKA-835 let's do the work here rather than every time in rendering
+	F32SecondsImplicit mFirstFullyVisibleAt; 
 
 	LLViewerFetchedTexture* mCamTexturesCustom;
 

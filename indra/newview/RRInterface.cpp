@@ -800,6 +800,7 @@ RRInterface::RRInterface():
 	, mSetsphereDistMin(EXTREMUM) // KKA-835
 	, mLeastDistMaxSquared(EXTREMUM) // KKA-835
 	, mSetsphereValueMax(0.0) // KKA-835
+	, mFirstFullyVisibleAt(0.f)
 	//, mContainsMoveUp(FALSE)
 	//, mContainsMoveDown(FALSE)
 	//, mContainsMoveForward(FALSE)

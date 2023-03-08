@@ -369,6 +369,7 @@ public:
 	void popRenderDebugFeatureMask();
 
 	static void toggleRenderType(U32 type);
+	static void setRenderType(U32 type, BOOL state);
 
 	// For UI control of render features
 	static bool hasRenderTypeControl(U32 data);

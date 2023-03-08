@@ -6789,16 +6789,29 @@ void LLPipeline::setLight(LLDrawable *drawablep, bool is_light)
 }
 
 //static
+void LLPipeline::setRenderType(U32 type, BOOL state)
+{
+  gPipeline.mRenderTypeEnabled[type] = state;
+}
+
+//static
 void LLPipeline::toggleRenderType(U32 type)
 {
 	gPipeline.mRenderTypeEnabled[type] = !gPipeline.mRenderTypeEnabled[type];
-//MK
-	// Force the render type to TRUE if our vision is restricted
-	if (gRRenabled && type == LLPipeline::RENDER_TYPE_AVATAR && gAgent.mRRInterface.mVisionRestricted)
+	//MK
+	// Force the render type to TRUE if our vision is restricted unless before the first garbage collection
+	if (gRRenabled && type == LLPipeline::RENDER_TYPE_AVATAR)
 	{
-		gPipeline.mRenderTypeEnabled[type] = TRUE;
+		if (!gAgent.mRRInterface.mGarbageCollectorCalledOnce)
+		{
+			gPipeline.mRenderTypeEnabled[type] = FALSE;		  
+		}
+		else if (gAgent.mRRInterface.mVisionRestricted)
+		{
+			gPipeline.mRenderTypeEnabled[type] = TRUE;
+		}
 	}
-//mk
+	//mk
 	if (type == LLPipeline::RENDER_TYPE_WATER)
 	{
 		gPipeline.mRenderTypeEnabled[LLPipeline::RENDER_TYPE_VOIDWATER] = !gPipeline.mRenderTypeEnabled[LLPipeline::RENDER_TYPE_VOIDWATER];
@@ -11689,9 +11702,21 @@ void LLPipeline::clearRenderTypeMask(U32 type, ...)
 
 void LLPipeline::setAllRenderTypes()
 {
+#if RLV_ALWAYS_ON
+	static bool blindStartup = true;
+#else
+	static LLCachedControl<bool> blindStartUp(gSavedSettings, "KokuaRLVEnableBlindStartup");
+#endif
 	for (U32 i = 0; i < NUM_RENDER_TYPES; ++i)
 	{
-		mRenderTypeEnabled[i] = true;
+		if (i == RENDER_TYPE_AVATAR  && gRRenabled && !gAgent.mRRInterface.mGarbageCollectorCalledOnce && blindStartUp)
+		{
+			mRenderTypeEnabled[i] = false;
+		}
+		else
+		{
+			mRenderTypeEnabled[i] = true;
+		}
 	}
 }
 

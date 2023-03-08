@@ -556,7 +556,7 @@ public:
 	void			moveYaw(F32 mag, bool reset_view = true);
 	void			movePitch(F32 mag);
 
-	BOOL			isMovementLocked() const				{ return mMovementKeysLocked; }
+	BOOL			isMovementLocked() const;
 	void			setMovementLocked(BOOL set_locked)	{ mMovementKeysLocked = set_locked; }
 
 	//--------------------------------------------------------------------

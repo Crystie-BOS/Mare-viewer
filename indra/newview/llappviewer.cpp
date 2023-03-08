@@ -342,6 +342,13 @@ F32 gFPSClamped = 10.f;						// Pretend we start at target rate.
 F32 gFrameDTClamped = 0.f;					// Time between adjacent checks to network for packets
 U64MicrosecondsImplicit	gStartTime = 0; // gStartTime is "private", used only to calculate gFrameTimeSeconds
 
+F32SecondsImplicit gNextGarbageCollection = 0.f;
+// default in Settings is 10 for 15 seconds total
+#define RLV_GC_INITIAL_WAIT 5.f
+// default in Settings is 8 for 10 seconds total
+#define RLV_GC_MINIMUM_INTERVAL 2.f
+F32SecondsImplicit gFrameTimeForStateStarted =0.f;
+
 LLTimer gRenderStartTime;
 LLFrameTimer gForegroundTime;
 LLFrameTimer gLoggedInTime;
@@ -1483,12 +1490,6 @@ static LLTrace::BlockTimerStatHandle FTM_AGENT_UPDATE("Update");
 // externally visible timers
 LLTrace::BlockTimerStatHandle FTM_FRAME("Frame");
 
-//CA this variable init/declaration should be outside of LLAppViewer::frame() otherwise garbage collection never fires
-//MK
-S32 garbage_collector_cnt = -100; // give the garbage collector a moment before even kicking in the first time, in case we are logging in a very laggy place, taking time to rez
-//mk
-//ca
-
 bool LLAppViewer::frame()
 {
 	bool ret = false;
@@ -1533,23 +1534,23 @@ bool LLAppViewer::doFrame()
 {
 	LL_RECORD_BLOCK_TIME(FTM_FRAME);
 
-    if (!LLWorld::instanceExists())
-    {
-        LLWorld::createInstance();
-    }
+	if (!LLWorld::instanceExists())
+	{
+		LLWorld::createInstance();
+	}
 
 	LLEventPump& mainloop(LLEventPumps::instance().obtain("mainloop"));
 	LLSD newFrame;
 
 	{
-        LL_PROFILE_ZONE_NAMED_CATEGORY_APP("df LLTrace");
-        if (LLFloaterReg::instanceVisible("block_timers"))
-        {
-	LLTrace::BlockTimer::processTimes();
-        }
-        
-	LLTrace::get_frame_recording().nextPeriod();
-	LLTrace::BlockTimer::logStats();
+		LL_PROFILE_ZONE_NAMED_CATEGORY_APP("df LLTrace");
+		if (LLFloaterReg::instanceVisible("block_timers"))
+		{
+			LLTrace::BlockTimer::processTimes();
+		}
+
+		LLTrace::get_frame_recording().nextPeriod();
+		LLTrace::BlockTimer::logStats();
 	}
 
 	LLTrace::get_thread_recorder()->pullFromChildren();
@@ -1569,7 +1570,7 @@ bool LLAppViewer::doFrame()
 
 		{
 			LL_PROFILE_ZONE_NAMED_CATEGORY_APP( "df gatherInput" )
-		pingMainloopTimeout("Main:GatherInput");
+			pingMainloopTimeout("Main:GatherInput");
 		}
 
 		if (gViewerWindow)
@@ -1587,7 +1588,7 @@ bool LLAppViewer::doFrame()
 		if (gSimulateMemLeak)
 		{
 			LLFloaterMemLeak* mem_leak_instance =
-				LLFloaterReg::findTypedInstance<LLFloaterMemLeak>("mem_leaking");
+			LLFloaterReg::findTypedInstance<LLFloaterMemLeak>("mem_leaking");
 			if (mem_leak_instance)
 			{
 				mem_leak_instance->idle();
@@ -1596,16 +1597,16 @@ bool LLAppViewer::doFrame()
 
 		{
 			LL_PROFILE_ZONE_NAMED_CATEGORY_APP( "df mainloop" )
-		// canonical per-frame event
-		mainloop.post(newFrame);
+			// canonical per-frame event
+			mainloop.post(newFrame);
 		}
 
 		{
 			LL_PROFILE_ZONE_NAMED_CATEGORY_APP( "df suspend" )
-		// give listeners a chance to run
-		llcoro::suspend();
-		// if one of our coroutines threw an uncaught exception, rethrow it now
-		LLCoros::instance().rethrow();
+			// give listeners a chance to run
+			llcoro::suspend();
+			// if one of our coroutines threw an uncaught exception, rethrow it now
+			LLCoros::instance().rethrow();
 		}
 
 		if (!LLApp::isExiting())
@@ -1626,89 +1627,143 @@ bool LLAppViewer::doFrame()
 			{
 				joystick->scanJoystick();
 				gKeyboard->scanKeyboard();
-                gViewerInput.scanMouse();
+				gViewerInput.scanMouse();
 				// <FS:Ansariel> Chalice Yao's crouch toggle
 				static LLCachedControl<bool> fsCrouchToggle(gSavedPerAccountSettings, "FSCrouchToggle");
 				static LLCachedControl<bool> fsCrouchToggleStatus(gSavedPerAccountSettings, "FSCrouchToggleStatus");
 				if (fsCrouchToggle && fsCrouchToggleStatus)
 				{
 					gAgent.moveUp(-1);
-			}
+				}	
 				// </FS:Ansariel>
 			}
 
-//MK
-				// Do some RLV maintenance (garbage collector etc)
-				if (gRRenabled && LLStartUp::getStartupState() == STATE_STARTED
-					&& !gViewerWindow->getShowProgress())
+			//MK
+			// Do some RLV maintenance (garbage collector etc)
+			if (gRRenabled && LLStartUp::getStartupState() == STATE_STARTED
+			&& !gViewerWindow->getShowProgress())
+			{
+				static LLCachedControl<F32> sInitialGCAdditionalWait(gSavedSettings, "RestrainedLoveInitialGarbageCollectionAdditionalWait");
+				static LLCachedControl<F32> sNextGCAdditionalInterval(gSavedSettings, "RestrainedLoveGarbageCollectionAdditionalInterval");
+				static LLCachedControl<F32> sFirstFullyVisibleTimeout(gSavedSettings, "RestrainedLoveGarbageCollectionFirstFullyVisibleTimeout");
+				static LLCachedControl<F32> sFirstFullyVisibleDelay(gSavedSettings, "RestrainedLoveGarbageCollectionFirstFullyVisibleDelay");
+				static LLCachedControl<bool> sIgnoreFirstFullyVisible(gSavedSettings, "RestrainedLoveGarbageCollectionIgnoreFirstFullyVisible");
+				if (gNextGarbageCollection == 0.0f)
 				{
-					// if RLV share inventory has not been fetched yet, fetch it now
-					gAgent.mRRInterface.fetchInventory ();
-					
-					// perform some maintenance only if no object is waiting to be reattached
-					if (gAgent.mRRInterface.mAssetsToReattach.empty())
+					if (sInitialGCAdditionalWait < 0.0f)
 					{
-						// fire all the stored commands that we received while initializing
-						gAgent.mRRInterface.fireCommands ();
-						
-						// fire the garbage collector for orphaned restrictions
-						if (++garbage_collector_cnt >= 100)  
-                        {
+						gSavedSettings.getControl("RestrainedLoveInitialGarbageCollectionAdditionalWait")->resetToDefault();
+					}
+					if (sInitialGCAdditionalWait < 0.0f)
+					{
+						gSavedSettings.getControl("RestrainedLoveInitialGarbageCollectionAdditionalWait")->resetToDefault();
+					}
+					if (sFirstFullyVisibleTimeout < 0.0f)
+					{
+						gSavedSettings.getControl("RestrainedLoveGarbageCollectionFirstFullyVisibleTimeout")->resetToDefault();
+					}
+					if (sFirstFullyVisibleDelay < 0.0f)
+					{
+						gSavedSettings.getControl("RestrainedLoveGarbageCollectionFirstFullyVisibleDelay")->resetToDefault();
+					}
+					// the viewer could have sat at pre-login for several minutes, so do our timeouts based on when we hit eligibility for garbage collection
+					if (gFrameTimeForStateStarted == 0.f) gFrameTimeForStateStarted = gFrameTimeSeconds;
+
+					// new behaviour taking FirstFullyVisible into account too, with a timeout in case the avatar stays clouded
+					if (sIgnoreFirstFullyVisible ||
+						((gFrameTimeSeconds - gFrameTimeForStateStarted) > sFirstFullyVisibleTimeout || 
+						(gAgent.mRRInterface.mFirstFullyVisibleAt > 0.f && 
+						gFrameTimeSeconds > ((F32)sFirstFullyVisibleDelay + gAgent.mRRInterface.mFirstFullyVisibleAt)
+						)))
+					{
+						// "RestrainedLoveInitialGarbageCollectionAdditionalWait" still applies if using FirstFullyVisible plus its delay
+						gNextGarbageCollection = gFrameTimeSeconds + RLV_GC_INITIAL_WAIT + (F32)sInitialGCAdditionalWait;
+						LL_INFOS() << "Frame time now " << gFrameTimeSeconds << ". STATE_STARTED at " << gFrameTimeForStateStarted << ". Setting up first RLV garbage collection at " << gNextGarbageCollection \
+						<< ". FirstFullyVisible ignored? " << sIgnoreFirstFullyVisible << ". First fully visible at " << gAgent.mRRInterface.mFirstFullyVisibleAt \
+						<< " plus delay of " << sFirstFullyVisibleDelay << "s and timeout at " << sFirstFullyVisibleTimeout << "s from STATE_STARTED" << LL_ENDL;					      
+					}
+				}
+				// if RLV share inventory has not been fetched yet, fetch it now
+				gAgent.mRRInterface.fetchInventory ();
+
+				// perform some maintenance only if no object is waiting to be reattached
+				if (gAgent.mRRInterface.mAssetsToReattach.empty())
+				{
+					// fire all the stored commands that we received while initializing
+					gAgent.mRRInterface.fireCommands ();
+
+					// fire the garbage collector for orphaned restrictions
+					if (gNextGarbageCollection > 0.0f && gFrameTimeSeconds > gNextGarbageCollection)  
+					{
+						if (sNextGCAdditionalInterval < 0.0f)
+						{
+							gSavedSettings.getControl("RestrainedLoveGarbageCollectionAdditionalInterval")->resetToDefault();
+						}
+						gNextGarbageCollection = gFrameTimeSeconds + RLV_GC_MINIMUM_INTERVAL + (F32)sNextGCAdditionalInterval;
+						if (!gAgent.mRRInterface.mGarbageCollectorCalledOnce)
+						{
+							gViewerWindow->setUIVisibility(true);
+							LLPipeline::setRenderType(LLPipeline::RENDER_TYPE_AVATAR, TRUE);
+							LL_INFOS() << "Doing first RLV garbage collection / removing any startup restrictions / beginning enforcement of attach restrictions at " << gFrameTimeSeconds << ". Next at " << gNextGarbageCollection << LL_ENDL;
 							gAgent.mRRInterface.garbageCollector (FALSE);
-							garbage_collector_cnt = 0;
+							gPipeline.setAllRenderTypes(); // this will turn on avatar rendering if previously disabled
 						}
-						
-					}
-
-					// We must check whether there is an object waiting to be reattached after
-					// having been kicked off while locked.
-					if (!gAgent.mRRInterface.mAssetsToReattach.empty())
-					{
-						// Get the elapsed time since detached, and the delay before reattach.
-						U32 elapsed = (U32)gAgent.mRRInterface.mReattachTimer.getElapsedTimeF32();
-						U32 delay = gSavedSettings.getU32("RestrainedLoveReattachDelay");
-						// Timeout flag.
-						BOOL timeout = (gAgent.mRRInterface.mReattaching && elapsed > 4 * delay);
-						if (timeout)
+						else
 						{
-							// If we timed out, reset the timer and tell the interface...
-							gAgent.mRRInterface.mReattachTimer.reset();
-							gAgent.mRRInterface.mReattachTimeout = TRUE;
-							LL_WARNS() << "Timeout reattaching an asset, retrying." << LL_ENDL;
-						}
-						if (!gAgent.mRRInterface.mReattaching || timeout)
-						{
-							// We are not reattaching an object (or we timed out), so
-							// let's see if the delay before auto-reattach has elapsed.
-							if (elapsed >= delay)
-							{
-								// Let's reattach the object to its default attach point.
-								AssetAndTarget& at = gAgent.mRRInterface.mAssetsToReattach.front();
-								LLUUID tmp_uuid = at.uuid;
-								std::string tmp_attachpt = at.attachpt;
-								int tmp_attachpt_nb = 0;
-								LLViewerJointAttachment* attachpt = gAgent.mRRInterface.findAttachmentPointFromName(tmp_attachpt, true);
-								if (attachpt) tmp_attachpt_nb = gAgent.mRRInterface.findAttachmentPointNumber(attachpt);
-								LL_INFOS() << "Reattaching asset " << tmp_uuid << " to point " << tmp_attachpt_nb << LL_ENDL;
-								gAgent.mRRInterface.mReattaching = TRUE;
-								gAgent.mRRInterface.attachObjectByUUID (tmp_uuid, tmp_attachpt_nb);
-							}
-						}
-					}
-
-					// Let's look at how much time has passed since the last chage to the outfit
-					// and trigger a cleanup if enough time has passed
-					if (RRInterface::sLastOutfitChange > 0.f)
-					{
-						if (gFrameTimeSeconds - RRInterface::sLastOutfitChange > OUTFIT_CLEANUP_DELAY)
-						{
-							RRInterface::sLastOutfitChange = -1000.f;
-							LLPointer<LLInventoryCallback> cb = new LLUpdateAppearanceOnDestroy;
-							LLAppearanceMgr::instance().enforceCOFItemRestrictions (cb);
+							gAgent.mRRInterface.garbageCollector (FALSE);
 						}
 					}
 				}
-//mk
+
+				// We must check whether there is an object waiting to be reattached after
+				// having been kicked off while locked.
+				if (!gAgent.mRRInterface.mAssetsToReattach.empty())
+				{
+					// Get the elapsed time since detached, and the delay before reattach.
+					U32 elapsed = (U32)gAgent.mRRInterface.mReattachTimer.getElapsedTimeF32();
+					U32 delay = gSavedSettings.getU32("RestrainedLoveReattachDelay");
+					// Timeout flag.
+					BOOL timeout = (gAgent.mRRInterface.mReattaching && elapsed > 4 * delay);
+					if (timeout)
+					{
+						// If we timed out, reset the timer and tell the interface...
+						gAgent.mRRInterface.mReattachTimer.reset();
+						gAgent.mRRInterface.mReattachTimeout = TRUE;
+						LL_WARNS() << "Timeout reattaching an asset, retrying." << LL_ENDL;
+					}
+					if (!gAgent.mRRInterface.mReattaching || timeout)
+					{
+						// We are not reattaching an object (or we timed out), so
+						// let's see if the delay before auto-reattach has elapsed.
+						if (elapsed >= delay)
+						{
+							// Let's reattach the object to its default attach point.
+							AssetAndTarget& at = gAgent.mRRInterface.mAssetsToReattach.front();
+							LLUUID tmp_uuid = at.uuid;
+							std::string tmp_attachpt = at.attachpt;
+							int tmp_attachpt_nb = 0;
+							LLViewerJointAttachment* attachpt = gAgent.mRRInterface.findAttachmentPointFromName(tmp_attachpt, true);
+							if (attachpt) tmp_attachpt_nb = gAgent.mRRInterface.findAttachmentPointNumber(attachpt);
+							LL_INFOS() << "Reattaching asset " << tmp_uuid << " to point " << tmp_attachpt_nb << LL_ENDL;
+							gAgent.mRRInterface.mReattaching = TRUE;
+							gAgent.mRRInterface.attachObjectByUUID (tmp_uuid, tmp_attachpt_nb);
+						}
+					}
+				}
+
+				// Let's look at how much time has passed since the last chage to the outfit
+				// and trigger a cleanup if enough time has passed
+				if (RRInterface::sLastOutfitChange > 0.f)
+				{
+					if (gFrameTimeSeconds - RRInterface::sLastOutfitChange > OUTFIT_CLEANUP_DELAY)
+					{
+						RRInterface::sLastOutfitChange = -1000.f;
+						LLPointer<LLInventoryCallback> cb = new LLUpdateAppearanceOnDestroy;
+						LLAppearanceMgr::instance().enforceCOFItemRestrictions (cb);
+					}
+				}
+			}
+			//mk
 
 			// Update state based on messages, user input, object idle.
 			{
@@ -1716,7 +1771,7 @@ bool LLAppViewer::doFrame()
 					LL_PROFILE_ZONE_NAMED_CATEGORY_APP( "df pauseMainloopTimeout" )
 					pauseMainloopTimeout(); // *TODO: Remove. Messages shouldn't be stalling for 20+ seconds!
 				}
-				
+
 				{
 					LL_PROFILE_ZONE_NAMED_CATEGORY_APP("df idle"); //LL_RECORD_BLOCK_TIME(FTM_IDLE);
 					idle();
@@ -1733,10 +1788,10 @@ bool LLAppViewer::doFrame()
 				pauseMainloopTimeout();
 				saveFinalSnapshot();
 
-                if (LLVoiceClient::instanceExists())
-                {
-                    LLVoiceClient::getInstance()->terminate();
-                }
+				if (LLVoiceClient::instanceExists())
+				{
+					LLVoiceClient::getInstance()->terminate();
+				}
 
 				disconnectViewer();
 				resumeMainloopTimeout();
@@ -1749,9 +1804,9 @@ bool LLAppViewer::doFrame()
 				LL_PROFILE_ZONE_NAMED_CATEGORY_APP( "df Display" )
 				pingMainloopTimeout("Main:Display");
 				gGLActive = TRUE;
-//MK
+				//MK
 				RRInterface::sRenderLimitRenderedThisFrame = FALSE;
-//mk
+				//mk
 
 				display();
 
@@ -1768,29 +1823,29 @@ bool LLAppViewer::doFrame()
 					}
 				}
 				last_call = LLTimer::getTotalTime();
-			{
-				LL_PROFILE_ZONE_NAMED_CATEGORY_APP( "df Snapshot" )
+				{
+					LL_PROFILE_ZONE_NAMED_CATEGORY_APP( "df Snapshot" )
 
-				pingMainloopTimeout("Main:Snapshot");
-				LLFloaterSnapshot::update(); // take snapshots
-                LLFloaterSimpleOutfitSnapshot::update();
-				gGLActive = FALSE;
+					pingMainloopTimeout("Main:Snapshot");
+					LLFloaterSnapshot::update(); // take snapshots
+					LLFloaterSimpleOutfitSnapshot::update();
+					gGLActive = FALSE;
+				}
 			}
-		}
 		}
 
 		{
 			LL_PROFILE_ZONE_NAMED_CATEGORY_APP( "df pauseMainloopTimeout" )
-		pingMainloopTimeout("Main:Sleep");
+			pingMainloopTimeout("Main:Sleep");
 
-		pauseMainloopTimeout();
-		}
+			pauseMainloopTimeout();
+		}	
 
 		// Sleep and run background threads
 		{
 			//LL_RECORD_BLOCK_TIME(SLEEP2);
 			LL_PROFILE_ZONE_WARN( "Sleep2" )
-			
+
 			// yield some time to the os based on command line option
 			static LLCachedControl<S32> yield_time(gSavedSettings, "YieldTime", -1);
 			if(yield_time >= 0)
@@ -1812,7 +1867,7 @@ bool LLAppViewer::doFrame()
 			// and when not quiting (causes trouble at mac's cleanup stage)
 			if (!LLApp::isExiting()
 				&& ((gViewerWindow && !gViewerWindow->getWindow()->getVisible())
-					|| !gFocusMgr.getAppHasFocus()))
+				|| !gFocusMgr.getAppHasFocus()))
 			{
 				// Sleep if we're not rendering, or the window is minimized.
 				static LLCachedControl<S32> s_background_yield_time(gSavedSettings, "BackgroundYieldTime", 40);
@@ -1827,7 +1882,7 @@ bool LLAppViewer::doFrame()
 					LLAppViewer::getImageDecodeThread()->pause();
 				}
 			}
-			
+
 			if (mRandomizeFramerate)
 			{
 				ms_sleep(rand() % 200);
@@ -1851,7 +1906,7 @@ bool LLAppViewer::doFrame()
 
 				{
 					LL_RECORD_BLOCK_TIME(FTM_LFS);
- 					io_pending += LLLFSThread::updateClass(1);
+					io_pending += LLLFSThread::updateClass(1);
 				}
 
 				if (io_pending > 1000)
@@ -1866,9 +1921,9 @@ bool LLAppViewer::doFrame()
 
 			{
 				LL_PROFILE_ZONE_NAMED_CATEGORY_APP( "df gMeshRepo" )
-			gMeshRepo.update() ;
+				gMeshRepo.update() ;
 			}
-			
+
 			if(!total_work_pending) //pause texture fetching threads if nothing to process.
 			{
 				LL_PROFILE_ZONE_NAMED_CATEGORY_APP( "df getTextureCache" )
@@ -1887,7 +1942,7 @@ bool LLAppViewer::doFrame()
 			{
 				LL_PROFILE_ZONE_NAMED_CATEGORY_APP( "df tex_fetch_debugger_instance" )
 				LLFloaterTextureFetchDebugger* tex_fetch_debugger_instance =
-					LLFloaterReg::findTypedInstance<LLFloaterTextureFetchDebugger>("tex_fetch_debugger");
+				LLFloaterReg::findTypedInstance<LLFloaterTextureFetchDebugger>("tex_fetch_debugger");
 				if(tex_fetch_debugger_instance)
 				{
 					tex_fetch_debugger_instance->idle() ;				
@@ -1896,7 +1951,7 @@ bool LLAppViewer::doFrame()
 
 			{
 				LL_PROFILE_ZONE_NAMED_CATEGORY_APP( "df resumeMainloopTimeout" )
-			resumeMainloopTimeout();
+				resumeMainloopTimeout();
 			}
 			pingMainloopTimeout("Main:End");
 		}
@@ -1923,7 +1978,7 @@ bool LLAppViewer::doFrame()
 		LL_INFOS() << "Exiting main_loop" << LL_ENDL;
 	}
 
-    LL_PROFILER_FRAME_END
+	LL_PROFILER_FRAME_END
 
 	return ! LLApp::isRunning();
 }

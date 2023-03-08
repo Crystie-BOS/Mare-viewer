@@ -1260,6 +1260,61 @@
       <key>Value</key>
       <integer>1</integer>
     </map>
+    <key>RestrainedLoveInitialGarbageCollectionAdditionalWait</key>
+    <map>
+      <key>Comment</key>
+      <string>Additional time in seconds to wait before doing the first garbage collection on top of 5 second minimum. Longer times can help avoid avatar loading issues</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <integer>5.0</integer>
+    </map>
+    <key>RestrainedLoveGarbageCollectionAdditionalInterval</key>
+    <map>
+      <key>Comment</key>
+      <string>Additional time in seconds to add to the interval between garbage collection cycles on top of the 2 second minimum</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <integer>8.0</integer>
+    </map>
+    <key>RestrainedLoveGarbageCollectionFirstFullyVisibleTimeout</key>
+    <map>
+      <key>Comment</key>
+      <string>How many seconds to wait for FirstFullyVisible after clearing login progress screen before enabling garbage collection anyway (for situations when the avatar is clouded with a missing body part)</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <integer>45.0</integer>
+    </map>
+    <key>RestrainedLoveGarbageCollectionFirstFullyVisibleDelay</key>
+    <map>
+      <key>Comment</key>
+      <string>How many seconds to wait after FirstFullyVisible before garbage collection could be enabled</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <integer>15.0</integer>
+    </map>
+    <key>RestrainedLoveGarbageCollectionIgnoreFirstFullyVisible</key>
+    <map>
+      <key>Comment</key>
+      <string>Whether to ignore FirstFullyVisible in scheduling first garbage collection (original behaviour)</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
     <key>RestrainedLoveDoNotQueueVersionRequests</key>
     <map>
       <key>Comment</key>
