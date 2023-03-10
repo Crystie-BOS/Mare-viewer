@@ -1282,6 +1282,17 @@
       <key>Value</key>
       <integer>8.0</integer>
     </map>
+    <key>RestrainedLoveHideAvatarUntilGarbageCollection</key>
+    <map>
+      <key>Comment</key>
+      <string>Whether to hide (not render) the avatar until after the first garbage collection cycle if blinding is enabled</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
     <key>RestrainedLoveGarbageCollectionFirstFullyVisibleTimeout</key>
     <map>
       <key>Comment</key>

@@ -6802,7 +6802,7 @@ void LLPipeline::toggleRenderType(U32 type)
 	// Force the render type to TRUE if our vision is restricted unless before the first garbage collection
 	if (gRRenabled && type == LLPipeline::RENDER_TYPE_AVATAR)
 	{
-		if (!gAgent.mRRInterface.mGarbageCollectorCalledOnce)
+		if (!gAgent.mRRInterface.mGarbageCollectorCalledOnce && gSavedSettings.getBOOL("RestrainedLoveHideAvatarUntilGarbageCollection"))
 		{
 			gPipeline.mRenderTypeEnabled[type] = FALSE;		  
 		}
@@ -11707,9 +11707,10 @@ void LLPipeline::setAllRenderTypes()
 #else
 	static LLCachedControl<bool> blindStartUp(gSavedSettings, "KokuaRLVEnableBlindStartup");
 #endif
+	static LLCachedControl<bool> hideAvatar(gSavedSettings, "RestrainedLoveHideAvatarUntilGarbageCollection");
 	for (U32 i = 0; i < NUM_RENDER_TYPES; ++i)
 	{
-		if (i == RENDER_TYPE_AVATAR  && gRRenabled && !gAgent.mRRInterface.mGarbageCollectorCalledOnce && blindStartUp)
+		if (i == RENDER_TYPE_AVATAR  && gRRenabled && !gAgent.mRRInterface.mGarbageCollectorCalledOnce && blindStartUp && hideAvatar)
 		{
 			mRenderTypeEnabled[i] = false;
 		}
