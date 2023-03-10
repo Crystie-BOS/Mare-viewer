@@ -6156,7 +6156,14 @@ bool RRInterface::canTouch(LLViewerObject* object, LLVector3 pick_intersection /
 		}
 		else
 		{
-			if (containsWithoutException("touchhud", sRootID)) return false;
+			LLInventoryItem* inv_item = getItem (rootID);
+			if (inv_item) {
+				std::string name = inv_item->getName();
+				LLUUID creator = inv_item->getCreatorUUID();
+				// Tiny Empires game HUDs by Ultralite Soleil get an exception to @touchhud during log in blinding
+				if (!(name.find("Tiny Empires") == 0 && creator == LLUUID("0691bff7-951c-42fa-ba64-66e67962f136") && !mGarbageCollectorCalledOnce) && containsWithoutException("touchhud", sRootID)) return false;
+			}
+			//if (containsWithoutException("touchhud", sRootID)) return false;
 		}
 	}
 	else {
