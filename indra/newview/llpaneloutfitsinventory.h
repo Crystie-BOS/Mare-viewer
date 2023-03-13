@@ -62,6 +62,7 @@ public:
 // [RLVa:KB] - Checked: 2010-08-24 (RLVa-1.4.0a) | Added: RLVa-1.2.1a
 	LLTabContainer* getAppearanceTabs()		{ return mAppearanceTabs; }
 	LLOutfitsList*  getMyOutfitsPanel()		{ return mMyOutfitsPanel; }
+	LLOutfitGallery* getOutfitGalleryPanel() { return mOutfitGalleryPanel; } // KKA-991
 	LLPanelWearing* getCurrentOutfitPanel()	{ return mCurrentOutfitPanel; }
 // [/RLVa:KB]
 

@@ -107,6 +107,7 @@
 #include "lluicolor.h"
 #include "lluicolortable.h"
 #include "lloutfitslist.h"				// @showinv - "Appearance / My Outfits" panel
+#include "lloutfitgallery.h"			// KKA-991
 #include "llpaneloutfitsinventory.h"	// @showinv - "Appearance" floater
 #include "llpanelwearing.h"				// @showinv - "Appearance / Current Outfit" panel
 #include "kokuarlvextras.h"
@@ -155,6 +156,7 @@ BOOL RRHelper::preventFloater(std::string floaterName)
 	else if (floaterName == "worldmap" && gAgent.mRRInterface.mContainsShowworldmap) return TRUE;
 	else if (floaterName == "Destinations" && gAgent.mRRInterface.mContainsTp) return TRUE;
 	else if (floaterName == "floater_my_inventory" && gAgent.mRRInterface.mContainsShowinv) return TRUE;
+	else if (floaterName == "floater_fs_wearable_favorites" && gAgent.mRRInterface.mContainsShowinv) return TRUE; // KKA-991
 	else if (floaterName == "rlv_console" && gAgent.mRRInterface.mContainsViewScript) return TRUE;
 
 	else if (gAgent.mRRInterface.mContainsSetenv)
@@ -481,6 +483,7 @@ void refreshCachedVariable (std::string var)
 		if (gAgent.mRRInterface.mContainsShowinv) {
 //			LLSideTray::getInstance()->childSetVisible("panel_main_inventory", false);
 			LLFloaterReg::hideInstance("panel_main_inventory", LLSD());
+			LLFloaterReg::hideInstance("fs_wearable_favorites", LLSD()); // KKA-991
 			setVisibleAll("inventory", FALSE);
 			LLPanelOutfitEdit* panel_outfit_edit = dynamic_cast<LLPanelOutfitEdit*>(LLFloaterSidePanelContainer::getPanel("appearance", "panel_outfit_edit"));
 			if (NULL != panel_outfit_edit) {
@@ -512,6 +515,20 @@ void refreshCachedVariable (std::string var)
 					pAppearanceTabs->enableTabButton(idxTab, !fHasBhvr);
 
 					// When disabling, switch to the COF tab if "My Outfits" is currently active
+					if ( (fHasBhvr) && (pAppearanceTabs->getCurrentPanelIndex() == idxTab) )
+						pAppearanceTabs->selectTabPanel(pAppearancePanel->getCurrentOutfitPanel());
+				}
+			}
+			// KKA-991
+			LLOutfitGallery* pOutfitGallery = pAppearancePanel->getOutfitGalleryPanel();
+			if ( (pAppearanceTabs) && (pOutfitGallery) )
+			{
+				S32 idxTab = pAppearanceTabs->getIndexForPanel(pOutfitGallery);
+				if (-1 != idxTab)
+				{
+					pAppearanceTabs->enableTabButton(idxTab, !fHasBhvr);
+
+					// When disabling, switch to the COF tab if "Outfit Gallery" is currently active
 					if ( (fHasBhvr) && (pAppearanceTabs->getCurrentPanelIndex() == idxTab) )
 						pAppearanceTabs->selectTabPanel(pAppearancePanel->getCurrentOutfitPanel());
 				}
