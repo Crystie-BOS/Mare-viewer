@@ -65,7 +65,7 @@ public:
 	{
 		Alternative<S32> bytes, chars;
 		
-		MaxLength() : bytes("max_length_bytes", 254),
+		MaxLength() : bytes("max_length_bytes", 4096), // FS:TM needs to be this big for fields like entering in full path location to files on the local computer
 					  chars("max_length_chars", 0) 
 		{}
 	};
@@ -286,13 +286,21 @@ public:
 	void			setBgImage(LLPointer<LLUIImage> image) { mBgImage = image; }
 	void			setBgImageFocused(LLPointer<LLUIImage> image) { mBgImageFocused = image; }
 
+	// <FS:Ansariel> Make these protected
+	void			removeChar();
+	void			removeWord(bool prev);
+	void			addChar(const llwchar c);
+	// </FS:Ansariel>
+
 private:
 	// private helper methods
 
 	void                    pasteHelper(bool is_primary);
 
-	void			removeChar();
-	void			addChar(const llwchar c);
+	// <FS:Ansariel> Make these protected
+	//void			removeChar();
+	//void			addChar(const llwchar c);
+	// </FS:Ansariel>
 	void			setCursorAtLocalPos(S32 local_mouse_x);
 	S32				findPixelNearestPos(S32 cursor_offset = 0) const;
 	S32				calcCursorPos(S32 mouse_x);
