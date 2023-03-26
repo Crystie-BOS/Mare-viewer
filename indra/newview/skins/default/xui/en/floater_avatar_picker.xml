@@ -87,7 +87,7 @@
              left_pad="5"
              name="Find"
              width="45" />
-          <scroll_list
+          <fs_scroll_list
             draw_heading="true" 
            follows="all"
            height="98"
@@ -104,7 +104,7 @@
               label="Username"
               name="username"
               width="150" />
-          </scroll_list>
+          </fs_scroll_list>
         </panel>
         <panel
          height="150"
@@ -139,7 +139,8 @@
              <button.commit_callback 
               function="Refresh.FriendList"/>
             </button>
-            <scroll_list
+            <fs_scroll_list
+             draw_heading="true"
              follows="all"
              height="120"
              layout="topleft"
@@ -147,7 +148,16 @@
              name="Friends"
              sort_column="0"
              top_pad="5"
-             width="132" />
+             width="132">
+            <columns
+              label="Name"
+              name="name"
+              width="150" />
+            <columns
+              label="Username"
+              name="username"
+              width="150" />
+            </fs_scroll_list>
         </panel>
 
         <panel
@@ -177,7 +187,7 @@
              follows="left|top"
              height="18"
              increment="5"
-             initial_value="130"
+             initial_value="20"
              label="Range"
              layout="topleft"
              left="10"
@@ -205,7 +215,7 @@
              width="28"
              name="Refresh"
              image_overlay="Refresh_Off" />
-          <scroll_list
+          <fs_scroll_list
              draw_heading="true"
              follows="all"
              height="100"
@@ -223,7 +233,67 @@
               label="Username"
               name="username"
               width="150" />
-          </scroll_list>
+          </fs_scroll_list>
+        </panel>
+
+        <panel
+         height="150"
+         label="Search by UUID"
+         layout="topleft"
+         left="6"
+         help_topic="avatarpicker"
+         name="SearchPanelUUID"
+         top="150"
+         width="132">
+            <text
+             type="string"
+             length="1"
+             follows="left|top"
+             height="16"
+             layout="topleft"
+             left="10"
+             name="SearchByUUIDLabel"
+             top="8"
+             width="220">
+                Enter a person&apos;s UUID:
+            </text>
+            <line_editor
+             bevel_style="none"
+             border_style="line"
+             commit_on_focus_lost="false"
+             follows="left|top|right"
+             height="23"
+             left_delta="0"
+             name="EditUUID"
+             top_pad="0"
+             width="65" />
+            <button
+             follows="top|right"
+             height="23"
+             label="Go"
+             label_selected="Go"
+             layout="topleft"
+             left_pad="5"
+             name="FindUUID"
+             width="45" />
+            <fs_scroll_list
+             draw_heading="true" 
+             follows="all"
+             height="98"
+             layout="topleft"
+             left="0"
+             name="SearchResultsUUID"
+             top="52"
+             width="132">
+             <columns
+              label="Name"
+              name="nameUUID"
+              width="150" />
+             <columns
+              label="Username"
+              name="usernameUUID"
+              width="150" />
+          </fs_scroll_list>
         </panel>
     </tab_container>
     <button
