@@ -1201,7 +1201,7 @@ void FSFloaterImport::uploadAsset(LLUUID asset_id, LLUUID inventory_item)
 	bool new_file_agent_inventory = false;
 	LLWearableType::EType wearable_type = (LLWearableType::EType)NO_INV_SUBTYPE;
 	std::string perms_prefix = "";
-	U32 expected_upload_cost = LLAgentBenefitsMgr::current().getTextureUploadCost();
+//	U32 expected_upload_cost = LLAgentBenefitsMgr::current().getTextureUploadCost();
 
 	if (name.empty())
 	{
@@ -1222,7 +1222,7 @@ void FSFloaterImport::uploadAsset(LLUUID asset_id, LLUUID inventory_item)
 		{
 			url = gAgent.getRegion()->getCapability("NewFileAgentInventory");
 			new_file_agent_inventory = true;
-			expected_upload_cost = LLAgentBenefitsMgr::current().getTextureUploadCost();
+//			expected_upload_cost = LLAgentBenefitsMgr::current().getTextureUploadCost();
 		}
 		LLTrace::add(LLStatViewer::UPLOAD_TEXTURE,1);
 	}
@@ -1241,7 +1241,7 @@ void FSFloaterImport::uploadAsset(LLUUID asset_id, LLUUID inventory_item)
 		{
 			url = gAgent.getRegion()->getCapability("NewFileAgentInventory");
 			new_file_agent_inventory = true;
-			expected_upload_cost = LLAgentBenefitsMgr::current().getSoundUploadCost();
+//			expected_upload_cost = LLAgentBenefitsMgr::current().getSoundUploadCost();
 			LLTrace::add(LLStatViewer::UPLOAD_SOUND,1);
 		}
 		
@@ -1362,7 +1362,7 @@ void FSFloaterImport::uploadAsset(LLUUID asset_id, LLUUID inventory_item)
 		{
 			url = gAgent.getRegion()->getCapability("NewFileAgentInventory");
 			new_file_agent_inventory = true;
-			expected_upload_cost = LLAgentBenefitsMgr::current().getAnimationUploadCost();
+//			expected_upload_cost = LLAgentBenefitsMgr::current().getAnimationUploadCost();
 			LLTrace::add(LLStatViewer::ANIMATION_UPLOADS,1);
 		}
 	}
