@@ -2725,7 +2725,7 @@ std::string RRInterface::getStatus (LLUUID object_uuid, std::string rule)
 	else {
 		it = mSpecialObjectBehaviours.find (object_uuid.asString());
 	}
-	bool is_first=true;
+//unused	bool is_first=true;
 	while (it != mSpecialObjectBehaviours.end() &&
 			(object_uuid.isNull() || it != mSpecialObjectBehaviours.upper_bound(object_uuid.asString()))
 	)
@@ -2734,7 +2734,7 @@ std::string RRInterface::getStatus (LLUUID object_uuid, std::string rule)
 			//if (!is_first) 
 			res+=separator;
 			res+=it->second;
-			is_first=false;
+//unused			is_first=false;
 		}
 		it++;
 	}
