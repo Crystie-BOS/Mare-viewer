@@ -168,6 +168,16 @@ void LLFloaterDisplayName::onReset()
 	{
 		LLNotificationsUtil::add("SetDisplayNameFailedGeneric");
 	}
+
+    LLAvatarName av_name;
+    if (!LLAvatarNameCache::get(gAgent.getID(), &av_name))
+    {
+        return;
+    }
+    getChild<LLUICtrl>("display_name_editor")->setValue(av_name.getCompleteName());
+
+    getChild<LLUICtrl>("display_name_confirm")->clear();
+    getChild<LLUICtrl>("display_name_confirm")->setFocus(TRUE);
 	
 	setVisible(false);
 }
