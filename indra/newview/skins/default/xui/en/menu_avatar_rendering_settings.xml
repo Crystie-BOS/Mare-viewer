@@ -3,21 +3,21 @@
  layout="topleft"
  name="Settings">
     <menu_item_check
-     label="Default"
+     label="Remove from exceptions"
      layout="topleft"
      name="default">
         <on_click function="Rendering.SetException" parameter="default"/>
 	<on_check function="Rendering.HasException" parameter="default" />  
     </menu_item_check>
     <menu_item_check
-     label="Always render"
+     label="Always full detail"
      layout="topleft"
      name="always_render">
         <on_click function="Rendering.SetException" parameter="always"/>
 	<on_check function="Rendering.HasException" parameter="always" />  
     </menu_item_check>
     <menu_item_check
-     label="Never render"
+     label="Never full detail"
      layout="topleft"
      name="never_render">
         <on_click function="Rendering.SetException" parameter="never"/>

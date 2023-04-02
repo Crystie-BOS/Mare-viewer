@@ -66,7 +66,7 @@
 //    bool mNeedsUpdate;
 //    LLListContextMenu* mContextMenu;
 //    LLNameListCtrl* mAvatarSettingsList;
-//
+
 //    std::string mNameFilter;
 //};
 
