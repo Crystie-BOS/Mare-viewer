@@ -408,7 +408,7 @@ void LLVOSurfacePatch::updateNorthGeometry(LLFace *facep,
 										LLStrider<U16> &indicesp,
 										U32 &index_offset)
 {
-	S32 vertex_count = 0;
+//unused	S32 vertex_count = 0;
 	S32 i, x, y;
 
 	S32 num_vertices;
@@ -443,7 +443,7 @@ void LLVOSurfacePatch::updateNorthGeometry(LLFace *facep,
 			normalsp++;
 			texCoords0p++;
 			texCoords1p++;
-			vertex_count++;
+//			vertex_count++;
 		}
 
 		// North patch
@@ -456,7 +456,7 @@ void LLVOSurfacePatch::updateNorthGeometry(LLFace *facep,
 			normalsp++;
 			texCoords0p++;
 			texCoords1p++;
-			vertex_count++;
+//			vertex_count++;
 		}
 
 
@@ -493,7 +493,7 @@ void LLVOSurfacePatch::updateNorthGeometry(LLFace *facep,
 			normalsp++;
 			texCoords0p++;
 			texCoords1p++;
-			vertex_count++;
+//			vertex_count++;
 		}
 
 		// Iterate through the north patch's points
@@ -507,7 +507,7 @@ void LLVOSurfacePatch::updateNorthGeometry(LLFace *facep,
 			normalsp++;
 			texCoords0p++;
 			texCoords1p++;
-			vertex_count++;
+//			vertex_count++;
 		}
 
 
@@ -551,7 +551,7 @@ void LLVOSurfacePatch::updateNorthGeometry(LLFace *facep,
 			normalsp++;
 			texCoords0p++;
 			texCoords1p++;
-			vertex_count++;
+//			vertex_count++;
 		}
 
 		// Iterate through the north patch's points
@@ -565,7 +565,7 @@ void LLVOSurfacePatch::updateNorthGeometry(LLFace *facep,
 			normalsp++;
 			texCoords0p++;
 			texCoords1p++;
-			vertex_count++;
+//			vertex_count++;
 		}
 
 		for (i = 0; i < length; i++)
