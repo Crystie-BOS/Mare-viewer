@@ -1019,11 +1019,11 @@ void LLTextureView::draw()
 						<< LL_ENDL;
 			}
 
-			if (imagep->getID() == LLAppViewer::getTextureFetch()->mDebugID)
-			{
-				static S32 debug_count = 0;
-				++debug_count; // for breakpoints
-			}
+//			if (imagep->getID() == LLAppViewer::getTextureFetch()->mDebugID)
+//			{
+//				static S32 debug_count = 0;
+//				++debug_count; // for breakpoints
+//			}
 			
 			F32 pri;
 			if (mOrderFetch)
