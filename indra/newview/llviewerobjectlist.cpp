@@ -848,7 +848,7 @@ void LLViewerObjectList::dirtyAllObjectInventory()
 void LLViewerObjectList::updateApparentAngles(LLAgent &agent)
 {
 	S32 i;
-	S32 num_objects = 0;
+//	S32 num_objects = 0;
 	LLViewerObject *objectp;
 
 	S32 num_updates, max_value;
@@ -905,7 +905,7 @@ void LLViewerObjectList::updateApparentAngles(LLAgent &agent)
 		objectp = mObjects[i];
 		if (!objectp->isDead())
 		{
-			num_objects++;
+//			num_objects++;
 
 			//  Update distance & gpw 
 			objectp->setPixelAreaAndAngle(agent); // Also sets the approx. pixel area
