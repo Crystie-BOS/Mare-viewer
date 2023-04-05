@@ -560,86 +560,86 @@ BOOL LLVOTree::updateGeometry(LLDrawable *drawable)
         mReferenceBuffer->getColorStrider(colors);
 		mReferenceBuffer->getIndexStrider(indicesp);
 				
-		S32 vertex_count = 0;
-		S32 index_count = 0;
+//		S32 vertex_count = 0;
+//		S32 index_count = 0;
 		
 		// First leaf
 		*(normals++) =		LLVector3(-SRR2, -SRR2, 0.f);
 		*(tex_coords++) =	LLVector2(LEAF_LEFT, LEAF_BOTTOM);
 		*(vertices++) =		LLVector3(-0.5f*LEAF_WIDTH, 0.f, 0.f);
         *(colors++) =       LLColor4U::white;
-		vertex_count++;
+//		vertex_count++;
 
 		*(normals++) =		LLVector3(SRR3, -SRR3, SRR3);
 		*(tex_coords++) =	LLVector2(LEAF_RIGHT, LEAF_TOP);
 		*(vertices++) =		LLVector3(0.5f*LEAF_WIDTH, 0.f, 1.f);
         *(colors++) =       LLColor4U::white;
-		vertex_count++;
+//		vertex_count++;
 
 		*(normals++) =		LLVector3(-SRR3, -SRR3, SRR3);
 		*(tex_coords++) =	LLVector2(LEAF_LEFT, LEAF_TOP);
 		*(vertices++) =		LLVector3(-0.5f*LEAF_WIDTH, 0.f, 1.f);
         *(colors++) =       LLColor4U::white;
-		vertex_count++;
+//		vertex_count++;
 
 		*(normals++) =		LLVector3(SRR2, -SRR2, 0.f);
 		*(tex_coords++) =	LLVector2(LEAF_RIGHT, LEAF_BOTTOM);
 		*(vertices++) =		LLVector3(0.5f*LEAF_WIDTH, 0.f, 0.f);
         *(colors++) =       LLColor4U::white;
-		vertex_count++;
+//		vertex_count++;
         
 		*(indicesp++) = 0;
-		index_count++;
+//		index_count++;
 		*(indicesp++) = 1;
-		index_count++;
+//		index_count++;
 		*(indicesp++) = 2;
-		index_count++;
+//		index_count++;
 
 		*(indicesp++) = 0;
-		index_count++;
+//		index_count++;
 		*(indicesp++) = 3;
-		index_count++;
+//		index_count++;
 		*(indicesp++) = 1;
-		index_count++;
+//		index_count++;
 
 		// Same leaf, inverse winding/normals
 		*(normals++) =		LLVector3(-SRR2, SRR2, 0.f);
 		*(tex_coords++) =	LLVector2(LEAF_LEFT, LEAF_BOTTOM);
 		*(vertices++) =		LLVector3(-0.5f*LEAF_WIDTH, 0.f, 0.f);
         *(colors++) =       LLColor4U::white;
-		vertex_count++;
+//		vertex_count++;
 
 		*(normals++) =		LLVector3(SRR3, SRR3, SRR3);
 		*(tex_coords++) =	LLVector2(LEAF_RIGHT, LEAF_TOP);
 		*(vertices++) =		LLVector3(0.5f*LEAF_WIDTH, 0.f, 1.f);
         *(colors++) =       LLColor4U::white;
-		vertex_count++;
+//		vertex_count++;
 
 		*(normals++) =		LLVector3(-SRR3, SRR3, SRR3);
 		*(tex_coords++) =	LLVector2(LEAF_LEFT, LEAF_TOP);
 		*(vertices++) =		LLVector3(-0.5f*LEAF_WIDTH, 0.f, 1.f);
         *(colors++) =       LLColor4U::white;
-		vertex_count++;
+//		vertex_count++;
 
 		*(normals++) =		LLVector3(SRR2, SRR2, 0.f);
 		*(tex_coords++) =	LLVector2(LEAF_RIGHT, LEAF_BOTTOM);
 		*(vertices++) =		LLVector3(0.5f*LEAF_WIDTH, 0.f, 0.f);
         *(colors++) =       LLColor4U::white;
-		vertex_count++;
+//		vertex_count++;
 
 		*(indicesp++) = 4;
-		index_count++;
+//		index_count++;
 		*(indicesp++) = 6;
-		index_count++;
+//		index_count++;
 		*(indicesp++) = 5;
-		index_count++;
+//		index_count++;
 
 		*(indicesp++) = 4;
-		index_count++;
+//		index_count++;
 		*(indicesp++) = 5;
-		index_count++;
+//		index_count++;
 		*(indicesp++) = 7;
-		index_count++;
+//		index_count++;
 
 
 		// next leaf
@@ -647,39 +647,39 @@ BOOL LLVOTree::updateGeometry(LLDrawable *drawable)
 		*(tex_coords++) =	LLVector2(LEAF_LEFT, LEAF_BOTTOM);
 		*(vertices++) =		LLVector3(0.f, -0.5f*LEAF_WIDTH, 0.f);
         *(colors++) =       LLColor4U::white;
-		vertex_count++;
+//		vertex_count++;
 
 		*(normals++) =		LLVector3(SRR3, SRR3, SRR3);
 		*(tex_coords++) =	LLVector2(LEAF_RIGHT, LEAF_TOP);
 		*(vertices++) =		LLVector3(0.f, 0.5f*LEAF_WIDTH, 1.f);
         *(colors++) =       LLColor4U::white;
-		vertex_count++;
+//		vertex_count++;
 
 		*(normals++) =		LLVector3(SRR3, -SRR3, SRR3);
 		*(tex_coords++) =	LLVector2(LEAF_LEFT, LEAF_TOP);
 		*(vertices++) =		LLVector3(0.f, -0.5f*LEAF_WIDTH, 1.f);
         *(colors++) =       LLColor4U::white;
-		vertex_count++;
+//		vertex_count++;
 
 		*(normals++) =		LLVector3(SRR2, SRR2, 0.f);
 		*(tex_coords++) =	LLVector2(LEAF_RIGHT, LEAF_BOTTOM);
 		*(vertices++) =		LLVector3(0.f, 0.5f*LEAF_WIDTH, 0.f);
         *(colors++) =       LLColor4U::white;
-		vertex_count++;
+//		vertex_count++;
 
 		*(indicesp++) = 8;
-		index_count++;
+//		index_count++;
 		*(indicesp++) = 9;
-		index_count++;
+//		index_count++;
 		*(indicesp++) = 10;
-		index_count++;
+//		index_count++;
 
 		*(indicesp++) = 8;
-		index_count++;
+//		index_count++;
 		*(indicesp++) = 11;
-		index_count++;
+//		index_count++;
 		*(indicesp++) = 9;
-		index_count++;
+//		index_count++;
 
 
 		// other side of same leaf
@@ -687,39 +687,39 @@ BOOL LLVOTree::updateGeometry(LLDrawable *drawable)
 		*(tex_coords++) =	LLVector2(LEAF_LEFT, LEAF_BOTTOM);
 		*(vertices++) =		LLVector3(0.f, -0.5f*LEAF_WIDTH, 0.f);
         *(colors++) =       LLColor4U::white;
-		vertex_count++;
+//		vertex_count++;
 
 		*(normals++) =		LLVector3(-SRR3, SRR3, SRR3);
 		*(tex_coords++) =	LLVector2(LEAF_RIGHT, LEAF_TOP);
 		*(vertices++) =		LLVector3(0.f, 0.5f*LEAF_WIDTH, 1.f);
         *(colors++) =       LLColor4U::white;
-		vertex_count++;
+//		vertex_count++;
 
 		*(normals++) =		LLVector3(-SRR3, -SRR3, SRR3);
 		*(tex_coords++) =	LLVector2(LEAF_LEFT, LEAF_TOP);
 		*(vertices++) =		LLVector3(0.f, -0.5f*LEAF_WIDTH, 1.f);
         *(colors++) =       LLColor4U::white;
-		vertex_count++;
+//		vertex_count++;
 
 		*(normals++) =		LLVector3(-SRR2, SRR2, 0.f);
 		*(tex_coords++) =	LLVector2(LEAF_RIGHT, LEAF_BOTTOM);
 		*(vertices++) =		LLVector3(0.f, 0.5f*LEAF_WIDTH, 0.f);
         *(colors++) =       LLColor4U::white;
-		vertex_count++;
+//		vertex_count++;
 
 		*(indicesp++) = 12;
-		index_count++;
+//		index_count++;
 		*(indicesp++) = 14;
-		index_count++;
+//		index_count++;
 		*(indicesp++) = 13;
-		index_count++;
+//		index_count++;
 
 		*(indicesp++) = 12;
-		index_count++;
+//		index_count++;
 		*(indicesp++) = 13;
-		index_count++;
+//		index_count++;
 		*(indicesp++) = 15;
-		index_count++;
+//		index_count++;
 
 		// Generate geometry for the cylinders
 
@@ -818,7 +818,7 @@ BOOL LLVOTree::updateGeometry(LLDrawable *drawable)
 					*(normals++) =		LLVector3(x1, y1, 0.f);
 					*(tex_coords++) = tc;
                     *(colors++) =       LLColor4U::white;
-					vertex_count++;
+//					vertex_count++;
 				}
 			}
 
@@ -835,28 +835,28 @@ BOOL LLVOTree::updateGeometry(LLDrawable *drawable)
 					*(indicesp) = j + (i*slices) + sLODVertexOffset[lod];
 					llassert(*(indicesp) < (U32)max_vertices);
 					indicesp++;
-					index_count++;
+//					index_count++;
 					*(indicesp) = x1_offset + ((i+1)*slices) + sLODVertexOffset[lod];
 					llassert(*(indicesp) < (U32)max_vertices);
 					indicesp++;
-					index_count++;
+//					index_count++;
 					*(indicesp) = j + ((i+1)*slices) + sLODVertexOffset[lod];
 					llassert(*(indicesp) < (U32)max_vertices);
 					indicesp++;
-					index_count++;
+//					index_count++;
 
 					*(indicesp) = j + (i*slices) + sLODVertexOffset[lod];
 					llassert(*(indicesp) < (U32)max_vertices);
 					indicesp++;
-					index_count++;
+//					index_count++;
 					*(indicesp) = x1_offset + (i*slices) + sLODVertexOffset[lod];
 					llassert(*(indicesp) < (U32)max_vertices);
 					indicesp++;
-					index_count++;
+//					index_count++;
 					*(indicesp) = x1_offset + ((i+1)*slices) + sLODVertexOffset[lod];
 					llassert(*(indicesp) < (U32)max_vertices);
 					indicesp++;
-					index_count++;
+//					index_count++;
 				}
 			}
 			slices /= 2; 

@@ -639,7 +639,7 @@ void LLAvatarPropertiesProcessor::notifyObservers(const LLUUID& id,void* data, E
 	observer_multimap_t::iterator end = observers.end();
 //MK
 	// debug code
-	int count = 0;
+//	int count = 0;
 //mk
 	for (; oi != end; ++oi)
 	{
@@ -659,7 +659,7 @@ void LLAvatarPropertiesProcessor::notifyObservers(const LLUUID& id,void* data, E
 ////			oi->second->processProperties(data,type);
 		}
 		// debug code
-		count++;
+//		count++;
 //mk
 	}
 }

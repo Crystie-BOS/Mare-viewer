@@ -393,14 +393,14 @@ bool findMultiple (std::deque<std::string> list, std::string str)
 void setVisibleAll(std::string floater_name, BOOL visible)
 {
 	// Use this to hide or show all floaters bearing this name
-	U32 count = 0;
+//	U32 count = 0;
 	LLFloaterReg::const_instance_list_t& inst_list = LLFloaterReg::getFloaterList(floater_name);
 	for (LLFloaterReg::const_instance_list_t::const_iterator iter = inst_list.begin(); iter != inst_list.end();)
 	{
 		LLFloater* iv = dynamic_cast<LLFloater*>(*iter++);
 		if (iv)
 		{
-			count++;
+//			count++;
 			iv->setVisible(visible);
 		}
 	}
