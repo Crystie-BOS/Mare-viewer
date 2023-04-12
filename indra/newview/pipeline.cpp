@@ -11703,11 +11703,13 @@ void LLPipeline::setAllRenderTypes()
 {
 #if RLV_ALWAYS_ON
 	static bool sBlindStartup = true;
+	static bool sHideAvatar = true;
+	static bool sUseStrict = true;
 #else
 	static LLCachedControl<bool> sBlindStartUp(gSavedSettings, "KokuaRLVEnableBlindStartup");
-#endif
 	static LLCachedControl<bool> sHideAvatar(gSavedSettings, "RestrainedLoveHideAvatarUntilGarbageCollection");
 	static LLCachedControl<bool> sUseStrict(gSavedSettings, "RestrainedLoveUseStrictGarbageCollectionRestrictions");
+#endif
 	for (U32 i = 0; i < NUM_RENDER_TYPES; ++i)
 	{
 		if (i == RENDER_TYPE_AVATAR  && gRRenabled && !gAgent.mRRInterface.mGarbageCollectorCalledOnce && sBlindStartUp && sUseStrict && sHideAvatar)

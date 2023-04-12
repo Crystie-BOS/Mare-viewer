@@ -5060,7 +5060,11 @@ class LLViewToggleUI : public view_listener_t
 	bool handleEvent(const LLSD& userdata)
 	{
 //MK
+#if RLV_ALWAYS_ON
+	if (!gRRenabled || gAgent.mRRInterface.mGarbageCollectorCalledOnce) // don't allow it while we've got the UI disabled during blinded login
+#else
 	if (!gRRenabled || gAgent.mRRInterface.mGarbageCollectorCalledOnce || !gSavedSettings.getBOOL("RestrainedLoveUseStrictGarbageCollectionRestrictions")) // don't allow it while we've got the UI disabled during blinded login
+#endif
 		// Let the user hide the UI in Mouselook as well
 ////		if(gAgentCamera.getCameraMode() != CAMERA_MODE_MOUSELOOK)
 //mk

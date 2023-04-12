@@ -1655,7 +1655,11 @@ bool LLAppViewer::doFrame()
 				static LLCachedControl<F32> sFirstFullyVisibleDelay(gSavedSettings, "RestrainedLoveGarbageCollectionFirstFullyVisibleDelay");
 				static LLCachedControl<bool> sIgnoreFirstFullyVisible(gSavedSettings, "RestrainedLoveGarbageCollectionIgnoreFirstFullyVisible");
 				static LLCachedControl<bool> sUseNewTiming(gSavedSettings, "RestrainedLoveUseNewGarbageCollectionTiming");
+#if RLV_ALWAYS_ON
+				static bool sStrictRestrictions = true;
+#else
 				static LLCachedControl<bool> sStrictRestrictions(gSavedSettings, "RestrainedLoveUseStrictGarbageCollectionRestrictions");
+#endif
 				if (gNextGarbageCollection == 0.0f)
 				{
 					if (sInitialGCAdditionalWait < 0.0f)

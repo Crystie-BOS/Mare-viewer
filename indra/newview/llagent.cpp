@@ -945,7 +945,11 @@ void LLAgent::movePitch(F32 mag)
 
 BOOL LLAgent::isMovementLocked() const
 {
+#if RLV_ALWAYS_ON
 		static LLCachedControl<bool> sStrictRestrictions(gSavedSettings, "RestrainedLoveUseStrictGarbageCollectionRestrictions");
+#else
+		static bool sStrictRestrictions = true;
+#endif
 		if (gRRenabled && sStrictRestrictions && !gAgent.mRRInterface.mGarbageCollectorCalledOnce) return TRUE;
 		return mMovementKeysLocked;
 }
