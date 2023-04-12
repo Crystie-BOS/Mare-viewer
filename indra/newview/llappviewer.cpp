@@ -1490,6 +1490,12 @@ static LLTrace::BlockTimerStatHandle FTM_AGENT_UPDATE("Update");
 // externally visible timers
 LLTrace::BlockTimerStatHandle FTM_FRAME("Frame");
 
+//CA this variable init/declaration should be outside of LLAppViewer::frame() otherwise garbage collection never fires
+//MK
+S32 garbage_collector_cnt = -100; // give the garbage collector a moment before even kicking in the first time, in case we are logging in a very laggy place, taking time to rez
+//mk
+//ca
+
 bool LLAppViewer::frame()
 {
 	bool ret = false;
@@ -1648,6 +1654,8 @@ bool LLAppViewer::doFrame()
 				static LLCachedControl<F32> sFirstFullyVisibleTimeout(gSavedSettings, "RestrainedLoveGarbageCollectionFirstFullyVisibleTimeout");
 				static LLCachedControl<F32> sFirstFullyVisibleDelay(gSavedSettings, "RestrainedLoveGarbageCollectionFirstFullyVisibleDelay");
 				static LLCachedControl<bool> sIgnoreFirstFullyVisible(gSavedSettings, "RestrainedLoveGarbageCollectionIgnoreFirstFullyVisible");
+				static LLCachedControl<bool> sUseNewTiming(gSavedSettings, "RestrainedLoveUseNewGarbageCollectionTiming");
+				static LLCachedControl<bool> sStrictRestrictions(gSavedSettings, "RestrainedLoveUseStrictGarbageCollectionRestrictions");
 				if (gNextGarbageCollection == 0.0f)
 				{
 					if (sInitialGCAdditionalWait < 0.0f)
@@ -1693,7 +1701,9 @@ bool LLAppViewer::doFrame()
 					gAgent.mRRInterface.fireCommands ();
 
 					// fire the garbage collector for orphaned restrictions
-					if (gNextGarbageCollection > 0.0f && gFrameTimeSeconds > gNextGarbageCollection)  
+					garbage_collector_cnt++;
+					if ((sUseNewTiming && (gNextGarbageCollection > 0.0f && gFrameTimeSeconds > gNextGarbageCollection))
+						|| (!sUseNewTiming && (garbage_collector_cnt >= 100))) 
 					{
 						if (sNextGCAdditionalInterval < 0.0f)
 						{
@@ -1702,11 +1712,17 @@ bool LLAppViewer::doFrame()
 						gNextGarbageCollection = gFrameTimeSeconds + RLV_GC_MINIMUM_INTERVAL + (F32)sNextGCAdditionalInterval;
 						if (!gAgent.mRRInterface.mGarbageCollectorCalledOnce)
 						{
-							gViewerWindow->setUIVisibility(true);
-							LLPipeline::setRenderType(LLPipeline::RENDER_TYPE_AVATAR, TRUE);
+							if (sStrictRestrictions)
+							{
+								gViewerWindow->setUIVisibility(true);
+								LLPipeline::setRenderType(LLPipeline::RENDER_TYPE_AVATAR, TRUE);
+							}
 							LL_INFOS() << "Doing first RLV garbage collection / removing any startup restrictions / beginning enforcement of attach restrictions at " << gFrameTimeSeconds << ". Next at " << gNextGarbageCollection << LL_ENDL;
 							gAgent.mRRInterface.garbageCollector (FALSE);
-							gPipeline.setAllRenderTypes(); // this will turn on avatar rendering if previously disabled
+							if (sStrictRestrictions)
+							{
+								gPipeline.setAllRenderTypes(); // this will turn on avatar rendering if previously disabled
+							}
 						}
 						else
 						{

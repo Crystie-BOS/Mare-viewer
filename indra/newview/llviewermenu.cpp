@@ -5060,7 +5060,7 @@ class LLViewToggleUI : public view_listener_t
 	bool handleEvent(const LLSD& userdata)
 	{
 //MK
-	if (!gRRenabled || gAgent.mRRInterface.mGarbageCollectorCalledOnce) // don't allow it while we've got the UI disabled during blinded login
+	if (!gRRenabled || gAgent.mRRInterface.mGarbageCollectorCalledOnce || !gSavedSettings.getBOOL("RestrainedLoveUseStrictGarbageCollectionRestrictions")) // don't allow it while we've got the UI disabled during blinded login
 		// Let the user hide the UI in Mouselook as well
 ////		if(gAgentCamera.getCameraMode() != CAMERA_MODE_MOUSELOOK)
 //mk
@@ -5091,7 +5091,6 @@ class LLViewToggleUI : public view_listener_t
 	{
 		S32 option = LLNotificationsUtil::getSelectedOption(notification, response);
 
-		// don't allow changing it 
 		if (option == 0) // OK
 		{
 			gViewerWindow->setUIVisibility(gSavedSettings.getBOOL("HideUIControls"));

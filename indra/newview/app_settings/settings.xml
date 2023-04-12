@@ -1260,6 +1260,28 @@
       <key>Value</key>
       <integer>1</integer>
     </map>
+    <key>RestrainedLoveUseNewGarbageCollectionTiming</key>
+    <map>
+      <key>Comment</key>
+      <string>Use the new time based garbage collection timing instead of the original frame count timing. Other Garbage Collection settings only apply to the new time based method</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
+    <key>RestrainedLoveUseStrictGarbageCollectionRestrictions</key>
+    <map>
+      <key>Comment</key>
+      <string>Use more strict restrictions before the first Garbage Collection (either timing method)</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
     <key>RestrainedLoveInitialGarbageCollectionAdditionalWait</key>
     <map>
       <key>Comment</key>
@@ -1285,7 +1307,7 @@
     <key>RestrainedLoveHideAvatarUntilGarbageCollection</key>
     <map>
       <key>Comment</key>
-      <string>Whether to hide (not render) the avatar until after the first garbage collection cycle if blinding is enabled</string>
+      <string>Whether to hide (not render) the avatar until after the first garbage collection cycle if blinding is enabled with strict restrictions</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
