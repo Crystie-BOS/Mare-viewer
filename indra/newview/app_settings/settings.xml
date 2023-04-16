@@ -35,6 +35,17 @@
       <key>Value</key>
       <integer>0</integer>
     </map>
+    <key>KokuaNearbyPeopleDoubleClickAction</key>
+    <map>
+      <key>Comment</key>
+      <string>Double click action in Nearby panel, 0=Open IM, 1=Zoom In</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>U32</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
     <key>KokuaSingularityMouseMovement</key>
     <map>
       <key>Comment</key>

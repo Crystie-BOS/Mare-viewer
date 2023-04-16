@@ -88,6 +88,11 @@ private:
 		E_SORT_BY_RECENT_SPEAKERS = 4,
 		E_SORT_BY_RECENT_ARRIVAL = 5
 	} ESortOrder;
+	
+	typedef enum e_double_click {
+		E_DCLICK_STARTIM = 0,
+		E_DCLICK_ZOOMIN = 1
+	} EDoubleClickAction;
 
     void				    removePicker();
 
@@ -129,6 +134,7 @@ private:
 	void					onImButtonClicked();
 	void					onMoreButtonClicked();
 	void					onAvatarListDoubleClicked(LLUICtrl* ctrl);
+	void					onNearbyAvatarListDoubleClicked(LLUICtrl* ctrl);
 	void					onAvatarListCommitted(LLAvatarList* list);
 	bool					onGroupPlusButtonValidate();
 	void					onGroupMinusButtonClicked();
