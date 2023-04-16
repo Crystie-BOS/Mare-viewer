@@ -91,7 +91,9 @@ private:
 	
 	typedef enum e_double_click {
 		E_DCLICK_STARTIM = 0,
-		E_DCLICK_ZOOMIN = 1
+		E_DCLICK_ZOOMIN = 1,
+		E_DCLICK_PROFILE = 2,
+		E_DCLICK_TELEPORT = 3
 	} EDoubleClickAction;
 
     void				    removePicker();
