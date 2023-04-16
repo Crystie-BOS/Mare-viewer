@@ -1541,6 +1541,18 @@ void LLPanelPeople::onNearbyAvatarListDoubleClicked(LLUICtrl* ctrl)
 			case EDoubleClickAction::E_DCLICK_ZOOMIN:
 					handle_zoom_to_object(clicked_id);
 					break;
+			case EDoubleClickAction::E_DCLICK_PROFILE:
+					LLAvatarActions::showProfile(clicked_id);
+					break;
+			case EDoubleClickAction::E_DCLICK_TELEPORT:
+					{
+							LLViewerObject* vobjectp = gObjectList.findObject(clicked_id);
+							if (vobjectp)
+							{
+								gAgent.teleportViaLocation(vobjectp->getPositionGlobal());
+							}
+					}
+					break;
 			default:
 					LLAvatarActions::startIM(clicked_id);	
 	}
@@ -1836,6 +1848,14 @@ void LLPanelPeople::onNearbyViewShowMenuItemClicked(const LLSD& userdata)
 	{
 		gSavedSettings.setU32("KokuaNearbyPeopleDoubleClickAction",EDoubleClickAction::E_DCLICK_ZOOMIN);
 	}
+	else if (chosen_item == "profile")
+	{
+		gSavedSettings.setU32("KokuaNearbyPeopleDoubleClickAction",EDoubleClickAction::E_DCLICK_PROFILE);
+	}
+	else if (chosen_item == "teleport")
+	{
+		gSavedSettings.setU32("KokuaNearbyPeopleDoubleClickAction",EDoubleClickAction::E_DCLICK_TELEPORT);
+	}
 }
 
 bool LLPanelPeople::onNearbyViewShowMenuItemCheck(const LLSD& userdata)
@@ -1857,6 +1877,12 @@ bool LLPanelPeople::onNearbyViewShowMenuItemCheck(const LLSD& userdata)
 	}
 	else if (item == "zoom_in") {
 		return (doubleClickOption == EDoubleClickAction::E_DCLICK_ZOOMIN);
+	}
+	else if (item == "profile") {
+		return (doubleClickOption == EDoubleClickAction::E_DCLICK_PROFILE);
+	}
+	else if (item == "teleport") {
+		return (doubleClickOption == EDoubleClickAction::E_DCLICK_TELEPORT);
 	}
 
 	return false;
