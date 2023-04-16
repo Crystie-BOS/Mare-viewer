@@ -741,7 +741,7 @@ BOOL LLPanelPeople::postBuild()
 
 	mOnlineFriendList->setItemDoubleClickCallback(boost::bind(&LLPanelPeople::onAvatarListDoubleClicked, this, _1));
 	mAllFriendList->setItemDoubleClickCallback(boost::bind(&LLPanelPeople::onAvatarListDoubleClicked, this, _1));
-	mNearbyList->setItemDoubleClickCallback(boost::bind(&LLPanelPeople::onAvatarListDoubleClicked, this, _1));
+	mNearbyList->setItemDoubleClickCallback(boost::bind(&LLPanelPeople::onNearbyAvatarListDoubleClicked, this, _1));
 	mRecentList->setItemDoubleClickCallback(boost::bind(&LLPanelPeople::onAvatarListDoubleClicked, this, _1));
 
 	mOnlineFriendList->setCommitCallback(boost::bind(&LLPanelPeople::onAvatarListCommitted, this, mOnlineFriendList));
@@ -1513,12 +1513,37 @@ void LLPanelPeople::onAvatarListDoubleClicked(LLUICtrl* ctrl)
 	{
 		return;
 	}
-	
 #if 0 // SJB: Useful for testing, but not currently functional or to spec
 	LLAvatarActions::showProfile(clicked_id);
 #else // spec says open IM window
 	LLAvatarActions::startIM(clicked_id);
 #endif
+}
+
+void LLPanelPeople::onNearbyAvatarListDoubleClicked(LLUICtrl* ctrl)
+{
+	LLAvatarListItem* item = dynamic_cast<LLAvatarListItem*>(ctrl);
+	if(!item)
+	{
+		return;
+	}
+
+	LLUUID clicked_id = item->getAvatarId();
+	if(gAgent.getID() == clicked_id)
+	{
+		return;
+	}
+	switch (gSavedSettings.getU32("KokuaNearbyPeopleDoubleClickAction"))
+	{
+			case EDoubleClickAction::E_DCLICK_STARTIM:
+					LLAvatarActions::startIM(clicked_id);	
+					break;
+			case EDoubleClickAction::E_DCLICK_ZOOMIN:
+					handle_zoom_to_object(clicked_id);
+					break;
+			default:
+					LLAvatarActions::startIM(clicked_id);	
+	}
 }
 
 void LLPanelPeople::onAvatarListCommitted(LLAvatarList* list)
@@ -1791,21 +1816,32 @@ void LLPanelPeople::onNearbyViewShowMenuItemClicked(const LLSD& userdata)
 	if (chosen_item == "show_all")
 	{
 		nearbyAvatarLimit = LLWorld::AVATAR_LIMIT_NONE;
+		gSavedSettings.setU32("KokuaNearbyPeopleLimit",(U32)nearbyAvatarLimit);
 	}
 	else if (chosen_item == "show_region")
 	{
 		nearbyAvatarLimit = LLWorld::AVATAR_LIMIT_REGION;
+		gSavedSettings.setU32("KokuaNearbyPeopleLimit",(U32)nearbyAvatarLimit);
 	}
 	else if (chosen_item == "show_parcel")
 	{
 		nearbyAvatarLimit = LLWorld::AVATAR_LIMIT_PARCEL;
+		gSavedSettings.setU32("KokuaNearbyPeopleLimit",(U32)nearbyAvatarLimit);
 	}
-	gSavedSettings.setU32("KokuaNearbyPeopleLimit",(U32)nearbyAvatarLimit);
+	else if (chosen_item == "start_im")
+	{
+		gSavedSettings.setU32("KokuaNearbyPeopleDoubleClickAction",EDoubleClickAction::E_DCLICK_STARTIM);
+	}
+	else if (chosen_item == "zoom_in")
+	{
+		gSavedSettings.setU32("KokuaNearbyPeopleDoubleClickAction",EDoubleClickAction::E_DCLICK_ZOOMIN);
+	}
 }
 
 bool LLPanelPeople::onNearbyViewShowMenuItemCheck(const LLSD& userdata)
 {
 	std::string item = userdata.asString();
+	U32 doubleClickOption = gSavedSettings.getU32("KokuaNearbyPeopleDoubleClickAction");
 
 	if (item == "show_all") {
 		return nearbyAvatarLimit == LLWorld::AVATAR_LIMIT_NONE;
@@ -1815,6 +1851,12 @@ bool LLPanelPeople::onNearbyViewShowMenuItemCheck(const LLSD& userdata)
 	}
 	else if (item == "show_parcel") {
 		return nearbyAvatarLimit == LLWorld::AVATAR_LIMIT_PARCEL;
+	}
+	else if (item == "start_im") {
+		return (doubleClickOption == EDoubleClickAction::E_DCLICK_STARTIM);
+	}
+	else if (item == "zoom_in") {
+		return (doubleClickOption == EDoubleClickAction::E_DCLICK_ZOOMIN);
 	}
 
 	return false;
