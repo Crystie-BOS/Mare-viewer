@@ -33,6 +33,7 @@
 #include "lllineeditor.h"
 #include "llinventoryfunctions.h"
 #include "llviewerinventory.h"
+#include "llcheckboxctrl.h" // <FS:Beq> FIRE-17695 - Delete links capability
 
 class LLButton;
 class LLTextBox;
@@ -105,19 +106,23 @@ private:
 
 	void onSourceItemDrop(const LLUUID& source_item_id);
 	void onTargetItemDrop(const LLUUID& target_item_id);
+	void onDeleteOnlyToggle();// <FS:Beq> FIRE-17695 - Delete links capability
 
 	LLInventoryLinkReplaceDropTarget*	mSourceEditor;
 	LLInventoryLinkReplaceDropTarget*	mTargetEditor;
 	LLButton*							mStartBtn;
 	LLButton*							mRefreshBtn;
 	LLTextBox*							mStatusText;
+	LLCheckBoxCtrl*						mDeleteOnlyToggle;// <FS:Beq> FIRE-17695 - Delete links capability
 
 	LLUUID	mSourceUUID;
 	LLUUID	mTargetUUID;
 	U32		mRemainingItems;
 	U32		mBatchSize;
+	U32		mActiveItems;
 
 	LLInventoryModel::item_array_t	mRemainingInventoryItems;
+	bool mDeleteOnly;// <FS:Beq> FIRE-17695 - Delete links capability
 };
 
 #endif // LL_FLOATERLINKREPLACE_H
