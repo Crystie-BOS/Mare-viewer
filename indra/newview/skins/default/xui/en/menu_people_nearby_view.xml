@@ -75,6 +75,27 @@
          parameter="show_parcel"/>
   </menu_item_check>
     <menu_item_separator layout="topleft" />
+    <menu_item_check
+       label="Double Click Starts IM"
+       name="start_im">
+      <menu_item_check.on_click
+         function="People.Nearby.ViewShow.Action"
+         parameter="start_im"/>
+      <menu_item_check.on_check
+         function="People.Nearby.ViewShow.CheckItem"
+         parameter="start_im"/>
+    </menu_item_check>
+    <menu_item_check
+       label="Double Click Zooms In"
+       name="zoom_in">
+      <menu_item_check.on_click
+         function="People.Nearby.ViewShow.Action"
+         parameter="zoom_in"/>
+      <menu_item_check.on_check
+         function="People.Nearby.ViewShow.CheckItem"
+         parameter="zoom_in"/>
+    </menu_item_check>
+    <menu_item_separator layout="topleft" />
     <menu_item_check label="View Login Names" name="view_login_names">
       <menu_item_check.on_click
          function="People.All.ViewSort.ToggleLoginNames" />
