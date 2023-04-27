@@ -418,6 +418,7 @@ private:
 	std::string mLastLoadedPreset; // contains the name of the latest loaded Windlight preset
 	int mLaunchTimestamp; // timestamp of the beginning of this session
 	BOOL reallyHandleCommand (LLUUID uuid, std::string command);	// CA: the public handleCommand is now a veneer so that we can do debug output cleanly for all callers, not just chat handling
+	void doRefreshEnabledState(); // gather three identical bits of code into one
 };
 
 

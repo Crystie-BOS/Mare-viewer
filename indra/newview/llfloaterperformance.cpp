@@ -170,6 +170,13 @@ BOOL LLFloaterPerformance::postBuild()
     return TRUE;
 }
 
+void LLFloaterPerformance::refreshEnabledState()
+{
+    // added so RLV can drive the ALM checkbox, fading it when needed
+    mSettingsPanel = getChild<LLPanel>("panel_performance_preferences");
+    mSettingsPanel->getChild<LLCheckBoxCtrl>("advanced_lighting_model")->setEnabled(! (gRRenabled && gAgent.mRRInterface.mContainsSetsphere));
+}
+
 void LLFloaterPerformance::showSelectedPanel(LLPanel* selected_panel)
 {
     hidePanels();

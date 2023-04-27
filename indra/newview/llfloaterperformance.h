@@ -55,6 +55,8 @@ public:
 		bool onHasException(const LLUUID& idAgent, const LLSD& sdParamn);
 		void onSetException(const LLUUID& idAgent, const LLSD& sdParamn);
 
+    void refreshEnabledState();
+
 private:
     void initBackBtn(LLPanel* panel);
     void populateHUDList();
