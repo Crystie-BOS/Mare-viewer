@@ -112,6 +112,7 @@
 #include "llscenemonitor.h"
 #include "llavatarrenderinfoaccountant.h"
 #include "lllocalbitmaps.h"
+#include "llperfstats.h" 
 
 // Linden library includes
 #include "llavatarnamecache.h"
@@ -1538,82 +1539,91 @@ bool LLAppViewer::frame()
 
 bool LLAppViewer::doFrame()
 {
-	LL_RECORD_BLOCK_TIME(FTM_FRAME);
+    LL_RECORD_BLOCK_TIME(FTM_FRAME);
+    {
+    // and now adjust the visuals from previous frame.
+    if(LLPerfStats::tunables.userAutoTuneEnabled && LLPerfStats::tunables.tuningFlag != LLPerfStats::Tunables::Nothing)
+    {
+        LLPerfStats::tunables.applyUpdates();
+    }
 
-	if (!LLWorld::instanceExists())
-	{
-		LLWorld::createInstance();
-	}
+    LLPerfStats::RecordSceneTime T (LLPerfStats::StatType_t::RENDER_FRAME);
+    if (!LLWorld::instanceExists())
+    {
+        LLWorld::createInstance();
+    }
 
-	LLEventPump& mainloop(LLEventPumps::instance().obtain("mainloop"));
-	LLSD newFrame;
+    LLEventPump& mainloop(LLEventPumps::instance().obtain("mainloop"));
+    LLSD newFrame;
+    {
+        LLPerfStats::RecordSceneTime T (LLPerfStats::StatType_t::RENDER_IDLE); // perf stats
+        {
+            LL_PROFILE_ZONE_NAMED_CATEGORY_APP("df LLTrace");
+            if (LLFloaterReg::instanceVisible("block_timers"))
+            {
+                LLTrace::BlockTimer::processTimes();
+            }
 
-	{
-		LL_PROFILE_ZONE_NAMED_CATEGORY_APP("df LLTrace");
-		if (LLFloaterReg::instanceVisible("block_timers"))
-		{
-			LLTrace::BlockTimer::processTimes();
-		}
+            LLTrace::get_frame_recording().nextPeriod();
+            LLTrace::BlockTimer::logStats();
+        }
 
-		LLTrace::get_frame_recording().nextPeriod();
-		LLTrace::BlockTimer::logStats();
-	}
+        LLTrace::get_thread_recorder()->pullFromChildren();
 
-	LLTrace::get_thread_recorder()->pullFromChildren();
+        //clear call stack records
+        LL_CLEAR_CALLSTACKS();
+    }
+    {
+        {
+            LLPerfStats::RecordSceneTime T(LLPerfStats::StatType_t::RENDER_IDLE); // ensure we have the entire top scope of frame covered (input event and coro)
+            LL_PROFILE_ZONE_NAMED_CATEGORY_APP("df processMiscNativeEvents")
+            pingMainloopTimeout("Main:MiscNativeWindowEvents");
 
-	//clear call stack records
-	LL_CLEAR_CALLSTACKS();
+            if (gViewerWindow)
+            {
+                LL_RECORD_BLOCK_TIME(FTM_MESSAGES);
+                gViewerWindow->getWindow()->processMiscNativeEvents();
+            }
 
-	{
-		LL_PROFILE_ZONE_NAMED_CATEGORY_APP( "df processMiscNativeEvents" )
-		pingMainloopTimeout("Main:MiscNativeWindowEvents");
+            {
+                LL_PROFILE_ZONE_NAMED_CATEGORY_APP("df gatherInput")
+                pingMainloopTimeout("Main:GatherInput");
+            }
 
-		if (gViewerWindow)
-		{
-			LL_RECORD_BLOCK_TIME(FTM_MESSAGES);
-			gViewerWindow->getWindow()->processMiscNativeEvents();
-		}
+            if (gViewerWindow)
+            {
+                LL_RECORD_BLOCK_TIME(FTM_MESSAGES);
+                if (!restoreErrorTrap())
+                {
+                    LL_WARNS() << " Someone took over my signal/exception handler (post messagehandling)!" << LL_ENDL;
+                }
 
-		{
-			LL_PROFILE_ZONE_NAMED_CATEGORY_APP( "df gatherInput" )
-			pingMainloopTimeout("Main:GatherInput");
-		}
+                gViewerWindow->getWindow()->gatherInput();
+            }
 
-		if (gViewerWindow)
-		{
-			LL_RECORD_BLOCK_TIME(FTM_MESSAGES);
-			if (!restoreErrorTrap())
-			{
-				LL_WARNS() << " Someone took over my signal/exception handler (post messagehandling)!" << LL_ENDL;
-			}
+            //memory leaking simulation
+            if (gSimulateMemLeak)
+            {
+                LLFloaterMemLeak* mem_leak_instance =
+                    LLFloaterReg::findTypedInstance<LLFloaterMemLeak>("mem_leaking");
+                if (mem_leak_instance)
+                {
+                    mem_leak_instance->idle();
+                }
+            }
 
-			gViewerWindow->getWindow()->gatherInput();
-		}
+            {
+                LL_PROFILE_ZONE_NAMED_CATEGORY_APP("df mainloop")
+                // canonical per-frame event
+                mainloop.post(newFrame);
+            }
 
-		//memory leaking simulation
-		if (gSimulateMemLeak)
-		{
-			LLFloaterMemLeak* mem_leak_instance =
-			LLFloaterReg::findTypedInstance<LLFloaterMemLeak>("mem_leaking");
-			if (mem_leak_instance)
-			{
-				mem_leak_instance->idle();
-			}
-		}
-
-		{
-			LL_PROFILE_ZONE_NAMED_CATEGORY_APP( "df mainloop" )
-			// canonical per-frame event
-			mainloop.post(newFrame);
-		}
-
-		{
-			LL_PROFILE_ZONE_NAMED_CATEGORY_APP( "df suspend" )
-			// give listeners a chance to run
-			llcoro::suspend();
-			// if one of our coroutines threw an uncaught exception, rethrow it now
-			LLCoros::instance().rethrow();
-		}
+            {
+                LL_PROFILE_ZONE_NAMED_CATEGORY_APP("df suspend")
+                // give listeners a chance to run
+                llcoro::suspend();
+            }
+        }
 
 		if (!LLApp::isExiting())
 		{
@@ -1631,6 +1641,7 @@ bool LLAppViewer::doFrame()
 				&& (gHeadlessClient || !gViewerWindow->getShowProgress())
 				&& !gFocusMgr.focusLocked())
 			{
+                LLPerfStats::RecordSceneTime T (LLPerfStats::StatType_t::RENDER_IDLE);
 				joystick->scanJoystick();
 				gKeyboard->scanKeyboard();
 				gViewerInput.scanMouse();
@@ -1793,6 +1804,7 @@ bool LLAppViewer::doFrame()
 				}
 
 				{
+                    LLPerfStats::RecordSceneTime T (LLPerfStats::StatType_t::RENDER_IDLE);
 					LL_PROFILE_ZONE_NAMED_CATEGORY_APP("df idle"); //LL_RECORD_BLOCK_TIME(FTM_IDLE);
 					idle();
 				}
@@ -1844,6 +1856,7 @@ bool LLAppViewer::doFrame()
 				}
 				last_call = LLTimer::getTotalTime();
 				{
+            	LLPerfStats::RecordSceneTime T(LLPerfStats::StatType_t::RENDER_IDLE);
 					LL_PROFILE_ZONE_NAMED_CATEGORY_APP( "df Snapshot" )
 
 					pingMainloopTimeout("Main:Snapshot");
@@ -1896,7 +1909,8 @@ bool LLAppViewer::doFrame()
 				// of equal priority on Windows
 				if (milliseconds_to_sleep > 0)
 				{
-					ms_sleep(milliseconds_to_sleep);
+                    LLPerfStats::RecordSceneTime T ( LLPerfStats::StatType_t::RENDER_SLEEP );
+                    ms_sleep(milliseconds_to_sleep);
 					// also pause worker threads during this wait period
 					LLAppViewer::getTextureCache()->pause();
 					LLAppViewer::getImageDecodeThread()->pause();
@@ -1997,7 +2011,7 @@ bool LLAppViewer::doFrame()
 
 		LL_INFOS() << "Exiting main_loop" << LL_ENDL;
 	}
-
+    }LLPerfStats::StatsRecorder::endFrame();
 	LL_PROFILER_FRAME_END
 
 	return ! LLApp::isRunning();
@@ -3463,15 +3477,9 @@ void LLAppViewer::initStrings()
 	}
 }
 
-//
-// This function decides whether the client machine meets the minimum requirements to
-// run in a maximized window, per the consensus of davep, boa and nyx on 3/30/2011.
-//
 bool LLAppViewer::meetsRequirementsForMaximizedStart()
 {
-	bool maximizedOk = (LLFeatureManager::getInstance()->getGPUClass() >= GPU_CLASS_2);
-
-	maximizedOk &= (gSysMemory.getPhysicalMemoryKB() >= U32Gigabytes(1));
+    bool maximizedOk = (gSysMemory.getPhysicalMemoryKB() >= U32Gigabytes(1));
 
 	return maximizedOk;
 }

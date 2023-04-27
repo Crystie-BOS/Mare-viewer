@@ -54,6 +54,8 @@
 #include "llfloaterblocked.h"
 // [/SL:KB]
 #include "llfavoritesbar.h"
+//#include "llfloaterpreferencesgraphicsadvanced.h"
+#include "llfloaterperformance.h"
 #include "llfloatersidepanelcontainer.h"
 #include "llfloaterimsession.h"
 #include "llkeyboard.h"
@@ -133,6 +135,7 @@
 #include "llpresetsmanager.h"
 
 #include "llsearchableui.h"
+#include "llperfstats.h"
 #include "kokuarlvmode.h"
 
 // Firestorm Includes
@@ -336,6 +339,7 @@ LLFloaterPreference::LLFloaterPreference(const LLSD& key)
 	mCommitCallbackRegistrar.add("Pref.ClickDisablePopup",		boost::bind(&LLFloaterPreference::onClickDisablePopup, this));	
 	mCommitCallbackRegistrar.add("Pref.LogPath",				boost::bind(&LLFloaterPreference::onClickLogPath, this));
 	mCommitCallbackRegistrar.add("Pref.RenderExceptions",       boost::bind(&LLFloaterPreference::onClickRenderExceptions, this));
+	mCommitCallbackRegistrar.add("Pref.AutoAdjustments",         boost::bind(&LLFloaterPreference::onClickAutoAdjustments, this));
 	mCommitCallbackRegistrar.add("Pref.HardwareDefaults",		boost::bind(&LLFloaterPreference::setHardwareDefaults, this));
 	mCommitCallbackRegistrar.add("Pref.AvatarImpostorsEnable",	boost::bind(&LLFloaterPreference::onAvatarImpostorsEnable, this));
 	mCommitCallbackRegistrar.add("Pref.UpdateIndirectMaxComplexity",	boost::bind(&LLFloaterPreference::updateMaxComplexity, this));
@@ -367,8 +371,11 @@ LLFloaterPreference::LLFloaterPreference(const LLSD& key)
 	gSavedSettings.getControl("UseDisplayNames")->getCommitSignal()->connect(boost::bind(&handleDisplayNamesOptionChanged,  _2));
 
 	gSavedSettings.getControl("AppearanceCameraMovement")->getCommitSignal()->connect(boost::bind(&handleAppearanceCameraMovementChanged,  _2));
+    gSavedSettings.getControl("WindLightUseAtmosShaders")->getCommitSignal()->connect(boost::bind(&LLFloaterPreference::onAtmosShaderChange, this));
 
 	LLAvatarPropertiesProcessor::getInstance()->addObserver( gAgent.getID(), this );
+
+    mComplexityChangedSignal = gSavedSettings.getControl("RenderAvatarMaxComplexity")->getCommitSignal()->connect(boost::bind(&LLFloaterPreference::updateComplexityText, this));
 
 	mCommitCallbackRegistrar.add("Pref.ClearLog",				boost::bind(&LLConversationLog::onClearLog, &LLConversationLog::instance()));
 	mCommitCallbackRegistrar.add("Pref.DeleteTranscripts",      boost::bind(&LLFloaterPreference::onDeleteTranscripts, this));
@@ -481,6 +488,10 @@ BOOL LLFloaterPreference::postBuild()
 	getChild<LLComboBox>("ObjectIMOptions")->setCommitCallback(boost::bind(&LLFloaterPreference::onNotificationsChange, this,"ObjectIMOptions"));
 
 	// if floater is opened before login set default localized do not disturb message
+	if (LLStartUp::getStartupState() < STATE_STARTED)
+	{
+		gSavedPerAccountSettings.setString("DoNotDisturbModeResponse", LLTrans::getString("DoNotDisturbModeResponseDefault"));
+	}
 	getChild<LLUICtrl>("WindowTitleAvatarName")->setEnabled(LLStartUp::getStartupState() < STATE_STARTED ? false : true);
 	getChild<LLUICtrl>("WindowTitleGridName")->setEnabled(LLStartUp::getStartupState() < STATE_STARTED ? false : true);
 	
@@ -675,6 +686,7 @@ void LLFloaterPreference::onDoNotDisturbResponseChanged()
 LLFloaterPreference::~LLFloaterPreference()
 {
 	LLConversationLog::instance().removeObserver(this);
+    mComplexityChangedSignal.disconnect();
 }
 
 void LLFloaterPreference::draw()
@@ -925,19 +937,22 @@ void LLFloaterPreference::onOpen(const LLSD& key)
 	LLPresetsManager::getInstance()->createMissingDefault(PRESETS_CAMERA);
 	LLPresetsManager::getInstance()->createMissingDefault(PRESETS_GRAPHIC);
 
-	bool started = (LLStartUp::getStartupState() == STATE_STARTED);
+	//bool started = (LLStartUp::getStartupState() == STATE_STARTED);
+	bool started = (LLStartUp::getStartupState() == STATE_MISC);
 
 	LLButton* load_btn = findChild<LLButton>("PrefLoadButton");
 	LLButton* save_btn = findChild<LLButton>("PrefSaveButton");
 	LLButton* delete_btn = findChild<LLButton>("PrefDeleteButton");
 	LLButton* exceptions_btn = findChild<LLButton>("RenderExceptionsButton");
+    LLButton* auto_adjustments_btn = findChild<LLButton>("AutoAdjustmentsButton");
 
-	if (load_btn && save_btn && delete_btn && exceptions_btn)
+	if (load_btn && save_btn && delete_btn && exceptions_btn && auto_adjustments_btn)
 	{
 		load_btn->setEnabled(started);
 		save_btn->setEnabled(started);
 		delete_btn->setEnabled(started);
 		exceptions_btn->setEnabled(started);
+        auto_adjustments_btn->setEnabled(started);
 	}
 
     collectSearchableItems();
@@ -1010,6 +1025,13 @@ void LLFloaterPreference::setHardwareDefaults()
 		saveGraphicsPreset(preset_graphic_active);
 		saveSettings(); // save here to be able to return to the previous preset by Cancel
 	}
+    setRecommendedSettings();
+}
+
+void LLFloaterPreference::setRecommendedSettings()
+{
+    resetAutotuneSettings();
+    gSavedSettings.getControl("RenderVSyncEnable")->resetToDefault(true);
 
 	LLFeatureManager::getInstance()->applyRecommendedSettings();
 
@@ -1032,6 +1054,28 @@ void LLFloaterPreference::setHardwareDefaults()
 			panel->setHardwareDefaults();
 		}
 	}
+}
+
+void LLFloaterPreference::resetAutotuneSettings()
+{
+    gSavedSettings.setBOOL("AutoTuneFPS", FALSE);
+
+    const std::string autotune_settings[] = {
+        "AutoTuneLock",
+        "KeepAutoTuneLock",
+        "TargetFPS",
+        "TuningFPSStrategy",
+        "AutoTuneImpostorByDistEnabled",
+        "AutoTuneImpostorFarAwayDistance" ,
+        "AutoTuneRenderFarClipMin",
+        "AutoTuneRenderFarClipTarget",
+        "RenderAvatarMaxART"
+    };
+
+    for (auto it : autotune_settings)
+    {
+        gSavedSettings.getControl(it)->resetToDefault(true);
+    }
 }
 
 void LLFloaterPreference::getControlNames(std::vector<std::string>& names)
@@ -2119,7 +2163,7 @@ void LLFloaterPreference::setMaxNonImpostorsTextAdvanced(U32 value, LLTextBox* t
 	}
 }
 
-void LLAvatarComplexityControls::updateMax(LLSliderCtrl* slider, LLTextBox* value_label)
+void LLAvatarComplexityControls::updateMax(LLSliderCtrl* slider, LLTextBox* value_label, bool short_val)
 {
 	// Called when the IndirectMaxComplexity control changes
 	// Responsible for fixing the slider label (IndirectMaxComplexityText) and setting RenderAvatarMaxComplexity
@@ -2141,10 +2185,10 @@ void LLAvatarComplexityControls::updateMax(LLSliderCtrl* slider, LLTextBox* valu
 	}
 
 	gSavedSettings.setU32("RenderAvatarMaxComplexity", (U32)max_arc);
-	setText(max_arc, value_label);
+	setText(max_arc, value_label, short_val);
 }
 
-void LLAvatarComplexityControls::setText(U32 value, LLTextBox* text_box)
+void LLAvatarComplexityControls::setText(U32 value, LLTextBox* text_box, bool short_val)
 {
 	if (0 == value)
 	{
@@ -2152,8 +2196,26 @@ void LLAvatarComplexityControls::setText(U32 value, LLTextBox* text_box)
 	}
 	else
 	{
-		text_box->setText(llformat("%d", value));
+        std::string text_value = short_val ? llformat("%d", value / 1000) : llformat("%d", value);
+        text_box->setText(text_value);
 	}
+}
+
+void LLAvatarComplexityControls::updateMaxRenderTime(LLSliderCtrl* slider, LLTextBox* value_label, bool short_val)
+{
+    setRenderTimeText((F32)(LLPerfStats::renderAvatarMaxART_ns/1000), value_label, short_val);
+}
+
+void LLAvatarComplexityControls::setRenderTimeText(F32 value, LLTextBox* text_box, bool short_val)
+{
+    if (0 == value)
+    {
+        text_box->setText(LLTrans::getString("no_limit"));
+    }
+    else
+    {
+        text_box->setText(llformat("%.0f", value));
+    }
 }
 
 void LLFloaterPreference::updateMaxComplexity()
@@ -2162,9 +2224,12 @@ void LLFloaterPreference::updateMaxComplexity()
     LLAvatarComplexityControls::updateMax(
         getChild<LLSliderCtrl>("IndirectMaxComplexity"),
         getChild<LLTextBox>("IndirectMaxComplexityText"));
-    LLAvatarComplexityControls::updateMax(
-        getChild<LLSliderCtrl>("IndirectMaxComplexityAdvanced"),
-        getChild<LLTextBox>("IndirectMaxComplexityTextAdvanced"));
+}
+
+void LLFloaterPreference::updateComplexityText()
+{
+    LLAvatarComplexityControls::setText(gSavedSettings.getU32("RenderAvatarMaxComplexity"),
+        getChild<LLTextBox>("IndirectMaxComplexityText", true));
 }
 
 bool LLFloaterPreference::loadFromFilename(const std::string& filename, std::map<std::string, std::string> &label_map)
@@ -2316,6 +2381,15 @@ void LLFloaterPreference::onClickRenderExceptions()
 //    LLFloaterReg::showInstance("avatar_render_settings");
 }
 
+void LLFloaterPreference::onClickAutoAdjustments()
+{
+    LLFloaterPerformance* performance_floater = LLFloaterReg::showTypedInstance<LLFloaterPerformance>("performance");
+    if (performance_floater)
+    {
+        performance_floater->showAutoadjustmentsPanel();
+    }
+}
+
 void LLFloaterPreference::onClickAdvanced()
 {
 	LLFloaterReg::showInstance("prefs_graphics_advanced");
@@ -2336,6 +2410,22 @@ void LLFloaterPreference::onClickAdvanced()
 void LLFloaterPreference::onClickActionChange()
 {
     updateClickActionControls();
+}
+
+void LLFloaterPreference::onAtmosShaderChange()
+{
+    LLCheckBoxCtrl* ctrl_alm = getChild<LLCheckBoxCtrl>("UseLightShaders");
+    if(ctrl_alm)
+    {
+        //Deferred/SSAO/Shadows
+        BOOL bumpshiny = gGLManager.mHasCubeMap && LLCubeMap::sUseCubeMaps && LLFeatureManager::getInstance()->isFeatureAvailable("RenderObjectBump") && gSavedSettings.getBOOL("RenderObjectBump");
+        BOOL shaders = gSavedSettings.getBOOL("WindLightUseAtmosShaders");
+        BOOL enabled = LLFeatureManager::getInstance()->isFeatureAvailable("RenderDeferred") &&
+                        bumpshiny &&
+                        shaders;
+
+        ctrl_alm->setEnabled(enabled);
+    }
 }
 
 void LLFloaterPreference::onClickPermsDefault()

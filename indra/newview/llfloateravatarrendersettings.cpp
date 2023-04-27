@@ -145,7 +145,7 @@
 //        }
 //    }
 //}
-//
+
 //void LLFloaterAvatarRenderSettings::onFilterEdit(const std::string& search_string)
 //{
 //    std::string filter_upper = search_string;
@@ -156,7 +156,7 @@
 //        mNeedsUpdate = true;
 //    }
 //}
-//
+
 //bool LLFloaterAvatarRenderSettings::isHiddenRow(const std::string& av_name)
 //{
 //    if (mNameFilter.empty()) return false;
@@ -214,6 +214,10 @@
 //    if ("default" == command_name)
 //    {
 //        return (visual_setting == S32(LLVOAvatar::AV_RENDER_NORMALLY));
+//    }
+//    else if ("non_default" == command_name)
+//    {
+//        return (visual_setting != S32(LLVOAvatar::AV_RENDER_NORMALLY));
 //    }
 //    else if ("never" == command_name)
 //    {
