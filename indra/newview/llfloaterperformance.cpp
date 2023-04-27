@@ -286,7 +286,14 @@ void LLFloaterPerformance::populateHUDList()
  
         row[2]["column"] = "name";
         row[2]["type"] = "text";
-        row[2]["value"] = hud_object_complexity.objectName;
+        if (!gRRenabled || gAgent.mRRInterface.canDetach(gAgentAvatarp->getWornAttachment(hud_object_complexity.objectId)))
+        {
+            row[2]["value"] = hud_object_complexity.objectName;
+        }
+        else
+        {
+            row[2]["value"] = hud_object_complexity.objectName + " (no detach)";							
+        }
         row[2]["font"]["name"] = "SANSSERIF";
 
         LLScrollListItem* obj = mHUDList->addElement(item);
@@ -345,7 +352,14 @@ void LLFloaterPerformance::populateObjectList()
 
             row[2]["column"] = "name";
             row[2]["type"] = "text";
-            row[2]["value"] = object_complexity.objectName;
+            if (!gRRenabled || gAgent.mRRInterface.canDetach(gAgentAvatarp->getWornAttachment(object_complexity.objectId)))
+            {
+                row[2]["value"] = object_complexity.objectName;
+            }
+            else
+            {
+                row[2]["value"] = object_complexity.objectName + " (no detach)";							
+            }
             row[2]["font"]["name"] = "SANSSERIF";
 
             LLScrollListItem* obj = mObjectList->addElement(item);
@@ -483,7 +497,10 @@ void LLFloaterPerformance::setFPSText()
 
 void LLFloaterPerformance::detachItem(const LLUUID& item_id)
 {
-    LLAppearanceMgr::instance().removeItemFromAvatar(item_id);
+		if (!gRRenabled || gAgent.mRRInterface.canDetach(gAgentAvatarp->getWornAttachment(item_id)))
+		{
+		    LLAppearanceMgr::instance().removeItemFromAvatar(item_id);
+		}
 }
 
 void LLFloaterPerformance::onClickAdvanced()
