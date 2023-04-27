@@ -386,6 +386,11 @@ void LLFloaterPerformance::populateNearbyList()
     mNearbyList->clearRows();
     mNearbyList->updateColumns(true);
 
+    if (gRRenabled && (gAgent.mRRInterface.mContainsShowNearby || gAgent.mRRInterface.mContainsShownames || gAgent.mRRInterface.mContainsShownametags))
+    {
+        return;
+    }
+
     static LLCachedControl<U32> max_render_cost(gSavedSettings, "RenderAvatarMaxComplexity", 0);
     std::vector<LLCharacter*> valid_nearby_avs;
     mNearbyMaxComplexity = LLWorld::getInstance()->getNearbyAvatarsAndCompl(valid_nearby_avs);
