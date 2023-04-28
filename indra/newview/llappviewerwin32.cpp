@@ -1051,7 +1051,8 @@ bool LLAppViewerWin32::sendURLToOtherInstance(const std::string& url)
 
 	if (other_window != NULL)
 	{
-		LL_DEBUGS() << "Found other window with the name '" << getWindowTitle() << "'" << LL_ENDL;
+		LL_INFOS() << "KKA-998 Found other window with the name '" << getWindowTitle() << "'" << LL_ENDL;
+//		LL_DEBUGS() << "Found other window with the name '" << getWindowTitle() << "'" << LL_ENDL;
 		COPYDATASTRUCT cds;
 		const S32 SLURL_MESSAGE_TYPE = 0;
 		cds.dwData = SLURL_MESSAGE_TYPE;
@@ -1059,10 +1060,12 @@ bool LLAppViewerWin32::sendURLToOtherInstance(const std::string& url)
 		cds.lpData = (void*)url.c_str();
 
 		LRESULT msg_result = SendMessage(other_window, WM_COPYDATA, NULL, (LPARAM)&cds);
-		LL_DEBUGS() << "SendMessage(WM_COPYDATA) to other window '" 
+//		LL_DEBUGS() << "SendMessage(WM_COPYDATA) to other window '" 
+		LL_INFOS() << "KKA-998 SendMessage(WM_COPYDATA) to other window '" 
 				 << getWindowTitle() << "' returned " << msg_result << LL_ENDL;
 		return true;
 	}
+	LL_INFOS() << "KKA-998 failed to locate other window" << LL_ENDL;
 	return false;
 }
 

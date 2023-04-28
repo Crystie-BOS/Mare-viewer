@@ -3021,6 +3021,7 @@ LRESULT CALLBACK LLWindowWin32::mainWindowProc(HWND h_wnd, UINT u_msg, WPARAM w_
         {
             LL_PROFILE_ZONE_NAMED_CATEGORY_WIN32("mwp - WM_COPYDATA");
             {
+                LL_INFOS() << "KKA-998 Received a URL" << LL_ENDL;
                 // received a URL
                 PCOPYDATASTRUCT myCDS = (PCOPYDATASTRUCT)l_param;
                 void* data = new U8[myCDS->cbData];
