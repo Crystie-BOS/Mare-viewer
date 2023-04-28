@@ -1793,12 +1793,14 @@ void LLViewerWindow::handleDataCopy(LLWindow *window, S32 data_type, void *data)
 	{
 	case SLURL_MESSAGE_TYPE:
 		// received URL
+		LL_INFOS() << "KKA-998 received a URL" << LL_ENDL;
 		std::string url = (const char*)data;
 		LLMediaCtrl* web = NULL;
 		const bool trusted_browser = false;
 		// don't treat slapps coming from external browsers as "clicks" as this would bypass throttling
 		if (LLURLDispatcher::dispatch(url, "", web, trusted_browser))
 		{
+		    LL_INFOS() << "KKA-998 Dispatch succeeded, bringing window to front" << LL_ENDL;
 			// bring window to foreground, as it has just been "launched" from a URL
 			mWindow->bringToFront();
 		}
