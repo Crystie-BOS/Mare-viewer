@@ -26,6 +26,7 @@
 #include "llviewerprecompiledheaders.h"
 #include "llfloaterperformance.h"
 
+#include "lggcontactsets.h"
 #include "llagent.h"
 #include "llagentcamera.h"
 #include "llappearancemgr.h"
@@ -474,12 +475,16 @@ void LLFloaterPerformance::populateNearbyList()
                             {
                                 bar->setColor(LLUIColorTable::instance().getColor(color));
                             }
+                            name_text->setColor(LLUIColorTable::instance().getColor(color));
                         }
                         else if (LLVOAvatar::AOA_NORMAL == avatar->getOverallAppearance())
                         {
                             color = LLAvatarActions::isFriend(avatar->getID()) ? "ConversationFriendColor" : "white";
+                            LLColor4 color4 = LLUIColorTable::instance().getColor(color);
+                            color4 = LGGContactSets::getInstance()->colorize(avatar->getID(), color4, LGG_CS_NEARBY);
+                            LGGContactSets::getInstance()->hasFriendColorThatShouldShow(avatar->getID(), LGG_CS_NEARBY, color4);
+                            name_text->setColor(color4);
                         }
-                        name_text->setColor(LLUIColorTable::instance().getColor(color));
                     }
                 }
             }
