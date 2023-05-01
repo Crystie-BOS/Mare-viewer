@@ -71,7 +71,7 @@
 #endif  // LL_WINDOWS
 
 #include "llsdserialize.h"
-#include "kokuarlvmode.h"
+#include "kokuarlvmode.h" // for RLV_ALWAYS_ON
 
 LLPanelLogin *LLPanelLogin::sInstance = NULL;
 BOOL LLPanelLogin::sCapslockDidNotification = FALSE;

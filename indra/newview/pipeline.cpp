@@ -121,6 +121,7 @@
 
 #include "llenvironment.h"
 #include "llsettingsvo.h"
+#include "kokuarlvmode.h" // for RLV_ALWAYS_ON
 
 #ifdef _DEBUG
 // Debug indices is disabled for now for debug performance - djs 4/24/02

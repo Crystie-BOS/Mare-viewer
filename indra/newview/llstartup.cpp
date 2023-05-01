@@ -233,7 +233,7 @@
 #include "lldrawpoolbump.h"
 //mk
 #include "kokuarlvfloaters.h"
-#include "kokuarlvmode.h"
+#include "kokuarlvmode.h" // for RLV_ALWAYS_ON
 #include "kokuarlvextras.h"
 
 //
@@ -1985,9 +1985,9 @@ bool idle_startup()
 				KokuaRLVFloaterSupport::addNameToLocalCache(id, name);
 				//KKA-810: add startim, share, shownearby, showhovertextworld and tplocal
 #if RLV_ALWAYS_ON
-				if (gSavedSettings.getBOOL("RestrainedLoveUseStrictGarbageCollectionRestrictions"))
-#else
 				if (true)
+#else
+				if (gSavedSettings.getBOOL("RestrainedLoveUseStrictGarbageCollectionRestrictions"))
 #endif
 				{
 					//Now that the duration of the login restricted period is configurable some protection is needed against manual intervention
@@ -1995,9 +1995,9 @@ bool idle_startup()
 					gAgent.mRRInterface.handleCommand(id, "fly=n,sendchannel=n,interact=n,remoutfit=n,remattach=n,showinv=n,touchall=n,touchhud=n,camavdist:0=n,startim=n,share=n,shownearby=n,showhovertextworld=n,tplocal=n,shownames=n,showloc=n,showworldmap=n,showminimap=n,tploc=n,tplm=n,tplure=n,camdrawmin:1=n,camdrawmax:1.1=n,camdrawalphamin:0=n,camdrawalphamax:1=n,camtextures=n");
 					gViewerWindow->setUIVisibility(false); // hide all UI elements (Ok, you can still bring up additional floaters with hot keys, but the temptation is reduced)
 #if RLV_ALWAYS_ON
-					if (gSavedSettings.getBOOL("RestrainedLoveHideAvatarUntilGarbageCollection"))
-#else
 					if (true)
+#else
+					if (gSavedSettings.getBOOL("RestrainedLoveHideAvatarUntilGarbageCollection"))
 #endif
 					{
 						LLPipeline::setRenderType(LLPipeline::RENDER_TYPE_AVATAR, FALSE);

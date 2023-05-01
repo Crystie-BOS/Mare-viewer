@@ -101,9 +101,8 @@
 
 //MK
 #include "llstartup.h"
-//mk
-//MK
 #include "RRInterface.h"
+#include "kokuarlvmode.h" // for RLV_ALWAYS_ON
 //mk
 using namespace LLAvatarAppearanceDefines;
 
