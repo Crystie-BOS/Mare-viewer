@@ -90,6 +90,18 @@
    width="270"
    control_name="ClickOnAvatarKeepsCamera"
    tool_tip="Normally, clicking on your avatar resets the camera position. This option removes this behavior."/>
+  <check_box
+   top_pad="6"
+   follows="left|top"
+   height="16"
+   initial_value="false"
+   label="Clicking your avatar focuses on the click"
+   layout="topleft"
+   left="74"
+   name="restrainedlovebreakfocusonclick"
+   width="270"
+   control_name="RestrainedLoveBreakFocusOnClick"
+   tool_tip="If on, clicking your avatar moves focus to that point. If off focus will not move unless Shift is held down while clicking"/>
   <text
   follows="left|top"
   type="string"
