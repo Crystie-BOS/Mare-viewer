@@ -11700,7 +11700,7 @@ void LLPipeline::clearRenderTypeMask(U32 type, ...)
 void LLPipeline::setAllRenderTypes()
 {
 #if RLV_ALWAYS_ON
-	static bool sBlindStartup = true;
+	static bool sBlindStartUp = true;
 	static bool sHideAvatar = true;
 	static bool sUseStrict = true;
 #else
