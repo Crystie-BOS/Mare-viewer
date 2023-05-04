@@ -486,7 +486,7 @@ void LLTextBase::drawHighlightsBackground(const highlight_list_t& highlights, co
     {
     	// LL abstracted the below routine into getSelectionRects() however we keep it inline here
     	// because our version is also used for highlighting with KB's additions
-		std::vector<LLRect> selection_rects;
+        std::vector<LLRect> selection_rects = getSelectionRects();
 //		S32 selection_left		= llmin( mSelectionStart, mSelectionEnd );
 //		S32 selection_right		= llmax( mSelectionStart, mSelectionEnd );
 
@@ -1497,9 +1497,9 @@ void LLTextBase::draw()
 		drawCursor();
 	}
  
-	mDocumentView->setVisible(FALSE);
+	mDocumentView->setVisibleDirect(FALSE);
 	LLUICtrl::draw();
-	mDocumentView->setVisible(TRUE);
+	mDocumentView->setVisibleDirect(TRUE);
 }
 
 
@@ -3673,7 +3673,7 @@ bool LLNormalTextSegment::getDimensionsF32(S32 first_char, S32 num_chars, F32& w
 		height = mFontHeight;
 		const LLWString &text = getWText();
 		// if last character is a newline, then return true, forcing line break
-		width = mStyle->getFont()->getWidthF32(text.c_str(), mStart + first_char, num_chars);
+		width = mStyle->getFont()->getWidthF32(text.c_str(), mStart + first_char, num_chars, true);
 	}
 	return false;
 }
