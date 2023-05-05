@@ -170,6 +170,9 @@ public:
 
 	class Impl;
 	friend class Impl;
+private:
+	boost::signals2::connection mRlvBehaviorCallbackConnection;
+	void updateRlvRestrictions(std::string behavior, bool added);
 };
 
 ///----------------------------------------------------------------------------

@@ -1022,6 +1022,7 @@ BOOL LLFloaterSnapshot::postBuild()
 		getChild<LLUICtrl>("hud_check")->setEnabled(TRUE);
 
 	}
+	mRlvBehaviorCallbackConnection = gAgent.mRRInterface.setBehaviourCallback(boost::bind(&LLFloaterSnapshot::updateRlvRestrictions, this, _1, _2));
 //mk
 
 	((Impl*)impl)->setAspectRatioCheckboxValue(this, gSavedSettings.getBOOL("KeepAspectForSnapshot"));
@@ -1090,6 +1091,11 @@ BOOL LLFloaterSnapshot::postBuild()
 	previewp->setThumbnailPlaceholderRect(getThumbnailPlaceholderRect());
 
 	return TRUE;
+}
+
+void LLFloaterSnapshot::updateRlvRestrictions(std::string behavior, bool added)
+{
+	impl->updateControls(this);	
 }
 
 // virtual
