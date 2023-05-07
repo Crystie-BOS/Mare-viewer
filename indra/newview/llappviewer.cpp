@@ -3313,30 +3313,22 @@ bool LLAppViewer::initConfiguration()
 		// the login location will be set by the login panel (see LLPanelLogin)
 	}
 
+    // KKA-998 - RLV should not suppress sendURLToOtherInstance
+    LLSLURL handoff_slurl = starting_location;
+
 	//RN: if we received a URL, hand it off to the existing instance.
 	// don't call anotherInstanceRunning() when doing URL handoff, as
 	// it relies on checking a marker file which will not work when running
 	// out of different directories
 
-	if (start_slurl.isValid() &&
+	if (handoff_slurl.isValid() &&
 		(gSavedSettings.getBOOL("SLURLPassToOtherInstance")))
     {
-//MK
-#if RLV_ALWAYS_ON
-		if (false)
-#else
-        if (!gSavedSettings.getBOOL("RestrainedLove"))
-#endif
-        {
-//mk
-		if (sendURLToOtherInstance(start_slurl.getSLURLString()))
+		if (sendURLToOtherInstance(handoff_slurl.getSLURLString()))
 		{  
 			// successfully handed off URL to existing instance, exit
 			return false;
 		}
-//MK
-		}
-//mk
 	}
 
 	// Display splash screen.  Must be after above check for previous
