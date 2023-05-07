@@ -3142,16 +3142,10 @@ bool LLAppViewer::initConfiguration()
 		(gSavedSettings.getBOOL("SLURLPassToOtherInstance")))
 	{
 		if (sendURLToOtherInstance(start_slurl.getSLURLString()))
-		{
-		    LL_INFOS() << "KKA-998 Handed off to prior instance - exiting" << LL_ENDL;  
+		{  
 			// successfully handed off URL to existing instance, exit
 			return false;
 		}
-		LL_INFOS() << "KKA-998 Handing off to prior instance failed" << LL_ENDL;
-    }
-    else
-    {
-        LL_INFOS() << "KKA-998 SLURLPassToOtherInstance " << gSavedSettings.getBOOL("SLURLPassToOtherInstance") << " isValid " << start_slurl.isValid() << LL_ENDL;
     }
 
 	// Display splash screen.  Must be after above check for previous
@@ -3200,7 +3194,6 @@ bool LLAppViewer::initConfiguration()
 	//
 	if (mSecondInstance && !gSavedSettings.getBOOL("AllowMultipleViewers"))
 	{
-	    LL_INFOS() << "KKA-998 only one viewer allowed and it's already running" << LL_ENDL;
 		OSMessageBox(
 			LLTrans::getString("MBAlreadyRunning"),
 			LLStringUtil::null,
