@@ -913,8 +913,7 @@ void LLFloaterPreference::onOpen(const LLSD& key)
 	LLPresetsManager::getInstance()->createMissingDefault(PRESETS_CAMERA);
 	LLPresetsManager::getInstance()->createMissingDefault(PRESETS_GRAPHIC);
 
-	//bool started = (LLStartUp::getStartupState() == STATE_STARTED);
-	bool started = (LLStartUp::getStartupState() == STATE_MISC);
+	bool started = (LLStartUp::getStartupState() == STATE_STARTED);
 
 	LLButton* load_btn = findChild<LLButton>("PrefLoadButton");
 	LLButton* save_btn = findChild<LLButton>("PrefSaveButton");

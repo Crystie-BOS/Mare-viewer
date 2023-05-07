@@ -764,7 +764,7 @@ class WindowsManifest(ViewerManifest):
             OutFile "%(installer_file)s"
             !define INSTNAME   "%(app_name_oneword)s"
             !define SHORTCUT   "%(app_name)s"
-            !define URLNAME   "kokua"
+            !define URLNAME   "secondlife"
             Caption "%(caption)s"
             """
 
