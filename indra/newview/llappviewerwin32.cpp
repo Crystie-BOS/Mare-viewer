@@ -243,7 +243,7 @@ extern "C" {
 #endif
 #endif
 
-const std::string LLAppViewerWin32::sWindowClass = "Kokua";
+const std::string LLAppViewerWin32::sWindowClass = "Second Life";
 
 /*
     This function is used to print to the command line a text message 
@@ -262,7 +262,7 @@ void nvapi_error(NvAPI_Status status)
 // Create app mutex creates a unique global windows object. 
 // If the object can be created it returns true, otherwise
 // it returns false. The false result can be used to determine 
-// if another instance of a Kokua app (this vers. or later)
+// if another instance of any secondlife app (this vers. or later)
 // is running.
 // *NOTE: Do not use this method to run a single instance of the app.
 // This is intended to help debug problems with the cross-platform 
@@ -270,7 +270,7 @@ void nvapi_error(NvAPI_Status status)
 bool create_app_mutex()
 {
 	bool result = true;
-	LPCWSTR unique_mutex_name = L"KokuaAppMutex";
+	LPCWSTR unique_mutex_name = L"SecondLifeAppMutex";
 	HANDLE hMutex;
 	hMutex = CreateMutex(NULL, TRUE, unique_mutex_name); 
 	if(GetLastError() == ERROR_ALREADY_EXISTS) 
