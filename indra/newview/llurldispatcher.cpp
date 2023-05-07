@@ -109,7 +109,6 @@ bool LLURLDispatcherImpl::dispatchCore(const LLSLURL& slurl,
 									   bool trusted_browser)
 {
 	//if (dispatchHelp(slurl, right_mouse)) return true;
-	LL_INFOS() << "KKA-998 calling dispatch*" << LL_ENDL;
 	switch(slurl.getType())
 	{
 		case LLSLURL::APP: 
@@ -173,7 +172,6 @@ bool LLURLDispatcherImpl::dispatchRegion(const LLSLURL& slurl, const std::string
 {
 	if(slurl.getType() != LLSLURL::LOCATION)
     {
-        LL_INFOS() << "KKA-998 Not a location" << LL_ENDL;
 		return false;
     }
 	// Before we're logged in, need to update the startup screen
@@ -188,7 +186,6 @@ bool LLURLDispatcherImpl::dispatchRegion(const LLSLURL& slurl, const std::string
 	}
 
 	// Request a region handle by name
-	LL_INFOS() << "KKA-998 sending sendNameRegionRequest" << LL_ENDL;
 	LLWorldMapMessage::getInstance()->sendNamedRegionRequest(slurl.getRegion(),
 									  LLURLDispatcherImpl::regionNameCallback,
 									  slurl.getSLURLString(),
@@ -211,7 +208,6 @@ void LLURLDispatcherImpl::regionHandleCallback(U64 region_handle, const LLSLURL&
 {
 
   // we can't teleport cross grid at this point
-    LL_INFOS() << "KKA-998 into regionHandleCallback" << LL_ENDL;
 	if(   LLGridManager::getInstance()->getGrid(slurl.getGrid())
 	   != LLGridManager::getInstance()->getGrid())
 	{
@@ -244,7 +240,6 @@ void LLURLDispatcherImpl::regionHandleCallback(U64 region_handle, const LLSLURL&
 		{
 			instance->trackLocation(global_pos);
 		}
-		LL_INFOS() << "KKA-998 teleport true, showing world map" << LL_ENDL;
 	}
 	else
 	{
@@ -265,7 +260,6 @@ void LLURLDispatcherImpl::regionHandleCallback(U64 region_handle, const LLSLURL&
 			LLFloaterSidePanelContainer::showPanel("places", key);
 		}
 		// </FS:Ansariel>
-		LL_INFOS() << "KKA-998 showing place floater" << LL_ENDL;
 	}
 }
 

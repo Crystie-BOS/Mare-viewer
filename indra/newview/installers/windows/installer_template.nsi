@@ -570,7 +570,7 @@ FunctionEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Function CloseSecondLife
   Push $0
-  FindWindow $0 "Kokua" ""
+  FindWindow $0 "Second Life" ""
   IntCmp $0 0 DONE
   
   StrCmp $SKIP_DIALOGS "true" CLOSE
@@ -584,7 +584,7 @@ Function CloseSecondLife
     SendMessage $0 16 0 0
 
   LOOP:
-	  FindWindow $0 "Kokua" ""
+	  FindWindow $0 "Second Life" ""
 	  IntCmp $0 0 SLEEP
 	  Sleep 500
 	  Goto LOOP
