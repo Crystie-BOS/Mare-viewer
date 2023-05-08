@@ -3266,30 +3266,27 @@ bool LLAppViewer::initConfiguration()
 		}
 	}
 
+    // KKA-998 The logic here is very fragile and the original RLV changes here break the scenario where
+    // the viewer fires up briefly and hands off a URL to the window of an already-running to handle.
+    // llPanelLogin already takes care of forcing login to last location so all we need to do in addition
+    // is making sure a command line login with user/password specified gets forced to last too.
+    //
+    // Instead we'll do the forcing to last location in LLStartUp::setStartSLURL which will make sure
+    // we catch all scenarios
+
 	LLSLURL start_slurl;
 	if (! starting_location.empty())
 	// The gridmanager doesn't know the grids yet, only prepare
 	// parsing the slurls, actually done when the grids are fetched 
 	// (currently at the top of startup STATE_AUDIO_INIT,
 	// but rather it belongs into the gridmanager)
-	{
-//MK
-#if RLV_ALWAYS_ON
-		if (false)
-#else
-        if (!gSavedSettings.getBOOL("RestrainedLove"))
-#endif
-        {
-//mk
-			start_slurl = starting_location;
-			LLStartUp::setStartSLURL(start_slurl);
-			if(start_slurl.getType() == LLSLURL::LOCATION) 
-			{
-				LLGridManager::getInstance()->setGridChoice(start_slurl.getGrid());
-			}
-//MK
+    {
+		start_slurl = starting_location;
+		LLStartUp::setStartSLURL(start_slurl);
+		if(start_slurl.getType() == LLSLURL::LOCATION) 
+		{  
+			LLGridManager::getInstance()->setGridChoice(start_slurl.getGrid());
 		}
-//mk
 	}
 
 	// NextLoginLocation is set as a side effect of LLStartUp::setStartSLURL()
@@ -3313,23 +3310,20 @@ bool LLAppViewer::initConfiguration()
 		// the login location will be set by the login panel (see LLPanelLogin)
 	}
 
-    // KKA-998 - RLV should not suppress sendURLToOtherInstance
-    LLSLURL handoff_slurl = starting_location;
-
 	//RN: if we received a URL, hand it off to the existing instance.
 	// don't call anotherInstanceRunning() when doing URL handoff, as
 	// it relies on checking a marker file which will not work when running
 	// out of different directories
 
-	if (handoff_slurl.isValid() &&
+	if (start_slurl.isValid() &&
 		(gSavedSettings.getBOOL("SLURLPassToOtherInstance")))
-    {
-		if (sendURLToOtherInstance(handoff_slurl.getSLURLString()))
+	{
+		if (sendURLToOtherInstance(start_slurl.getSLURLString()))
 		{  
 			// successfully handed off URL to existing instance, exit
 			return false;
 		}
-	}
+    }
 
 	// Display splash screen.  Must be after above check for previous
 	// crash as this dialog is always frontmost.

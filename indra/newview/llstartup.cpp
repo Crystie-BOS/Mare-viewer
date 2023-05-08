@@ -3517,10 +3517,28 @@ void LLStartUp::setStartSLURL(const LLSLURL& slurl)
 	if ( slurl.isSpatial() )
 	{
 		std::string new_start = slurl.getSLURLString();
-		LL_DEBUGS("AppInit")<<new_start<<LL_ENDL;
-		sStartSLURL = slurl;
-		LLPanelLogin::onUpdateStartSLURL(slurl); // updates grid if needed
-
+        // KKA-998 Force login to last location for RLV (replaces broken logic in llAppViewer::initConfiguration() )
+//MK (CA)
+#if RLV_ALWAYS_ON
+		if (true)
+#else
+        if (gSavedSettings.getBOOL("RestrainedLove"))
+#endif
+        {
+    		new_start = LLSLURL::SIM_LOCATION_LAST;
+    		LL_DEBUGS("AppInit")<<new_start<<LL_ENDL;
+        	sStartSLURL = new_start;
+        	LLPanelLogin::onUpdateStartSLURL(new_start); // updates grid if needed
+        }
+        else
+        {
+//mk (ca)
+    		LL_DEBUGS("AppInit")<<new_start<<LL_ENDL;
+    		sStartSLURL = slurl;
+    		LLPanelLogin::onUpdateStartSLURL(slurl); // updates grid if needed
+//MK (CA)
+        }
+//mk (ca)
 		// remember that this is where we wanted to log in...if the login fails,
 		// the next attempt will default to the same place.
 		gSavedSettings.setString("NextLoginLocation", new_start);
