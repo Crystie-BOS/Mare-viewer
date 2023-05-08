@@ -2888,8 +2888,9 @@ void show_release_notes_if_required()
         && gSavedSettings.getBOOL("UpdaterShowReleaseNotes")
         && !gSavedSettings.getBOOL("FirstLoginThisInstall"))
     {
-
-#if LL_RELEASE_FOR_DOWNLOAD
+// Use the old way for Kokua
+//#if LL_RELEASE_FOR_DOWNLOAD
+#if 0
         if (!gSavedSettings.getBOOL("CmdLineSkipUpdater")
             && !LLAppViewer::instance()->isUpdaterMissing())
         {
