@@ -1176,7 +1176,7 @@ BOOL AOEngine::removeAnimation(const AOSet* set, AOSet::AOState* state, S32 inde
 
 	// check if this item is actually an animation link
 	BOOL move = TRUE;
-	if (item->getIsLinkType())
+	if (item && item->getIsLinkType()) // KKA-1008 cope with item being null
 	{
 		if (item->getInventoryType() == LLInventoryType::IT_ANIMATION)
 		{
@@ -1186,7 +1186,7 @@ BOOL AOEngine::removeAnimation(const AOSet* set, AOSet::AOState* state, S32 inde
 	}
 
 	// this item was not an animation link, move it to lost and found
-	if (move)
+	if (item && move) // KKA-1008 cope with item being null
 	{
 		LLInventoryModel* model = &gInventory;
 		model->changeItemParent(item, gInventory.findCategoryUUIDForType(LLFolderType::FT_LOST_AND_FOUND), FALSE);
@@ -1196,9 +1196,12 @@ BOOL AOEngine::removeAnimation(const AOSet* set, AOSet::AOState* state, S32 inde
 	}
 
 	// purge the item from inventory
-	LL_DEBUGS("AOEngine") << __LINE__ << " purging: " << state->mAnimations[index].mInventoryUUID << LL_ENDL;
-	remove_inventory_object(state->mAnimations[index].mInventoryUUID, NULL); // item->getUUID());
-	gInventory.notifyObservers();
+	if (item) // KKA-1008 cope with item being null
+	{
+		LL_DEBUGS("AOEngine") << __LINE__ << " purging: " << state->mAnimations[index].mInventoryUUID << LL_ENDL;
+		remove_inventory_object(state->mAnimations[index].mInventoryUUID, NULL); // item->getUUID());
+		gInventory.notifyObservers();
+	}
 
 	state->mAnimations.erase(state->mAnimations.begin() + index);
 
