@@ -283,6 +283,23 @@ void LLPanelOutfitsInventory::onCOFChanged()
 
 	std::string attstatus = getString("att_status", args);
 	mMyOutfitsPanel->childSetText("avatar_attachment_status", attstatus);
+
+    const LLUUID &category_id = gInventory.findCategoryUUIDForType(LLFolderType::FT_MY_OUTFITS, false);
+    LLInventoryModel::cat_array_t cat_array;
+    LLInventoryModel::item_array_t item_array;
+    LLIsType is_category(LLAssetType::AT_CATEGORY);
+    gInventory.collectDescendentsIf(
+        (const LLUUID&)category_id,
+        cat_array,
+        item_array,
+        LLInventoryModel::EXCLUDE_TRASH,
+        is_category);
+
+	LLStringUtil::format_map_t outfit_args;
+	outfit_args["COUNT"] = llformat("%d", cat_array.size());
+	std::string outfit_title = getString("outfitslist_label", outfit_args);
+	mAppearanceTabs->setPanelTitle(mAppearanceTabs->getIndexForPanel(mMyOutfitsPanel), outfit_title);
+
 }
 // </FS:Ansariel>
 
