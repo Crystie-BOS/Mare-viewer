@@ -25,6 +25,10 @@
      WEARING ([COUNT]/[MAX] Att.)
    </panel.string>
    <panel.string
+     name="outfitslist_label">
+     OUTFITS ([COUNT])
+   </panel.string>
+   <panel.string
      name="att_status">
      [COUNT]/[MAX] Attached
    </panel.string>
