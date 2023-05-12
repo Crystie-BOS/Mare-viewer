@@ -336,6 +336,7 @@ void LLFloaterLinkReplace::itemRemovedCallback(LLHandle<LLFloaterLinkReplace> fl
 
 void LLFloaterLinkReplace::decreaseOpenItemCount()
 {
+	mActiveItems--;
 	mRemainingItems--;
 
 	if (mRemainingItems == 0)
