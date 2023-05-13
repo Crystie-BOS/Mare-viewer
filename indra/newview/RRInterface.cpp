@@ -2779,22 +2779,36 @@ BOOL RRInterface::forceDetachByUuid (std::string object_uuid)
 
 BOOL RRInterface::hasLockedHuds ()
 {
+    // KKA-1004 nostrip items shouldn't count towards whether any HUD items are locked so
+    // perform the check with it disabled and put back the original setting afterwards
 	LLVOAvatar* avatar = gAgentAvatarp;
-	if (!avatar) return FALSE;
-	for (LLVOAvatar::attachment_map_t::iterator iter = avatar->mAttachmentPoints.begin(); 
-		 iter != avatar->mAttachmentPoints.end(); iter++)
+	BOOL return_value = FALSE;
+	BOOL saved_nostrip = mHandleNoStrip;
+	mHandleNoStrip = FALSE;
+	if (avatar)
 	{
-		LLVOAvatar::attachment_map_t::iterator curiter = iter;
-		LLViewerJointAttachment* attachment = curiter->second;
-		LLViewerObject* obj;
-		if (attachment) {
-			for (unsigned int i = 0; i < attachment->mAttachedObjects.size(); ++i) {
-				obj = attachment->mAttachedObjects.at(i);
-				if (obj && obj->isHUDAttachment() && !canDetach(obj)) return TRUE;
-			}
-		}
-	}
-	return FALSE;
+    	for (LLVOAvatar::attachment_map_t::iterator iter = avatar->mAttachmentPoints.begin(); 
+    		 iter != avatar->mAttachmentPoints.end(); iter++)
+    	{
+    		LLVOAvatar::attachment_map_t::iterator curiter = iter;
+    		LLViewerJointAttachment* attachment = curiter->second;
+    		LLViewerObject* obj;
+    		if (attachment) {
+    			for (unsigned int i = 0; i < attachment->mAttachedObjects.size(); ++i) {
+    				obj = attachment->mAttachedObjects.at(i);
+    				if (obj && obj->isHUDAttachment() && !canDetach(obj))
+    				{
+                    	if (sRestrainedLoveLogging) {
+        				    LL_INFOS() << "undetachable hud item = " << obj->getAttachmentItemName() << LL_ENDL;
+                    	}
+    				    return_value = TRUE;  
+    				} 
+    			}
+    		}
+    	}
+    }
+    mHandleNoStrip = saved_nostrip;
+	return return_value;;
 }
 
 
