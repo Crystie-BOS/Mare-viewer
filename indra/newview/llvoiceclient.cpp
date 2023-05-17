@@ -146,6 +146,7 @@ LLVoiceClient::LLVoiceClient(LLPumpIO *pump)
 
 LLVoiceClient::~LLVoiceClient()
 {
+    llassert(!mVoiceModule);
 }
 
 void LLVoiceClient::init(LLPumpIO *pump)
