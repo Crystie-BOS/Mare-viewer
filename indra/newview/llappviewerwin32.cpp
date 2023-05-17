@@ -294,9 +294,8 @@ void ll_nvapi_init(NvDRSSessionHandle hSession)
 	std::string app_name = LLTrans::getString("APP_NAME");
 	llutf16string w_app_name = utf8str_to_utf16str(app_name);
 	wsprintf(profile_name, L"%s", w_app_name.c_str());
-
 	NvDRSProfileHandle hProfile = 0;
-	// Check if we already have a Firestorm profile
+	// (3) Check if we already have an application profile for the viewer
 	status = NvAPI_DRS_FindProfileByName(hSession, profile_name, &hProfile);
 	if (status != NVAPI_OK && status != NVAPI_PROFILE_NOT_FOUND)
 	{
@@ -305,8 +304,8 @@ void ll_nvapi_init(NvDRSSessionHandle hSession)
 	}
 	else if (status == NVAPI_PROFILE_NOT_FOUND)
 	{
-		// Don't have a Viewer profile yet - create one
-		LL_INFOS() << "Creating Viewer profile for NVIDIA driver" << LL_ENDL;
+		// Don't have an application profile yet - create one
+		LL_INFOS() << "Creating NVIDIA application profile" << LL_ENDL;
 
 		NVDRS_PROFILE profileInfo;
 		profileInfo.version = NVDRS_PROFILE_VER;
@@ -321,7 +320,7 @@ void ll_nvapi_init(NvDRSSessionHandle hSession)
 		}
 	}
 
-	// Check if current exe is part of the profile
+	// (4) Check if current exe is part of the profile
 	std::string exe_name = gDirUtilp->getExecutableFilename();
 	NVDRS_APPLICATION profile_application;
 	profile_application.version = NVDRS_APPLICATION_VER;
@@ -338,7 +337,7 @@ void ll_nvapi_init(NvDRSSessionHandle hSession)
 	}
 	else if (status == NVAPI_EXECUTABLE_NOT_FOUND)
 	{
-		LL_INFOS() << "Creating application for " << exe_name << " for NVIDIA driver" << LL_ENDL;
+		LL_INFOS() << "Creating application for " << exe_name << " for NVIDIA application profile" << LL_ENDL;
 
 		// Add this exe to the profile
 		NVDRS_APPLICATION application;
@@ -358,7 +357,7 @@ void ll_nvapi_init(NvDRSSessionHandle hSession)
 
 		// Save application in case we added one
 		status = NvAPI_DRS_SaveSettings(hSession);
-		if (status != NVAPI_OK) 
+		if (status != NVAPI_OK)
 		{
 			nvapi_error(status);
 			return;
@@ -379,7 +378,7 @@ void ll_nvapi_init(NvDRSSessionHandle hSession)
 	status = NvAPI_DRS_GetSetting(hSession, hProfile, PREFERRED_PSTATE_ID, &drsSetting);
 	if (status == NVAPI_SETTING_NOT_FOUND)
 	{ //only override if the user hasn't specifically set this setting
-		// (4) Specify that we want the VSYNC disabled setting
+		// (5) Specify that we want to enable maximum performance setting
 		// first we fill the NVDRS_SETTING struct, then we call the function
 		drsSetting.version = NVDRS_SETTING_VER;
 		drsSetting.settingId = PREFERRED_PSTATE_ID;
@@ -392,7 +391,7 @@ void ll_nvapi_init(NvDRSSessionHandle hSession)
 			return;
 		}
 
-        // (5) Now we apply (or save) our changes to the system
+        // (6) Now we apply (or save) our changes to the system
         status = NvAPI_DRS_SaveSettings(hSession);
         if (status != NVAPI_OK) 
         {
@@ -476,27 +475,31 @@ int APIENTRY WINMAIN(HINSTANCE hInstance,
 		LL_WARNS() << "Application init failed." << LL_ENDL;
 		return -1;
 	}
-	
-	NvAPI_Status status;
-    
-	// Initialize NVAPI
-	status = NvAPI_Initialize();
-	NvDRSSessionHandle hSession = 0;
 
-    if (status == NVAPI_OK) 
-	{
-		// Create the session handle to access driver settings
-		status = NvAPI_DRS_CreateSession(&hSession);
-		if (status != NVAPI_OK) 
-		{
-			nvapi_error(status);
-		}
-		else
-		{
-			//override driver setting as needed
-			ll_nvapi_init(hSession);
-		}
-	}
+    NvDRSSessionHandle hSession = 0;
+    static LLCachedControl<bool> use_nv_api(gSavedSettings, "NvAPICreateApplicationProfile", true);
+    if (use_nv_api)
+    {
+        NvAPI_Status status;
+
+        // Initialize NVAPI
+        status = NvAPI_Initialize();
+
+        if (status == NVAPI_OK)
+        {
+            // Create the session handle to access driver settings
+            status = NvAPI_DRS_CreateSession(&hSession);
+            if (status != NVAPI_OK)
+            {
+                nvapi_error(status);
+            }
+            else
+            {
+                //override driver setting as needed
+                ll_nvapi_init(hSession);
+            }
+        }
+    }
 
 	// Have to wait until after logging is initialized to display LFH info
 	if (num_heaps > 0)
