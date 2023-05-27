@@ -79,6 +79,7 @@
 #include "llviewermedia.h"
 #include "llviewermedia_streamingaudio.h"
 #include "llfloaterreporter.h"
+#include "fskeywords.h"
 
 static LLDefaultChildRegistry::Register<LLChatHistory> r("chat_history");
 
@@ -1603,6 +1604,7 @@ void LLChatHistory::appendMessage(const LLChat& chat, const LLSD &args, const LL
 	LL_RECORD_BLOCK_TIME(FTM_APPEND_MESSAGE);
 	bool use_plain_text_chat_history = args["use_plain_text_chat_history"].asBoolean();
 	bool square_brackets = false; // square brackets necessary for a system messages
+	bool is_local = args.has("is_local") && args["is_local"].asBoolean();
 
 	llassert(mEditor);
 	if (!mEditor)
@@ -1645,7 +1647,7 @@ void LLChatHistory::appendMessage(const LLChat& chat, const LLSD &args, const LL
 	LLColor4 txt_color = LLUIColorTable::instance().getColor("White");
 	LLColor4 name_color(txt_color);
 
-	LLViewerChat::getChatColor(chat, txt_color);
+	LLViewerChat::getChatColor(chat, txt_color, LLSD().with("is_local", is_local));
 	LLFontGL* fontp = LLViewerChat::getChatFont();
 	std::string font_name = LLFontGL::nameFromFont(fontp);
 	std::string font_size = LLFontGL::sizeFromFont(fontp);
@@ -1697,6 +1699,14 @@ void LLChatHistory::appendMessage(const LLChat& chat, const LLSD &args, const LL
 	else if (chat.mChatType == CHAT_TYPE_SHOUT)
 	{
 		body_message_params.font.style = "BOLD";
+	}
+
+    // alternative way of doing keyword alerts
+	static LLCachedControl<std::string> sFSKeywordStyle(gSavedPerAccountSettings, "FSKeywordStyle");
+	static LLCachedControl<bool> sFSKeywordChangeStyle(gSavedPerAccountSettings, "FSKeywordChangeStyle");
+	if (sFSKeywordChangeStyle && FSKeywords::getInstance()->chatContainsKeyword(chat, is_local))
+	{
+		body_message_params.font.style = sFSKeywordStyle;
 	}
 
 	bool message_from_log = chat.mChatStyle == CHAT_STYLE_HISTORY;

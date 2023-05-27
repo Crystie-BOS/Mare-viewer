@@ -37,7 +37,7 @@ class LLViewerChat
 public:
 	typedef boost::signals2::signal<void (LLFontGL*)> font_change_signal_t;
 
-	static void getChatColor(const LLChat& chat, LLColor4& r_color);
+	static void getChatColor(const LLChat& chat, LLColor4& r_color, LLSD args = LLSD::emptyMap());
 	static void getChatColor(const LLChat& chat, std::string& r_color_name, F32& r_color_alpha);
 	static LLFontGL* getChatFont();
 	static S32 getChatFontSize();

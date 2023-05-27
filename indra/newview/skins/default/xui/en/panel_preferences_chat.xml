@@ -843,7 +843,18 @@
 		 width="15"
 		 name="colorswatch"
 		 tool_tip="Click to open color picker"/>
-
+		<check_box
+		 enabled="false"
+		 enabled_control="FSKeywordOn"
+		 layout="topleft"
+		 follows="left|top"
+		 top_delta="23"
+		 left="20"
+		 width="150"
+		 height="20"
+		 control_name="FSKeywordChangeStyle"
+		 name="FSKeywordChangeStyle"
+		 label="Change font style"/>
 		<check_box
 		 enabled="false"
 		 enabled_control="FSKeywordOn"
