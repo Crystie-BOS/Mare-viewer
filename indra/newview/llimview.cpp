@@ -73,6 +73,7 @@
 #include "lluiusage.h"
 #include "exogroupmutelist.h"
 #include "fscommon.h"
+#include "fskeywords.h"
 
 #include "llslurl.h"
 
@@ -162,6 +163,32 @@ static void on_avatar_name_cache_toast(const LLUUID& agent_id,
 	LLNotificationsUtil::add("IMToast", args, args, boost::bind(&LLFloaterIMContainer::showConversation, LLFloaterIMContainer::getInstance(), msg["session_id"].asUUID()));
 }
 
+IMViewVisibilityType get_visibility_type(LLUUID session_id)
+{
+    LLFloaterIMContainer* im_box = LLFloaterReg::getTypedInstance<LLFloaterIMContainer>("im_container");
+	LLFloaterIMSessionTab* session_floater = LLFloaterIMSessionTab::getConversation(session_id);
+	if (!LLFloater::isVisible(im_box) || im_box->isMinimized() || !session_floater)
+	{
+		return CLOSED;
+	}
+// CA: the focus checks could mean that a fully visible, selected tab was getting reported as
+// NOT_ON_TOP if it was lacking input focus. 
+//
+//	else if (!im_box->hasFocus() &&
+//			    !(session_floater && LLFloater::isVisible(session_floater)
+//	            && !session_floater->isMinimized() && session_floater->hasFocus()))
+	else if (!(session_floater && LLFloater::isVisible(session_floater)
+	            && !session_floater->isMinimized()))
+	{
+		return NOT_ON_TOP;
+	}
+	else if (im_box->getSelectedSession() != session_id || !im_box->hasFocus())
+	{
+		return ON_TOP;
+    }
+	return ON_TOP_AND_ITEM_IS_SELECTED;
+}
+
 void notify_of_message(const LLSD& msg, bool is_dnd_msg)
 {
     std::string user_preferences;
@@ -176,31 +203,12 @@ void notify_of_message(const LLSD& msg, bool is_dnd_msg)
     }
 
     // determine state of conversations floater
-    enum {CLOSED, NOT_ON_TOP, ON_TOP, ON_TOP_AND_ITEM_IS_SELECTED} conversations_floater_status;
-
+    IMViewVisibilityType conversations_floater_status = get_visibility_type(session_id);
 
     LLFloaterIMContainer* im_box = LLFloaterReg::getTypedInstance<LLFloaterIMContainer>("im_container");
 	LLFloaterIMSessionTab* session_floater = LLFloaterIMSessionTab::getConversation(session_id);
 	bool store_dnd_message = false; // flag storage of a dnd message
 	bool is_session_focused = session_floater->isTornOff() && session_floater->hasFocus();
-	if (!LLFloater::isVisible(im_box) || im_box->isMinimized())
-	{
-		conversations_floater_status = CLOSED;
-	}
-	else if (!im_box->hasFocus() &&
-			    !(session_floater && LLFloater::isVisible(session_floater)
-	            && !session_floater->isMinimized() && session_floater->hasFocus()))
-	{
-		conversations_floater_status = NOT_ON_TOP;
-	}
-	else if (im_box->getSelectedSession() != session_id)
-	{
-		conversations_floater_status = ON_TOP;
-    }
-	else
-	{
-		conversations_floater_status = ON_TOP_AND_ITEM_IS_SELECTED;
-	}
 
     //  determine user prefs for this session
     if (session_id.isNull())
@@ -1650,6 +1658,25 @@ void LLIMModel::processAddingMessage(const LLUUID& session_id, const std::string
 	arg["keyword_alert_performed"] = keyword_alert_performed; // <FS:Ansariel> Pass info if keyword alert has been performed
     arg["is_region_msg"] = is_region_msg;
     mNewMsgSignal(arg);
+    
+	static LLCachedControl<bool> sFSKeywordNotifyForVisibleConversation(gSavedPerAccountSettings, "FSKeywordNotifyForVisibleConversation");
+	static LLCachedControl<bool> sFSKeywordNotifyForHiddenConversations(gSavedPerAccountSettings, "FSKeywordNotifyForHiddenConversations");
+    LLChat chat;
+    chat.mText = utf8_text;
+    chat.mFromName = from;
+    chat.mFromID = from_id;
+    chat.mMuted = false;
+    if (FSKeywords::getInstance()->chatContainsKeyword(chat, false) && !keyword_alert_performed)
+    {
+		IMViewVisibilityType visibility = get_visibility_type(session_id);
+	    if (
+	        ((visibility == CLOSED || visibility == NOT_ON_TOP) && sFSKeywordNotifyForHiddenConversations) ||
+	        ((visibility == ON_TOP || visibility == ON_TOP_AND_ITEM_IS_SELECTED) && sFSKeywordNotifyForVisibleConversation)
+	        )
+	    {
+    		    FSKeywords::notify(chat);
+		}
+    }    
 }
 
 // <FS:Ansariel> Added is_announcement parameter
@@ -4219,7 +4246,9 @@ public:
 				message_params["parent_estate_id"].asInteger(),
 				message_params["region_id"].asUUID(),
 				ll_vector3_from_sd(message_params["position"]),
-                false,      // is_region_message
+				false, // is_announced
+				false, // keyword_alert_performed
+                false, // is_region_message
                 timestamp);
 
 			if (LLMuteList::getInstance()->isMuted(from_id, name, LLMute::flagTextChat))

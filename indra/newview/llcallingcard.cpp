@@ -847,17 +847,19 @@ static void on_avatar_name_cache_notify(const LLUUID& agent_id,
 	  chat.mFromID = agent_id;
 	  chat.mChatType = CHAT_TYPE_RADAR;
 		LLFloaterIMNearbyChat* nearby_chat = LLFloaterReg::findTypedInstance<LLFloaterIMNearbyChat>("nearby_chat");
+		chat.mText = notify_msg;
 		if(nearby_chat)
 		{
 			nearby_chat->addMessage(chat);
 		}
-		// <FS:PP> FIRE-10178: Keyword Alerts in group IM do not work unless the group is in the foreground (notification on receipt of IM)
-		chat.mText = notify_msg;
-		if (FSKeywords::getInstance()->chatContainsKeyword(chat, true))
+		else
 		{
-			FSKeywords::notify(chat);
-		}
-		// </FS:PP>
+    		if (FSKeywords::getInstance()->chatContainsKeyword(chat, true))
+    		{
+    		    // we're not adding it to chat, so notify from here
+    			FSKeywords::notify(chat);
+    		}
+        }
 	}
 }
 

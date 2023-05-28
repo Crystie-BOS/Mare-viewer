@@ -67,7 +67,6 @@
 // Firestorm includes
 #include "exogroupmutelist.h"
 #include "fscommon.h"
-#include "fskeywords.h"
 #include "llavataractions.h"
 #if LL_MSVC
 // disable boost::lexical_cast warning
@@ -541,13 +540,14 @@ void LLIMProcessing::processNewMessage(LLUUID from_id,
 	BOOL is_owned_by_me = FALSE;
 	BOOL is_friend = (LLAvatarTracker::instance().getBuddyInfo(from_id) == NULL) ? false : true;
     BOOL accept_im_from_only_friend = gSavedPerAccountSettings.getBOOL("VoiceCallsFriendsOnly");
-	BOOL is_linden = chat.mSourceType != CHAT_SOURCE_OBJECT &&
-        LLMuteList::isLinden(name);
 
 	chat.mMuted = is_muted;
 	chat.mFromID = from_id;
 	chat.mFromName = name;
 	chat.mSourceType = (from_id.isNull() || (name == std::string(SYSTEM_FROM))) ? CHAT_SOURCE_SYSTEM : CHAT_SOURCE_AGENT;
+
+    BOOL is_linden = chat.mSourceType != CHAT_SOURCE_OBJECT &&
+        LLMuteList::isLinden(name);
 
 	if (chat.mSourceType == CHAT_SOURCE_SYSTEM)
 	{ // Translate server message if required (MAINT-6109)
@@ -620,15 +620,8 @@ void LLIMProcessing::processNewMessage(LLUUID from_id,
 
 			LL_DEBUGS("Messaging") << "session_id( " << session_id << " ), from_id( " << from_id << " )" << LL_ENDL;
 
-                // <FS:PP> FIRE-10178: Keyword Alerts in group IM do not work unless the group is in the foreground (notification on receipt of IM)
                 chat.mText = buffer;
                 bool keyword_alert_performed = false;
-                if (FSKeywords::getInstance()->chatContainsKeyword(chat, false))
-                {
-                    FSKeywords::notify(chat);
-                    keyword_alert_performed = true;
-                }
-                // </FS:PP>
 
                 // add to IM panel, but do not bother the user
                 gIMMgr->addMessage(
@@ -876,15 +869,8 @@ void LLIMProcessing::processNewMessage(LLUUID from_id,
 			}
 			if (!mute_im)
 			{
-                    // <FS:PP> FIRE-10178: Keyword Alerts in group IM do not work unless the group is in the foreground (notification on receipt of IM)
                     chat.mText = message;
                     bool keyword_alert_performed = false;
-                    if (FSKeywords::getInstance()->chatContainsKeyword(chat, false))
-                    {
-                        FSKeywords::notify(chat);
-                        keyword_alert_performed = true;
-                    }
-                    // </FS:PP>
 
                     //KKA-674 - this got pulled across in the keywords port but isn't needed here (and reinstates squashed incoming IMs)
 					//buffer = saved + message;
@@ -1416,13 +1402,6 @@ void LLIMProcessing::processNewMessage(LLUUID from_id,
 //mk
 		chat.mText = message;
 
-            // <FS:PP> FIRE-10178: Keyword Alerts in group IM do not work unless the group is in the foreground (notification on receipt of Task IM)
-            if (FSKeywords::getInstance()->chatContainsKeyword(chat, true))
-            {
-                FSKeywords::notify(chat);
-            }
-            // </FS:PP>
-
 		// Note: lie to Nearby Chat, pretending that this is NOT an IM, because
 		// IMs from obejcts don't open IM sessions.
 		LLFloaterIMNearbyChat* nearby_chat = LLFloaterReg::getTypedInstance<LLFloaterIMNearbyChat>("nearby_chat");
@@ -1532,15 +1511,8 @@ void LLIMProcessing::processNewMessage(LLUUID from_id,
 		else
 		{
 
-                // <FS:PP> FIRE-10178: Keyword Alerts in group IM do not work unless the group is in the foreground (notification on receipt of IM)
                 chat.mText = message;
                 bool keyword_alert_performed = false;
-                if (FSKeywords::getInstance()->chatContainsKeyword(chat, false))
-                {
-                    FSKeywords::notify(chat);
-                    keyword_alert_performed = true;
-                }
-                // </FS:PP>
 
 			// standard message, not from system
 			std::string saved;

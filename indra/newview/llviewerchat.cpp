@@ -43,9 +43,9 @@
 LLViewerChat::font_change_signal_t LLViewerChat::sChatFontChangedSignal;
 
 //static 
-void LLViewerChat::getChatColor(const LLChat& chat, LLColor4& r_color)
+void LLViewerChat::getChatColor(const LLChat& chat, LLColor4& r_color, LLSD args)
 {
-	const bool is_local = true; // replaces call to fsdata
+	const bool is_local = args.has("is_local") ? args["is_local"].asBoolean() : true;
 	if(chat.mMuted)
 	{
 		r_color= LLUIColorTable::instance().getColor("LtGray");

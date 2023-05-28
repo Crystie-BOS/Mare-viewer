@@ -57,6 +57,15 @@ private:
 	LLUUID mSessionId;
 };
 
+    typedef enum e_visibility_type
+	{   
+		CLOSED,
+		NOT_ON_TOP,
+		ON_TOP,
+		ON_TOP_AND_ITEM_IS_SELECTED
+	} IMViewVisibilityType;
+	
+	IMViewVisibilityType get_visibility_type(LLUUID session_id);
 
 /**
  * Model (MVC) for IM Sessions
