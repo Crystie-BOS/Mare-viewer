@@ -1701,15 +1701,35 @@ void LLChatHistory::appendMessage(const LLChat& chat, const LLSD &args, const LL
 		body_message_params.font.style = "BOLD";
 	}
 
-    // alternative way of doing keyword alerts
+	bool message_from_log = chat.mChatStyle == CHAT_STYLE_HISTORY;
+
+    // new location for keyword alerts (and notifications for chat)
 	static LLCachedControl<std::string> sFSKeywordStyle(gSavedPerAccountSettings, "FSKeywordStyle");
 	static LLCachedControl<bool> sFSKeywordChangeStyle(gSavedPerAccountSettings, "FSKeywordChangeStyle");
-	if (sFSKeywordChangeStyle && FSKeywords::getInstance()->chatContainsKeyword(chat, is_local))
+	static LLCachedControl<bool> sFSKeywordNotifyForVisibleConversation(gSavedPerAccountSettings, "FSKeywordNotifyForVisibleConversation");
+	static LLCachedControl<bool> sFSKeywordNotifyForHiddenConversations(gSavedPerAccountSettings, "FSKeywordNotifyForHiddenConversations");
+	if (!message_from_log && FSKeywords::getInstance()->chatContainsKeyword(chat, is_local))
 	{
-		body_message_params.font.style = sFSKeywordStyle;
+		if (sFSKeywordChangeStyle) 
+		{
+		    body_message_params.font.style = sFSKeywordStyle;
+		}
+		IMViewVisibilityType visibility = get_visibility_type(LLUUID::null);
+		// Only notify for local; IM notifications are handled in llimview, plus we don't
+		// want to fire off a stack of notifications when an IM session floater is populated
+		// from past alerts
+		if (is_local)
+		{
+		    if (
+		        ((visibility == CLOSED || visibility == NOT_ON_TOP) && sFSKeywordNotifyForHiddenConversations) ||
+		        ((visibility == ON_TOP || visibility == ON_TOP_AND_ITEM_IS_SELECTED) && sFSKeywordNotifyForVisibleConversation)
+		        )
+		    {
+    		    FSKeywords::notify(chat);
+    		}
+		}
 	}
 
-	bool message_from_log = chat.mChatStyle == CHAT_STYLE_HISTORY;
 	bool teleport_separator = chat.mSourceType == CHAT_SOURCE_TELEPORT;
 	// We graying out chat history by graying out messages that contains full date in a time string
 	if (message_from_log)
