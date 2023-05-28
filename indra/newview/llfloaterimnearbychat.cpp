@@ -657,7 +657,9 @@ void LLFloaterIMNearbyChat::sendChatWithText( EChatType type, LLWString text)
 
 void LLFloaterIMNearbyChat::addMessage(const LLChat& chat,bool archive,const LLSD &args)
 {
-	appendMessage(chat, args);
+    LLSD chat_args = args;
+    chat_args["is_local"] = true;
+	appendMessage(chat, chat_args);
 
 	if(archive)
 	{
