@@ -798,14 +798,6 @@ void set_nav_save_data(LLFilePicker::ESaveFilter filter, std::string &extension,
             creator = "\?\?\?\?";
             extension = "xaf";
             break;
-
-#ifdef _CORY_TESTING
-        case LLFilePicker::FFSAVE_GEOMETRY:
-            type = "\?\?\?\?";
-            creator = "\?\?\?\?";
-            extension = "slg";
-            break;
-#endif
             
         case LLFilePicker::FFSAVE_XML:
             type = "\?\?\?\?";
