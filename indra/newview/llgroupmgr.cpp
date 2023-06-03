@@ -2221,6 +2221,11 @@ void LLGroupMgr::groupMembersRequestCoro(std::string url, LLUUID groupId)
 void LLGroupMgr::sendCapGroupMembersRequest(const LLUUID& group_id)
 {
     static U32 lastGroupMemberRequestFrame = 0;
+    // KKA-1018 If we're called with null, don't bother calling the server - this resolves the first group fetch failing issue
+    if (group_id == LLUUID::null)
+    {
+        return;
+    }     
 
 	// Have we requested the information already this frame?
     // Todo: make this per group, we can invite to one group and simultaneously be checking another one
