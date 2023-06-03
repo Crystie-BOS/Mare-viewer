@@ -2493,9 +2493,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>a74e21beaf739563d323c55386c05296</string>
+              <string>711f4ec769e4b5f59ba25ee43c11bcbc</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-llqtwebkit2/downloads/llqtwebkit-4.7.1-linux64-201506082044.tar.bz2</string>
+              <string>http://automated-builds-secondlife-com.s3.amazonaws.com/ct2/4724/14846/llphysicsextensions_stub-1.0.504712-linux64-504712.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
