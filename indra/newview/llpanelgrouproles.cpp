@@ -417,8 +417,9 @@ void LLPanelGroupRoles::setGroupID(const LLUUID& id)
 	if ( button )
 		button->setEnabled(gAgent.hasPowerInGroup(mGroupID, GP_MEMBER_INVITE));
 
+    // KKA-1018 No idea why this used to open the Roles tab (1) but let's open on the first tab (Members, 0) instead
 	if(mSubTabContainer)
-		mSubTabContainer->selectTab(1);
+		mSubTabContainer->selectTab(0); // KKA-1018, was 1
 	group_roles_tab->mFirstOpen = TRUE;
 	activate();
 }
