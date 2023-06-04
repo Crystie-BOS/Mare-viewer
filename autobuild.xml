@@ -2692,11 +2692,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>5609b79a14fec30fc950134f8627f86a</string>
+              <string>90d3556f0602d12bf7edd6a68afd7bfb</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-meshoptimizer/downloads/meshoptimizer-0.16.221500027-linux64-221500027.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-meshoptimizer/downloads/meshoptimizer-0.16.231510256-linux64-231510256.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>

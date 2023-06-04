@@ -32,7 +32,6 @@ elseif (LINUX)
           boost_filesystem-mt${addrsfx}
           boost_program_options-mt${addrsfx}
           boost_regex-mt${addrsfx}
-          boost_signals-mt${addrsfx}
           boost_system-mt${addrsfx}
           boost_thread-mt${addrsfx})
 elseif (DARWIN)
