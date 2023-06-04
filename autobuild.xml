@@ -4059,9 +4059,9 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>3a7334ad1e1aa55439a7e73720cae770</string>
+              <string>3c2bf9469dda100aa5bede905e5d49bc</string>
               <key>url</key>
-              <string>http://bitbucket.org/kokua/3p-zlib/downloads/zlib-1.2.8.201505161535-linux64-201505161535.tar.bz2</string>
+              <string>http://bitbucket.org/kokua/3p-zlib-ng/downloads/zlib_ng-2.0.5.231540321-linux64-231540321.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
