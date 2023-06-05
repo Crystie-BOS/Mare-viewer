@@ -70,6 +70,9 @@ if (LINUX)
        llkeyboardsdl.h
        llwindowsdl.h
        )
+  list(APPEND llwindow_LINK_LIBRARIES
+      fontconfig          # For FCInit and other FC* functions.
+      )
 
   if (BUILD_HEADLESS)
     set(llwindowheadless_LINK_LIBRARIES
