@@ -42,6 +42,7 @@ ca_*.sh
 /indra/newview/character
 /indra/newview/fmod.dll
 /indra/newview/fmod.log
+/indra/newview/fonts
 /indra/newview/mozilla-theme
 /indra/newview/mozilla-universal-darwin.tgz
 /indra/newview/pilot.txt
@@ -50,6 +51,7 @@ ca_*.sh
 /indra/newview/res-sdl/ll_icon.*
 /indra/newview/vivox-runtime
 /indra/newview/skins/default/html/common/equirectangular/js
+emoji_characters.xml
 /indra/server-linux-*
 /indra/temp
 /indra/test/linden_file.dat
