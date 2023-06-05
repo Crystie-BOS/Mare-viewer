@@ -1861,9 +1861,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>56f8925102d9e17498fbe7b0f0119b68</string>
+              <string>d9df3703ba462279c87de20839dc7a8f</string>
               <key>url</key>
-              <string>http://bitbucket.org/kokua/3p-jpeglib/downloads/jpeglib-8c.201505141845-linux64-201505141845.tar.bz2</string>
+              <string>http://bitbucket.org/kokua/3p-jpeglib/downloads/jpeglib-8c.231560616-linux64-231560616.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
