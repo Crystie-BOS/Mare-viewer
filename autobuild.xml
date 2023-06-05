@@ -1657,9 +1657,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>de7bba8fd2275a11b077b124413065d0</string>
+              <string>e0f2d27a3b86507f0a08aca99ec2672e</string>
               <key>url</key>
-              <string>http://automated-builds-secondlife-com.s3.amazonaws.com/hg/repo/p64_3p-gtk-atk-pango-glib/rev/314220/arch/Linux/installer/gtk_atk_pango_glib-0.1-linux64-314220.tar.bz2</string>
+	      <string>http://bitbucket.org/kokua/3p-gtk-atk-pango-glib/downloads/gtk_atk_pango_glib-0.1-linux64-314220.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
