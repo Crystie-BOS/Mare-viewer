@@ -2757,6 +2757,18 @@
             <key>name</key>
             <string>darwin64</string>
           </map>
+          <key>linux64</key>
+          <map>
+            <key>archive</key>
+            <map>
+              <key>hash</key>
+              <string>2c3cec1dfb0758aec7f90a41a1473cc2</string>
+              <key>url</key>
+	      <string>http://bitbucket.org/kokua/3p-minizip-ng/downloads/minizip_ng-3.0.2.231560052-linux64-231560052.tar.bz2</string>
+            </map>
+            <key>name</key>
+            <string>linux64</string>
+          </map>
           <key>windows</key>
           <map>
             <key>archive</key>
