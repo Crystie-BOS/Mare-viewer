@@ -1600,39 +1600,21 @@ class Linux_x86_64_Manifest(LinuxManifest):
         #    self.end_prefix("lib") 
 
         with self.prefix(src=relpkgdir, dst="lib"):
-            try:
-                if self.args['fmodversion'].lower() == 'fmodstudio':
-                    if self.args['configuration'].lower() == 'debug':
-                       self.path("libfmodstudio*.so")
-                       self.path("libfmodstudio.so")
-                       self.path("libfmodstudio.so*")
-                       self.path("libfmod*.so")
-                       self.path("libfmod.so")
-                       self.path("libfmod.so*")
-                    else:
-                       self.path("libfmodstudio*.so")
-                       self.path("libfmodstudio.so")
-                       self.path("libfmodstudio.so*")
-                       self.path("libfmod*.so")
-                       self.path("libfmod.so")
-                       self.path("libfmod.so*")
-            except:
-                print("Skipping libfmodstudio.so - not found")
-                pass
-            try:
-                if self.args['fmodversion'].lower() == 'fmodex':
-                   if self.args['configuration'].lower() == 'debug':
-                      self.path("libfmodex64-*.so")
-                      self.path("libfmodex64.so")
-                      self.path("libfmodex64.so*")
-                   else:
-                      self.path("libfmodex64-*.so")
-                      self.path("libfmodex64.so")
-                      self.path("libfmodex64.so*")
-            except:
-                print("Skipping libfmodex.so - not found")
-                pass
-            
+            if self.args['fmodstudio'] == 'ON':
+	              if self.args['configuration'].lower() == 'debug':
+	                  self.path("libfmodstudio*.so")
+	                  self.path("libfmodstudio.so")
+	                  self.path("libfmodstudio.so*")
+	                  self.path("libfmod*.so")
+	                  self.path("libfmod.so")
+	                  self.path("libfmod.so*")
+	              else:
+	                  self.path("libfmodstudio*.so")
+	                  self.path("libfmodstudio.so")
+	                  self.path("libfmodstudio.so*")
+	                  self.path("libfmod*.so")
+	                  self.path("libfmod.so")
+	                  self.path("libfmod.so*")
 
             self.path("libapr-1.so*")
             self.path("libaprutil-1.so*")
