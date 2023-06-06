@@ -38,6 +38,7 @@ endif ()
 # that CMAKE_BUILD_TYPE is essentially meaningless at configuration time for IDE generators and
 # CMAKE_CFG_INTDIR is meaningless at build time for Makefile generators
 
+message(STATUS "Processing ${PROJECT_NAME} (${CMAKE_BUILD_TYPE})")
 link_directories(${AUTOBUILD_INSTALL_DIR}/lib/$<LOWER_CASE:$<CONFIG>>)
 link_directories(${AUTOBUILD_INSTALL_DIR}/lib/release)
 
