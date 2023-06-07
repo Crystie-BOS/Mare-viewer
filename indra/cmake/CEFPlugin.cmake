@@ -39,6 +39,3 @@ elseif (LINUX)
         cef_dll_wrapper
        )
 endif (WINDOWS)
-if (LINUX)
-      add_definitions(-std=gnu++11)
-endif (LINUX)
