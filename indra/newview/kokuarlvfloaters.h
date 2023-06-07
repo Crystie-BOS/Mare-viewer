@@ -39,9 +39,6 @@ class LLUUID;
 class LLInventoryObserver;
 
 static std::map<LLUUID, std::string> mKnownIDs;		// known list of names for object IDs
-static BOOL option_ignore_queries;
-static BOOL option_auto_open;
-static BOOL option_focus_on_latest;
 
 // ---- Inventory Observer
 
