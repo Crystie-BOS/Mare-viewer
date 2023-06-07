@@ -1595,48 +1595,30 @@ class Linux_x86_64_Manifest(LinuxManifest):
         self.path("secondlife-i686.supp")
 
         # Arch does not package libpng12 a dependency of Kokua's gtk+ libraries
-        if self.prefix("/lib/x86_64-linux-gnu", dst="lib"):
-            self.path("libpng12.so.0*")
-            self.end_prefix("lib") 
+        #if self.prefix("/lib/x86_64-linux-gnu", dst="lib"):
+        #    self.path("libpng12.so.0*")
+        #    self.end_prefix("lib") 
 
         with self.prefix(src=relpkgdir, dst="lib"):
-            try:
-                if self.args['fmodversion'].lower() == 'fmodstudio':
-                    if self.args['configuration'].lower() == 'debug':
-                       self.path("libfmodstudio*.so")
-                       self.path("libfmodstudio.so")
-                       self.path("libfmodstudio.so*")
-                       self.path("libfmod*.so")
-                       self.path("libfmod.so")
-                       self.path("libfmod.so*")
-                    else:
-                       self.path("libfmodstudio*.so")
-                       self.path("libfmodstudio.so")
-                       self.path("libfmodstudio.so*")
-                       self.path("libfmod*.so")
-                       self.path("libfmod.so")
-                       self.path("libfmod.so*")
-            except:
-                print("Skipping libfmodstudio.so - not found")
-                pass
-            try:
-                if self.args['fmodversion'].lower() == 'fmodex':
-                   if self.args['configuration'].lower() == 'debug':
-                      self.path("libfmodex64-*.so")
-                      self.path("libfmodex64.so")
-                      self.path("libfmodex64.so*")
-                   else:
-                      self.path("libfmodex64-*.so")
-                      self.path("libfmodex64.so")
-                      self.path("libfmodex64.so*")
-            except:
-                print("Skipping libfmodex.so - not found")
-                pass
-            
+            if self.args['fmodstudio'] == 'ON':
+	              if self.args['configuration'].lower() == 'debug':
+	                  self.path("libfmodstudio*.so")
+	                  self.path("libfmodstudio.so")
+	                  self.path("libfmodstudio.so*")
+	                  self.path("libfmod*.so")
+	                  self.path("libfmod.so")
+	                  self.path("libfmod.so*")
+	              else:
+	                  self.path("libfmodstudio*.so")
+	                  self.path("libfmodstudio.so")
+	                  self.path("libfmodstudio.so*")
+	                  self.path("libfmod*.so")
+	                  self.path("libfmod.so")
+	                  self.path("libfmod.so*")
 
             self.path("libapr-1.so*")
             self.path("libaprutil-1.so*")
-            self.path("libdb*.so")
+            #self.path("libdb*.so")
             self.path("libexpat.so.*")
             self.path("libSDL-1.2.so.*")
             self.path("libdirectfb-1.*.so.*")
@@ -1650,9 +1632,9 @@ class Linux_x86_64_Manifest(LinuxManifest):
             self.path("libuuid.so.16")
             self.path("libuuid.so.16.0.22")
             self.path("libhunspell-1.3.so*")
-            self.path("libGLOD.so")
+            #self.path("libGLOD.so")
             self.path("libfreetype.so.*.*")
-            self.path("libjemalloc.so*")
+            #self.path("libjemalloc.so*")
 
             #cef plugin
 # already pulled this in earlier

@@ -70,6 +70,9 @@ if (LINUX)
        llkeyboardsdl.h
        llwindowsdl.h
        )
+  list(APPEND llwindow_LINK_LIBRARIES
+      fontconfig          # For FCInit and other FC* functions.
+      )
 
   if (BUILD_HEADLESS)
     set(llwindowheadless_LINK_LIBRARIES
@@ -183,3 +186,11 @@ if (DARWIN)
   find_library(CARBON_LIBRARY Carbon)
   target_link_libraries(llwindow ${CARBON_LIBRARY})
 endif (DARWIN)
+
+if (LINUX)
+  target_include_directories(llwindow INTERFACE
+    ${LIBS_PREBUILT_DIR}/include/gtk-2.0
+    ${LIBS_PREBUILT_DIR}/include/glib-2.0
+    ${LIBS_PREBUILT_DIR}/include/atk-1.0
+    ${LIBS_PREBUILT_DIR}/include/pango-1.0)
+endif (LINUX)

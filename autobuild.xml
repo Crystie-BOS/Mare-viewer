@@ -66,9 +66,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>f609bdacb3fa461890889bc4e659bac5</string>
+              <string>84a1a140f20b25d714949185e854d14b</string>
               <key>url</key>
-              <string>http://bitbucket.org/kokua/3p-apr/downloads/apr_suite-1.4.5.201505112108-linux64-201505112108.tar.bz2</string>
+              <string>http://automated-builds-secondlife-com.s3.amazonaws.com/ct2/4811/15302/apr_suite-1.4.5.504800-linux64-504800.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -824,9 +824,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>7eee24f7309849b14283a4c529b384b2</string>
+              <string>5e1f025d1cebd12db542080aa755257f</string>
               <key>url</key>
-              <string>http://bitbucket.org/kokua/3p-expat/downloads/expat-2.0.1.201505112037-linux64-201505112037.tar.bz2</string>
+              <string>http://automated-builds-secondlife-com.s3.amazonaws.com/ct2/380/943/expat-2.1.1.500375-linux64-500375.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -970,9 +970,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>926b3873f51f18ead54bef5b88c5fb9f</string>
+              <string>3bec7d1a92a66b70eefaab4cb12d5a8f</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-fontconfig/downloads/fontconfig-2.11.0-linux64-201505182117.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-fontconfig/downloads/fontconfig-2.13.1-linux64-202005151055.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -1044,9 +1044,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>5e529c5fd598cf16972e2d096630a791</string>
+              <string>978b1f11da6e70eafe81a41b7adc2450</string>
               <key>url</key>
-              <string>http://bitbucket.org/kokua/3p-freetype/downloads/freetype-2.4.4.201505162052-linux64-201505162052.tar.bz2</string>
+              <string>http://bitbucket.org/kokua/3p-freetype/downloads/freetype-2.10.4.202305250622-linux64-202305250622.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -1640,6 +1640,34 @@
         <key>version</key>
         <string>0.9.40</string>
       </map>
+      <key>gtk-atk-pango-glib</key>
+      <map>
+        <key>copyright</key>
+        <string>Copyright (various, see sources)</string>
+        <key>license</key>
+        <string>lgpl</string>
+        <key>license_file</key>
+        <string>LICENSES/gtk-atk-pango-glib.txt</string>
+        <key>name</key>
+        <string>gtk-atk-pango-glib</string>
+        <key>platforms</key>
+        <map>
+          <key>linux64</key>
+          <map>
+            <key>archive</key>
+            <map>
+              <key>hash</key>
+              <string>e0f2d27a3b86507f0a08aca99ec2672e</string>
+              <key>url</key>
+	      <string>http://bitbucket.org/kokua/3p-gtk-atk-pango-glib/downloads/gtk_atk_pango_glib-0.1-linux64-314220.tar.bz2</string>
+            </map>
+            <key>name</key>
+            <string>linux64</string>
+          </map>
+        </map>
+        <key>version</key>
+        <string>0.1</string>
+      </map>
       <key>havok-source</key>
       <map>
         <key>copyright</key>
@@ -1833,9 +1861,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>56f8925102d9e17498fbe7b0f0119b68</string>
+              <string>d9df3703ba462279c87de20839dc7a8f</string>
               <key>url</key>
-              <string>http://bitbucket.org/kokua/3p-jpeglib/downloads/jpeglib-8c.201505141845-linux64-201505141845.tar.bz2</string>
+              <string>http://bitbucket.org/kokua/3p-jpeglib/downloads/jpeglib-8c.231560616-linux64-231560616.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -1901,9 +1929,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>93be1f25037bf118be445bb3399522d7</string>
+              <string>f1ff52d6515f83b99fb1ae8218992b99</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-jsoncpp/downloads/jsoncpp-0.5.0.201506061927-linux64-201506061927.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-jsoncpp/downloads/jsoncpp-0.5.0.231570155-linux64-231570155.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -2493,9 +2521,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>a74e21beaf739563d323c55386c05296</string>
+              <string>711f4ec769e4b5f59ba25ee43c11bcbc</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-llqtwebkit2/downloads/llqtwebkit-4.7.1-linux64-201506082044.tar.bz2</string>
+              <string>http://automated-builds-secondlife-com.s3.amazonaws.com/ct2/4724/14846/llphysicsextensions_stub-1.0.504712-linux64-504712.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -2664,11 +2692,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>5609b79a14fec30fc950134f8627f86a</string>
+              <string>90d3556f0602d12bf7edd6a68afd7bfb</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-meshoptimizer/downloads/meshoptimizer-0.16.221500027-linux64-221500027.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-meshoptimizer/downloads/meshoptimizer-0.16.231510256-linux64-231510256.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -2728,6 +2756,18 @@
             </map>
             <key>name</key>
             <string>darwin64</string>
+          </map>
+          <key>linux64</key>
+          <map>
+            <key>archive</key>
+            <map>
+              <key>hash</key>
+              <string>2c3cec1dfb0758aec7f90a41a1473cc2</string>
+              <key>url</key>
+	      <string>http://bitbucket.org/kokua/3p-minizip-ng/downloads/minizip_ng-3.0.2.231560052-linux64-231560052.tar.bz2</string>
+            </map>
+            <key>name</key>
+            <string>linux64</string>
           </map>
           <key>windows</key>
           <map>
@@ -3011,9 +3051,9 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>a9a603958c5e9fb6511abe229da012c3</string>
+              <string>7a413db32c331f613cc08b42cad7d7e3</string>
               <key>url</key>
-              <string>http://bitbucket.org/kokua/3p-ogvorbis/downloads/ogg_vorbis-1.2.2-1.3.2.201505102205-linux64-201505102205.tar.bz2</string>
+              <string>http://bitbucket.org/kokua/3p-ogg_vorbis/downloads/ogg_vorbis-1.3.3-1.3.6.231560612-linux64-231560612.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -3185,9 +3225,9 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>109696609aeec4e31b10f982422426f7</string>
+              <string>c7413bf075958b7d22d9ce3b610a0c99</string>
               <key>url</key>
-              <string>http://bitbucket.org/kokua/3p-openjpeg/downloads/openjpeg-1.4.201505151441-linux64-201505151441.tar.bz2</string>
+              <string>http://bitbucket.org/kokua/3p-openjpeg/downloads/openjpeg-2.5.0.231541043-linux64-231541043.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -3933,9 +3973,9 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>b438780c670b00b53d01d3efe622ac82</string>
+              <string>35df17c3eb673030dea4bde9191aa506</string>
               <key>url</key>
-              <string>http://bitbucket.org/kokua/3p-xmlrpc-epi/downloads/xmlrpc_epi-0.54.1.201505141438-linux64-201505141438.tar.bz2</string>
+              <string>http://automated-builds-secondlife-com.s3.amazonaws.com/ct2/727/1489/xmlrpc_epi-0.54.1.500719-linux64-500719.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -4031,9 +4071,9 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>3a7334ad1e1aa55439a7e73720cae770</string>
+              <string>3c2bf9469dda100aa5bede905e5d49bc</string>
               <key>url</key>
-              <string>http://bitbucket.org/kokua/3p-zlib/downloads/zlib-1.2.8.201505161535-linux64-201505161535.tar.bz2</string>
+              <string>http://bitbucket.org/kokua/3p-zlib-ng/downloads/zlib_ng-2.0.5.231540321-linux64-231540321.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>

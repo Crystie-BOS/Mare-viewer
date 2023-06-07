@@ -124,8 +124,8 @@ if (LINUX)
   add_compile_definitions(
           _REENTRANT
           _FORTIFY_SOURCE=2
-          EXTERNAL_TOS
-          APPID=secondlife
+	  #EXTERNAL_TOS
+          APPID=kokua
           LL_IGNORE_SIGCHLD
   )
   add_compile_options(
