@@ -131,14 +131,14 @@ struct LLCalcParser : grammar<LLCalcParser>
 			
 			power =
 				unary_expr[power.value = arg1] >>
-				*('^' >> assert_syntax(unary_expr[power.value = phoenix::bind(&powf)(power.value, arg1)]))
+				*('^' >> assert_syntax(unary_expr[power.value = phoenix::bind<float, float, float>(&powf)(power.value, arg1)]))
 			;
 			
 			term =
 				power[term.value = arg1] >>
 				*(('*' >> assert_syntax(power[term.value *= arg1])) |
 				  ('/' >> assert_syntax(power[term.value /= arg1])) |
-				  ('%' >> assert_syntax(power[term.value = phoenix::bind(&fmodf)(term.value, arg1)]))
+				  ('%' >> assert_syntax(power[term.value = phoenix::bind<float, float, float>(&fmodf)(term.value, arg1)]))
 				)
 			;
 			

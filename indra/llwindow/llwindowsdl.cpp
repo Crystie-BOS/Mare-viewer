@@ -1038,6 +1038,27 @@ void LLWindowSDL::setMinSize(U32 min_width, U32 min_height, bool enforce_immedia
 #endif
 }
 
+void *LLWindowSDL::createSharedContext()
+{
+    // *FIX: What to do with SDL?
+    return nullptr;
+}
+
+void LLWindowSDL::makeContextCurrent(void* context)
+{
+    // *FIX: What to do with SDL?
+}
+
+void LLWindowSDL::destroySharedContext(void* context)
+{
+    // *FIX: What to do with SDL?
+}
+
+void LLWindowSDL::toggleVSync(bool enable_vsync)
+{
+    // *FIX: What to do with SDL?
+}
+
 BOOL LLWindowSDL::setCursorPosition(const LLCoordWindow position)
 {
 	BOOL result = TRUE;

@@ -1405,6 +1405,14 @@ static std::string add_save_texture_filter_to_gtkchooser(GtkWindow *picker)
 	return caption;
 }
 
+BOOL LLFilePicker::getMultipleOpenFilesModeless(ELoadFilter filter,
+                                                void (*callback)(bool, std::vector<std::string> &, void*),
+                                                void *userdata )
+{
+    LL_ERRS() << "NOT IMPLEMENTED" << LL_ENDL;
+    return FALSE;
+}
+
 BOOL LLFilePicker::getSaveFile( ESaveFilter filter, const std::string& filename, bool blocking)
 {
 	BOOL rtn = FALSE;
@@ -1536,6 +1544,15 @@ BOOL LLFilePicker::getSaveFile( ESaveFilter filter, const std::string& filename,
 	return rtn;
 }
 
+BOOL LLFilePicker::getSaveFileModeless(ESaveFilter filter,
+                                       const std::string& filename,
+                                       void (*callback)(bool, std::string&, void*),
+                                       void *userdata)
+{
+    LL_ERRS() << "NOT IMPLEMENTED" << LL_ENDL;
+    return FALSE;
+}
+
 BOOL LLFilePicker::getOpenFile( ELoadFilter filter, bool blocking )
 {
 	BOOL rtn = FALSE;
@@ -1601,6 +1618,14 @@ BOOL LLFilePicker::getOpenFile( ELoadFilter filter, bool blocking )
 	gViewerWindow->getWindow()->afterDialog();
 
 	return rtn;
+}
+
+BOOL LLFilePicker::getOpenFileModeless(ELoadFilter filter,
+                                       void (*callback)(bool, std::vector<std::string> &, void*),
+                                       void *userdata)
+{
+    LL_ERRS() << "NOT IMPLEMENTED" << LL_ENDL;
+    return FALSE;
 }
 
 BOOL LLFilePicker::getMultipleOpenFiles( ELoadFilter filter, bool blocking )
