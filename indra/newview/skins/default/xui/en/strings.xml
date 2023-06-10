@@ -4348,7 +4348,8 @@ name="Command_360_Capture_Label">360 snapshot</string>
   
 <!--Draw distance set from command line dd x response chat-->
   <string name="FSCmdLineDrawDistanceSet">Draw Distance set to [DISTANCE]m.</string>  
-  
+  <string name="FSCmdLineTpOffered">Offered teleport to [NAME].</string>
+
   <!-- Experience Tools strings -->
   <string name="experience_tools_experience">Experience</string>
   <string name="ExperienceNameNull">(no experience)</string>

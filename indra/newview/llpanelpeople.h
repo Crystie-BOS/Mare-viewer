@@ -65,13 +65,7 @@ public:
 	// when voice is available
 	/*virtual*/ void onChange(EStatusType status, const std::string &channelURI, bool proximal);
 
-// [RLVa:KB] - Checked: 2010-04-05 (RLVa-1.2.0d) | Added: RLVa-1.2.0d
-	// Externalized to FSRadar
-	//LLAvatarList* getNearbyList() { return mNearbyList; }
-// [/RLVa:KB]
-
-	// <FS:Ansariel> Firestorm radar
-	void updateNearby(const std::vector<LLSD>& entries, const LLSD& stats);
+	LLAvatarList* getNearbyList() { return mNearbyList; }
 
 	// internals
 	class Updater;
