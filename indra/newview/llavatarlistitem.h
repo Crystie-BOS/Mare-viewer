@@ -128,6 +128,7 @@ public:
 	
 	const LLUUID& getAvatarId() const;
 	std::string getAvatarName() const;
+	std::string getUserName() const { return mUserName; }
 	std::string getAvatarToolTip() const;
 
 	void onInfoBtnClick();
@@ -269,6 +270,7 @@ private:
 	//Speaker indicator and avatar name coords are translated accordingly
 	bool mShowInfoBtn;
 	bool mShowProfileBtn;
+	std::string mUserName; //KC - username cache used for sorting
 
 	/// indicates whether to show icons representing permissions granted
 	bool mShowPermissions;
