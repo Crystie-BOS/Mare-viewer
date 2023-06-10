@@ -278,6 +278,7 @@ void LLAvatarListItem::setOnline(bool online)
 
 void LLAvatarListItem::setAvatarName(const std::string& name)
 {
+	mUserName = name;
 	setNameInternal(name, mHighlihtSubstring);
 }
 
