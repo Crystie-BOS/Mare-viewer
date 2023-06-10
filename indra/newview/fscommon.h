@@ -38,12 +38,13 @@ const F32 AVATAR_UNKNOWN_RANGE = -1.f;
 std::string format_string(std::string text, const LLStringUtil::format_map_t& args);
 
 void report_to_nearby_chat(const std::string& message);
-std::string applyAutoCloseOoc(const std::string& message);
-std::string applyMuPose(const std::string& message);
 LLPanelPeople* getPeoplePanel();
 
 namespace FSCommon
 {
+	std::string applyAutoCloseOoc(std::string message);
+	std::string applyMuPose(std::string message);
+
 	/**
 	* Convert a string of a specified date format into seconds since the Epoch.
 	*

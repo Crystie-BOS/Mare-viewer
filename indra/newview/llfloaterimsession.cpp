@@ -65,6 +65,7 @@
 #include "llnotificationmanager.h"
 #include "llautoreplace.h"
 #include "llcorehttputil.h"
+#include "fscommon.h"
 #include "kokuarlvextras.h"
 
 const F32 ME_TYPING_TIMEOUT = 4.0f;
@@ -264,59 +265,9 @@ void LLFloaterIMSession::sendMsgFromInputEditor()
 				// Truncate and convert to UTF8 for transport
 				std::string utf8_text = wstring_to_utf8str(text);
 
-//-TT Patch MU_OOC from Satomi Ahn
-//		if (gSavedSettings.getBOOL("AutoCloseOOC"))
-		{
-			// Try to find any unclosed OOC chat (i.e. an opening
-			// double parenthesis without a matching closing double
-			// parenthesis.
-			if (utf8_text.find("(( ") != -1 && utf8_text.find("))") == -1)
-			{
-				// add the missing closing double parenthesis.
-				utf8_text += " ))";
-			}
-			else if (utf8_text.find("((") != -1 && utf8_text.find("))") == -1)
-			{
-				if (utf8_text.at(utf8_text.length() - 1) == ')')
-				{
-					// cosmetic: add a space first to avoid a closing triple parenthesis
-					utf8_text += " ";
-				}
-				// add the missing closing double parenthesis.
-				utf8_text += "))";
-			}
-			else if (utf8_text.find("[[ ") != -1 && utf8_text.find("]]") == -1)
-			{
-				// add the missing closing double parenthesis.
-				utf8_text += " ]]";
-			}
-			else if (utf8_text.find("[[") != -1 && utf8_text.find("]]") == -1)
-			{
-				if (utf8_text.at(utf8_text.length() - 1) == ']')
-				{
-					// cosmetic: add a space first to avoid a closing triple parenthesis
-					utf8_text += " ";
-				}
-					// add the missing closing double parenthesis.
-				utf8_text += "]]";
-			}
-		}
-		// Convert MU*s style poses into IRC emotes here.
-		if (gSavedSettings.getBOOL("AllowMUpose"))
-		{
-			if (utf8_text.find(":") == 0 && utf8_text.length() > 3)
-			{
-				if (utf8_text.find(":'") == 0)
-				{
-					utf8_text.replace(0, 1, "/me");
-				}
-				else if (isalpha(utf8_text.at(1)))	// Do not prevent smileys and such.
-				{
-					utf8_text.replace(0, 1, "/me ");
-				}
-			}
-		}
-//-TT /Patch MU_OOC from Satomi Ahn
+                // Convert OOC and MU* style poses
+                utf8_text = FSCommon::applyAutoCloseOoc(utf8_text);
+                utf8_text = FSCommon::applyMuPose(utf8_text);
 
 				sendMsg(utf8_text);
 
