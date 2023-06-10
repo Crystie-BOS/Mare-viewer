@@ -1496,6 +1496,17 @@
       <key>Value</key>
       <string>default</string>
     </map>
+  <key>AllowMUpose</key>
+    <map>
+      <key>Comment</key>
+      <string>Allow MU* pose style in chat and IM (with ':' as a synonymous to '/me ')</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
     <!-- ## Zi: Pie menu -->
     <key>OverridePieColors</key>
     <map>
@@ -1529,6 +1540,17 @@
             <string>F32</string>
             <key>Value</key>
             <real>0.85</real>
+    </map>
+  <key>AutoCloseOOC</key>
+    <map>
+      <key>Comment</key>
+      <string>Auto-close OOC chat (i.e. add &quot;))&quot; if not found and &quot;((&quot; was used)</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
   </map>
   <key>RenderVolumeSAProtection</key>
     <map>
