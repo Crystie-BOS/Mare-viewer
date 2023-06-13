@@ -70,7 +70,13 @@ Preparations to build:
 
 --------------
 
+Git may need updating for SmartGit to work completely (in particular, a problem was observed around trying to revert a commit). The follow sets things up for tracking with current git releases.
+
+sudo apt-add-repository ppa:git-core/ppa
+
 sudo apt update
+
+sudo apt install git (or upgrade instead of install if already present)
 
 sudo apt upgrade
 
@@ -99,14 +105,17 @@ Make a directory name Envs and make it active and make a directory named autobui
         python3.7 -m venv /home/<user>/Envs/autobuild
 
 This will place all the python bits into autobuild.
+And then you can switch to it (this can be added to the .bashrc).
+
+        source <venv location>/bin/activate
 
 Below will install the most recent version of autobuild. Public version V3 will be installed:_
 
-        sudo pip install git+http://bitbucket.org/lindenlab/autobuild.git@v3
+        sudo pip install git+https://github.com/secondlife/autobuild.git@v3
 
 Current development version may be installed with:
 
-       sudo pip install git+https://bitbucket.org/lindenlab/autobuild#egg=autobuild
+        sudo pip install git+https://github.com/secondlife/autobuild#egg=autobuild
 
 Install optional tools
 
