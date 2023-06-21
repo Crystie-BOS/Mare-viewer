@@ -895,8 +895,8 @@
           <map>
             <key>archive</key>
             <map>
-              <key>f6ad1adddbd7feb6fe8954aff95fae8d</key>
-              <string></string>
+              <key>hash</key>
+              <string>f6ad1adddbd7feb6fe8954aff95fae8d</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
