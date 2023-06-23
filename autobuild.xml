@@ -938,18 +938,18 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>a262f7c0e84aacb297541c155a64e4fa</string>
+              <string>143ec21facbedde786bba5ee646b5c99</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokuaprivate/3p-fmodstudio/downloads/fmodstudio-2.02.07-windows64-221832308.tar.bz2</string>
+              <string>https://bitbucket.org/kokuaprivate/3p-fmodstudio/downloads/fmodstudio-2.02.15-windows64-231741822.tar.bz2</string>
             </map>
             <key>name</key>
             <string>windows64</string>
           </map>
         </map>
         <key>version</key>
-        <string>2.02.07</string>
+        <string>2.02.15</string>
       </map>
       <key>fontconfig</key>
       <map>
