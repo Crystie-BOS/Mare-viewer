@@ -1,7 +1,8 @@
-﻿Updated 17 April 2021
+﻿Updated 1 June 2023
 
 ================
-Please note: We do not provide support for self-building outside of the active Kokua team. This is due in part to the use of licenced components which we cannot share in buildable form and also the limited resources of the current team. Before trying to build Kokua make sure that you can successfully build the standard LL Viewer. At this writing several repositories no longerp rovide Python2 updates. To update to the last supplied version 2.7.18 folllow the procdure at:
+
+Please note: We do not provide support for self-building outside of the active Kokua team. This is due, in part, to the use of licenced components which we cannot share in buildable form and also the limited resources of the current team. Before trying to build Kokua, make sure that you can successfully build the standard LL Viewer. At this writing, several repositories no longer provide Python2 updates. To update to the last supplied version 2.7.18, follow the procedure at:
 
 https://tecadmin.net/install-python-2-7-on-ubuntu-and-linuxmint/
 
@@ -15,26 +16,25 @@ Our issue tracker is at https://kokua.atlassian.net/secure/Dashboard.jspa
 
 Contributions by frequent contributors or Kokua Team members requires a formalized work flow as outlined below.
 
-Kokua repositories use git branches. We do not specify a master branch because the Kokua repo maintains three different releases so there is no single "master". Kokua-MKRLV is the closest we have to a master branch and if you clone kokua-release repository it will default to Kokua-MKRLV as that is the most popular Kokua variant (and also usually the most recently committed to since it gets updated in the last stage of the work flow below).
+Kokua repositories use git branches. We do not specify a master branch because the Kokua repo maintains three different releases so there is no single "master". Kokua-MKRLV is the closest we have to a master branch, and if you clone kokua repository, it will default to Kokua-MKRLV as that is the most popular Kokua variant (and also usually the most recently committed to since it gets updated in the last stage of the work flow below).
 
 Work Flow:
 
-On bitbucket fork kokua-release to your Bitbucket account. The repository name will default to kokua-release but can be named as desired.
+On Bitbucket, fork kokua to your Bitbucket account. The repository name will default to kokua but can be named as desired.
 
-Now is when you should clone your fork to your local file system. 
+Now is when you should clone your fork to your local file system.
 
 We use SmartGit for graphical display of our repositories. Open the repository and notice branches named Kokua-MKRLV and Kokua-NORLV; these represent our most used branches.
 
-Our workflow starts with lindenlab/viewer master branch which is assigned branch LL-VIEWER-RELEASE-TIP within kokua-release repository. At this point we should be able
+Our workflow starts with lindenlab/viewer master branch which is assigned branch LL-VIEWER-RELEASE-TIP within kokua repository. At this point we should be able
 
 Next, LL-VIEWER-RELEASE-TIP is merged into Kokua-NORLV. This binds the latest SL default viewer to Kokua-NORLV which becomes a kokua deliverable. The merge is usually taken from one commit behind the LL tip to avoid including the version number increment which LL perform after promoting a release.
 
-Then, Kokua-NORLV is merged into Kokua-MKRLV. Two deliverables, Kokua-MKRLV and Kokua-FTRLV may result from building the Kokua-MKRLV branch. 
+Then, Kokua-NORLV is merged into Kokua-MKRLV. Two deliverables, Kokua-MKRLV and Kokua-FTRLV may result from building the Kokua-MKRLV branch.
 
-When contributing a change it should be implemented first on Kokua-NORLV and then merged to Kokua-MRKLV. There are two exceptions to this. The first is when the change is only for the with-RLV versions of Kokua - make the change on the Kokua-MKRLV branch. The other is when it's likely the commit will be modified after being accepted - in this case it's simpler to only commit on NORLV and leave us to do the merge to MKRLV once the NORLV code is approved. 
+When contributing a change, it should be implemented first on Kokua-NORLV and then merged to Kokua-MRKLV. There are two exceptions to this. The first is when the change is only for the with-RLV versions of Kokua - make the change on the Kokua-MKRLV branch. The other is when it's likely the commit will be modified after being accepted - in this case it's simpler to only commit on NORLV and leave us to do the merge to MKRLV once the NORLV code is approved.
 
-
-When LindenLab updated to autobuild 1.1 most custom build variables were moved to a repository. The kokua custom repository should be cloned as follows:
+When LindenLab updated autobuild, most custom build variables were moved to a repository. The kokua custom repository should be cloned as follows:
 
 git clone https://bitbucket.org/kokua/viewer-build-variables.git
 
@@ -42,78 +42,99 @@ The variables file in this repository contains custom build variables for window
 
 An environment variable must be set in order for autobuild to see custom build variables throughout configure and build phases.
 
-Follow each operating systems procedure for persistent setting of environment variables. 
+Follow each operating system's procedure for persistent setting of environment variables.
 
 For linux it is:
 
 export AUTOBUILD_VARIABLES_FILE=/home/<user>/viewer-build-variables/variables
 
-If not already done, use git clone to place your forked kokua repository on your local file system. Example: 
+If not already done, use git clone to place your forked kokua repository on your local file system.
 
 Example:
 
-git clone https://bitbucket.org/kokua/kokua-release.git
-
-
+git clone https://bitbucket.org/kokua/kokua.git
 
 Linux 64 Bit
 
 ------------
 
-
-
 Development system:
 
 -------------
 
+Development system: Ubuntu 18.04.6
 
-
-Development system: Ubuntu 16.04.1 
-
-4.15.0-34-generic #37~16.04.1-Ubuntu SMP Tue Aug 28 10:44:06 UTC 2018 x86_64 x86_64 x86_64 GNU/Linux
-
+Linux ubuntu 5.4.0-150-generic #167~18.04.1-Ubuntu SMP Wed May 24 00:51:42 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
 
 Preparations to build:
 
 --------------
 
-sudo apt-get update
+Git may need updating for SmartGit to work completely (in particular, a problem was observed around trying to revert a commit). The follow sets things up for tracking with current git releases.
 
-sudo apt-get upgrade
+sudo apt-add-repository ppa:git-core/ppa
 
-sudo apt-get install --install-recommends bison bzip2 cmake curl flex g++-5.4,m4 mercurial python2.7 python2.7-dev python-pip
+sudo apt update
 
-sudo apt-get install --install-recommends pulseaudio
+sudo apt install git (or upgrade instead of install if already present)
 
-sudo apt-get install --install-recommends libgl1-mesa-dev libglu1-mesa-dev libstdc++6 libxinerama-dev libxml2-dev libxrender-dev libpulse-dev libalut-dev 
+sudo apt upgrade
+
+Download script cmake-3.26.4-linux-x86_64.sh from cmake, run as normal user, and follow prompts to install cmake.
+
+sudo apt install --install-recommends bison bzip2 ninja-build curl flex
+
+sudo apt install --install-recommends pulseaudio
+
+sudo apt install --install-recommends libgl1-mesa-dev libglu1-mesa-dev libstdc++6 libxinerama-dev libxml2-dev libxrender-dev libpulse-dev libalut-dev
 
 Verify
+
 gcc --version
-gcc (Ubuntu 5.4.0-6ubuntu1~16.04.10) 5.4.0 20160609
+
+gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0
 
 Install autobuild into python
-@
--   If building lindenlab viewer64 code base use autobuild-1.1.7 */confirmed to work with linux but, versions are up to 1.1.9 at this writing/*
 
--       sudo pip install git+http://bitbucket.org/lindenlab/autobuild.git@v1.1.7
+Use of python virtual environment provides a level of system isolation for installing autobuild.
+Using Python 3 set up a virtual environment named autobuild.
+Make a directory name Envs and make it active and make a directory named autobuild and make it active.
+
+        sudo apt install python3.7-venv
+
+        python3.7 -m venv /home/<user>/Envs/autobuild
+
+This will place all the python bits into autobuild.
+And then you can switch to it (this can be added to the .bashrc).
+
+        source <venv location>/bin/activate
+
+Below will install the most recent version of autobuild. Public version V3 will be installed:_
+
+        sudo pip install git+https://github.com/secondlife/autobuild.git@v3
+
+Current development version may be installed with:
+
+        sudo pip install git+https://github.com/secondlife/autobuild#egg=autobuild
 
 Install optional tools
 
-sudo apt-get install --install-recommends git kdiff3 mc
-
-Optionally install gcc-version 4.6 which is needed to build library archives,
-
-sudo apt-get install --install-recommends gcc-4.6 g++-4.6 cpp-4.6
+sudo apt install --install-recommends git kdiff3 mc
 
 If using ssh
 
 mkdir ~/.ssh
 
-copy you keys to this directory
+And copy your keys to this directory
 
 cd ~/.ssh
 
 sudo chmod 600 id_rsa
+
+id_rsa is an older key which is no longer on some servers. Consider updating to id_ecdsa or id_ed25519. Bitbucket and SourceForge
+have instructions for replacing with the newer keys.
+
+
 
 cd ~/
 
@@ -125,48 +146,51 @@ Voice 32 bit libraries are not needed to build the viewer but, are needed to tes
 
 sudo dpkg --add-architecture i386
 
-sudo apt-get update
+sudo apt update
 
-sudo apt-get install --install-recommends libasound2:i386 libasound2-plugins:i386 libasyncns0:i386 libattr1:i386 libc6:i386 libc6-i686:i386 libcap2:i386 libdbus-1-3:i386 libflac8:i386 libgcc1:i386 libice6:i386 libidn11:i386 libjson0:i386 libogg0:i386 libpulse0:i386 libsm6:i386 libsndfile1:i386 libstdc++6:i386 libvorbis0a:i386 libvorbisenc2:i386 libwrap0:i386 libuuid1:i386 libx11-6:i386 libx11-xcb1:i386 libxau6:i386 libxcb1:i386 libxdmcp6:i386 libxext6:i386 libxi6:i386 libxtst6:i386 zlib1g:i386 
-Open your vm and follow instructions for 64 bit from above. 
+sudo apt install --install-recommends libasound2:i386 libasound2-plugins:i386 libasyncns0:i386 libattr1:i386 libc6:i386 libc6-i686:i386 libcap2:i386 libdbus-1-3:i386 libflac8:i386 libgcc1:i386 libice6:i386 libidn11:i386 libogg0:i386 libpulse0:i386 libsm6:i386 libsndfile1:i386 libstdc++6:i386 libvorbis0a:i386 libvorbisenc2:i386 libwrap0:i386 libuuid1:i386 libx11-6:i386 libx11-xcb1:i386 libxau6:i386 libxcb1:i386 libxdmcp6:i386 libxext6:i386 libxi6:i386 libxtst6:i386 zlib1g:i386
 
-Below is a sample ~/.hgrc (mercurial.ini) file. This uses tortoisehg or command line mercurial, kdiff3 as a merge tool and gedit as a visual editor.
-The visual editor may be changed based on personal perference.
+Removed libjson0:i386. It was not found. Need to research a replacement.
+
+Open your vm and follow instructions for 64 bit from above.
+
+Kdiff3 as a merge tool and gedit as a visual editor.
+
+The visual editor may be changed based on personal preference.
 
 As an option add this to you bash history file ~/.bashrc
 
 export AUTOBUILD_PLATFORM_OVERRIDE='linux64'
 
+  git clone https://bitbucket.org/kokua/kokua
 
--  git clone https://bitbucket.org/kokua/kokua-release
+  Kokua-NORLV can be built with opensource or proprietary audio engine. The opensource solution uses openal for sounds. Use of the proprietary FMOD Studio library for sounds and streaming audio is supported but, the FMOD Studio library must be provided separately.
 
-  Kokua-NORLV can be built with opensource or properity audio engine. The opensource solution uses openal for sounds. Use of the propriety FMOD Studio library for sounds and streaming audio is supported but, the FMOD Studio library must be provided separately.
-
--  Configure for an openal build:
+- Configure for an openal build:
 
 Following assumes a clean build tree.
 
-cd Kokua-release
+cd kokua
 
 Update the source tree to Kokua-NORLV. This is a build without RLV or if you want RLV it would be git checkout Kokua-MKRLV
 
 git checkout Kokua-NORLV
 
-autobuild configure -A 64 -c ReleaseOS -- -DLL_TESTS:BOOL=OFF -DUSE_KDU:BOOL=OFF -DHAVOK_TPV:BOOL=OFF -DFMODSSTUDIO:BOOL=OFF -DOPENAL:BOOL=ON -DPACKAGE:BOOL=ON 2>&1 |tee configure.log
+autobuild configure -A 64 -c ReleaseOS -- -DLL_TESTS:BOOL=OFF -DUSE_KDU:BOOL=OFF -DHAVOK_TPV:BOOL=OFF -DUSE_FMODSTUDIO:BOOL=OFF -DUSE_OPENAL:BOOL=ON -DPACKAGE:BOOL=ON -DOpenGL_GL_PREFERENCE=LEGACY 2>&1 |tee configure.log
 
 Note: Kokua is built with various libraries which have restrictions on their distribution in source form. For this reason we do not recommend self-builds of Kokua unless it's specifically for contributing code.
 
 - Build the viewer
 
--autobuild build -A 64 -c ReleaseOS 2>&1 |tee build.log
+autobuild build -A 64 -c ReleaseOS 2>&1 |tee build.log
 
 - Configuration and building typically takes 30-45 minutes for NORLV or MKRLV depending on the hardware. FTRLV and MKRLV use substantially the same code so building one after the other is much quicker with only changed files needing compilation.
 
 - Test the build
 
-cd build-linux-x86_64/newview/packaged
+cd build-linux-x86_64-kokua-norlv/newview/packaged
 
-Install the viewer with
+- Install the viewer with
 
 sudo ./install.sh follow the defaults
 
