@@ -1993,6 +1993,7 @@ endif (WINDOWS)
 # modern version.
 
 target_link_libraries(${VIEWER_BINARY_NAME}
+        ${PNG_PRELOAD_ARCHIVES}
         llaudio
         llcharacter
         llimage
