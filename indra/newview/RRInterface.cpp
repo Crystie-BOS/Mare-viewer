@@ -159,6 +159,7 @@ BOOL RRHelper::preventFloater(std::string floaterName)
 	else if (floaterName == "floater_my_inventory" && gAgent.mRRInterface.mContainsShowinv) return TRUE;
 	else if (floaterName == "floater_fs_wearable_favorites" && gAgent.mRRInterface.mContainsShowinv) return TRUE; // KKA-991
 	else if (floaterName == "rlv_console" && gAgent.mRRInterface.mContainsViewScript) return TRUE;
+    else if (floaterName == "360capture" && gAgent.mRRInterface.mHasLockedHuds) return TRUE; // KKA-1027
 
 	else if (gAgent.mRRInterface.mContainsSetenv)
 	{
@@ -425,6 +426,8 @@ void refreshCachedVariable (std::string var)
 		if (gAgent.mRRInterface.mHasLockedHuds) {
 			// To force the viewer to render the HUDs again, just in case
 			LLPipeline::sShowHUDAttachments = TRUE;
+			// KKA-1027 Close the 360 snapshot floater if open
+			LLFloaterReg::hideInstance("360capture", LLSD());
 		}
 	}
 	else if (var == "showinv")				gAgent.mRRInterface.mContainsShowinv = contained;

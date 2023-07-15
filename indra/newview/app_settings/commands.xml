@@ -437,6 +437,8 @@
          execute_parameters="360capture"
          is_running_function="Floater.IsOpen"
          is_running_parameters="360capture"
+         is_enabled_function="Agent.IsActionAllowed"
+         is_enabled_parameters="lockedhuds"
            />
   <command name="performance"
          available_in_toybox="true"

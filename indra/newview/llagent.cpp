@@ -413,19 +413,28 @@ bool LLAgent::isActionAllowed(const LLSD& sdname)
 //CA Area Search doesn't appear in Marine's viewer (or Kitty's) and this has no restrictions defined. Apply showloc.
 	else if (param == "areasearch")
 	{
-		retval = TRUE;
+		retval = true;
 		if (gRRenabled && gAgent.mRRInterface.mContainsShowloc)
 		{
-			retval = FALSE;
+			retval = false;
 		}
 	}
 	//KKA-765 add the enable/disable code
 	else if (param == "setenv")
 	{
-		retval = TRUE;
+		retval = true;
 		if (gRRenabled && gAgent.mRRInterface.mContainsSetenv)
 		{
-			retval = FALSE;
+			retval = false;
+		}
+	}
+	//KKA-1027 add locked huds (for the 360 snapshot floater)
+	else if (param == "lockedhuds")
+	{
+		retval = true;
+		if (gRRenabled && gAgent.mRRInterface.mHasLockedHuds)
+		{
+			retval = false;
 		}
 	}
 //ca
