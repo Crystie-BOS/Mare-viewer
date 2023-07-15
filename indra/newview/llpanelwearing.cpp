@@ -572,7 +572,7 @@ void LLPanelWearing::onRemoveAttachment()
 	{
 		LLSelectMgr::getInstance()->deselectAll();
 		LLSelectMgr::getInstance()->selectObjectAndFamily(mAttachmentsMap[item->getUUID()]);
-		LLSelectMgr::getInstance()->sendDropAttachment();
+		LLSelectMgr::getInstance()->sendDetach();
 	}
 }
 
