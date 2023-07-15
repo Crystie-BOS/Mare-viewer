@@ -24,6 +24,17 @@
       <key>Value</key>
       <integer>0</integer>
     </map>
+    <key>KokuaAlways360InterestList</key>
+    <map>
+      <key>Comment</key>
+      <string>Tell the similulator to always send a full interest list. Using this will help with interest list object absent bugs but have a cost in bandwidth and performance</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
     <key>KokuaNearbyPeopleLimit</key>
     <map>
       <key>Comment</key>
