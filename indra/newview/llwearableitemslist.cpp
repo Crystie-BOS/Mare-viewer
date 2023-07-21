@@ -105,10 +105,7 @@ LLPanelWearableOutfitItem::Params::Params()
 BOOL LLPanelWearableOutfitItem::postBuild()
 {
     LLPanelWearableListItem::postBuild();
-
-//  KKA-1009 - do enable widgets for bodyparts and do special handling later on    
-//    LLViewerInventoryItem* inv_item = getItem();
-//    mShowWidgets &= (inv_item->getType() != LLAssetType::AT_BODYPART);
+    
     if(mShowWidgets)
     {
         addWidgetToRightSide("add_wearable");
@@ -210,14 +207,13 @@ void LLPanelWearableOutfitItem::updateItem(const std::string& name,
 	}
     if(mShowWidgets)
     {
-        // KKA-1009
-        // if it's a body part we can wear it (replacing the existing one) if not worn
-        // however we cannot detach it
-        LLViewerInventoryItem* inv_item = getItem();
-        bool notBodyPart = (inv_item->getType() != LLAssetType::AT_BODYPART);
-
         setShowWidget("add_wearable", !is_worn);
-        setShowWidget("remove_wearable", is_worn && notBodyPart);
+
+        // Body parts can't be removed, only replaced
+        LLViewerInventoryItem* inv_item = getItem();
+        bool show_remove = is_worn && inv_item && (inv_item->getType() != LLAssetType::AT_BODYPART);
+        setShowWidget("remove_wearable", show_remove);
+
         if(mHovered)
         {
             setWidgetsVisible(true);
