@@ -13,6 +13,17 @@
       <key>Value</key>
       <integer>0</integer>
     </map>
+    <key>KokuaPersistInterestListMode</key>
+    <map>
+      <key>Comment</key>
+      <string>This setting persists the 360 Interest List option. Values 'default' or '360'</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>String</string>
+      <key>Value</key>
+      <string>default</string>
+    </map>
     <key>KokuaAlwaysHideBalance</key>
     <map>
       <key>Comment</key>

@@ -511,6 +511,17 @@ void LLAgent::init()
 
 	mHttpPolicy = app_core_http.getPolicy(LLAppCoreHttp::AP_AGENT);
 
+    std::string checkInterestSetting = gSavedSettings.getString("KokuaPersistInterestListMode");
+    if (checkInterestSetting == LLViewerRegion::IL_MODE_DEFAULT || checkInterestSetting == LLViewerRegion::IL_MODE_360)
+    {
+        LL_INFOS() << "Setting initial interest list mode to " << checkInterestSetting << LL_ENDL;
+        mInterestListMode = checkInterestSetting;
+    }
+    else
+    {
+        gSavedSettings.setString("KokuaPersistInterestListMode",mInterestListMode); // we got a value we don't understand so overwrite it
+    }
+
 	mInitialized = TRUE;
 }
 
@@ -3015,6 +3026,7 @@ void LLAgent::changeInterestListMode(const std::string &new_mode)
     if (new_mode != mInterestListMode)
     {
         mInterestListMode = new_mode;
+        gSavedSettings.setString("KokuaPersistInterestListMode",new_mode);
 
         // Change interest list mode for all regions.  If they are already set for the current mode,
         // the setting will have no effect.
