@@ -577,46 +577,6 @@ bool handleKokuaAlwaysHideBalance(const LLSD& newvalue) // KKA-980
 	return true;
 }
 
-bool handleKokuaAlways360InterestList(const LLSD& newvalue)
-{
-    LL_INFOS() << "In Always360" << LL_ENDL;
-    // the 360 Photo Floater makes use of a server capability that tells the server to send the whole
-    // Interest list for the duration. This setting makes that more widely available as a workround
-    // to server bugs where the interest list gets it wrong
-    LLSD body;
-
-    if (newvalue.asBoolean())
-    {
-        body["mode"] = LLSD::String("360");
-    }
-    else
-    {
-        body["mode"] = LLSD::String("default");
-    }
-
-    if (gAgent.requestPostCapability("InterestList", body, [](const LLSD & response)
-    {
-        LL_INFOS() <<
-                               "InterestList capability responded: \n" <<
-                               ll_pretty_print_sd(response) <<
-                               LL_ENDL;
-    }))
-    {
-        LL_INFOS() <<
-                               "Successfully posted an InterestList capability request with payload: \n" <<
-                               ll_pretty_print_sd(body) <<
-                               LL_ENDL;
-    }
-    else
-    {
-        LL_INFOS() <<
-                               "Unable to post an InterestList capability request with payload: \n" <<
-                               ll_pretty_print_sd(body) <<
-                               LL_ENDL;
-    }
-	return true;
-}
-
 bool handleHighResSnapshotChanged(const LLSD& newvalue)
 {
 	// High Res Snapshot active, must uncheck RenderUIInSnapshot
@@ -1058,7 +1018,6 @@ void settings_setup_listeners()
     setting_setup_signal_listener(gSavedSettings, "DebugAvatarJoints", handleDebugAvatarJointsChanged);
     setting_setup_signal_listener(gSavedSettings, "RenderAutoMuteByteLimit", handleRenderAutoMuteByteLimitChanged);
 	setting_setup_signal_listener(gSavedSettings, "KokuaAlwaysHideBalance", handleKokuaAlwaysHideBalance); // KKA-980
-	setting_setup_signal_listener(gSavedSettings, "KokuaAlways360InterestList", handleKokuaAlways360InterestList);
 
     setting_setup_signal_listener(gSavedSettings, "TargetFPS", handleTargetFPSChanged);
     setting_setup_signal_listener(gSavedSettings, "AutoTuneFPS", handleAutoTuneFPSChanged);

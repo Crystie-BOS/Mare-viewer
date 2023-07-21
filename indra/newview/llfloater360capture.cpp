@@ -184,9 +184,6 @@ void LLFloater360Capture::onChooseQualityRadioGroup()
 // not (the default mode)
 void LLFloater360Capture::changeInterestListMode(bool send_everything)
 {
-    // if the Kokua option to use this full time is turned on, don't turn it on or off here
-    if (gSavedSettings.getBOOL("KokuaAlways360InterestList")) return;
-
     LLSD body;
 
     if (send_everything)

@@ -3337,35 +3337,6 @@ void process_agent_movement_complete(LLMessageSystem* msg, void**)
 	}
 	// </FS:Ansariel>
 
-    LL_INFOS() << "Checking if we need to ask for 360 Interest List" << LL_ENDL;
-    if (gSavedSettings.getBOOL("KokuaAlways360InterestList"))
-    {
-        LL_INFOS() << "Turning on 360 Interest List" << LL_ENDL;
-        LLSD body;
-        body["mode"] = LLSD::String("360");
-
-        if (gAgent.requestPostCapability("InterestList", body, [](const LLSD & response)
-        {
-            LL_INFOS() <<
-                                   "InterestList capability responded: \n" <<
-                                   ll_pretty_print_sd(response) <<
-                                   LL_ENDL;
-        }))
-        {
-            LL_INFOS() <<
-                                   "Successfully posted an InterestList capability request with payload: \n" <<
-                                   ll_pretty_print_sd(body) <<
-                                   LL_ENDL;
-        }
-        else
-        {
-            LL_INFOS() <<
-                                   "Unable to post an InterestList capability request with payload: \n" <<
-                                   ll_pretty_print_sd(body) <<
-                                   LL_ENDL;
-        }
-    }
-
 	LL_INFOS("Teleport","Messaging") << "Changing home region to region id " << regionp->getRegionID() << " handle " << region_handle << " == x,y " << x << "," << y << LL_ENDL;
 
 	// set our upstream host the new simulator and shuffle things as
