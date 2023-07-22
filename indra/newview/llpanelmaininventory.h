@@ -108,7 +108,6 @@ protected:
 	//
 	// Misc functions
 	//
-	static void launchNewWindow(bool lite); // KKA-827
 	void setFilterTextFromFilter();
 	void startSearch();
 	
@@ -159,7 +158,6 @@ private:
 	std::string					mCategoryCountString;
 	LLComboBox*					mSearchTypeCombo;
 	LLFrameTimer				mUpdateWornTimer;
-	bool						mIsLite;
 
 
 
