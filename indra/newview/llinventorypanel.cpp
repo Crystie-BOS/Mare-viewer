@@ -384,6 +384,24 @@ void LLInventoryPanel::initializeViewBuilding()
             gIdleCallbacks.addFunction(onIdle, (void*)this);
         }
     }
+	// <FS:Ansariel> Optional hiding of Received Items folder aka Inbox
+	if (getName() != "Worn Items" && getName() != "inventory_inbox")
+	{
+		if (!gSavedSettings.getBOOL("FSShowInboxFolder"))
+		{
+			getFilter().setFilterCategoryTypes(getFilter().getFilterCategoryTypes() & ~(1ULL << LLFolderType::FT_INBOX));
+		}
+		gSavedSettings.getControl("FSShowInboxFolder")->getSignal()->connect(boost::bind(&LLInventoryPanel::updateShowInboxFolder, this, _2));
+	}
+	// </FS:Ansariel> Optional hiding of Received Items folder aka Inbox
+
+	// set the filter for the empty folder if the debug setting is on
+	if (gSavedSettings.getBOOL("DebugHideEmptySystemFolders"))
+	{
+		getFilter().setFilterEmptySystemFolders();
+	}
+	// <FS:Ansariel> Optional hiding of empty system folders
+	gSavedSettings.getControl("DebugHideEmptySystemFolders")->getSignal()->connect(boost::bind(&LLInventoryPanel::updateHideEmptySystemFolders, this, _2));
 }
 
 /*virtual*/
@@ -998,8 +1016,8 @@ LLFolderViewFolder * LLInventoryPanel::createFolderViewFolder(LLInvFVBridge * br
 	params.tool_tip = params.name;
     params.allow_drop = allow_drop;
 
-	params.font_color = (bridge->isLibraryItem() ? sLibraryColor : sDefaultColor);
-	params.font_highlight_color = (bridge->isLibraryItem() ? sLibraryColor : sDefaultHighlightColor);
+	params.font_color = (bridge->isLibraryItem() ? sLibraryColor : (bridge->isLink() ? sLinkColor : sDefaultColor));
+	params.font_highlight_color = (bridge->isLibraryItem() ? sLibraryColor : (bridge->isLink() ? sLinkColor : sDefaultHighlightColor));
 	
 	return LLUICtrlFactory::create<LLFolderViewFolder>(params);
 }
@@ -1015,8 +1033,8 @@ LLFolderViewItem * LLInventoryPanel::createFolderViewItem(LLInvFVBridge * bridge
 	params.rect = LLRect (0, 0, 0, 0);
 	params.tool_tip = params.name;
 
-	params.font_color = (bridge->isLibraryItem() ? sLibraryColor : sDefaultColor);
-	params.font_highlight_color = (bridge->isLibraryItem() ? sLibraryColor : sDefaultHighlightColor);
+	params.font_color = (bridge->isLibraryItem() ? sLibraryColor : (bridge->isLink() ? sLinkColor : sDefaultColor));
+	params.font_highlight_color = (bridge->isLibraryItem() ? sLibraryColor : (bridge->isLink() ? sLinkColor : sDefaultHighlightColor));
 	
 	return LLUICtrlFactory::create<LLFolderViewItem>(params);
 }
@@ -1655,7 +1673,7 @@ void LLInventoryPanel::onSelectionChange(const std::deque<LLFolderViewItem*>& it
 		}
         else
         {
-            LL_DEBUGS("Inventory") << "Failed to start renemr, no items selected" << LL_ENDL;
+            LL_DEBUGS("Inventory") << "Failed to start renamer, no items selected" << LL_ENDL;
         }
 	}
 
