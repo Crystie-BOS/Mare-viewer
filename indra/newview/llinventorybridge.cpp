@@ -91,13 +91,18 @@
 
 void copy_slurl_to_clipboard_callback_inv(const std::string& slurl);
 
+typedef std::pair<LLUUID, LLUUID> two_uuids_t;
+typedef std::list<two_uuids_t> two_uuids_list_t;
+
 const F32 SOUND_GAIN = 1.0f;
 
 using namespace LLOldEvents;
 
 // Function declarations
+bool move_task_inventory_callback(const LLSD& notification, const LLSD& response, boost::shared_ptr<LLMoveInv>);
 bool confirm_attachment_rez(const LLSD& notification, const LLSD& response);
 void teleport_via_landmark(const LLUUID& asset_id);
+static bool can_move_to_my_outfits(LLInventoryModel* model, LLInventoryCategory* inv_cat, U32 wear_limit);
 // <FS:CR> Function left unused from FIRE-7219
 //static bool check_category(LLInventoryModel* model,
 //						   const LLUUID& cat_id,
@@ -4333,6 +4338,12 @@ void LLFolderBridge::buildContextMenuOptions(U32 flags, menuentry_vec_t&   items
 		}
 
 		disabled_items.push_back(std::string("New Folder"));
+		disabled_items.push_back(std::string("New Script"));
+		disabled_items.push_back(std::string("New Note"));
+		disabled_items.push_back(std::string("New Settings"));
+		disabled_items.push_back(std::string("New Gesture"));
+		disabled_items.push_back(std::string("New Clothes"));
+		disabled_items.push_back(std::string("New Body Parts"));
 		disabled_items.push_back(std::string("upload_def"));
 	}
 	if (favorites == mUUID)
@@ -4355,6 +4366,11 @@ void LLFolderBridge::buildContextMenuOptions(U32 flags, menuentry_vec_t&   items
     if (getPreferredType() == LLFolderType::FT_MARKETPLACE_STOCK)
     {
         disabled_items.push_back(std::string("New Folder"));
+		disabled_items.push_back(std::string("New Script"));
+		disabled_items.push_back(std::string("New Note"));
+		disabled_items.push_back(std::string("New Gesture"));
+		disabled_items.push_back(std::string("New Clothes"));
+		disabled_items.push_back(std::string("New Body Parts"));
 		disabled_items.push_back(std::string("upload_def"));
     }
     if (marketplace_listings_id == mUUID)
@@ -4416,7 +4432,19 @@ void LLFolderBridge::buildContextMenuOptions(U32 flags, menuentry_vec_t&   items
 				}
                 if (!isMarketplaceListingsFolder())
                 {
+                    items.push_back(std::string("New Script"));
+                    items.push_back(std::string("New Note"));
+                    items.push_back(std::string("New Gesture"));
+                    items.push_back(std::string("New Clothes"));
+                    items.push_back(std::string("New Body Parts"));
+                    items.push_back(std::string("New Settings"));
                     items.push_back(std::string("upload_def"));
+
+                    if (!LLEnvironment::instance().isInventoryEnabled())
+                    {
+                        disabled_items.push_back("New Settings");
+                    }
+
                 }
 			}
 			getClipboardEntries(false, items, disabled_items, flags);
@@ -4588,7 +4616,7 @@ void LLFolderBridge::buildContextMenuFolderOptions(U32 flags,   menuentry_vec_t&
 	// BAP change once we're no longer treating regular categories as ensembles.
 	const bool is_agent_inventory = isAgentInventory();
 // [SL:KB] - Patch: Appearance-Misc | Checked: 2010-11-24 (Catznip-2.4)
-//	const bool is_outfit = (type == LLFolderType::FT_OUTFIT);
+	const bool is_outfit = (type == LLFolderType::FT_OUTFIT);
 // [/SL:KB]
 
 	// Only enable calling-card related options for non-system folders.
@@ -4674,6 +4702,18 @@ void LLFolderBridge::buildContextMenuFolderOptions(U32 flags,   menuentry_vec_t&
             {
                 disabled_items.push_back(std::string("Remove From Outfit"));
             }
+		}
+		//if (!LLAppearanceMgr::instance().getCanReplaceCOF(mUUID))
+// [SL:KB] - Patch: Appearance-Misc | Checked: 2010-11-24 (Catznip-2.4)
+		if ( ((is_outfit) && (!LLAppearanceMgr::instance().getCanReplaceCOF(mUUID))) || 
+			 ((!is_outfit) && (gAgentWearables.isCOFChangeInProgress())) )
+// [/SL:KB]
+		{
+			disabled_items.push_back(std::string("Replace Outfit"));
+		}
+		if (!LLAppearanceMgr::instance().getCanAddToCOF(mUUID))
+		{
+			disabled_items.push_back(std::string("Add To Outfit"));
 		}
 		items.push_back(std::string("Outfit Separator"));
 
@@ -5097,6 +5137,46 @@ bool move_task_inventory_callback(const LLSD& notification, const LLSD& response
 
 	move_inv.reset(); //since notification will persist
 	return false;
+}
+
+// Returns true if folder's content can be moved to Current Outfit or any outfit folder.
+static bool can_move_to_my_outfits(LLInventoryModel* model, LLInventoryCategory* inv_cat, U32 wear_limit)
+{
+    LLInventoryModel::cat_array_t *cats;
+    LLInventoryModel::item_array_t *items;
+    model->getDirectDescendentsOf(inv_cat->getUUID(), cats, items);
+
+    if (items->size() > wear_limit)
+    {
+        return false;
+    }
+
+    if (items->size() == 0)
+    {
+        // Nothing to move(create)
+        return false;
+    }
+
+    if (cats->size() > 0)
+    {
+        // We do not allow subfolders in outfits of "My Outfits" yet
+        return false;
+    }
+
+    LLInventoryModel::item_array_t::iterator iter = items->begin();
+    LLInventoryModel::item_array_t::iterator end = items->end();
+
+    while (iter != end)
+    {
+        LLViewerInventoryItem *item = *iter;
+        if (!can_move_to_outfit(item, false))
+        {
+            return false;
+        }
+        iter++;
+    }
+
+    return true;
 }
 
 void LLFolderBridge::dropToFavorites(LLInventoryItem* inv_item)
@@ -6198,7 +6278,7 @@ std::string LLCallingCardBridge::getLabelSuffix() const
 	LLViewerInventoryItem* item = getItem();
 	if( item && LLAvatarTracker::instance().isBuddyOnline(item->getCreatorUUID()) )
 	{
-		return LLItemBridge::getLabelSuffix() + "  online";
+		return LLItemBridge::getLabelSuffix() + " (online)";
 	}
 	else
 	{
