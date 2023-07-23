@@ -141,6 +141,7 @@ public:
     std::string getLocalizedRootName();
 
     LLInventoryFilter& getCurrentFilter();
+	bool isActionVisible(const LLSD& userdata);
 
 protected:
 	//
@@ -231,6 +232,7 @@ protected:
 	void updateListCommands();
 	void onAddButtonClick();
 	void showActionMenu(LLMenuGL* menu, std::string spawning_view_name);
+	void onTrashButtonClick();
 	void onClipboardAction(const LLSD& userdata);
 	BOOL isActionEnabled(const LLSD& command_name);
 	BOOL isActionChecked(const LLSD& userdata);
@@ -247,7 +249,7 @@ protected:
 	LLInventoryFilter::EFilterSubstringTarget getSearchTarget() const;
 	// ## Zi: Extended Inventory Search
 
-    bool isActionVisible(const LLSD& userdata);
+	bool handleDragAndDropToTrash(BOOL drop, EDragAndDropType cargo_type, EAcceptance* accept);
     static bool hasSettingsInventory();
     void updateTitle();
     void updateNavButtons();
@@ -261,6 +263,7 @@ protected:
 	void setUploadCostIfNeeded();
     void disableAddIfNeeded();
 private:
+	LLDragAndDropButton*		mTrashButton;
 	LLToggleableMenu*			mMenuGearDefault;
     LLToggleableMenu*           mMenuViewDefault;
 	LLToggleableMenu*			mMenuVisibility;

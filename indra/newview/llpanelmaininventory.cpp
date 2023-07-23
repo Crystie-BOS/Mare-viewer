@@ -1552,7 +1552,15 @@ void LLFloaterInventoryFinder::selectNoTypes(void* user_data)
 
 void LLPanelMainInventory::initListCommandsHandlers()
 {
+	childSetAction("trash_btn", boost::bind(&LLPanelMainInventory::onTrashButtonClick, this));
 	childSetAction("add_btn", boost::bind(&LLPanelMainInventory::onAddButtonClick, this));
+
+	mTrashButton = getChild<LLDragAndDropButton>("trash_btn");
+	mTrashButton->setDragAndDropHandler(boost::bind(&LLPanelMainInventory::handleDragAndDropToTrash, this
+			,	_4 // BOOL drop
+			,	_5 // EDragAndDropType cargo_type
+			,	_7 // EAcceptance* accept
+			));
     childSetAction("view_mode_btn", boost::bind(&LLPanelMainInventory::onViewModeClick, this));
     childSetAction("up_btn", boost::bind(&LLPanelMainInventory::onUpFolderClicked, this));
     childSetAction("back_btn", boost::bind(&LLPanelMainInventory::onBackFolderClicked, this));
@@ -1578,6 +1586,9 @@ void LLPanelMainInventory::initListCommandsHandlers()
 
 void LLPanelMainInventory::updateListCommands()
 {
+	bool trash_enabled = isActionEnabled("delete");
+
+	mTrashButton->setEnabled(trash_enabled);
 }
 
 void LLPanelMainInventory::onAddButtonClick()
@@ -1817,6 +1828,11 @@ void LLPanelMainInventory::showActionMenu(LLMenuGL* menu, std::string spawning_v
 		spawning_view->localPointToOtherView(0, 0, &menu_x, &menu_y, this);
 		LLMenuGL::showPopup(this, menu, menu_x, menu_y);
 	}
+}
+
+void LLPanelMainInventory::onTrashButtonClick()
+{
+	onClipboardAction("delete");
 }
 
 void LLPanelMainInventory::onClipboardAction(const LLSD& userdata)
@@ -2391,6 +2407,20 @@ BOOL LLPanelMainInventory::isSearchTargetChecked(const LLSD& userdata)
 	return FALSE;
 }
 // ## Zi: Extended Inventory Search
+
+bool LLPanelMainInventory::handleDragAndDropToTrash(BOOL drop, EDragAndDropType cargo_type, EAcceptance* accept)
+{
+	*accept = ACCEPT_NO;
+
+	const bool is_enabled = isActionEnabled("delete");
+	if (is_enabled) *accept = ACCEPT_YES_MULTI;
+
+	if (is_enabled && drop)
+	{
+		onClipboardAction("delete");
+	}
+	return true;
+}
 
 void LLPanelMainInventory::setUploadCostIfNeeded()
 {
