@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <panel
  follows="all"
- height="423"
+ height="448"
  label="Things"
  layout="topleft"
  min_height="300"
@@ -147,55 +147,7 @@
        max_length_chars="300"
        highlight_text_field="true"
        name="inventory search editor"
-       width="150" />
-      <menu_button
-       follows="top|right"
-       tool_tip="Actions"
-       height="23"
-       image_hover_unselected="Toolbar_Middle_Over"
-       image_overlay="OptionsMenu_Off"
-       image_selected="Toolbar_Middle_Selected"
-       image_unselected="Toolbar_Middle_Off"
-       layout="topleft"
-       left_pad="1"
-       name="options_gear_btn"
-       width="31" />
-      <menu_button
-       follows="top|right"
-       tool_tip="View &amp; sort options"
-       height="23"
-       image_hover_unselected="Toolbar_Middle_Over"
-       image_overlay="Conv_toolbar_sort"
-       image_selected="Toolbar_Middle_Selected"
-       image_unselected="Toolbar_Middle_Off"
-       layout="topleft"
-       left_pad="1"
-       name="view_btn"
-       width="31" />
-      <button
-       follows="top|right"
-       height="23"
-       image_hover_unselected="Toolbar_Middle_Over"
-       image_overlay="AddItem_Off"
-       image_selected="Toolbar_Middle_Selected"
-       image_unselected="Toolbar_Middle_Off"
-       layout="topleft"
-       left_pad="1"
-       name="add_btn"
-       tool_tip="Create new item"
-       width="31" />
-      <button
-       follows="top|right"
-       tool_tip="Switch between views"
-       height="23"
-       image_hover_unselected="Toolbar_Middle_Over"
-       image_overlay="Single_Folder_Mode"
-       image_selected="Toolbar_Middle_Selected"
-       image_unselected="Toolbar_Middle_Off"
-       layout="topleft"
-       left_pad="1"
-       name="view_mode_btn"
-       width="31" />
+       width="280" />
     </layout_panel>
     </layout_stack>
     <panel
@@ -343,4 +295,130 @@
        </layout_panel>
      </layout_stack>
     </panel>
+  <layout_stack
+   animate="false"
+   border_size="0"
+   follows="left|right|bottom"
+   height="25"
+   layout="topleft"
+   orientation="horizontal"
+   top_pad="0"
+   left="10"
+   name="bottom_panel">
+      <layout_panel
+       auto_resize="false"
+       height="25"
+       layout="topleft"
+       name="options_gear_btn_panel"
+       width="32">
+          <menu_button
+           follows="bottom|left"
+           tool_tip="Actions"
+           height="23"
+           image_hover_unselected="Toolbar_Middle_Over"
+           image_overlay="OptionsMenu_Off"
+           image_selected="Toolbar_Left_Selected"
+           image_unselected="Toolbar_Left_Off"
+           layout="topleft"
+           left="0"
+           top="0"
+           name="options_gear_btn"
+           width="31" />
+      </layout_panel>
+      <layout_panel
+       auto_resize="false"
+       height="25"
+       layout="topleft"
+       name="add_btn_panel"
+       width="32">
+          <button
+           follows="bottom|left"
+           tool_tip="Create new item"
+           height="23"
+           image_hover_unselected="Toolbar_Middle_Over"
+           image_overlay="AddItem_Off"
+           image_selected="Toolbar_Middle_Selected"
+           image_unselected="Toolbar_Middle_Off"
+           layout="topleft"
+           left="0"
+           top="0"
+           name="add_btn"
+           width="31" />
+      </layout_panel>
+      <layout_panel
+       auto_resize="false"
+       height="25"
+       layout="topleft"
+       name="view_btn_panel"
+       width="32">
+          <menu_button
+           follows="bottom|left"
+           tool_tip="View &amp; sort options"
+           height="23"
+           image_hover_unselected="Toolbar_Middle_Over"
+           image_overlay="Conv_toolbar_sort"
+           image_selected="Toolbar_Middle_Selected"
+           image_unselected="Toolbar_Middle_Off"
+           layout="topleft"
+           left="0"
+           top="0"
+           name="view_btn"
+           width="31" />
+      </layout_panel>
+      <layout_panel
+       auto_resize="false"
+       height="25"
+       layout="topleft"
+       name="view_btn_panel"
+       width="32">
+          <button
+           follows="bottom|left"
+           tool_tip="Switch between views"
+           height="23"
+           image_hover_unselected="Toolbar_Middle_Over"
+           image_overlay="Single_Folder_Mode"
+           image_selected="Toolbar_Middle_Selected"
+           image_unselected="Toolbar_Middle_Off"
+           layout="topleft"
+           left="0"
+           top="0"
+           name="view_mode_btn"
+           width="31" />
+      </layout_panel>
+      <layout_panel
+       auto_resize="true"
+       height="25"
+       layout="topleft"
+       name="dummy_panel"
+       width="15">
+          <icon
+           follows="bottom|left|right"
+           height="25"
+           image_name="Toolbar_Middle_Off"
+           layout="topleft"
+           left="0"
+           top="0"
+           name="dummy_icon"
+           width="15" />
+      </layout_panel>
+      <layout_panel
+       auto_resize="false"
+       height="25"
+       layout="topleft"
+       name="trash_btn_panel"
+       width="32">
+          <dnd_button
+           follows="bottom|left"
+           height="23"
+           image_hover_unselected="Toolbar_Right_Over"
+           image_overlay="TrashItem_Off"
+           image_selected="Toolbar_Right_Selected"
+           image_unselected="Toolbar_Right_Off"           layout="topleft"
+           left="0"
+           top="0"
+           name="trash_btn"
+           tool_tip="Remove selected item"
+           width="31"/>
+      </layout_panel>
+  </layout_stack>
 </panel>
