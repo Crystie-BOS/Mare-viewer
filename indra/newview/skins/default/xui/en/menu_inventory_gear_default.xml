@@ -239,9 +239,11 @@
     </menu_item_call>
 
 	<!-- ## Zi: Filter Links Menu -->
+    <menu_item_separator
+     layout="topleft" />
 	<menu_item_check
 		name="inventory_filter_show_links"
-		label="Show Links">
+		label="Show Links and Items">
 		<on_click
 			function="Inventory.FilterLinks.Set"
 			parameter="show_links" />
@@ -261,7 +263,7 @@
 	</menu_item_check>
 	<menu_item_check
 		name="inventory_filter_hide_links"
-		label="Hide Links">
+		label="Show Only Items">
 		<on_click
 			function="Inventory.FilterLinks.Set"
 			parameter="hide_links" />
