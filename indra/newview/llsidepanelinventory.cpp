@@ -233,7 +233,7 @@ BOOL LLSidepanelInventory::postBuild()
 
     	// <FS:Ansariel> Optional hiding of Received Items folder aka Inbox
     	//gSavedSettings.getControl("InventoryDisplayInbox")->getCommitSignal()->connect(boost::bind(&handleInventoryDisplayInboxChanged));
-//    }    
+    }    
     LLFloater *floater = dynamic_cast<LLFloater*>(getParent());
     if (floater && floater->getKey().isUndefined() && !sLoginCompleted)
     {
