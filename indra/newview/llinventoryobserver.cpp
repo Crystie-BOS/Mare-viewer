@@ -37,8 +37,10 @@
 
 #include "llagent.h"
 #include "llagentwearables.h"
+#include "llaisapi.h"
 #include "llfloater.h"
 #include "llfocusmgr.h"
+#include "llinventorymodelbackgroundfetch.h"
 #include "llinventorybridge.h"
 #include "llinventoryfunctions.h"
 #include "llinventorymodel.h"
@@ -149,7 +151,7 @@ LLInventoryFetchItemsObserver::LLInventoryFetchItemsObserver(const uuid_vec_t& i
 
 void LLInventoryFetchItemsObserver::changed(U32 mask)
 {
-	LL_DEBUGS() << this << " remaining incomplete " << mIncomplete.size()
+    LL_DEBUGS("InventoryFetch") << this << " remaining incomplete " << mIncomplete.size()
 			 << " complete " << mComplete.size()
 			 << " wait period " << mFetchingPeriod.getRemainingTimeF32()
 			 << LL_ENDL;
@@ -158,6 +160,15 @@ void LLInventoryFetchItemsObserver::changed(U32 mask)
 	// appropriate.
 	if (!mIncomplete.empty())
 	{
+        if (!LLInventoryModelBackgroundFetch::getInstance()->isEverythingFetched())
+        {
+            // Folders have a priority over items and they download items as well
+            // Wait untill initial folder fetch is done
+            LL_DEBUGS("InventoryFetch") << "Folder fetch in progress, resetting fetch timer" << LL_ENDL;
+
+            mFetchingPeriod.reset();
+            mFetchingPeriod.setTimerExpirySec(FETCH_TIMER_EXPIRY);
+        }
 
 		// Have we exceeded max wait time?
 		bool timeout_expired = mFetchingPeriod.hasExpired();
@@ -176,7 +187,7 @@ void LLInventoryFetchItemsObserver::changed(U32 mask)
 				if (timeout_expired)
 				{
 					// Just concede that this item hasn't arrived in reasonable time and continue on.
-					LL_WARNS() << "Fetcher timed out when fetching inventory item UUID: " << item_id << LL_ENDL;
+                    LL_WARNS("InventoryFetch") << "Fetcher timed out when fetching inventory item UUID: " << item_id << LL_ENDL;
 					it = mIncomplete.erase(it);
 				}
 				else
@@ -191,7 +202,7 @@ void LLInventoryFetchItemsObserver::changed(U32 mask)
 
 	if (mIncomplete.empty())
 	{
-		LL_DEBUGS() << this << " done at remaining incomplete "
+        LL_DEBUGS("InventoryFetch") << this << " done at remaining incomplete "
 				 << mIncomplete.size() << " complete " << mComplete.size() << LL_ENDL;
 		done();
 	}
@@ -251,29 +262,21 @@ void fetch_items_from_llsd(const LLSD& items_llsd)
 
 void LLInventoryFetchItemsObserver::startFetch()
 {
-	LLUUID owner_id;
+    bool aisv3 = AISAPI::isAvailable();
+
 	LLSD items_llsd;
+
+    typedef std::map<LLUUID, uuid_vec_t> requests_by_fodlers_t;
+    requests_by_fodlers_t requests;
 	for (uuid_vec_t::const_iterator it = mIDs.begin(); it < mIDs.end(); ++it)
 	{
-		LLViewerInventoryItem* item = gInventory.getItem(*it);
-		if (item)
-		{
-			if (item->isFinished())
-			{
-				// It's complete, so put it on the complete container.
-				mComplete.push_back(*it);
-				continue;
-			}
-			else
-			{
-				owner_id = item->getPermissions().getOwner();
-			}
-		}
-		else
-		{
-			// assume it's agent inventory.
-			owner_id = gAgent.getID();
-		}
+        LLViewerInventoryItem* item = gInventory.getItem(*it);
+        if (item && item->isFinished())
+        {
+            // It's complete, so put it on the complete container.
+            mComplete.push_back(*it);
+            continue;
+        }
 
 		// Ignore categories since they're not items.  We
 		// could also just add this to mComplete but not sure what the
@@ -294,17 +297,98 @@ void LLInventoryFetchItemsObserver::startFetch()
 		// pack this on the message.
 		mIncomplete.push_back(*it);
 
-		// Prepare the data to fetch
-		LLSD item_entry;
-		item_entry["owner_id"] = owner_id;
-		item_entry["item_id"] = (*it);
-		items_llsd.append(item_entry);
+        if (aisv3)
+        {
+            if (item)
+            {
+                LLUUID parent_id = item->getParentUUID();
+                requests[parent_id].push_back(*it);
+            }
+            else
+            {
+                // Can happen for gestures and calling cards if server notified us before they fetched
+                // Request by id without checking for an item.
+                LLInventoryModelBackgroundFetch::getInstance()->scheduleItemFetch(*it);
+            }
+        }
+        else
+        {
+            // Prepare the data to fetch
+            LLSD item_entry;
+            if (item)
+            {
+                item_entry["owner_id"] = item->getPermissions().getOwner();
+            }
+            else
+            {
+                // assume it's agent inventory.
+                item_entry["owner_id"] = gAgent.getID();
+            }
+            item_entry["item_id"] = (*it);
+            items_llsd.append(item_entry);
+        }
 	}
 
 	mFetchingPeriod.reset();
 	mFetchingPeriod.setTimerExpirySec(FETCH_TIMER_EXPIRY);
 
-	fetch_items_from_llsd(items_llsd);
+    if (aisv3)
+    {
+        const S32 MAX_INDIVIDUAL_REQUESTS = 10;
+        for (requests_by_fodlers_t::value_type &folder : requests)
+        {
+            if (folder.second.size() > MAX_INDIVIDUAL_REQUESTS)
+            {
+                // requesting one by one will take a while
+                // do whole folder
+                LLInventoryModelBackgroundFetch::getInstance()->start(folder.first);
+            }
+            else
+            {
+                LLViewerInventoryCategory* cat = gInventory.getCategory(folder.first);
+                if (cat)
+                {
+                    if (cat->getVersion() == LLViewerInventoryCategory::VERSION_UNKNOWN)
+                    {
+                        // start fetching whole folder since it's not ready either way
+                        cat->fetch();
+                    }
+                    else if (cat->getViewerDescendentCount() <= folder.second.size())
+                    {
+                        // start fetching whole folder since we need all items
+                        cat->setVersion(LLViewerInventoryCategory::VERSION_UNKNOWN);
+                        cat->fetch();
+
+                    }
+                    else
+                    {
+                        // get items one by one
+                        for (LLUUID &item_id : folder.second)
+                        {
+                            LLInventoryModelBackgroundFetch::getInstance()->scheduleItemFetch(item_id);
+                        }
+                    }
+                }
+                else
+                {
+                    // Isn't supposed to happen? We should have all folders
+                    // and if item exists, folder is supposed to exist as well.
+                    llassert(false);
+
+                    // get items one by one
+                    for (LLUUID &item_id : folder.second)
+                    {
+                        LLInventoryModelBackgroundFetch::getInstance()->scheduleItemFetch(item_id);
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        fetch_items_from_llsd(items_llsd);
+    }
+
 }
 
 LLInventoryFetchDescendentsObserver::LLInventoryFetchDescendentsObserver(const LLUUID& cat_id) :
@@ -649,6 +733,13 @@ void LLInventoryCategoriesObserver::changed(U32 mask)
 			}
 		}
 
+        const LLUUID thumbnail_id = category->getThumbnailUUID();
+        if (cat_data.mThumbnailId != thumbnail_id)
+        {
+            cat_data.mThumbnailId = thumbnail_id;
+            cat_changed = true;
+        }
+
 		// If anything has changed above, fire the callback.
 		if (cat_changed)
 			cat_data.mCallback();
@@ -666,6 +757,7 @@ bool LLInventoryCategoriesObserver::addCategory(const LLUUID& cat_id, callback_t
 	S32 version = LLViewerInventoryCategory::VERSION_UNKNOWN;
 	S32 current_num_known_descendents = LLViewerInventoryCategory::DESCENDENT_COUNT_UNKNOWN;
 	bool can_be_added = true;
+    LLUUID thumbnail_id;
 
 	LLViewerInventoryCategory* category = gInventory.getCategory(cat_id);
 	// If category could not be retrieved it might mean that
@@ -677,6 +769,7 @@ bool LLInventoryCategoriesObserver::addCategory(const LLUUID& cat_id, callback_t
 		// Inventory category version is used to find out if some changes
 		// to a category have been made.
 		version = category->getVersion();
+        thumbnail_id = category->getThumbnailUUID();
 
 		LLInventoryModel::cat_array_t* cats;
 		LLInventoryModel::item_array_t* items;
@@ -702,11 +795,11 @@ bool LLInventoryCategoriesObserver::addCategory(const LLUUID& cat_id, callback_t
 		if(init_name_hash)
 		{
 			LLMD5 item_name_hash = gInventory.hashDirectDescendentNames(cat_id);
-			mCategoryMap.insert(category_map_value_t(cat_id,LLCategoryData(cat_id, cb, version, current_num_known_descendents,item_name_hash)));
+			mCategoryMap.insert(category_map_value_t(cat_id,LLCategoryData(cat_id, thumbnail_id, cb, version, current_num_known_descendents,item_name_hash)));
 		}
 		else
 		{
-			mCategoryMap.insert(category_map_value_t(cat_id,LLCategoryData(cat_id, cb, version, current_num_known_descendents)));
+			mCategoryMap.insert(category_map_value_t(cat_id,LLCategoryData(cat_id, thumbnail_id, cb, version, current_num_known_descendents)));
 		}
 	}
 
@@ -719,24 +812,26 @@ void LLInventoryCategoriesObserver::removeCategory(const LLUUID& cat_id)
 }
 
 LLInventoryCategoriesObserver::LLCategoryData::LLCategoryData(
-	const LLUUID& cat_id, callback_t cb, S32 version, S32 num_descendents)
+	const LLUUID& cat_id, const LLUUID& thumbnail_id, callback_t cb, S32 version, S32 num_descendents)
 	
 	: mCatID(cat_id)
 	, mCallback(cb)
 	, mVersion(version)
 	, mDescendentsCount(num_descendents)
+    , mThumbnailId(thumbnail_id)
 	, mIsNameHashInitialized(false)
 {
 	mItemNameHash.finalize();
 }
 
 LLInventoryCategoriesObserver::LLCategoryData::LLCategoryData(
-	const LLUUID& cat_id, callback_t cb, S32 version, S32 num_descendents, LLMD5 name_hash)
+	const LLUUID& cat_id, const LLUUID& thumbnail_id, callback_t cb, S32 version, S32 num_descendents, LLMD5 name_hash)
 
 	: mCatID(cat_id)
 	, mCallback(cb)
 	, mVersion(version)
 	, mDescendentsCount(num_descendents)
+    , mThumbnailId(thumbnail_id)
 	, mIsNameHashInitialized(true)
 	, mItemNameHash(name_hash)
 {

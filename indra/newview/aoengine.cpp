@@ -984,7 +984,19 @@ LLUUID AOEngine::addSet(const std::string& name, BOOL reload)
 	BOOL wasProtected = gSavedPerAccountSettings.getBOOL("ProtectAOFolders");
 	gSavedPerAccountSettings.setBOOL("ProtectAOFolders", FALSE);
 	LL_DEBUGS("AOEngine") << "adding set folder " << name << LL_ENDL;
-	LLUUID newUUID = gInventory.createNewCategory(mAOFolder, LLFolderType::FT_NONE, name);
+	//LLUUID newUUID = gInventory.createNewCategory(mAOFolder, LLFolderType::FT_NONE, name);
+	LLUUID newUUID;
+
+    gInventory.createNewCategory(
+        mAOFolder,
+		LLFolderType::FT_NONE,
+        name,
+        [&](const LLUUID &new_cat_id)
+    {
+        newUUID = new_cat_id; 
+    }
+    );
+
 	gSavedPerAccountSettings.setBOOL("ProtectAOFolders", wasProtected);
 
 	if (reload)

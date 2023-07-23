@@ -243,10 +243,28 @@ void FSFloaterWearableFavorites::initCategory()
 		LLUUID fs_root_cat_id = gInventory.findCategoryByName(ROOT_FIRESTORM_FOLDER);
 		if (fs_root_cat_id.isNull())
 		{
-			fs_root_cat_id = gInventory.createNewCategory(gInventory.getRootFolderID(), LLFolderType::FT_NONE, ROOT_FIRESTORM_FOLDER);
+        	//fs_root_cat_id = gInventory.createNewCategory(gInventory.getRootFolderID(), LLFolderType::FT_NONE, ROOT_FIRESTORM_FOLDER);
+            gInventory.createNewCategory(
+                gInventory.getRootFolderID(),
+        		LLFolderType::FT_NONE,
+                ROOT_FIRESTORM_FOLDER,
+                [&](const LLUUID &new_cat_id)
+            {
+                fs_root_cat_id = new_cat_id; 
+            }
+            );
 		}
 
-		sFolderID = gInventory.createNewCategory(fs_root_cat_id, LLFolderType::FT_NONE, FS_WEARABLE_FAVORITES_FOLDER);
+		//sFolderID = gInventory.createNewCategory(fs_root_cat_id, LLFolderType::FT_NONE, FS_WEARABLE_FAVORITES_FOLDER);
+        gInventory.createNewCategory(
+            fs_root_cat_id,
+    		LLFolderType::FT_NONE,
+            FS_WEARABLE_FAVORITES_FOLDER,
+            [&](const LLUUID &new_cat_id)
+        {
+            sFolderID = new_cat_id; 
+        }
+        );
 	}
 }
 

@@ -74,6 +74,7 @@
 #include "llpanelblockedlist.h"
 #include "llpanelprofileclassifieds.h"
 #include "llpanelprofilepicks.h"
+#include "llthumbnailctrl.h"
 #include "lltrans.h"
 #include "llviewercontrol.h"
 #include "llviewermenu.h" //is_agent_mappable
@@ -378,7 +379,7 @@ LLUUID post_profile_image(std::string cap_url, const LLSD &first_data, std::stri
     httpResults = result[LLCoreHttpUtil::HttpCoroutineAdapter::HTTP_RESULTS];
     status = LLCoreHttpUtil::HttpCoroutineAdapter::getStatusFromLLSD(httpResults);
 
-    LL_WARNS("AvatarProperties") << result << LL_ENDL;
+    LL_DEBUGS("AvatarProperties") << result << LL_ENDL;
 
     if (!status)
     {
@@ -929,7 +930,7 @@ BOOL LLPanelProfileSecondLife::postBuild()
 {
     mGroupList              = getChild<LLGroupList>("group_list");
     mShowInSearchCombo      = getChild<LLComboBox>("show_in_search");
-    mSecondLifePic          = getChild<LLIconCtrl>("2nd_life_pic");
+    mSecondLifePic          = getChild<LLThumbnailCtrl>("2nd_life_pic");
     mSecondLifePicLayout    = getChild<LLPanel>("image_panel");
     mDescriptionEdit        = getChild<LLTextEditor>("sl_description_edit");
     mAgentActionMenuButton  = getChild<LLMenuButton>("agent_actions_menu");
@@ -1553,7 +1554,6 @@ void LLPanelProfileSecondLife::setLoaded()
 }
 
 
-
 class LLProfileImagePicker : public LLFilePickerThread
 {
 public:
@@ -1600,15 +1600,20 @@ void LLProfileImagePicker::notify(const std::vector<std::string>& filenames)
     const S32 MAX_DIM = 256;
     if (!LLViewerTextureList::createUploadFile(file_path, temp_file, codec, MAX_DIM))
     {
-        //todo: image not supported notification
-        LL_WARNS("AvatarProperties") << "Failed to upload profile image of type " << (S32)PROFILE_IMAGE_SL << ", failed to open image" << LL_ENDL;
+        LLSD notif_args;
+        notif_args["REASON"] = LLImage::getLastError().c_str();
+        LLNotificationsUtil::add("CannotUploadTexture", notif_args);
+        LL_WARNS("AvatarProperties") << "Failed to upload profile image of type " << (S32)mType << ", " << notif_args["REASON"].asString() << LL_ENDL;
         return;
     }
 
     std::string cap_url = gAgent.getRegionCapability(PROFILE_IMAGE_UPLOAD_CAP);
     if (cap_url.empty())
     {
-        LL_WARNS("AvatarProperties") << "Failed to upload profile image of type " << (S32)PROFILE_IMAGE_SL << ", no cap found" << LL_ENDL;
+        LLSD args;
+        args["CAPABILITY"] = PROFILE_IMAGE_UPLOAD_CAP;
+        LLNotificationsUtil::add("RegionCapabilityRequestError", args);
+        LL_WARNS("AvatarProperties") << "Failed to upload profile image of type " << (S32)mType << ", no cap found" << LL_ENDL;
         return;
     }
 
@@ -2039,7 +2044,7 @@ void LLPanelProfileSecondLife::onShowTexturePicker()
             });
             texture_floaterp->setLocalTextureEnabled(FALSE);
             texture_floaterp->setBakeTextureEnabled(FALSE);
-            texture_floaterp->setCanApply(false, true);
+            texture_floaterp->setCanApply(false, true, false);
 
             parent_floater->addDependentFloater(mFloaterTexturePickerHandle);
 
@@ -2254,7 +2259,7 @@ LLPanelProfileFirstLife::~LLPanelProfileFirstLife()
 BOOL LLPanelProfileFirstLife::postBuild()
 {
     mDescriptionEdit = getChild<LLTextEditor>("fl_description_edit");
-    mPicture = getChild<LLIconCtrl>("real_world_pic");
+    mPicture = getChild<LLThumbnailCtrl>("real_world_pic");
 
     mUploadPhoto = getChild<LLButton>("fl_upload_image");
     mChangePhoto = getChild<LLButton>("fl_change_image");
@@ -2379,7 +2384,7 @@ void LLPanelProfileFirstLife::onChangePhoto()
                 }
             });
             texture_floaterp->setLocalTextureEnabled(FALSE);
-            texture_floaterp->setCanApply(false, true);
+            texture_floaterp->setCanApply(false, true, false);
 
             parent_floater->addDependentFloater(mFloaterTexturePickerHandle);
 

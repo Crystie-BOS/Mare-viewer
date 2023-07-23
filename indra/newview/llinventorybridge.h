@@ -28,7 +28,6 @@
 #define LL_LLINVENTORYBRIDGE_H
 
 #include "llcallingcard.h"
-#include "llfloaterproperties.h"
 #include "llfolderviewmodel.h"
 #include "llinventorymodel.h"
 #include "llinventoryobserver.h"
@@ -50,7 +49,8 @@ class LLFolderView;
 class FSFolderViewModelItem;
 
 typedef std::vector<std::string> menuentry_vec_t;
-
+typedef std::pair<LLUUID, LLUUID> two_uuids_t;
+typedef std::list<two_uuids_t> two_uuids_list_t;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Class LLInvFVBridge
 //
@@ -85,6 +85,7 @@ public:
 	// LLInvFVBridge functionality
 	//--------------------------------------------------------------------
 	virtual const LLUUID& getUUID() const { return mUUID; }
+    virtual const LLUUID& getThumbnailUUID() const { return LLUUID::null; }
 	virtual void clearDisplayName() { mDisplayName.clear(); }
 	virtual void restoreItem() {}
 	virtual void restoreToWorld() {}
@@ -107,6 +108,7 @@ public:
 	virtual std::string getLabelSuffix() const { return LLStringUtil::null; }
 	virtual void openItem() {}
 	virtual void closeItem() {}
+    virtual void navigateToFolder(bool new_window = false, bool change_mode = false);
 	virtual void showProperties();
 	virtual BOOL isItemRenameable() const { return TRUE; }
 	virtual BOOL isMultiPreviewAllowed() { return TRUE; }
@@ -114,6 +116,7 @@ public:
 	virtual BOOL isItemRemovable() const;
 	virtual BOOL isItemMovable() const;
 	virtual BOOL isItemInTrash() const;
+    virtual bool isItemInOutfits() const;
 	virtual BOOL isLink() const;
 	virtual BOOL isLibraryItem() const;
 	//virtual BOOL removeItem() = 0;
@@ -264,6 +267,7 @@ public:
 	virtual LLUIImagePtr getIconOverlay() const;
 
 	LLViewerInventoryItem* getItem() const;
+    virtual const LLUUID& getThumbnailUUID() const;
 
 protected:
 	BOOL confirmRemoveItem(const LLSD& notification, const LLSD& response);
@@ -309,6 +313,7 @@ public:
 	static LLUIImagePtr getIcon(LLFolderType::EType preferred_type);
 	virtual std::string getLabelSuffix() const;
 	virtual LLFontGL::StyleFlags getLabelStyle() const;
+    virtual const LLUUID& getThumbnailUUID() const;
 
 	void setShowDescendantsCount(bool show_count) {mShowDescendantsCount = show_count;}
 
@@ -351,6 +356,7 @@ public:
 protected:
 	void buildContextMenuOptions(U32 flags, menuentry_vec_t& items,   menuentry_vec_t& disabled_items);
 	void buildContextMenuFolderOptions(U32 flags, menuentry_vec_t& items,   menuentry_vec_t& disabled_items);
+    void addOpenFolderMenuOptions(U32 flags, menuentry_vec_t& items);
 
 	//--------------------------------------------------------------------
 	// Menu callbacks
@@ -819,5 +825,17 @@ public:
     virtual void groupFilterContextMenu(folder_view_item_deque& selected_items, LLMenuGL& menu);
     bool canWearSelected(const uuid_vec_t& item_ids) const;
 };
+
+struct LLMoveInv
+{
+    LLUUID mObjectID;
+    LLUUID mCategoryID;
+    two_uuids_list_t mMoveList;
+    void (*mCallback)(S32, void*);
+    void* mUserData;
+};
+
+void warn_move_inventory(LLViewerObject* object, boost::shared_ptr<LLMoveInv> move_inv);
+bool move_task_inventory_callback(const LLSD& notification, const LLSD& response, boost::shared_ptr<LLMoveInv>);
 
 #endif // LL_LLINVENTORYBRIDGE_H

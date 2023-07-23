@@ -119,17 +119,19 @@ private:
 	//--------------------------------------------------------------------
 public:
 	void			onAppFocusGained();
-	void			setFirstLogin(BOOL b) 	{ mFirstLogin = b; }
+	void			setFirstLogin(bool b);
 	// Return TRUE if the database reported this login as the first for this particular user.
-	BOOL 			isFirstLogin() const 	{ return mFirstLogin; }
-	BOOL 			isInitialized() const 	{ return mInitialized; }
+	bool 			isFirstLogin() const 	{ return mFirstLogin; }
+	bool 			isInitialized() const 	{ return mInitialized; }
+
+    void            showLatestFeatureNotification();
 public:
 	std::string		mMOTD; 					// Message of the day
 //from HB
   BOOL      mRebakeNeeded;
 private:
-	BOOL			mInitialized;
-	BOOL			mFirstLogin;
+	bool			mInitialized;
+	bool			mFirstLogin;
 	boost::shared_ptr<LLAgentListener> mListener;
 
 	//--------------------------------------------------------------------

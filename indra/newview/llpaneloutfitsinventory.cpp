@@ -98,7 +98,7 @@ BOOL LLPanelOutfitsInventory::postBuild()
 	// ( This is only necessary if we want to show a warning if a user deletes an item that has a
 	// a link in an outfit, see "ConfirmItemDeleteHasLinks". )
 
-	const LLUUID &outfits_cat = gInventory.findCategoryUUIDForType(LLFolderType::FT_MY_OUTFITS, false);
+	const LLUUID &outfits_cat = gInventory.findCategoryUUIDForType(LLFolderType::FT_MY_OUTFITS);
 	if (outfits_cat.notNull())
 	{
 		LLInventoryModelBackgroundFetch::instance().start(outfits_cat);
@@ -183,7 +183,11 @@ void LLPanelOutfitsInventory::onSearchEdit(const std::string& string)
 		mActivePanel->setFilterSubString(LLStringUtil::null);
 	}
 
-	LLInventoryModelBackgroundFetch::instance().start();
+    if (!LLInventoryModelBackgroundFetch::instance().inventoryFetchStarted())
+    {
+        llassert(false); // this should have been done on startup
+        LLInventoryModelBackgroundFetch::instance().start();
+    }
 
 	if (mActivePanel->getFilterSubString().empty() && string.empty())
 	{
@@ -284,7 +288,7 @@ void LLPanelOutfitsInventory::onCOFChanged()
 	std::string attstatus = getString("att_status", args);
 	mMyOutfitsPanel->childSetText("avatar_attachment_status", attstatus);
 
-    const LLUUID &category_id = gInventory.findCategoryUUIDForType(LLFolderType::FT_MY_OUTFITS, false);
+    const LLUUID &category_id = gInventory.findCategoryUUIDForType(LLFolderType::FT_MY_OUTFITS);
     LLInventoryModel::cat_array_t cat_array;
     LLInventoryModel::item_array_t item_array;
     LLIsType is_category(LLAssetType::AT_CATEGORY);
