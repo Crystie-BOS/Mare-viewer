@@ -86,7 +86,7 @@ sudo apt install --install-recommends bison bzip2 ninja-build curl flex
 
 sudo apt install --install-recommends pulseaudio
 
-sudo apt install --install-recommends libgl1-mesa-dev libglu1-mesa-dev libstdc++6 libxinerama-dev libxml2-dev libxrender-dev libpulse-dev libalut-dev
+sudo apt install --install-recommends libgl1-mesa-dev libglu1-mesa-dev libstdc++6 libxinerama-dev libxml2-dev libxrender-dev libpulse-dev libalut-dev libgtk2.0-dev
 
 Verify
 
