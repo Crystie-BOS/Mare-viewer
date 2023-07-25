@@ -82,7 +82,7 @@ sudo apt upgrade
 
 Download script cmake-3.26.4-linux-x86_64.sh from cmake, run as normal user, and follow prompts to install cmake.
 
-sudo apt install --install-recommends bison bzip2 ninja-build curl flex
+sudo apt install --install-recommends bison bzip2 ninja-build curl flex pkg-config
 
 sudo apt install --install-recommends pulseaudio
 
