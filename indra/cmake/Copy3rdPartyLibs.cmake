@@ -240,7 +240,7 @@ elseif(LINUX)
          list( APPEND release_files
                  libapr-1.so.0
                  libaprutil-1.so.0
-                 libatk-1.0.so
+		 #libatk-1.0.so
                  libfreetype.so.6.17.4
                  libfreetype.so.6
                  libhunspell-1.3.so.0.0.0
@@ -249,8 +249,8 @@ elseif(LINUX)
                  libuuid.so.16.0.22
                  libfontconfig.so.1.12.0
                  libfontconfig.so.1
-                 libgmodule-2.0.so
-                 libgobject-2.0.so
+		 #libgmodule-2.0.so
+		 #libgobject-2.0.so
                  )
      endif()
 
