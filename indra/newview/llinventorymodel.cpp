@@ -3856,15 +3856,22 @@ void LLInventoryModel::processBulkUpdateInventory(LLMessageSystem* msg, void**)
 			LLViewerInventoryCategory* folderp = gInventory.getCategory(tfolder->getUUID());
 			if(folderp)
 			{
-				if(tfolder->getParentUUID() == folderp->getParentUUID())
-				{
-					update[tfolder->getParentUUID()];
-				}
-				else
-				{
-					++update[tfolder->getParentUUID()];
-					--update[folderp->getParentUUID()];
-				}
+                if (folderp->getVersion() != LLViewerInventoryCategory::VERSION_UNKNOWN)
+                {
+                    if (tfolder->getParentUUID() == folderp->getParentUUID())
+                    {
+                        update[tfolder->getParentUUID()];
+                    }
+                    else
+                    {
+                        ++update[tfolder->getParentUUID()];
+                        --update[folderp->getParentUUID()];
+                    }
+                }
+                else
+                {
+                    folderp->fetch();
+                }
 			}
 			else
 			{
@@ -3874,7 +3881,14 @@ void LLInventoryModel::processBulkUpdateInventory(LLMessageSystem* msg, void**)
 				folderp = gInventory.getCategory(tfolder->getParentUUID());
 				if(folderp)
 				{
-					++update[tfolder->getParentUUID()];
+                    if (folderp->getVersion() != LLViewerInventoryCategory::VERSION_UNKNOWN)
+                    {
+                        ++update[tfolder->getParentUUID()];
+                    }
+                    else
+                    {
+                        folderp->fetch();
+                    }
 				}
 			}
 		}
@@ -3920,7 +3934,14 @@ void LLInventoryModel::processBulkUpdateInventory(LLMessageSystem* msg, void**)
 				LLViewerInventoryCategory* folderp = gInventory.getCategory(titem->getParentUUID());
 				if(folderp)
 				{
-					++update[titem->getParentUUID()];
+                    if (folderp->getVersion() != LLViewerInventoryCategory::VERSION_UNKNOWN)
+                    {
+                        ++update[titem->getParentUUID()];
+                    }
+                    else
+                    {
+                        folderp->fetch();
+                    }
 				}
 			}
 		}
