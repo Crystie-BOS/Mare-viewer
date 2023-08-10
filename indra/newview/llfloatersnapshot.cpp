@@ -632,7 +632,7 @@ void LLFloaterSnapshotBase::ImplBase::setWorking(bool working)
 
 	// All controls should be disabled while posting.
 	mFloater->setCtrlsEnabled(!working);
-	LLPanelSnapshot* active_panel = getActivePanel(mFloater);
+	LLPanelSnapshot* active_panel = getActivePanel(mFloater, true); // KKA-1031 don't assert out if not found
 	if (active_panel)
 	{
 		active_panel->enableControls(!working);
