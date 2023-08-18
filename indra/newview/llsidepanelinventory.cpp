@@ -428,7 +428,7 @@ void LLSidepanelInventory::onOpen(const LLSD& key)
 	}
 #endif
 
-    gAgent.showLatestFeatureNotification();
+    gAgent.showLatestFeatureNotification("inventory");
 }
 
 void LLSidepanelInventory::performActionOnSelection(const std::string &action)
