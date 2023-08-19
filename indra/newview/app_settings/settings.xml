@@ -14373,6 +14373,17 @@
         <key>Value</key>
             <integer>0</integer>
     </map> 
+    <key>NearbyListHideFirstSeen</key>
+    <map>
+        <key>Comment</key>
+            <string>Hide First Seen in Nearby list</string>
+        <key>Persist</key>
+            <integer>1</integer>
+        <key>Type</key>
+            <string>Boolean</string>
+        <key>Value</key>
+            <integer>0</integer>
+    </map>
     <key>NearbyListShowMap</key>
     <map>
       <key>Comment</key>
