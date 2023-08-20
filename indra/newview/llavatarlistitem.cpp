@@ -411,7 +411,7 @@ void LLAvatarListItem::updateFirstSeen(int nb /* = 5 */)
 	mFirstSeenDisplay->setValue(llformat("%d:%02d:%02d", hours, mins, secs));
 	showPaymentStatus(nb >= 5);
 	showAvatarAge(nb >= 4);
-	showFirstSeen(nb >= 3);
+	showFirstSeen(nb >= 3 && mFirstSeenDisplay->getVisible());
 	showRange(nb >= 2);
 	updateChildren();
 }

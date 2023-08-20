@@ -708,7 +708,7 @@ BOOL LLPanelPeople::postBuild()
   mMiniMap->setAltToolTipHintMsg(getString("AltToolTipHintMsg"));
 //MK
 	mNearbyList->showRange(true); 
-	mNearbyList->showFirstSeen(true);
+	mNearbyList->showFirstSeen(!gSavedSettings.getBOOL("NearbyListHideFirstSeen"));
 	mNearbyList->showAvatarAge(true);
 	mNearbyList->showStatusFlags(true);
 	mNearbyList->showUsername(false);
@@ -1818,6 +1818,13 @@ void LLPanelPeople::onNearbyViewSortMenuItemClicked(const LLSD& userdata)
 
 	    mNearbyList->setShowCompleteName(!hide_usernames);
 	    mNearbyList->handleDisplayNamesOptionChanged();
+	}
+	else if (chosen_item == "view_first_seen")
+	{
+	    bool hide_first_seen = !gSavedSettings.getBOOL("NearbyListHideFirstSeen");
+	    gSavedSettings.setBOOL("NearbyListHideFirstSeen", hide_first_seen);
+
+	    mNearbyList->showFirstSeen(!hide_first_seen);
 	}
 	else if (chosen_item == "view_login_names") {
 		gSavedSettings.setBOOL(
