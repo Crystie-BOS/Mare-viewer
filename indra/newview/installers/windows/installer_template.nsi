@@ -513,7 +513,7 @@ Call un.UserSettingsFiles
 SectionEnd
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Make sure the user can install
+;; Make sure the user can install/uninstall
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Function CheckIfAdministrator
     DetailPrint $(CheckAdministratorInstDP)
@@ -528,20 +528,6 @@ lbl_is_admin:
 FunctionEnd
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Make sure the user can uninstall
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;Function un.CheckIfAdministrator
-;;    DetailPrint $(CheckAdministratorUnInstDP)
-;;    UserInfo::GetAccountType
-;;    Pop $R0
-;;    StrCmp $R0 "Admin" lbl_is_admin
-;;        MessageBox MB_OK $(CheckAdministratorUnInstMB)
-;;        Quit
-;;lbl_is_admin:
-;;    Return
-;;
-;;FunctionEnd
-
 ;; Function CheckWillUninstallV2               
 ;;
 ;; If called through auto-update, need to uninstall any existing V2 installation.

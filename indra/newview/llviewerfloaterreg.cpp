@@ -309,6 +309,7 @@ public:
 	bool handle(
         const LLSD& params,
         const LLSD& query_map,
+        const std::string& grid,
         LLMediaCtrl* web) override
 	{
 		if (params.size() != 1)

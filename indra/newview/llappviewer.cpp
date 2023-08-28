@@ -1855,16 +1855,21 @@ bool LLAppViewer::doFrame()
 					}
 				}
 				last_call = LLTimer::getTotalTime();
-				{
+			{
             	LLPerfStats::RecordSceneTime T(LLPerfStats::StatType_t::RENDER_IDLE);
-					LL_PROFILE_ZONE_NAMED_CATEGORY_APP( "df Snapshot" )
+				LL_PROFILE_ZONE_NAMED_CATEGORY_APP( "df Snapshot" )
 
-					pingMainloopTimeout("Main:Snapshot");
-					LLFloaterSnapshot::update(); // take snapshots
-					LLFloaterSimpleOutfitSnapshot::update();
-					gGLActive = FALSE;
-				}
+				pingMainloopTimeout("Main:Snapshot");
+				LLFloaterSnapshot::update(); // take snapshots
+                LLFloaterSimpleOutfitSnapshot::update();
+				gGLActive = FALSE;
 			}
+
+                if (LLViewerStatsRecorder::instanceExists())
+                {
+                    LLViewerStatsRecorder::instance().idle();
+                }
+            }
 		}
 
 		{
