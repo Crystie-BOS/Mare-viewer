@@ -101,6 +101,7 @@
 #include "llviewerobjectlist.h"
 #include "llviewerparcelmgr.h"
 #include "llviewerstats.h"
+#include "llviewerstatsrecorder.h"
 #include "llviewertexteditor.h"
 #include "llviewerthrottle.h"
 #include "llviewerwindow.h"
@@ -3362,35 +3363,6 @@ void process_agent_movement_complete(LLMessageSystem* msg, void**)
 	}
 	// </FS:Ansariel>
 
-    LL_INFOS() << "Checking if we need to ask for 360 Interest List" << LL_ENDL;
-    if (gSavedSettings.getBOOL("KokuaAlways360InterestList"))
-    {
-        LL_INFOS() << "Turning on 360 Interest List" << LL_ENDL;
-        LLSD body;
-        body["mode"] = LLSD::String("360");
-
-        if (gAgent.requestPostCapability("InterestList", body, [](const LLSD & response)
-        {
-            LL_INFOS() <<
-                                   "InterestList capability responded: \n" <<
-                                   ll_pretty_print_sd(response) <<
-                                   LL_ENDL;
-        }))
-        {
-            LL_INFOS() <<
-                                   "Successfully posted an InterestList capability request with payload: \n" <<
-                                   ll_pretty_print_sd(body) <<
-                                   LL_ENDL;
-        }
-        else
-        {
-            LL_INFOS() <<
-                                   "Unable to post an InterestList capability request with payload: \n" <<
-                                   ll_pretty_print_sd(body) <<
-                                   LL_ENDL;
-        }
-    }
-
 	LL_INFOS("Teleport","Messaging") << "Changing home region to region id " << regionp->getRegionID() << " handle " << region_handle << " == x,y " << x << "," << y << LL_ENDL;
 
 	// set our upstream host the new simulator and shuffle things as
@@ -4082,7 +4054,7 @@ void process_kill_object(LLMessageSystem *mesgsys, void **user_data)
 			continue;
 		}
  
-		LLViewerObject* objectp = gObjectList.findObject(id);
+			LLViewerObject *objectp = gObjectList.findObject(id);
 		if (!objectp)
 		{
 			continue;
@@ -4110,7 +4082,7 @@ void process_kill_object(LLMessageSystem *mesgsys, void **user_data)
 				(gAgent.getTeleportState() != LLAgent::TELEPORT_NONE || gPostTeleportFinishKillObjectDelayTimer.getElapsedTimeF32() <= fsExperimentalLostAttachmentsFixKillDelay || gAgentAvatarp->isCrossingRegion()) && 
 				(objectp->isAttachment() || objectp->isTempAttachment()) &&
 				objectp->permYouOwner())
-			{
+		{
 				// Simply ignore the request and don't kill the object - this should work...
 				if (gSavedSettings.getBOOL("FSExperimentalLostAttachmentsFixReport"))
 				{
@@ -4143,26 +4115,30 @@ void process_kill_object(LLMessageSystem *mesgsys, void **user_data)
 									<< LL_ENDL;
 		}
 
-		// Display green bubble on kill
-		if (gShowObjectUpdates)
-		{
-			gPipeline.addDebugBlip(objectp->getPositionAgent(),
-								   LLColor4::green);
-		}
+				// Display green bubble on kill
+				if ( gShowObjectUpdates )
+				{
+				LLColor4 color(0.f,1.f,0.f,1.f);
+				gPipeline.addDebugBlip(objectp->getPositionAgent(), color);
+				LL_DEBUGS("MessageBlip") << "Kill blip for local " << local_id << " at " << objectp->getPositionAgent() << LL_ENDL;
 
-		// Do the kill
+				}
+
+				// Do the kill
 		LLSelectMgr::getInstance()->removeObjectFromSelections(id);
-		gObjectList.killObject(objectp);
-		if (delete_object)
+				gObjectList.killObject(objectp);
+			if(delete_object)
 		{
 			regionp->killCacheEntry(local_id);
  		}
+
+		// We should remove the object from selection after it is marked dead by gObjectList to make LLToolGrab,
+	    // which is using the object, release the mouse capture correctly when the object dies.
+	    // See LLToolGrab::handleHoverActive() and LLToolGrab::handleHoverNonPhysical().
+		LLSelectMgr::getInstance()->removeObjectFromSelections(id);
  	}
 
-	// We should remove the object from selection after it is marked dead by gObjectList to make LLToolGrab,
-    // which is using the object, release the mouse capture correctly when the object dies.
-    // See LLToolGrab::handleHoverActive() and LLToolGrab::handleHoverNonPhysical().
-	LLSelectMgr::getInstance()->removeObjectFromSelections(id);
+    LLViewerStatsRecorder::instance().recordObjectKills(num_objects);
 
 	if (need_cof_resync)
 	{
@@ -5732,6 +5708,11 @@ bool attempt_standard_notification(LLMessageSystem* msgsystem)
 				LandBuyAccessBlocked_AdultsOnlyContent
 			 
 			-----------------------------------------------------------------------*/ 
+            static LLCachedControl<S32> ban_lines_mode(gSavedSettings , "ShowBanLines" , LLViewerParcelMgr::PARCEL_BAN_LINES_ON_COLLISION);
+            if (ban_lines_mode == LLViewerParcelMgr::PARCEL_BAN_LINES_ON_COLLISION)
+            {
+                LLViewerParcelMgr::getInstance()->resetCollisionTimer();
+            }
 			if (handle_special_notification(notificationID, llsdBlock))
 			{
 				return true;
@@ -5900,6 +5881,13 @@ void process_alert_message(LLMessageSystem *msgsystem, void **user_data)
 	{
 		BOOL modal = FALSE;
 		process_alert_core(message, modal);
+
+        static LLCachedControl<S32> ban_lines_mode(gSavedSettings , "ShowBanLines" , LLViewerParcelMgr::PARCEL_BAN_LINES_ON_COLLISION);
+        if (ban_lines_mode == LLViewerParcelMgr::PARCEL_BAN_LINES_ON_COLLISION
+            && message.find("Cannot enter parcel") != std::string::npos)
+        {
+            LLViewerParcelMgr::getInstance()->resetCollisionTimer();
+        }
 	}
 }
 

@@ -1153,15 +1153,37 @@
        label="Show"
        name="LandShow"
        tear_off="true">
-      <menu_item_check
-         label="Ban Lines"
-         name="Ban Lines">
-        <menu_item_check.on_check
-           control="ShowBanLines" />
-        <menu_item_check.on_click
-           function="ToggleControl"
-           parameter="ShowBanLines" />
-      </menu_item_check>
+          <menu_item_check
+             label="Hide Ban Lines"
+             name="Hide Ban Lines">
+            <menu_item_check.on_check
+             function="World.CheckBanLines"
+             parameter="0" />
+            <menu_item_check.on_click
+             function="World.ShowBanLines"
+             parameter="0" />
+          </menu_item_check>
+          <menu_item_check
+             label="Show Ban Lines On Collision"
+             name="Show Ban Lines On Collision">
+            <menu_item_check.on_check
+             function="World.CheckBanLines"
+             parameter="1" />
+            <menu_item_check.on_click
+             function="World.ShowBanLines"
+             parameter="1" />
+          </menu_item_check>
+          <menu_item_check
+             label="Show Ban Lines On Proximity"
+             name="Show Ban Lines On Proximity">
+            <menu_item_check.on_check
+             function="World.CheckBanLines"
+             parameter="2" />
+            <menu_item_check.on_click
+             function="World.ShowBanLines"
+             parameter="2" />
+          </menu_item_check>
+          <menu_item_separator />
       <menu_item_check
             label="Beacons"
             name="beacons"
@@ -2494,16 +2516,6 @@
             <menu_item_call.on_click
              function="Advanced.RefreshScene" />
         </menu_item_call> 
-          <menu_item_check
-           label="360 Interest List"
-           name="360 Interest List">
-            <menu_item_check.on_check
-             function="CheckControl"
-             parameter="KokuaAlways360InterestList" />
-            <menu_item_check.on_click
-             function="ToggleControl"
-             parameter="KokuaAlways360InterestList" />
-          </menu_item_check>
         <menu_item_call
            label="Set UI Size to Default"
            name="Set UI Size to Default">
@@ -4507,13 +4519,29 @@
                 <menu_item_call.on_click
                  function="Advanced.DumpRegionObjectCache" />
             </menu_item_call>
-						<menu_item_call
-             label="Interest List: Full Update"
-             name="Interest List: Full Update"
+			<menu_item_check
+             label="Record Stats to File"
+             name="Stats Recorder File">
+				<menu_item_check.on_check
+                 function="Advanced.CheckStatsRecorder" />
+				<menu_item_check.on_click
+                 function="Advanced.ToggleStatsRecorder" />
+			</menu_item_check>
+			<menu_item_check
+		     label="Interest Lists 360 Mode"
+             name="Interest List: 360 Mode"
              shortcut="alt|shift|I">
-                <menu_item_call.on_click
-                 function="Advanced.InterestListFullUpdate" />
-            </menu_item_call>
+			   <menu_item_check.on_check
+				function="Advanced.CheckInterestList360Mode" />
+			   <menu_item_check.on_click
+				  function="Advanced.ToggleInterestList360Mode" />
+            </menu_item_check>
+			<menu_item_call
+             label="Reset Interest Lists"
+             name="Reset Interest Lists">
+				<menu_item_call.on_click
+                 function="Advanced.ResetInterestLists" />
+			</menu_item_call>
         </menu>
         <menu
          create_jump_keys="true"

@@ -2,7 +2,11 @@
 
 set(PYTHONINTERP_FOUND)
 
-if (WINDOWS)
+if (DEFINED ENV{PYTHON})
+  # Allow python executable to be explicitly set
+  set(python "$ENV{PYTHON}")
+  set(PYTHONINTERP_FOUND ON)
+elseif (WINDOWS)
   # On Windows, explicitly avoid Cygwin Python.
 
 	# Prefer local over system and new over older
@@ -29,7 +33,7 @@ else()
   if (PYTHON_EXECUTABLE)
     set(PYTHONINTERP_FOUND ON)
   endif (PYTHON_EXECUTABLE)
-endif (WINDOWS)
+endif (DEFINED ENV{PYTHON})
 
 if (NOT PYTHON_EXECUTABLE)
   message(FATAL_ERROR "No Python interpreter found")
