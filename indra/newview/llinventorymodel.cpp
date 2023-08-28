@@ -1062,7 +1062,7 @@ void LLInventoryModel::createNewCategory(const LLUUID& parent_id,
 		new_inventory["categories"] = LLSD::emptyArray();
 		LLViewerInventoryCategory cat(LLUUID::null, parent_id, preferred_type, name, gAgent.getID());
         cat.setThumbnailUUID(thumbnail_id);
-		LLSD cat_sd = cat.asAISLLSD();
+		LLSD cat_sd = cat.asAISCreateCatLLSD();
 		new_inventory["categories"].append(cat_sd);
 		AISAPI::CreateInventory(
             parent_id,
@@ -1135,7 +1135,6 @@ void LLInventoryModel::createNewCategory(const LLUUID& parent_id,
     {
         callback(LLUUID::null); // Notify about failure
     }
-//	LL_INFOS(LOG_INV) << "Created new category '" << make_inventory_path(id) << "'" << LL_ENDL;
 }
 
 void LLInventoryModel::createNewCategoryCoro(std::string url, LLSD postData, inventory_func_type callback)

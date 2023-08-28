@@ -802,7 +802,7 @@ bool LLInventoryCategoriesObserver::addCategory(const LLUUID& cat_id, callback_t
 	{
 		if(init_name_hash)
 		{
-			digest_t item_name_hash = gInventory.hashDirectDescendentNames(cat_id);
+			digest_t item_name_hash = gInventory.hashDirectDescendentNames(cat_id);			
 			mCategoryMap.insert(category_map_value_t(cat_id,LLCategoryData(cat_id, thumbnail_id, cb, version, current_num_known_descendents,item_name_hash)));
 		}
 		else

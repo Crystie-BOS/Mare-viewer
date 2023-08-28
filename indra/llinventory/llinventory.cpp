@@ -1132,7 +1132,7 @@ LLSD LLInventoryCategory::asLLSD() const
     return sd;
 }
 
-LLSD LLInventoryCategory::asAISLLSD() const
+LLSD LLInventoryCategory::asAISCreateCatLLSD() const
 {
     LLSD sd                 = LLSD();
     sd[INV_FOLDER_ID_LABEL_WS]  = mUUID;
@@ -1140,7 +1140,10 @@ LLSD LLInventoryCategory::asAISLLSD() const
     S8 type                 = static_cast<S8>(mPreferredType);
     sd[INV_ASSET_TYPE_LABEL_WS] = type;
     sd[INV_NAME_LABEL] = mName;
-    sd[INV_THUMBNAIL_LABEL] = LLSD().with(INV_ASSET_ID_LABEL, mThumbnailUUID);
+    if (mThumbnailUUID.notNull())
+    {
+        sd[INV_THUMBNAIL_LABEL] = LLSD().with(INV_ASSET_ID_LABEL, mThumbnailUUID);
+    }
 
     return sd;
 }
