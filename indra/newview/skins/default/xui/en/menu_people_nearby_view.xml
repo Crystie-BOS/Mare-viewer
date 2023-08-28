@@ -149,6 +149,14 @@
          function="CheckControl"
          parameter="NearbyListHideUsernames" />
     </menu_item_check>
+    <menu_item_check name="view_first_seen" label="Hide First Seen">
+        <menu_item_check.on_click
+         function="People.Nearby.ViewSort.Action"
+         parameter="view_first_seen" />
+        <menu_item_check.on_check
+         function="CheckControl"
+         parameter="NearbyListHideFirstSeen" />
+    </menu_item_check>
   <menu_item_separator/>
     <menu
      create_jump_keys="true"
