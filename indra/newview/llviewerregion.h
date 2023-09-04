@@ -605,6 +605,9 @@ public:
     std::string mInterestListMode;
 };
 
+const std::string LLViewerRegion::IL_MODE_DEFAULT = "default";
+const std::string LLViewerRegion::IL_MODE_360     = "360";
+
 inline BOOL LLViewerRegion::getRegionProtocol(U64 protocol) const
 {
 	return ((mRegionProtocols & protocol) != 0);
