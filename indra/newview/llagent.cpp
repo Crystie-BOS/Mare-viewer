@@ -408,8 +408,11 @@ LLAgent::LLAgent() :
 	mHttpPolicy(LLCore::HttpRequest::DEFAULT_POLICY_ID),
 	mTeleportState(TELEPORT_NONE),
 	mRegionp(NULL),
+#if LL_LINUX
+    mInterestListMode("default"), // since GCC can't figure this out
+#else
     mInterestListMode(LLViewerRegion::IL_MODE_DEFAULT),
-
+#endif
 	mAgentOriginGlobal(),
 	mPositionGlobal(),
     mLastTestGlobal(),
