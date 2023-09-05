@@ -105,11 +105,6 @@ S32  LLViewerRegion::sLastCameraUpdated = 0;
 S32  LLViewerRegion::sNewObjectCreationThrottle = -1;
 LLViewerRegion::vocache_entry_map_t LLViewerRegion::sRegionCacheCleanup;
 
-#ifndef LL_LINUX
-const std::string LLViewerRegion::IL_MODE_DEFAULT = "default";
-const std::string LLViewerRegion::IL_MODE_360     = "360";
-#endif
-
 typedef std::map<std::string, std::string> CapabilityMap;
 
 static void log_capabilities(const CapabilityMap &capmap);
