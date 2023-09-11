@@ -575,7 +575,7 @@ F32 LLFontGL::getWidthF32(const llwchar* wchars, S32 begin_offset, S32 max_chars
 	}
 	else
 	{
-	    // KKA-1050
+	    // KKA-1029
 	    // at lower resolutions and short strings this routine can come up with a lower result than the per character
 	    // plotting code resulting in the last character not being plotted because it would overflow the width this
 	    // routine returned
