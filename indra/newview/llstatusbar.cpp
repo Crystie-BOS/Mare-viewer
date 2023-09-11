@@ -250,7 +250,7 @@ BOOL LLStatusBar::postBuild()
 	gMenuBarView->setRightMouseDownCallback(boost::bind(&show_navbar_context_menu, _1, _2, _3));
 
 	mTextTime = getChild<LLTextBox>("TimeText" );
-	mPurchasePanel = getChild<LLLayoutPanel>("purchase_panel");
+	mPurchasePanel = getChild<LLLayoutPanel>("balance_bg");
 	
 	getChild<LLUICtrl>("buyL")->setCommitCallback(
 		boost::bind(&LLStatusBar::onClickBuyCurrency, this));
