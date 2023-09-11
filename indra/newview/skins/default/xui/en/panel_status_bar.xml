@@ -72,71 +72,61 @@
 					</search_editor>
 			  </layout_panel>	
         <layout_panel
-            name="balance_panel"
-            follows="top|left"
-            layout="topleft"
-            height="19"
-            width="60"
-            auto_resize="true"
-            user_resize="false"
-            visible="true">
-            <text
-                name="balance"
-                tool_tip="Click to refresh your L$ balance"
-                follows="all"
-                height="18"
-                width="60"
-                top="0"
-                left="0"
-                v_pad="4"
-                halign="right"
-                wrap="false"
-                value="L$ --" />
-        </layout_panel>
+    height="18"
+    width="170"
+    top="1"
+    follows="right|top" 
+    name="balance_bg">
+    <text
+     halign="center"
+     font="SansSerifSmall"
+     follows="all"
+     height="18"
+     left="0" 
+     name="balance"
+     tool_tip="Click to refresh your L$ balance"
+     v_pad="4"
+     top="0"
+     wrap="false" 
+     value="L$ --" 
+     width="40" />
+    <button
+     halign="center"
+     font="SansSerifSmall"
+     follows="right|top|bottom"
+     image_hover_unselected="PushButton_Over"
+     image_unselected="PushButton_Off"
+     image_pressed="PushButton_Press"
+     height="18"
+     label="Buy L$"
+     label_color="White"
+     left_pad="0"
+     label_shadow="true"
+     name="buyL"
+     pad_right="0"
+     tool_tip="Click to buy more L$"
+     top="0"
+     width="65" />
+    <button
+     halign="left"
+     font="SansSerifSmall"
+     follows="right|top|bottom"
+     imgoverlay_label_space="7"
+     image_overlay="Command_MiniCart_Icon"
+     image_overlay_alignment="left"
+     image_hover_unselected="PushButton_Over"
+     image_unselected="PushButton_Off"
+     image_pressed="PushButton_Press"
+     height="18"
+     label="Shop"
+     label_color="White"
+     left_pad="0"
+     label_shadow="true"
+     name="goShop"
+     tool_tip="Open Second Life Marketplace"
+     top="0"
+     width="65" />
 
-        <layout_panel
-            name="purchase_panel"
-            follows="top|left"
-            layout="topleft"
-            height="19"
-            width="135"
-            auto_resize="false"
-            user_resize="false"
-            visible="true">
-            <button
-                name="buyL"
-                label="Buy L$"
-                tool_tip="Click to buy more L$"
-                follows="top|bottom|left"
-                top="1"
-                left="10"
-                pad_right="0"
-                height="18"
-                width="70"
-                halign="center"
-                image_hover_unselected="PushButton_Over"
-                image_unselected="PushButton_Off"
-                image_pressed="PushButton_Press"
-                label_color="White"
-                label_shadow="true" />
-            <button
-                name="goShop"
-                label="Shop"
-                tool_tip="Open [SECOND_LIFE] Marketplace"
-                follows="top|bottom|left"
-                top="1"
-                left_pad="0"
-                width="70"
-                height="18"
-                halign="left"
-                imgoverlay_label_space="10"
-                image_overlay="Command_MiniCart_Icon"
-                image_overlay_alignment="left"
-                image_hover_unselected="PushButton_Over"
-                image_unselected="PushButton_Off"
-                image_pressed="PushButton_Press"
-                label_color="White"
-                label_shadow="true" />
         </layout_panel>
 
         <layout_panel

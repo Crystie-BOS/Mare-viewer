@@ -573,6 +573,16 @@ F32 LLFontGL::getWidthF32(const llwchar* wchars, S32 begin_offset, S32 max_chars
 		// add in extra pixels for last character's width past its xadvance
 		cur_x += width_padding;
 	}
+	else
+	{
+	    // KKA-1050
+	    // at lower resolutions and short strings this routine can come up with a lower result than the per character
+	    // plotting code resulting in the last character not being plotted because it would overflow the width this
+	    // routine returned
+	    //
+	    // apply a crude hack on short strings to avoid this
+	    if (cur_x && cur_x < 150) cur_x++;
+	}
 
 	return cur_x / sScaleX;
 }
