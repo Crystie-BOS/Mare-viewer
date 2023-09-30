@@ -415,6 +415,7 @@ private:
 	bool mCanApply;
 	bool mCanPreview;
 	bool mPreviewSettingChanged;
+    bool mLimitsSet;
     S32 mMaxDim;
     S32 mMinDim;
 
