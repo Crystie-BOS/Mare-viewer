@@ -4734,7 +4734,7 @@ public:
 		for(S32 i = 0; i < count; ++i)
 		{
 			ids.push_back(items->at(i)->getUUID());
-			LL_INFOS() << "item id " << item_array.at(i)->getUUID() << " name " << item_array.at(i)->getName() << LL_ENDL;
+			LL_INFOS() << "item id " << items->at(i)->getUUID() << " name " << items->at(i)->getName() << LL_ENDL;
 		}
 		
 		gInventory.removeObserver(this);
