@@ -84,10 +84,33 @@ void LLFloaterSidePanelContainer::closeFloater(bool app_quitting)
 	
 	LLFloater::closeFloater(app_quitting);
 
-	if ((getInstanceName() == "inventory") && !getKey().isUndefined()) //KKA-827 add inventory_lite
+	if (getInstanceName() == "inventory" && !getKey().isUndefined())
 	{
 		destroy();
 	}
+}
+
+LLFloater* LLFloaterSidePanelContainer::getTopmostInventoryFloater()
+{
+    LLFloater* topmost_floater = NULL;
+    S32 z_min = S32_MAX;
+    
+    LLFloaterReg::const_instance_list_t& inst_list = LLFloaterReg::getFloaterList("inventory");
+    for (LLFloaterReg::const_instance_list_t::const_iterator iter = inst_list.begin(); iter != inst_list.end(); ++iter)
+    {
+        LLFloater* inventory_floater = (*iter);
+
+        if (inventory_floater && inventory_floater->getVisible())
+        {
+            S32 z_order = gFloaterView->getZOrder(inventory_floater);
+            if (z_order < z_min)
+            {
+                z_min = z_order;
+                topmost_floater = inventory_floater;
+            }
+        }
+    }
+    return topmost_floater;
 }
 
 LLPanel* LLFloaterSidePanelContainer::openChildPanel(const std::string& panel_name, const LLSD& params)

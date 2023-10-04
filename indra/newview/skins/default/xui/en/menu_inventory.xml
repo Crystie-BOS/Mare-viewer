@@ -421,43 +421,6 @@
         </menu_item_call>
     </menu>
     <menu
-     label="Use as default for"
-     layout="topleft"
-     name="upload_def">
-      <menu_item_call
-       label="Image uploads"
-       layout="topleft"
-       name="Image uploads">
-        <menu_item_call.on_click
-         function="Inventory.FileUploadLocation"
-         parameter="texture" />
-      </menu_item_call>
-      <menu_item_call
-       label="Sound uploads"
-       layout="topleft"
-       name="Sound uploads">
-        <menu_item_call.on_click
-         function="Inventory.FileUploadLocation"
-         parameter="sound" />
-      </menu_item_call>
-      <menu_item_call
-       label="Animation uploads"
-       layout="topleft"
-       name="Animation uploads">
-        <menu_item_call.on_click
-         function="Inventory.FileUploadLocation"
-         parameter="animation" />
-      </menu_item_call>
-      <menu_item_call
-       label="Model uploads"
-       layout="topleft"
-       name="Model uploads">
-        <menu_item_call.on_click
-         function="Inventory.FileUploadLocation"
-         parameter="model" />
-      </menu_item_call>
-    </menu>
-    <menu
      label="Change Type"
      layout="topleft"
      name="Change Type">
@@ -679,6 +642,14 @@
          parameter="rename" />
     </menu_item_call>
     <menu_item_call
+     label="Image..."
+     layout="topleft"
+     name="thumbnail">
+        <menu_item_call.on_click
+         function="Inventory.DoToSelected"
+         parameter="thumbnail" />
+    </menu_item_call>
+    <menu_item_call
      label="Save Texture As"
      layout="topleft"
      name="Save As">
@@ -713,6 +684,32 @@
         <menu_item_separator
      layout="topleft" 
      name="Copy Separator" />
+    <menu_item_call
+     label="Open"
+     layout="topleft"
+     name="open_in_current_window">
+        <menu_item_call.on_click
+         function="Inventory.DoToSelected"
+         parameter="open_in_current_window" />
+    </menu_item_call>
+    <menu_item_call
+     label="Open in new window"
+     layout="topleft"
+     name="open_in_new_window">
+        <menu_item_call.on_click
+         function="Inventory.OpenNewFolderWindow"/>
+    </menu_item_call>
+    <menu_item_separator
+     layout="topleft"
+     name="Open Folder Separator" />
+    <menu_item_call
+     label="Rename"
+     layout="topleft"
+     name="Rename">
+        <menu_item_call.on_click
+         function="Inventory.DoToSelected"
+         parameter="rename" />
+    </menu_item_call>
     <menu_item_call
      label="Cut"
      layout="topleft"
@@ -1025,6 +1022,43 @@
      function="Inventory.DoToSelected"
      parameter="ungroup_folder_items" />
   </menu_item_call>
+  <menu
+   label="Use as default for"
+   layout="topleft"
+   name="upload_def">
+    <menu_item_call
+     label="Image uploads"
+     layout="topleft"
+     name="Image uploads">
+      <menu_item_call.on_click
+       function="Inventory.FileUploadLocation"
+        parameter="texture" />
+    </menu_item_call>
+    <menu_item_call
+     label="Sound uploads"
+     layout="topleft"
+     name="Sound uploads">
+    <menu_item_call.on_click
+     function="Inventory.FileUploadLocation"
+     parameter="sound" />
+    </menu_item_call>
+    <menu_item_call
+     label="Animation uploads"
+     layout="topleft"
+     name="Animation uploads">
+    <menu_item_call.on_click
+     function="Inventory.FileUploadLocation"
+     parameter="animation" />
+    </menu_item_call>
+    <menu_item_call
+     label="Model uploads"
+     layout="topleft"
+     name="Model uploads">
+    <menu_item_call.on_click
+     function="Inventory.FileUploadLocation"
+     parameter="model" />
+    </menu_item_call>
+  </menu>
 	<menu_item_separator
 	 layout="topleft"
 	 name="Marketplace Separator" />

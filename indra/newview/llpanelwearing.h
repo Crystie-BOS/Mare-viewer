@@ -94,7 +94,6 @@ private:
 
 	void getAttachmentLimitsCoro(std::string url);
 
-	LLInventoryCategoriesObserver* 	mCategoriesObserver;
 	LLWearableItemsList* 			mCOFItemsList;
 	LLScrollListCtrl*				mTempItemsList;
 	LLWearingGearMenu*				mGearMenu;

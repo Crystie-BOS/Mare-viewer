@@ -80,6 +80,13 @@ public:
 		FILTERLINK_ONLY_LINKS		// only show links
 	};
 
+    enum EFilterThumbnail
+    {
+        FILTER_INCLUDE_THUMBNAILS,
+        FILTER_EXCLUDE_THUMBNAILS,
+        FILTER_ONLY_THUMBNAILS
+    };
+
 	enum ESortOrderType
 	{
 		SO_NAME = 0,						// Sort inventory by name
@@ -120,7 +127,8 @@ public:
 		VISIBILITY_NONE = 0,
 		VISIBILITY_TRASH = 0x1 << 0,
 		VISIBILITY_LIBRARY = 0x1 << 1,
-		VISIBILITY_LINKS	= 0x1 << 2
+		VISIBILITY_LINKS	= 0x1 << 2,
+        VISIBILITY_OUTFITS    = 0x1 << 3
 	};
 
 	struct FilterOps
@@ -155,12 +163,14 @@ public:
 			Optional<EFolderShow>		show_folder_state;
 			Optional<PermissionMask>	permissions;
 			Optional<EFilterCreatorType> creator_type;
+            Optional<EFilterThumbnail> thumbnails;
 
 			Params()
 			:	types("filter_types", FILTERTYPE_OBJECT),
 				object_types("object_types", 0xffffFFFFffffFFFFULL),
 				wearable_types("wearable_types", 0xffffFFFFffffFFFFULL),
                 settings_types("settings_types", 0xffffFFFFffffFFFFULL),
+                thumbnails("thumbnails", FILTER_INCLUDE_THUMBNAILS),
 				category_types("category_types", 0xffffFFFFffffFFFFULL),
 				links("links", FILTERLINK_INCLUDE_LINKS),
 				search_visibility("search_visibility", 0xFFFFFFFF),
@@ -181,6 +191,7 @@ public:
 		U64				mFilterObjectTypes,   // For _OBJECT
 						mFilterWearableTypes,
                         mFilterSettingsTypes, // for _SETTINGS
+                        mFilterThumbnails,
 						mFilterLinks,
 						mFilterCategoryTypes; // For _CATEGORY
 		LLUUID      	mFilterUUID; 		  // for UUID
@@ -223,6 +234,7 @@ public:
 	U64					getFilterWearableTypes() const;
 	U64					getFilterSettingsTypes() const;
 	U64					getSearchVisibilityTypes() const;
+    U64                 getFilterThumbnails() const;
 
 	bool 				isFilterObjectTypesWith(LLInventoryType::EType t) const;
 	void 				setFilterObjectTypes(U64 types);
@@ -238,6 +250,7 @@ public:
 	void				setFilterMarketplaceUnassociatedFolders();
 	void				setFilterMarketplaceListingFolders(bool select_only_listing_folders);
 	void				setFilterNoMarketplaceFolder();
+    void                setFilterThumbnails(U64 filter_thumbnails);
 	void				updateFilterTypes(U64 types, U64& current_types);
 	void 				setSearchType(ESearchType type);
 	ESearchType			getSearchType() { return mSearchType; }
@@ -245,6 +258,7 @@ public:
 
 	void				toggleSearchVisibilityLinks();
 	void				toggleSearchVisibilityTrash();
+    void                toggleSearchVisibilityOutfits();
 	void				toggleSearchVisibilityLibrary();
 	void 				setSearchVisibilityTypes(U32 types);
 	void 				setSearchVisibilityTypes(const Params& params);
@@ -253,6 +267,8 @@ public:
 	const std::string& 	getFilterSubString(BOOL trim = FALSE) const;
 	const std::string& 	getFilterSubStringOrig() const { return mFilterSubStringOrig; } 
 	bool 				hasFilterString() const;
+
+    void                setSingleFolderMode(bool is_single_folder) { mSingleFolderMode = is_single_folder; }
 
 	//	Begin Multi-substring inventory search
 	//	For use by LLFolderViewItem for highlighting
@@ -314,7 +330,7 @@ public:
 
 	void 				setEmptyLookupMessage(const std::string& message);
 	void				setDefaultEmptyLookupMessage(const std::string& message);
-	std::string			getEmptyLookupMessage() const;
+	std::string			getEmptyLookupMessage(bool is_empty_folder = false) const;
 
 	// +-------------------------------------------------------------------+
 	// + Status
@@ -358,6 +374,8 @@ public:
 	void 				fromParams(const Params& p);
 
 	LLInventoryFilter& operator =(const LLInventoryFilter& other);
+
+    bool checkAgainstFilterThumbnails(const LLUUID& object_id) const;
 
 private:
 	bool				areDateLimitsSet();
@@ -404,6 +422,8 @@ private:
 
 	std::vector<std::string> mFilterTokens;
 	std::string				 mExactToken;
+
+    bool mSingleFolderMode;
 };
 
 #endif
