@@ -103,7 +103,6 @@ using namespace LLOldEvents;
 bool move_task_inventory_callback(const LLSD& notification, const LLSD& response, boost::shared_ptr<LLMoveInv>);
 bool confirm_attachment_rez(const LLSD& notification, const LLSD& response);
 void teleport_via_landmark(const LLUUID& asset_id);
-static bool can_move_to_my_outfits(LLInventoryModel* model, LLInventoryCategory* inv_cat, U32 wear_limit);
 // <FS:CR> Function left unused from FIRE-7219
 //static bool check_category(LLInventoryModel* model,
 //						   const LLUUID& cat_id,
@@ -5385,46 +5384,6 @@ void drop_to_favorites_cb(const LLUUID& id, LLPointer<LLInventoryCallback> cb1, 
     cb1->fire(id);
     cb2->fire(id);
 }	
-
-// Returns true if folder's content can be moved to Current Outfit or any outfit folder.
-static bool can_move_to_my_outfits(LLInventoryModel* model, LLInventoryCategory* inv_cat, U32 wear_limit)
-{
-    LLInventoryModel::cat_array_t *cats;
-    LLInventoryModel::item_array_t *items;
-    model->getDirectDescendentsOf(inv_cat->getUUID(), cats, items);
-
-    if (items->size() > wear_limit)
-    {
-        return false;
-    }
-
-    if (items->size() == 0)
-    {
-        // Nothing to move(create)
-        return false;
-    }
-
-    if (cats->size() > 0)
-    {
-        // We do not allow subfolders in outfits of "My Outfits" yet
-        return false;
-    }
-
-    LLInventoryModel::item_array_t::iterator iter = items->begin();
-    LLInventoryModel::item_array_t::iterator end = items->end();
-
-    while (iter != end)
-    {
-        LLViewerInventoryItem *item = *iter;
-        if (!can_move_to_outfit(item, false))
-        {
-            return false;
-        }
-        iter++;
-    }
-
-    return true;
-}
 
 void LLFolderBridge::dropToFavorites(LLInventoryItem* inv_item, LLPointer<LLInventoryCallback> cb)
 {
