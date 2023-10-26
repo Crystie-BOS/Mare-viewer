@@ -3999,6 +3999,11 @@ void LLInventoryModel::processBulkUpdateInventory(LLMessageSystem* msg, void**)
 								if (found != NULL) // we found a folder of the same name under the parent => use this one as the parent for the next folder to examine in the path
 								{
 									target_folder = found;
+        							// Finally, rename the folder we've created first (the one with all the items in it)
+        							tfolder->rename(hierarchy.at(hierarchy.size()-1));
+        							tfolder->updateServer(FALSE);
+        							tfolder->setParent(target_folder->getUUID()); // and hook it to the folder before it in the path (we've reused an existing one)
+        							tfolder->updateParentOnServer(FALSE);
 								}
 								else // we didn't find a folder of the same name => create it
 								{
@@ -4018,16 +4023,16 @@ void LLInventoryModel::processBulkUpdateInventory(LLMessageSystem* msg, void**)
 								        else
 								        {
     										target_folder = gInventory.getCategory(folder_uuid); // the new parent for the next folder is the one we've just created							            
+                							// Finally, rename the folder we've created first (the one with all the items in it)
+                							tfolder->rename(hierarchy.at(hierarchy.size()-1));
+                							tfolder->updateServer(FALSE);
+                							tfolder->setParent(target_folder->getUUID()); // and hook it to the folder before it in the path (we've created a new one)
+                							tfolder->updateParentOnServer(FALSE);
 								        }
 								    }
 								    );
 								}
 							}
-							// Finally, rename the folder we've created first (the one with all the items in it)
-							tfolder->rename(hierarchy.at(hierarchy.size()-1));
-							tfolder->updateServer(FALSE);
-							tfolder->setParent(target_folder->getUUID()); // and hook it to the folder before it in the path (we've either reused an existing one or created a new one)
-							tfolder->updateParentOnServer(FALSE);
 						}
 					}
 
