@@ -97,5 +97,8 @@ openjpeg.dll
 .metadata
 configure.log
 configure-stamp
+web/config.*
+web/locale.*
+web/secondlife.com.*
 
-# no line terminator after this comment
+.env
