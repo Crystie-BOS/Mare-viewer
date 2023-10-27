@@ -106,7 +106,8 @@ class AOEngine
 
 		const LLUUID& getAOFolder() const;
 
-		LLUUID addSet(const std::string& name, BOOL reload = TRUE);
+		// true doesn't mean success, it just means we went ahead with calling createNewCategory - use the callback for certainty
+        bool addSet(const std::string &name, BOOL reload = TRUE, inventory_func_type callback = no_op_inventory_func);
 		bool removeSet(AOSet* set);
 
 		bool addAnimation(const AOSet* set, AOSet::AOState* state, const LLInventoryItem* item, bool reload = true);
@@ -116,6 +117,8 @@ class AOEngine
 
 		bool importNotecard(const LLInventoryItem* item);
 		void processImport(bool from_timer);
+        void processImportStage2();
+        void processImportStage3(const LLUUID &item_uuid);
 
 		bool swapWithPrevious(AOSet::AOState* state, S32 index);
 		bool swapWithNext(AOSet::AOState* state, S32 index);
@@ -176,7 +179,8 @@ class AOEngine
 		void saveSet(const AOSet* set);
 		void saveState(const AOSet::AOState* state);
 
-		bool createAnimationLink(const AOSet* set, AOSet::AOState* state, const LLInventoryItem* item);
+		// use the callback if you need to know whether it succeeded
+		void createAnimationLink(const AOSet *set, AOSet::AOState *state, const LLInventoryItem *item, inventory_func_type callback);
 		bool findForeignItems(const LLUUID& uuid) const;
 		void purgeFolder(const LLUUID& uuid) const;
 
@@ -200,6 +204,9 @@ class AOEngine
 		bool mEnabledStands;
 		bool mInMouselook;
 		bool mUnderWater;
+
+		bool mProcessImportFromTimer;
+        int  mProcessImportCreateCount;
 
 		LLUUID mAOFolder;
 		LLUUID mLastMotion;
