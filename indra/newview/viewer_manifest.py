@@ -35,11 +35,13 @@ import os.path
 import plistlib
 import random
 import re
+import secrets
 import shutil
 import stat
 import subprocess
 import sys
 import tarfile
+import tempfile
 import time
 import zipfile
 
@@ -421,6 +423,7 @@ class WindowsManifest(ViewerManifest):
     # We want the platform, per se, for every Windows build to be 'win'. The
     # VMP will concatenate that with the address_size.
     build_data_json_platform = 'win'
+    address_size = 64
 
     def final_exe(self):
         return self.exec_name()+".exe"
@@ -542,20 +545,12 @@ class WindowsManifest(ViewerManifest):
                 self.path("SLVoice.exe")
 
             # Vivox libraries
-            if (self.address_size == 64):
-                self.path("vivoxsdk_x64.dll")
-                self.path("ortp_x64.dll")
-            else:
-                self.path("vivoxsdk.dll")
-                self.path("ortp.dll")
+            self.path("vivoxsdk_x64.dll")
+            self.path("ortp_x64.dll")
             
             # OpenSSL
-            if (self.address_size == 64):
-                self.path("libcrypto-1_1-x64.dll")
-                self.path("libssl-1_1-x64.dll")
-            else:
-                self.path("libcrypto-1_1.dll")
-                self.path("libssl-1_1.dll")
+            self.path("libcrypto-1_1-x64.dll")
+            self.path("libssl-1_1-x64.dll")
 
             # HTTP/2
             self.path("nghttp2.dll")
@@ -565,14 +560,9 @@ class WindowsManifest(ViewerManifest):
 
             # BugSplat
             if self.args.get('bugsplat'):
-                if(self.address_size == 64):
-                    self.path("BsSndRpt64.exe")
-                    self.path("BugSplat64.dll")
-                    self.path("BugSplatRc64.dll")
-                else:
-                    self.path("BsSndRpt.exe")
-                    self.path("BugSplat.dll")
-                    self.path("BugSplatRc.dll")
+                self.path("BsSndRpt64.exe")
+                self.path("BugSplat64.dll")
+                self.path("BugSplatRc64.dll")
 
         self.path(src="licenses-win32.txt", dst="licenses.txt")
         self.path("featuretable.txt")
@@ -837,6 +827,7 @@ class Windows_x86_64_Manifest(WindowsManifest):
 
 class DarwinManifest(ViewerManifest):
     build_data_json_platform = 'mac'
+    address_size = 64
 
     def finish_build_data_dict(self, build_data_dict):
         build_data_dict.update({'Bundle Id':self.args['bundleid']})
