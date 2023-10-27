@@ -2413,6 +2413,19 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
           <map>
             <key>archive</key>
             <map>
+              <key>hash</key>
+              <string>f824d586ab5de6edd14ef6828e9e4b66</string>
+              <key>url</key>
+              <string>http://automated-builds-secondlife-com.s3.amazonaws.com/ct2/44719/395040/slvoice-4.10.0000.32327.5fc3fe7c.531581-darwin64-531581.tar.bz2</string>
+            </map>
+            <key>name</key>
+            <string>darwin64</string>
+          </map>
+          <!-- this is giving a credentials error, so stay with aws for now
+          <key>darwin64</key>
+          <map>
+            <key>archive</key>
+            <map>
               <key>creds</key>
               <string>github</string>
               <key>hash</key>
@@ -2425,6 +2438,7 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
             <key>name</key>
             <string>darwin64</string>
           </map>
+          -->
           <key>linux64</key>
           <map>
             <key>archive</key>
@@ -2439,6 +2453,7 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
             <key>name</key>
             <string>linux64</string>
           </map>
+          <!-- keep using aws for now
           <key>windows64</key>
           <map>
             <key>archive</key>
@@ -2451,6 +2466,19 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
               <string>sha1</string>
               <key>url</key>
               <string>https://api.github.com/repos/secondlife/3p-slvoice/releases/assets/108299356</string>
+            </map>
+            <key>name</key>
+            <string>windows64</string>
+          </map>
+          -->
+          <key>windows64</key>
+          <map>
+            <key>archive</key>
+            <map>
+              <key>hash</key>
+              <string>c39735851fd05c194d0be09b8f9e8cb7</string>
+              <key>url</key>
+              <string>https://automated-builds-secondlife-com.s3.amazonaws.com/ct2/98682/871552/slvoice-4.10.0000.32327.5fc3fe7c.571099-windows64-571099.tar.bz2</string>
             </map>
             <key>name</key>
             <string>windows64</string>
