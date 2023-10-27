@@ -94,16 +94,16 @@ class FloaterAO
 
 		void onAnimationChanged(const LLUUID& animation, const std::string state, const std::string name);
 
-		void reloading(BOOL yes);
+		void reloading(bool reload);
 
 		void updateSmart();
 		void updateCycleParameters();
 
-		void enableSetControls(BOOL yes);
-		void enableStateControls(BOOL yes);
+		void enableSetControls(BOOL enable);
+		void enableStateControls(BOOL enable);
 
-		BOOL newSetCallback(const LLSD& notification, const LLSD& response);
-		BOOL removeSetCallback(const LLSD& notification, const LLSD& response);
+		bool newSetCallback(const LLSD& notification, const LLSD& response);
+		bool removeSetCallback(const LLSD& notification, const LLSD& response);
 
 		virtual BOOL tick();
 
@@ -132,7 +132,7 @@ class FloaterAO
 
 		LLComboBox* mStateSelector;
 		LLScrollListCtrl* mAnimationList;
-		LLUUID mCurrentBoldItemID;
+		LLScrollListItem* mCurrentBoldItem;
 		LLButton* mMoveUpButton;
 		LLButton* mMoveDownButton;
 		LLButton* mTrashButton;
@@ -159,9 +159,9 @@ class FloaterAO
 		LLButton* mRandomButtonSmall;
 		LLCheckBoxCtrl* mOverrideSitsCheckBoxSmall;
 
-		BOOL mCanDragAndDrop;
-		BOOL mImportRunning;
-		BOOL mMore;
+		bool mCanDragAndDrop;
+		bool mImportRunning;
+		bool mMore;
 };
 
 #endif // AO_H

@@ -45,17 +45,18 @@
 #include "llnotificationsutil.h"
 
 FloaterAO::FloaterAO(const LLSD& key)
-:	LLTransientDockableFloater(NULL, true, key), LLEventTimer(10.f),
+:	LLTransientDockableFloater(nullptr, true, key), LLEventTimer(10.f),
 	mSetList(0),
 	mSelectedSet(0),
 	mSelectedState(0),
-	mCanDragAndDrop(FALSE),
-	mImportRunning(FALSE),
-	mCurrentBoldItemID(LLUUID::null),
+	mCanDragAndDrop(false),
+	mImportRunning(false),
+	mCurrentBoldItem(nullptr),
+
 	mLastState(""),
 	mLastName(""),
-	mLastUUID(LLUUID::null),
-	mMore(TRUE)
+	mLastUUID(nullptr),
+	mMore(true)
 {
 	mEventTimer.stop();
 }
@@ -64,9 +65,9 @@ FloaterAO::~FloaterAO()
 {
 }
 
-void FloaterAO::reloading(BOOL yes)
+void FloaterAO::reloading(bool reload)
 {
-	if (yes)
+	if (reload)
 	{
 		mEventTimer.start();
 	}
@@ -75,9 +76,9 @@ void FloaterAO::reloading(BOOL yes)
 		mEventTimer.stop();
 	}
 
-	mReloadCoverPanel->setVisible(yes);
-	enableSetControls(!yes);
-	enableStateControls(!yes);
+	mReloadCoverPanel->setVisible(reload);
+	enableSetControls(!reload);
+	enableStateControls(!reload);
 }
 
 BOOL FloaterAO::tick()
@@ -93,7 +94,7 @@ void FloaterAO::updateSetParameters()
 	mOverrideSitsCheckBox->setValue(mSelectedSet->getSitOverride());
 	mOverrideSitsCheckBoxSmall->setValue(mSelectedSet->getSitOverride());
 	mSmartCheckBox->setValue(mSelectedSet->getSmart());
-	mDisableMouselookCheckBox->setValue(mSelectedSet->getMouselookDisable());
+	mDisableMouselookCheckBox->setValue(mSelectedSet->getMouselookStandDisable());
 	BOOL isDefault = (mSelectedSet == AOEngine::instance().getDefaultSet());
 	mDefaultCheckBox->setValue(isDefault);
 	mDefaultCheckBox->setEnabled(!isDefault);
@@ -121,7 +122,7 @@ void FloaterAO::updateAnimationList()
 		mStateSelector->add(stateName, state, ADD_BOTTOM, TRUE);
 	}
 
-	enableStateControls(TRUE);
+	enableStateControls(true);
 
 	if (currentStateSelected == -1)
 	{
@@ -138,7 +139,7 @@ void FloaterAO::updateAnimationList()
 void FloaterAO::updateList()
 {
 	mReloadButton->setEnabled(TRUE);
-	mImportRunning = FALSE;
+	mImportRunning = false;
 
 	// Lambda provides simple Alpha sorting, note this is case sensitive.
 	auto sortRuleLambda = [](const AOSet* s1, const AOSet* s2) -> bool
@@ -146,7 +147,7 @@ void FloaterAO::updateList()
 		return s1->getName() < s2->getName();
 	};
 
-	mSetList=AOEngine::instance().getSetList();
+	mSetList = AOEngine::instance().getSetList();
 	std::sort(mSetList.begin(), mSetList.end(), sortRuleLambda);
 
 	// remember currently selected animation set name
@@ -158,8 +159,8 @@ void FloaterAO::updateList()
 	mSetSelectorSmall->clear();
 
 	mAnimationList->deleteAllItems();
-	mCurrentBoldItemID = LLUUID::null;
-	reloading(FALSE);
+	mCurrentBoldItem = nullptr;
+	reloading(false);
 
 	if (mSetList.empty())
 	{
@@ -187,6 +188,7 @@ void FloaterAO::updateList()
 		}
 	}
 
+	U32 selected_index = 0;
 	for (U32 index = 0; index < mSetList.size(); ++index)
 	{
 		std::string setName = mSetList[index]->getName();
@@ -194,22 +196,21 @@ void FloaterAO::updateList()
 		mSetSelectorSmall->add(setName, &mSetList[index], ADD_BOTTOM, TRUE);
 		if (setName.compare(currentSetName) == 0)
 		{
+			selected_index = index;
 			mSelectedSet = AOEngine::instance().selectSetByName(currentSetName);
-			mSetSelector->selectNthItem(index);
-			mSetSelectorSmall->selectNthItem(index);
 			updateSetParameters();
 			updateAnimationList();
 		}
 	}
+
+	mSetSelector->selectNthItem(selected_index);
+	mSetSelectorSmall->selectNthItem(selected_index);
+
 	enableSetControls(TRUE);
-	// not only does this addition causes crashes due to onClickReload not expecting to be called from a timer
-	// it also can lead to a recursive crash since onClickReload calls this routine again so it's a matter of
-	// pure luck how quickly things load and the chance of recursion goes away. It's time to do the login refresh
-	// a different way
-	//if (mSetSelector->getSelectedItemLabel().empty())
-	//{
-	//	onClickReload();
-	//}
+	if (mSetSelector->getSelectedItemLabel().empty())
+	{
+		onClickReload();
+	}
 }
 
 BOOL FloaterAO::postBuild()
@@ -312,47 +313,46 @@ BOOL FloaterAO::postBuild()
 	return LLDockableFloater::postBuild();
 }
 
-void FloaterAO::enableSetControls(BOOL yes)
+void FloaterAO::enableSetControls(BOOL enable)
 {
-	mSetSelector->setEnabled(yes);
-	mSetSelectorSmall->setEnabled(yes);
-	mActivateSetButton->setEnabled(yes);
-	mRemoveButton->setEnabled(yes);
-	mDefaultCheckBox->setEnabled(yes && (mSelectedSet != AOEngine::instance().getDefaultSet()));
-	mChatCheckBox->setEnabled(yes);
-	mOverrideSitsCheckBox->setEnabled(yes);
-	mOverrideSitsCheckBoxSmall->setEnabled(yes);
-	mDisableMouselookCheckBox->setEnabled(yes);
+	mSetSelector->setEnabled(enable);
+	mSetSelectorSmall->setEnabled(enable);
+	mActivateSetButton->setEnabled(enable);
+	mRemoveButton->setEnabled(enable);
+	mDefaultCheckBox->setEnabled(enable && (mSelectedSet != AOEngine::instance().getDefaultSet()));
+	mChatCheckBox->setEnabled(enable);
+	mOverrideSitsCheckBox->setEnabled(enable);
+	mOverrideSitsCheckBoxSmall->setEnabled(enable);
+	mDisableMouselookCheckBox->setEnabled(enable);
 
-	if (!yes)
+	if (!enable)
 	{
-		enableStateControls(yes);
+		enableStateControls(enable);
 	}
 }
 
-void FloaterAO::enableStateControls(BOOL yes)
+void FloaterAO::enableStateControls(BOOL enable)
 {
-	mStateSelector->setEnabled(yes);
-	mAnimationList->setEnabled(yes);
-	mCycleCheckBox->setEnabled(yes);
-	if (yes)
+	mStateSelector->setEnabled(enable);
+	mAnimationList->setEnabled(enable);
+	mCycleCheckBox->setEnabled(enable);
+	if (enable)
 	{
 		updateCycleParameters();
 	}
 	else
 	{
-		mRandomizeCheckBox->setEnabled(yes);
-		mCycleTimeTextLabel->setEnabled(yes);
-		mCycleTimeSpinner->setEnabled(yes);
+		mRandomizeCheckBox->setEnabled(enable);
+		mCycleTimeTextLabel->setEnabled(enable);
+		mCycleTimeSpinner->setEnabled(enable);
 	}
-	mPreviousButton->setEnabled(yes);
-	mPreviousButtonSmall->setEnabled(yes);
-	mNextButton->setEnabled(yes);
-	mNextButtonSmall->setEnabled(yes);
-	mRandomButton->setEnabled(yes);
-	mRandomButtonSmall->setEnabled(yes);
-
-	mCanDragAndDrop = yes;
+	mPreviousButton->setEnabled(enable);
+	mPreviousButtonSmall->setEnabled(enable);
+	mNextButton->setEnabled(enable);
+	mNextButtonSmall->setEnabled(enable);
+	mRandomButton->setEnabled(enable);
+	mRandomButtonSmall->setEnabled(enable);
+	mCanDragAndDrop = enable;
 }
 
 void FloaterAO::onOpen(const LLSD& key)
@@ -452,7 +452,7 @@ LLScrollListItem* FloaterAO::addAnimation(const std::string& name)
 	LLSD row;
 	row["columns"][0]["column"] = "icon";
 	row["columns"][0]["type"] = "icon";
-	row["columns"][0]["value"] = "Inv_Animation";
+	row["columns"][0]["value"] = "FSAO_Animation_Stopped";
 
 	row["columns"][1]["column"] = "animation_name";
 	row["columns"][1]["type"] = "text";
@@ -464,7 +464,7 @@ LLScrollListItem* FloaterAO::addAnimation(const std::string& name)
 void FloaterAO::onSelectState()
 {
 	mAnimationList->deleteAllItems();
-	mCurrentBoldItemID = LLUUID::null;
+	mCurrentBoldItem = nullptr;
 	mAnimationList->setCommentText(getString("ao_no_animations_loaded"));
 	mAnimationList->setEnabled(FALSE);
 
@@ -490,6 +490,15 @@ void FloaterAO::onSelectState()
 			if (item)
 			{
 				item->setUserdata(&mSelectedState->mAnimations[index].mInventoryUUID);
+
+				// update currently playing animation if we are looking at the currently running state in the UI
+				if (mSelectedSet->getMotion() == mSelectedState->mRemapID &&
+				    mSelectedState->mCurrentAnimationID == mSelectedState->mAnimations[index].mAssetUUID)
+				{
+					mCurrentBoldItem = item;
+					((LLScrollListIcon*)item->getColumn(0))->setValue("FSAO_Animation_Playing");
+					((LLScrollListText*)item->getColumn(1))->setFontStyle(LLFontGL::BOLD);
+				}
 			}
 		}
 
@@ -502,17 +511,14 @@ void FloaterAO::onSelectState()
 	mCycleTimeSpinner->setValue(mSelectedState->mCycleTime);
 
 	updateCycleParameters();
-	// see if the new state contains the current anim and get it bolded if so
-	LL_DEBUGS("AOEngine") << "Trying to reinstate: " << mLastState << " / " << mLastName << LL_ENDL;
-	onAnimationChanged(mLastUUID, mLastState, mLastName);
 }
 
 void FloaterAO::onClickReload()
 {
-	reloading(TRUE);
+	reloading(true);
 
-	mSelectedSet = 0;
-	mSelectedState = 0;
+	mSelectedSet = nullptr;
+	mSelectedState = nullptr;
 
 	AOEngine::instance().reload(false);
 	updateList();
@@ -523,7 +529,7 @@ void FloaterAO::onClickAdd()
 	LLNotificationsUtil::add("NewAOSet", LLSD(), LLSD(), boost::bind(&FloaterAO::newSetCallback, this, _1, _2));
 }
 
-BOOL FloaterAO::newSetCallback(const LLSD& notification, const LLSD& response)
+bool FloaterAO::newSetCallback(const LLSD& notification, const LLSD& response)
 {
 	std::string newSetName = response["message"].asString();
 	S32 option = LLNotificationsUtil::getSelectedOption(notification, response);
@@ -534,7 +540,7 @@ BOOL FloaterAO::newSetCallback(const LLSD& notification, const LLSD& response)
 
 	if (newSetName.empty())
 	{
-		return FALSE;
+		return false;
 	}
 	else if (
 		!LLTextValidate::validateASCIIPrintableNoPipe(new_set_name.getWString()) ||		// only allow ASCII
@@ -543,18 +549,14 @@ BOOL FloaterAO::newSetCallback(const LLSD& notification, const LLSD& response)
 		LLSD args;
 		args["AO_SET_NAME"] = newSetName;
 		LLNotificationsUtil::add("NewAOCantContainNonASCII", args);
-		return FALSE;
+		return false;
 	}
 
 	if (option == 0)
 	{
-		if (AOEngine::instance().addSet(newSetName).notNull())
-		{
-			reloading(TRUE);
-			return TRUE;
-		}
+        return AOEngine::instance().addSet(newSetName, false, [this](const LLUUID &new_cat_id) { reloading(true); });
 	}
-	return FALSE;
+	return false;
 }
 
 void FloaterAO::onClickRemove()
@@ -569,7 +571,7 @@ void FloaterAO::onClickRemove()
 	LLNotificationsUtil::add("RemoveAOSet", args, LLSD(), boost::bind(&FloaterAO::removeSetCallback, this, _1, _2));
 }
 
-BOOL FloaterAO::removeSetCallback(const LLSD& notification, const LLSD& response)
+bool FloaterAO::removeSetCallback(const LLSD& notification, const LLSD& response)
 {
 	S32 option = LLNotificationsUtil::getSelectedOption(notification, response);
 
@@ -577,7 +579,7 @@ BOOL FloaterAO::removeSetCallback(const LLSD& notification, const LLSD& response
 	{
 		if (AOEngine::instance().removeSet(mSelectedSet))
 		{
-			reloading(TRUE);
+			reloading(true);
 			// to prevent snapping back to deleted set
 			mSetSelector->removeall();
 			mSetSelectorSmall->removeall();
@@ -585,11 +587,11 @@ BOOL FloaterAO::removeSetCallback(const LLSD& notification, const LLSD& response
 			mSetSelector->clear();
 			mSetSelectorSmall->clear();
 			mAnimationList->deleteAllItems();
-			mCurrentBoldItemID = LLUUID::null;
-			return TRUE;
+			mCurrentBoldItem = nullptr;
+			return true;
 		}
 	}
-	return FALSE;
+	return false;
 }
 
 void FloaterAO::onCheckDefault()
@@ -640,7 +642,7 @@ void FloaterAO::onCheckDisableStands()
 {
 	if (mSelectedSet)
 	{
-		AOEngine::instance().setDisableStands(mSelectedSet, mDisableMouselookCheckBox->getValue().asBoolean());
+		AOEngine::instance().setDisableMouselookStands(mSelectedSet, mDisableMouselookCheckBox->getValue().asBoolean());
 	}
 }
 
@@ -732,7 +734,7 @@ void FloaterAO::onClickTrash()
 	}
 
 	std::vector<LLScrollListItem*> list = mAnimationList->getAllSelected();
-	if (list.size() == 0)
+	if (list.empty())
 	{
 		return;
 	}
@@ -743,23 +745,23 @@ void FloaterAO::onClickTrash()
 	}
 
 	mAnimationList->deleteSelectedItems();
-	mCurrentBoldItemID = LLUUID::null;
+	mCurrentBoldItem = nullptr;
 }
 
 void FloaterAO::updateCycleParameters()
 {
-	BOOL yes = mCycleCheckBox->getValue().asBoolean();
-	mRandomizeCheckBox->setEnabled(yes);
-	mCycleTimeTextLabel->setEnabled(yes);
-	mCycleTimeSpinner->setEnabled(yes);
+	BOOL enabled = mCycleCheckBox->getValue().asBoolean();
+	mRandomizeCheckBox->setEnabled(enabled);
+	mCycleTimeTextLabel->setEnabled(enabled);
+	mCycleTimeSpinner->setEnabled(enabled);
 }
 
 void FloaterAO::onCheckCycle()
 {
 	if (mSelectedState)
 	{
-		BOOL yes = mCycleCheckBox->getValue().asBoolean();
-		AOEngine::instance().setCycle(mSelectedState, yes);
+		bool cycle = mCycleCheckBox->getValue().asBoolean();
+		AOEngine::instance().setCycle(mSelectedState, cycle);
 		updateCycleParameters();
 	}
 }
@@ -809,7 +811,7 @@ void FloaterAO::onClickMore()
 		fullSize.setOriginAndSize(fullSize.mLeft, fullSize.mBottom, getRect().getWidth(), fullSize.getHeight());
 	}
 
-	mMore = TRUE;
+	mMore = true;
 
 	mSmallInterfacePanel->setVisible(FALSE);
 	mMainInterfacePanel->setVisible(TRUE);
@@ -828,7 +830,7 @@ void FloaterAO::onClickLess()
 
 	gSavedPerAccountSettings.setRect("floater_rect_animation_overrider_full", fullSize);
 
-	mMore = FALSE;
+	mMore = false;
 
 	mSmallInterfacePanel->setVisible(TRUE);
 	mMainInterfacePanel->setVisible(FALSE);
@@ -845,21 +847,7 @@ void FloaterAO::onClickLess()
 void FloaterAO::onAnimationChanged(const LLUUID& animation, const std::string state, const std::string name)
 {
 	LL_DEBUGS("AOEngine") << "Received animation change to " << animation << LL_ENDL;
-	
-	// BEWARE: This routine now has very little resemblance with the original. Be very cautious with merges.
 
-	// This is the relocated fix to make sure the UI is populated if login happens with the full size
-	// panel selected - the original of this (calling onClickReload from updateList() ) caused problems
-	// with recursive crashes (because onClickReload calls back to updateList) and instance tracker
-	// exits because onClickReload was getting called from timer and didn't expect to be (since it calls
-	// clear(false) to assert it's not in a timer but it actually was)
-	if (mSetSelector->getSelectedItemLabel().empty())
-	{
-		updateList();
-	}
-
-	// we have to do our own de-dupe check because we can't rely on the bold item - it's possible that the
-	// anim concerned isn't from the group being displayed so there's no match in the currently displayed scroll list
 	if (gSavedPerAccountSettings.getBOOL("AOChatNotifications") && animation != LLUUID::null && animation != mLastUUID)
 	{
 		LLChat chat;
@@ -876,33 +864,37 @@ void FloaterAO::onAnimationChanged(const LLUUID& animation, const std::string st
 		mLastUUID = animation;
 	}
 
+	if (mCurrentBoldItem)
+	{
+		((LLScrollListIcon*)mCurrentBoldItem->getColumn(0))->setValue("FSAO_Animation_Stopped");
+		((LLScrollListText*)mCurrentBoldItem->getColumn(1))->setFontStyle(LLFontGL::NORMAL);
+
+		mCurrentBoldItem = nullptr;
+	}
+
+	if (animation.isNull())
+	{
+		return;
+	}
+
 	// why do we have no LLScrollListCtrl::getItemByUserdata() ? -Zi
 	std::vector<LLScrollListItem*> item_list = mAnimationList->getAllData();
 	std::vector<LLScrollListItem*>::const_iterator iter;
-	
-	// after trying various ways to make the unbold smart, I'm settling on a brute force approach - go through the whole
-	// list and clear every item except the one we want bold
-		
 	for (iter = item_list.begin(); iter != item_list.end(); ++iter)
 	{
 		LLScrollListItem* item = *iter;
 		LLUUID* id = (LLUUID*)item->getUserdata();
-		// compare uuids rather than memory pointers so that we can get a match if someone displays a different state and
-		// then comes back to the original state with an item in it that needs to be boldened. The original pointer is no
-		// longer valid because the scroll list has been rebuilt at least twice, but uuids won't have changed
-		//
-		// beware - UserData can be null sometimes now that we don't take an early exit above, so checks are needed
-		LLScrollListText* column = (LLScrollListText*)item->getColumn(1);
-		if (id && *id == animation)
+
+		if (id == &animation)
 		{
-			column->setFontStyle(LLFontGL::BOLD);
-		}
-		else
-		{
-			column->setFontStyle(LLFontGL::NORMAL);
+			mCurrentBoldItem = item;
+
+			((LLScrollListIcon*)mCurrentBoldItem->getColumn(0))->setValue("FSAO_Animation_Playing");
+			((LLScrollListText*)mCurrentBoldItem->getColumn(1))->setFontStyle(LLFontGL::BOLD);
+
+			return;
 		}
 	}
-	mCurrentBoldItemID = animation;
 }
 
 // virtual
@@ -953,7 +945,7 @@ BOOL FloaterAO::handleDragAndDrop(S32 x, S32 y, MASK mask, BOOL drop, EDragAndDr
 
 				// TODO: this would be the right thing to do, but it blocks multi drop
 				// before final release this must be resolved
-				reloading(TRUE);
+				reloading(true);
 			}
 		}
 	}

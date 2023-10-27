@@ -1854,7 +1854,7 @@ void LLInventoryModel::changeItemParent(LLViewerInventoryItem* item,
 
 		// ## Zi: Animation Overrider
 		if ((isObjectDescendentOf(item->getUUID(),AOEngine::instance().getAOFolder())
-			&& gSavedPerAccountSettings.getBOOL("ProtectAOFolders")) ||
+			&& gSavedPerAccountSettings.getBOOL("LockAOFolders")) ||
 			(isObjectDescendentOf(item->getUUID(), FSFloaterWearableFavorites::getFavoritesFolder())
 				&& gSavedPerAccountSettings.getBOOL("LockWearableFavoritesFolders")))
 		{
@@ -1918,7 +1918,7 @@ void LLInventoryModel::changeCategoryParent(LLViewerInventoryCategory* cat,
 		<< " to " << make_inventory_info(new_parent_id) << LL_ENDL;
 	// ## Zi: Animation Overrider
 	if((isObjectDescendentOf(cat->getUUID(),AOEngine::instance().getAOFolder())
-		&& gSavedPerAccountSettings.getBOOL("ProtectAOFolders")) ||
+		&& gSavedPerAccountSettings.getBOOL("LockAOFolders")) ||
 		(isObjectDescendentOf(cat->getUUID(), FSFloaterWearableFavorites::getFavoritesFolder())
 			&& gSavedPerAccountSettings.getBOOL("LockWearableFavoritesFolders")))
 	{

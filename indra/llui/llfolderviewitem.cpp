@@ -23,8 +23,7 @@
 * Linden Research, Inc., 945 Battery Street, San Francisco, CA  94111  USA
 * $/LicenseInfo$
 */
-#include "../newview/llviewerprecompiledheaders.h"
-#include "../newview/aoengine.h" // ## Zi: Animation Overrider
+
 #include "llflashtimer.h"
 
 #include "linden_common.h"
@@ -986,24 +985,7 @@ void LLFolderViewItem::draw()
             }
         }
     }
-/*
-	// ## Zi: Animation Overrider
-	//--------------------------------------------------------------------------------//
-	// Draw "protected" indicator
-	//
-	if((mListener->getUUID()==AOEngine::instance().getAOFolder() && gSavedPerAccountSettings.getBOOL("ProtectAOFolders"))
-// //-TT Client LSL Bridge
-// 		||(mListener->getUUID()==FSLSLBridge::instance().getBridgeFolder() && gSavedPerAccountSettings.getBOOL("ProtectBridgeFolder"))
-// //-TT
-		)
-	{
-		std::string locked_string = " (" + LLTrans::getString("ProtectedFolder") + ") ";
-		font->renderUTF8(locked_string, 0, right_x, y, sProtectedColor,
-						 LLFontGL::LEFT, LLFontGL::BOTTOM, LLFontGL::NORMAL, LLFontGL::NO_SHADOW, 
-						 S32_MAX, S32_MAX, &right_x, FALSE);
-	}
-	// ## Zi: Animation Overrider
-*/
+
     LLColor4 color = (mIsSelected && filled) ? mFontHighlightColor : mFontColor;
 
     if (isFadeItem())
