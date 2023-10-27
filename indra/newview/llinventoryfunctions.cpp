@@ -700,8 +700,8 @@ BOOL get_is_item_removable(const LLInventoryModel* model, const LLUUID& id)
 
 	// ## Zi: Animation Overrider
 	if (
-		(model->isObjectDescendentOf(id,AOEngine::instance().getAOFolder())
-		&& gSavedPerAccountSettings.getBOOL("ProtectAOFolders"))
+		(model->isObjectDescendentOf(id, AOEngine::instance().getAOFolder())
+			&& gSavedPerAccountSettings.getBOOL("LockAOFolders"))
 		||
 		(model->isObjectDescendentOf(id, FSFloaterWearableFavorites::getFavoritesFolder())
 			&& gSavedPerAccountSettings.getBOOL("LockWearableFavoritesFolders"))
@@ -796,7 +796,7 @@ BOOL get_is_category_removable(const LLInventoryModel* model, const LLUUID& id)
 	// ## Zi: Animation Overrider
 	if(
 		((id==AOEngine::instance().getAOFolder() || model->isObjectDescendentOf(id,AOEngine::instance().getAOFolder()))
-			&& gSavedPerAccountSettings.getBOOL("ProtectAOFolders"))
+			&& gSavedPerAccountSettings.getBOOL("LockAOFolders"))
 		||
 		((id == FSFloaterWearableFavorites::getFavoritesFolder() || model->isObjectDescendentOf(id, FSFloaterWearableFavorites::getFavoritesFolder()))
 			&& gSavedPerAccountSettings.getBOOL("LockWearableFavoritesFolders"))
