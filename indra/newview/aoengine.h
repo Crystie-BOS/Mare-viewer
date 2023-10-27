@@ -106,7 +106,7 @@ class AOEngine
 
 		const LLUUID& getAOFolder() const;
 
-		bool addSet(const std::string& name, inventory_func_type callback, bool reload = true);
+		LLUUID addSet(const std::string& name, BOOL reload = TRUE);
 		bool removeSet(AOSet* set);
 
 		bool addAnimation(const AOSet* set, AOSet::AOState* state, const LLInventoryItem* item, bool reload = true);
