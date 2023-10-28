@@ -549,15 +549,14 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>4cd82e2dec06ddff19e9b3dc0254f2593ec80452</string>
-              <key>hash_algorithm</key>
-              <string>sha1</string>
+              <string>5e1f025d1cebd12db542080aa755257f</string>
               <key>url</key>
-              <string>https://github.com/secondlife/3p-expat/releases/download/v2.1.1.1f36d02/expat-2.1.1.1f36d02-linux64-1f36d02.tar.zst</string>
+              <string>http://automated-builds-secondlife-com.s3.amazonaws.com/ct2/380/943/expat-2.1.1.500375-linux64-500375.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
           </map>
+
           <key>windows64</key>
           <map>
             <key>archive</key>
@@ -2830,15 +2829,14 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>ad0c8b41ee4b4de216382bec46ee1c25962a3f12</string>
-              <key>hash_algorithm</key>
-              <string>sha1</string>
+              <string>35df17c3eb673030dea4bde9191aa506</string>
               <key>url</key>
-              <string>https://github.com/secondlife/3p-xmlrpc-epi/releases/download/v0.54.1.8a05acf/xmlrpc_epi-0.54.1.8a05acf-linux64-8a05acf.tar.zst</string>
+              <string>http://automated-builds-secondlife-com.s3.amazonaws.com/ct2/727/1489/xmlrpc_epi-0.54.1.500719-linux64-500719.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
           </map>
+
           <key>windows64</key>
           <map>
             <key>archive</key>
