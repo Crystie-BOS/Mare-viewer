@@ -979,7 +979,6 @@ void AOEngine::updateSortOrder(AOSet::AOState* state)
 
 bool AOEngine::addSet(const std::string &name, BOOL reload, inventory_func_type callback)
 {
-	LLUUID newUUID = LLUUID::null; //fixme
 	if (mAOFolder.isNull())
 	{
 		LL_WARNS("AOEngine") << ROOT_AO_FOLDER << " folder not there yet. Requesting recreation." << LL_ENDL;
