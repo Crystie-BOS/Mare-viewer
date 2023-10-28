@@ -2958,11 +2958,9 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>fba88375e12454ae19f4528e11ffc7ddf7d879ec</string>
-              <key>hash_algorithm</key>
-              <string>sha1</string>
+              <string>3c2bf9469dda100aa5bede905e5d49bc</string>
               <key>url</key>
-              <string>https://github.com/secondlife/3p-zlib-ng/releases/download/v1.2.11.zlib-ng.32fd361/zlib_ng-1.2.11.zlib-ng.32fd361-linux64-32fd361.tar.zst</string>
+              <string>http://bitbucket.org/kokua/3p-zlib-ng/downloads/zlib_ng-2.0.5.231540321-linux64-231540321.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -2992,6 +2990,10 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
         <string>1.2.11.zlib-ng.32fd361</string>
         <key>name</key>
         <string>zlib-ng</string>
+        <key>canonical_repo</key>
+        <string>https://bitbucket.org/lindenlab/3p-zlib-ng</string>
+        <key>description</key>
+        <string>zlib data compression library for the next generation systems</string>
       </map>
 			<!-- below here are Kokua-specific -->
       <key>ares</key>
