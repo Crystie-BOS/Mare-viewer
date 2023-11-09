@@ -2785,9 +2785,11 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>5eace400c487011a678493fc520be24d</string>
+              <string>89da16855cc62441b4eee1de9f104149c411881b</string>
+              <key>hash_algorithm</key>
+              <string>sha1</string>
               <key>url</key>
-              <string>http://downloads.phoenixviewer.com/vlc_bin-2.2.3-linux-x64-201610182130-r16.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-vlc_bin/downloads/vlc_bin-2.2.3-linux-x64-201610182130-r16.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
