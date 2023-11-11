@@ -3826,12 +3826,11 @@ void LLPipeline::postSort(LLCamera& camera)
 	for (LLCullResult::sg_iterator i = sCull->beginVisibleGroups(); i != sCull->endVisibleGroups(); ++i)
 	{
 		LLSpatialGroup* group = *i;
-		if ((sUseOcclusion && 
         if (group->isDead())
         {
             continue;
         }
-
+		if ((sUseOcclusion && 
 			group->isOcclusionState(LLSpatialGroup::OCCLUDED)) ||
 			(RenderGeometryOverloadProtection &&
 			RenderAutoHideSurfaceAreaLimit > 0.f && 
