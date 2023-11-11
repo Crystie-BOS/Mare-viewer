@@ -11323,7 +11323,10 @@ bool LLPipeline::hasRenderType(const U32 type) const
     // STORM-365 : LLViewerJointAttachment::setAttachmentVisibility() is setting type to 0 to actually mean "do not render"
     // We then need to test that value here and return false to prevent attachment to render (in mouselook for instance)
     // TODO: reintroduce RENDER_TYPE_NONE in LLRenderTypeMask and initialize its mRenderTypeEnabled[RENDER_TYPE_NONE] to false explicitely
-	return (type == 0 ? false : mRenderTypeEnabled[type]);
+
+    // This is where stateSort crashes are happening - type is an undefined negative number, probably fixed by SL-18720
+    // but we'll add some specific protection here as well
+	return ((type < 1 || type > END_RENDER_TYPES) ? false : mRenderTypeEnabled[type]);
 }
 
 void LLPipeline::setRenderTypeMask(U32 type, ...)
