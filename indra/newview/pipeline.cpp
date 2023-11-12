@@ -2683,8 +2683,11 @@ void LLPipeline::doOcclusion(LLCamera& camera)
 		for (LLCullResult::sg_iterator iter = sCull->beginOcclusionGroups(); iter != sCull->endOcclusionGroups(); ++iter)
 		{
 			LLSpatialGroup* group = *iter;
-			group->doOcclusion(&camera);
-			group->clearOcclusionState(LLSpatialGroup::ACTIVE_OCCLUSION);
+            if (!group->isDead())
+            {
+                group->doOcclusion(&camera);
+                group->clearOcclusionState(LLSpatialGroup::ACTIVE_OCCLUSION);
+            }
 		}
 	
 		//apply occlusion culling to object cache tree
@@ -3333,6 +3336,10 @@ void LLPipeline::stateSort(LLCamera& camera, LLCullResult &result)
 	for (LLCullResult::sg_iterator iter = sCull->beginDrawableGroups(); iter != sCull->endDrawableGroups(); ++iter)
 	{
 		LLSpatialGroup* group = *iter;
+        if (group->isDead())
+        {
+            continue;
+        }
 		group->checkOcclusion();
 		if (sUseOcclusion > 1 && group->isOcclusionState(LLSpatialGroup::OCCLUDED))
 		{
@@ -3393,6 +3400,10 @@ void LLPipeline::stateSort(LLCamera& camera, LLCullResult &result)
 	for (LLCullResult::sg_iterator iter = sCull->beginVisibleGroups(); iter != sCull->endVisibleGroups(); ++iter)
 	{
 		LLSpatialGroup* group = *iter;
+        if (group->isDead())
+        {
+            continue;
+        }
 		group->checkOcclusion();
 		if (sUseOcclusion > 1 && group->isOcclusionState(LLSpatialGroup::OCCLUDED))
 		{
@@ -3553,7 +3564,12 @@ void forAllDrawables(LLCullResult::sg_iterator begin,
 {
 	for (LLCullResult::sg_iterator i = begin; i != end; ++i)
 	{
-		for (LLSpatialGroup::element_iter j = (*i)->getDataBegin(); j != (*i)->getDataEnd(); ++j)
+        LLSpatialGroup* group = *i;
+        if (group->isDead())
+        {
+            continue;
+        }
+		for (LLSpatialGroup::element_iter j = group->getDataBegin(); j != group->getDataEnd(); ++j)
 		{
 			if((*j)->hasDrawable())
 			{
@@ -3788,13 +3804,17 @@ void LLPipeline::postSort(LLCamera& camera)
 	for (LLCullResult::sg_iterator i = sCull->beginDrawableGroups(); i != sCull->endDrawableGroups(); ++i)
 	{
 		LLSpatialGroup* group = *i;
-		if (!sUseOcclusion || 
-			!group->isOcclusionState(LLSpatialGroup::OCCLUDED))
+        if (group->isDead())
+        {
+            continue;
+        }
+		if (!sUseOcclusion || !group->isOcclusionState(LLSpatialGroup::OCCLUDED))
 		{
 			group->rebuildGeom();
 		}
 	}
 	LL_PUSH_CALLSTACKS();
+
 	//rebuild groups
 	sCull->assertDrawMapsEmpty();
 
@@ -3806,6 +3826,10 @@ void LLPipeline::postSort(LLCamera& camera)
 	for (LLCullResult::sg_iterator i = sCull->beginVisibleGroups(); i != sCull->endVisibleGroups(); ++i)
 	{
 		LLSpatialGroup* group = *i;
+        if (group->isDead())
+        {
+            continue;
+        }
 		if ((sUseOcclusion && 
 			group->isOcclusionState(LLSpatialGroup::OCCLUDED)) ||
 			(RenderGeometryOverloadProtection &&
@@ -11298,7 +11322,10 @@ bool LLPipeline::hasRenderType(const U32 type) const
     // STORM-365 : LLViewerJointAttachment::setAttachmentVisibility() is setting type to 0 to actually mean "do not render"
     // We then need to test that value here and return false to prevent attachment to render (in mouselook for instance)
     // TODO: reintroduce RENDER_TYPE_NONE in LLRenderTypeMask and initialize its mRenderTypeEnabled[RENDER_TYPE_NONE] to false explicitely
-	return (type == 0 ? false : mRenderTypeEnabled[type]);
+
+    // This is where stateSort crashes are happening - type is an undefined negative number, probably fixed by SL-18720
+    // but we'll add some specific protection here as well
+	return ((type < 1 || type > END_RENDER_TYPES) ? false : mRenderTypeEnabled[type]);
 }
 
 void LLPipeline::setRenderTypeMask(U32 type, ...)
