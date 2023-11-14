@@ -100,9 +100,9 @@ Use of python virtual environment provides a level of system isolation for insta
 Using Python 3 set up a virtual environment named autobuild.
 Make a directory name Envs and make it active and make a directory named autobuild and make it active.
 
-        sudo apt install python3.7-venv
+        sudo apt install python3.8-venv
 
-        python3.7 -m venv /home/<user>/Envs/autobuild
+        python3.8 -m venv /home/<user>/Envs/autobuild
 
 This will place all the python bits into autobuild.
 And then you can switch to it (this can be added to the .bashrc).

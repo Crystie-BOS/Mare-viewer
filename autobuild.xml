@@ -607,8 +607,6 @@
           <map>
             <key>archive</key>
             <map>
-              <key>creds</key>
-              <string>github</string>
               <key>hash</key>
               <string>2e962534310da80935be41de0b813665</string>
               <key>hash_algorithm</key>
@@ -623,8 +621,6 @@
           <map>
             <key>archive</key>
             <map>
-              <key>creds</key>
-              <string>github</string>
               <key>hash</key>
               <string>143ec21facbedde786bba5ee646b5c99</string>
               <key>hash_algorithm</key>
