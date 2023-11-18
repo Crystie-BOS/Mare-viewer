@@ -536,7 +536,7 @@ void LLViewerTexture::getGPUMemoryForTextures(S32Megabytes &gpu, S32Megabytes &p
     }
     timer.reset();
 
-    LL_RECORD_BLOCK_TIME(FTM_TEXTURE_MEMORY_CHECK);
+    //LL_RECORD_BLOCK_TIME(FTM_TEXTURE_MEMORY_CHECK);
 
     if (gGLManager.mHasATIMemInfo)
     {

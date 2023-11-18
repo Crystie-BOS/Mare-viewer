@@ -551,7 +551,6 @@ void LLGLTexMemBar::draw()
     U32 texFetchLatMax = U32(recording.getMax(LLTextureFetch::sTexFetchLatency).value() * 1000.0f);
 
 	text = llformat("GL Tot: %d/%d MB Bound: %4d/%4d MB FBO: %d MB Raw Tot: %d MB Bias: %.2f Cache: %.1f/%.1f MB",
-	text = llformat("GL Tot: %d/%d MB Bound: %d/%d MB FBO: %d MB VRAM: %d/%d MB Raw Tot: %d MB Bias: %.2f Cache: %.1f/%.1f MB",
 					total_mem.value(),
 					max_total_mem.value(),
                     LLImageGLThread::getFreeVRAMMegabytes(),
