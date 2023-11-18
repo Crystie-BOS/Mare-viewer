@@ -67,9 +67,6 @@ void (*LLViewerTextureList::sUUIDCallback)(void **, const LLUUID&) = NULL;
 
 S32 LLViewerTextureList::sNumImages = 0;
 
-// <FS:Ansariel> Fast cache stats
-U32 LLViewerTextureList::sNumFastCacheReads = 0;
-
 LLViewerTextureList gTextureList;
 
 ETexListType get_element_type(S32 priority)
@@ -1093,9 +1090,6 @@ F32 LLViewerTextureList::updateImagesLoadingFastCache(F32 max_time)
 		enditer = iter;
 		LLViewerFetchedTexture *imagep = *curiter;
 		imagep->loadFromFastCache();
-		// <FS:Ansariel> Fast cache stats
-		sNumFastCacheReads++;
-		// </FS:Ansariel>
 		if (timer.getElapsedTimeF32() > max_time)
 		{
 			break;
