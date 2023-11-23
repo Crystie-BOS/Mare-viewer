@@ -228,6 +228,21 @@ public:
 	void saveCameraPreset(std::string& preset);
 	void saveGraphicsPreset(std::string& preset);
 
+//These were in LLFloaterPreferenceGraphicsAdvanced, all have Advanced appended to their names
+	/*virtual*/ BOOL postBuildAdvanced();
+	void disableUnavailableSettingsAdvanced();
+	void refreshEnabledGraphicsAdvanced();
+	void refreshEnabledStateAdvanced();
+	void updateSliderTextAdvanced(LLSliderCtrl* ctrl, LLTextBox* text_box);
+	void updateMaxNonImpostorsAdvanced();
+	void setMaxNonImpostorsTextAdvanced(U32 value, LLTextBox* text_box);
+	void setMaxComplexityTextAdvanced(U32 value, LLTextBox* text_box);
+	void refreshAdvanced();
+	// callback for when client modifies a render option
+	void onRenderOptionEnableAdvanced();
+  void onAdvancedAtmosphericsEnableAdvanced();
+//End Advanced section
+
     void setRecommendedSettings();
     void resetAutotuneSettings();
 
@@ -388,32 +403,6 @@ private:
 	std::string mEditingControl;
 	S32 mEditingColumn;
 	S32 mEditingMode;
-};
-
-class LLFloaterPreferenceGraphicsAdvanced : public LLFloater
-{
-  public: 
-	LLFloaterPreferenceGraphicsAdvanced(const LLSD& key);
-	~LLFloaterPreferenceGraphicsAdvanced();
-	/*virtual*/ BOOL postBuild();
-	void onOpen(const LLSD& key);
-	void onClickCloseBtn(bool app_quitting);
-	void disableUnavailableSettings();
-	void refreshEnabledGraphics();
-	void refreshEnabledState();
-	void updateSliderText(LLSliderCtrl* ctrl, LLTextBox* text_box);
-	void updateMaxNonImpostors();
-	void setMaxNonImpostorsText(U32 value, LLTextBox* text_box);
-	void updateMaxComplexity();
-	void setMaxComplexityText(U32 value, LLTextBox* text_box);
-	static void setIndirectControls();
-	static void setIndirectMaxNonImpostors();
-	static void setIndirectMaxArc();
-	void refresh();
-	// callback for when client modifies a render option
-	void onRenderOptionEnable();
-    void onAdvancedAtmosphericsEnable();
-	LOG_CLASS(LLFloaterPreferenceGraphicsAdvanced);
 };
 
 class LLAvatarComplexityControls
