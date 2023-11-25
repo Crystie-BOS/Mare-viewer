@@ -267,11 +267,7 @@ void LLManipTranslate::restoreGL()
 				}
 			}
 		}
-#ifdef LL_WINDOWS
 		LLImageGL::setManualImage(GL_TEXTURE_2D, mip, GL_RGBA, rez, rez, GL_RGBA, GL_UNSIGNED_BYTE, d);
-#else
-		LLImageGL::setManualImage(GL_TEXTURE_2D, mip, GL_RGBA, rez, rez, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, d);
-#endif
 		rez = rez >> 1;
 		mip++;
 	}
@@ -1070,7 +1066,7 @@ void LLManipTranslate::render()
 		renderGuidelines();
 	}
 	{
-		LLGLDisable gls_stencil(GL_STENCIL_TEST);
+		//LLGLDisable gls_stencil(GL_STENCIL_TEST);
 		renderTranslationHandles();
 		renderSnapGuides();
 	}
@@ -1536,7 +1532,7 @@ void LLManipTranslate::renderSnapGuides()
 			LLGLDepthTest gls_depth(GL_TRUE, GL_FALSE);
 
 			{
-				LLGLDisable stencil(GL_STENCIL_TEST);
+				//LLGLDisable stencil(GL_STENCIL_TEST);
 				{
 					LLGLDepthTest gls_depth(GL_TRUE, GL_FALSE, GL_GREATER);
 					gGL.getTexUnit(0)->bindManual(LLTexUnit::TT_TEXTURE, getGridTexName());
@@ -1548,7 +1544,6 @@ void LLManipTranslate::renderSnapGuides()
 				}
 				
 				{
-					LLGLDisable alpha_test(GL_ALPHA_TEST);
 					//draw black overlay
 					gGL.getTexUnit(0)->unbind(LLTexUnit::TT_TEXTURE);
 					renderGrid(u,v,tiles,0.0f, 0.0f, 0.0f,a*0.16f);
@@ -1569,7 +1564,6 @@ void LLManipTranslate::renderSnapGuides()
 
 				{
 					LLGLDepthTest gls_depth(GL_TRUE, GL_FALSE, GL_GREATER);
-					LLGLEnable stipple(GL_LINE_STIPPLE);
 					gGL.flush();
 
 					switch (mManipPart)
@@ -1641,12 +1635,7 @@ void LLManipTranslate::highlightIntersection(LLVector3 normal,
 											 LLQuaternion grid_rotation, 
 											 LLColor4 inner_color)
 {
-//MK
-	if (gRRenabled && gAgent.mRRInterface.mVisionRestricted && (gAgent.mRRInterface.mCamDistDrawAlphaMax >= 0.25 || gAgent.mRRInterface.mSetsphereValueMax >= 0.25))
-	{
-		return;
-	}
-//mk
+#if 0 // DEPRECATED
 	if (!gSavedSettings.getBOOL("GridCrossSections"))
 	{
 		return;
@@ -1670,13 +1659,13 @@ void LLManipTranslate::highlightIntersection(LLVector3 normal,
 	}
 		
 	{
-		glStencilMask(stencil_mask);
-		glClearStencil(1);
-		glClear(GL_STENCIL_BUFFER_BIT);
+		//glStencilMask(stencil_mask); //deprecated
+		//glClearStencil(1);
+		//glClear(GL_STENCIL_BUFFER_BIT);
 		LLGLEnable cull_face(GL_CULL_FACE);
-		LLGLEnable stencil(GL_STENCIL_TEST);
+		//LLGLEnable stencil(GL_STENCIL_TEST);
 		LLGLDepthTest depth (GL_TRUE, GL_FALSE, GL_ALWAYS);
-		glStencilFunc(GL_ALWAYS, 0, stencil_mask);
+		//glStencilFunc(GL_ALWAYS, 0, stencil_mask);
 		gGL.setColorMask(false, false);
 		gGL.getTexUnit(0)->unbind(LLTexUnit::TT_TEXTURE);
 
@@ -1709,14 +1698,14 @@ void LLManipTranslate::highlightIntersection(LLVector3 normal,
 		}
 		
 		//stencil in volumes
-		glStencilOp(GL_INCR, GL_INCR, GL_INCR);
+		//glStencilOp(GL_INCR, GL_INCR, GL_INCR);
 		glCullFace(GL_FRONT);
 		for (U32 i = 0; i < num_types; i++)
 		{
 			gPipeline.renderObjects(types[i], LLVertexBuffer::MAP_VERTEX, FALSE);
 		}
 
-		glStencilOp(GL_DECR, GL_DECR, GL_DECR);
+		//glStencilOp(GL_DECR, GL_DECR, GL_DECR);
 		glCullFace(GL_BACK);
 		for (U32 i = 0; i < num_types; i++)
 		{
@@ -1760,7 +1749,7 @@ void LLManipTranslate::highlightIntersection(LLVector3 normal,
 	{
 		gGL.getTexUnit(0)->unbind(LLTexUnit::TT_TEXTURE);
 		LLGLDepthTest depth(GL_FALSE);
-		LLGLEnable stencil(GL_STENCIL_TEST);
+		//LLGLEnable stencil(GL_STENCIL_TEST);
 		glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 		glStencilFunc(GL_EQUAL, 0, stencil_mask);
 		renderGrid(0,0,tiles,inner_color.mV[0], inner_color.mV[1], inner_color.mV[2], 0.25f);
@@ -1771,6 +1760,7 @@ void LLManipTranslate::highlightIntersection(LLVector3 normal,
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
 	gGL.popMatrix();
+#endif
 }
 
 void LLManipTranslate::renderText()
@@ -2203,7 +2193,6 @@ void LLManipTranslate::renderArrow(S32 which_arrow, S32 selected_arrow, F32 box_
 {
 	gGL.getTexUnit(0)->unbind(LLTexUnit::TT_TEXTURE);
 	LLGLEnable gls_blend(GL_BLEND);
-	LLGLEnable gls_color_material(GL_COLOR_MATERIAL);
 
 	for (S32 pass = 1; pass <= 2; pass++)
 	{	

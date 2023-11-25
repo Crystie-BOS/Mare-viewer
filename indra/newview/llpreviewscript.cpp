@@ -1247,7 +1247,7 @@ BOOL LLScriptEdCore::handleKeyHere(KEY key, MASK mask)
 
 void LLScriptEdCore::onBtnLoadFromFile( void* data )
 {
-	(new LLFilePickerReplyThread(boost::bind(&LLScriptEdCore::loadScriptFromFile, _1, data), LLFilePicker::FFLOAD_SCRIPT, false))->getFile();
+	LLFilePickerReplyThread::startPicker(boost::bind(&LLScriptEdCore::loadScriptFromFile, _1, data), LLFilePicker::FFLOAD_SCRIPT, false);
 }
 
 void LLScriptEdCore::loadScriptFromFile(const std::vector<std::string>& filenames, void* data)
@@ -1288,7 +1288,7 @@ void LLScriptEdCore::onBtnSaveToFile( void* userdata )
 
 	if( self->mSaveCallback )
 	{
-		(new LLFilePickerReplyThread(boost::bind(&LLScriptEdCore::saveScriptToFile, _1, userdata), LLFilePicker::FFSAVE_SCRIPT, self->mScriptName))->getFile();
+		LLFilePickerReplyThread::startPicker(boost::bind(&LLScriptEdCore::saveScriptToFile, _1, userdata), LLFilePicker::FFSAVE_SCRIPT, self->mScriptName);
 	}
 }
 
@@ -1777,7 +1777,7 @@ class FSScriptAssetUpload: public LLScriptAssetUpload
 	bool m_bMono;
 public:
     FSScriptAssetUpload( LLUUID itemId, std::string buffer, invnUploadFinish_f finish, bool a_bMono )
-	: LLScriptAssetUpload( itemId, buffer, finish )
+	: LLScriptAssetUpload( itemId, buffer, finish, nullptr )
 	{
 		m_bMono = a_bMono;
 	}
@@ -1793,6 +1793,32 @@ public:
 	}
 };
 // </FS:ND>
+
+bool LLPreviewLSL::failedLSLUpload(LLUUID itemId, LLUUID taskId, LLSD response, std::string reason)
+{
+    LLSD floater_key;
+    if (taskId.notNull())
+    {
+        floater_key["taskid"] = taskId;
+        floater_key["itemid"] = itemId;
+    }
+    else
+    {
+        floater_key = LLSD(itemId);
+    }
+
+    LLPreviewLSL* preview = LLFloaterReg::findTypedInstance<LLPreviewLSL>("preview_script", floater_key);
+    if (preview)
+    {
+        // unfreeze floater
+        LLSD errors;
+        errors.append(LLTrans::getString("UploadFailed") + reason);
+        preview->callbackLSLCompileFailed(errors);
+        return true;
+    }
+
+    return false;
+}
 
 // Save needs to compile the text in the buffer. If the compile
 // succeeds, then save both assets out to the database. If the compile
@@ -2562,9 +2588,9 @@ void LLLiveLSLEditor::uploadAssetViaCaps(const std::string& url,
     std::string buffer(mScriptEd->mEditor->getText());
     LLBufferedAssetUploadInfo::taskUploadFinish_f proc = boost::bind(&LLLiveLSLEditor::finishLSLUpload, _1, _2, _3, _4, is_running);
 
-    LLResourceUploadInfo::ptr_t uploadInfo(new LLScriptAssetUpload(mObjectUUID, mItemUUID,
+    LLResourceUploadInfo::ptr_t uploadInfo(std::make_shared<LLScriptAssetUpload>(mObjectUUID, mItemUUID,
         monoChecked() ? LLScriptAssetUpload::MONO : LLScriptAssetUpload::LSL2,
-        is_running, mScriptEd->getAssociatedExperience(), buffer, proc));
+        is_running, mScriptEd->getAssociatedExperience(), buffer, proc, nullptr));
 
     LLViewerAssetUpload::EnqueueInventoryUpload(url, uploadInfo);
 //	LLHTTPClient::post(url, body,

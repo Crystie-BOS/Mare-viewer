@@ -43,6 +43,7 @@ include(UI)
 include(ViewerMiscLibs)
 include(ViewerManager)
 include(VisualLeakDetector)
+include(VulkanGltf)
 include(ZLIBNG)
 include(URIPARSER)
 include(LLPrimitive)
@@ -175,8 +176,8 @@ set(viewer_SOURCE_FILES
     lldrawpoolalpha.cpp
     lldrawpoolavatar.cpp
     lldrawpoolbump.cpp
-    lldrawpoolground.cpp
     lldrawpoolmaterials.cpp
+    lldrawpoolpbropaque.cpp
     lldrawpoolsimple.cpp
     lldrawpoolsky.cpp
     lldrawpoolterrain.cpp
@@ -196,6 +197,7 @@ set(viewer_SOURCE_FILES
     llfasttimerview.cpp
     llfavoritesbar.cpp
     llfeaturemanager.cpp
+    llfetchedgltfmaterial.cpp
     llfilepicker.cpp
     llfilteredwearablelist.cpp
     llfirstuse.cpp
@@ -319,7 +321,6 @@ set(viewer_SOURCE_FILES
     llfloatertelehub.cpp
     llfloatertestinspectors.cpp
     llfloatertestlistview.cpp
-    llfloatertexturefetchdebugger.cpp
     llfloatertools.cpp
     llfloatertopobjects.cpp
     llfloatertos.cpp
@@ -341,6 +342,7 @@ set(viewer_SOURCE_FILES
     llgesturemgr.cpp
     llgiveinventory.cpp
     llglsandbox.cpp
+    llgltfmateriallist.cpp
     llgroupactions.cpp
     llgroupiconctrl.cpp
     llgrouplist.cpp
@@ -393,6 +395,7 @@ set(viewer_SOURCE_FILES
     lllistcontextmenu.cpp
     lllistview.cpp
     lllocalbitmaps.cpp
+    lllocalgltfmaterials.cpp
     lllocationhistory.cpp
     lllocationinputctrl.cpp
     lllogchat.cpp
@@ -405,6 +408,7 @@ set(viewer_SOURCE_FILES
     llmaniptranslate.cpp
     llmarketplacefunctions.cpp
     llmarketplacenotifications.cpp
+    llmaterialeditor.cpp
     llmaterialmgr.cpp
     llmediactrl.cpp
     llmediadataclient.cpp
@@ -547,6 +551,8 @@ set(viewer_SOURCE_FILES
     llproductinforequest.cpp
     llprogressview.cpp
     llrecentpeople.cpp
+    llreflectionmap.cpp
+    llreflectionmapmanager.cpp
     llregioninfomodel.cpp
     llregionposition.cpp
     llremoteparcelrequest.cpp
@@ -604,6 +610,7 @@ set(viewer_SOURCE_FILES
     lltexturestats.cpp
     lltextureview.cpp
     llthumbnailctrl.cpp
+    lltinygltfhelper.cpp
     lltoast.cpp
     lltoastalertpanel.cpp
     lltoastgroupnotifypanel.cpp
@@ -712,7 +719,6 @@ set(viewer_SOURCE_FILES
     llvoavatarself.cpp
     llvocache.cpp
     llvograss.cpp
-    llvoground.cpp
     llvoicecallhandler.cpp
     llvoicechannel.cpp
     llvoiceclient.cpp
@@ -871,7 +877,7 @@ set(viewer_HEADER_FILES
     lldrawpoolavatar.h
     lldrawpoolbump.h
     lldrawpoolmaterials.h
-    lldrawpoolground.h
+    lldrawpoolpbropaque.h
     lldrawpoolsimple.h
     lldrawpoolsky.h
     lldrawpoolterrain.h
@@ -891,6 +897,7 @@ set(viewer_HEADER_FILES
     llfasttimerview.h
     llfavoritesbar.h
     llfeaturemanager.h
+    llfetchedgltfmaterial.h
     llfilepicker.h
     llfilteredwearablelist.h
     llfirstuse.h
@@ -1017,7 +1024,6 @@ set(viewer_HEADER_FILES
     llfloatertelehub.h
     llfloatertestinspectors.h
     llfloatertestlistview.h
-    llfloatertexturefetchdebugger.h
     llfloatertools.h
     llfloatertopobjects.h
     llfloatertos.h
@@ -1038,6 +1044,7 @@ set(viewer_HEADER_FILES
     llgesturelistener.h
     llgesturemgr.h
     llgiveinventory.h
+    llgltfmateriallist.h
     llgroupactions.h
     llgroupiconctrl.h
     llgrouplist.h
@@ -1089,6 +1096,7 @@ set(viewer_HEADER_FILES
     lllistcontextmenu.h
     lllistview.h
     lllocalbitmaps.h
+    lllocalgltfmaterials.h
     lllocationhistory.h
     lllocationinputctrl.h
     lllogchat.h
@@ -1101,6 +1109,7 @@ set(viewer_HEADER_FILES
     llmaniptranslate.h
     llmarketplacefunctions.h
     llmarketplacenotifications.h
+    llmaterialeditor.h
     llmaterialmgr.h
     llmediactrl.h
     llmediadataclient.h
@@ -1230,6 +1239,8 @@ set(viewer_HEADER_FILES
     llproductinforequest.h
     llprogressview.h
     llrecentpeople.h
+    llreflectionmap.h
+    llreflectionmapmanager.h
     llregioninfomodel.h
     llregionposition.h
     llremoteparcelrequest.h
@@ -1291,6 +1302,7 @@ set(viewer_HEADER_FILES
     lltexturestats.h
     lltextureview.h
     llthumbnailctrl.h
+    lltinygltfhelper.h
     lltoast.h
     lltoastalertpanel.h
     lltoastgroupnotifypanel.h
@@ -1401,7 +1413,6 @@ set(viewer_HEADER_FILES
     llvoavatarself.h
     llvocache.h
     llvograss.h
-    llvoground.h
     llvoicechannel.h
     llvoiceclient.h
     llvoicevisualizer.h
@@ -1722,18 +1733,23 @@ set_source_files_properties(${viewer_XUI_FILES}
 
 list(APPEND viewer_SOURCE_FILES ${viewer_XUI_FILES})
 
+file(GLOB_RECURSE viewer_SHADER_FILES LIST_DIRECTORIES TRUE
+    ${CMAKE_CURRENT_SOURCE_DIR}/app_settings/shaders/*.glsl)
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/app_settings/shaders PREFIX "Shaders" FILES ${viewer_SHADER_FILES})
+set_source_files_properties(${viewer_SHADER_FILES} 
+                            PROPERTIES HEADER_FILE_ONLY TRUE)
+list(APPEND viewer_SOURCE_FILES ${viewer_SHADER_FILES})
+
+
 set(viewer_APPSETTINGS_FILES
     app_settings/anim.ini
     app_settings/cmd_line.xml
     app_settings/commands.xml
     app_settings/grass.xml
-    app_settings/high_graphics.xml
     app_settings/ignorable_dialogs.xml
     app_settings/key_bindings.xml
     app_settings/keywords_lsl_default.xml
     app_settings/logcontrol.xml
-    app_settings/low_graphics.xml
-    app_settings/mid_graphics.xml
     app_settings/posestand.xml
     app_settings/settings.xml
     app_settings/settings_crash_behavior.xml
@@ -1742,7 +1758,6 @@ set(viewer_APPSETTINGS_FILES
     app_settings/std_bump.ini
     app_settings/toolbars.xml
     app_settings/trees.xml
-    app_settings/ultra_graphics.xml
     app_settings/viewerart.xml
     ${CMAKE_SOURCE_DIR}/../etc/message.xml
     ${CMAKE_SOURCE_DIR}/../scripts/messages/message_template.msg
@@ -1819,8 +1834,9 @@ if (WINDOWS)
         # *TODO -reenable this once we get server usage sorted out
         LINK_FLAGS "/debug /NODEFAULTLIB:LIBCMT /SUBSYSTEM:WINDOWS /LARGEADDRESSAWARE"
         LINK_FLAGS_DEBUG "/NODEFAULTLIB:\"LIBCMT;LIBCMTD;MSVCRT\" /INCREMENTAL:NO /LARGEADDRESSAWARE"
-        LINK_FLAGS_RELEASE "/FORCE:MULTIPLE /MAP\"kokua-bin.MAP\" /OPT:REF /INCREMENTAL:NO /LTCG /LARGEADDRESSAWARE"
+        LINK_FLAGS_RELEASE "/FORCE:MULTIPLE /MAP\"kokua-bin.MAP\" /OPT:REF /LTCG /LARGEADDRESSAWARE"
         )
+    target_compile_options(${VIEWER_BINARY_NAME} PRIVATE /bigobj)
 
     if(USE_PRECOMPILED_HEADERS)
        target_precompile_headers( ${VIEWER_BINARY_NAME} PRIVATE llviewerprecompiledheaders.h )
@@ -2337,6 +2353,7 @@ if (LL_TESTS)
 #    llremoteparcelrequest.cpp
     llviewerhelputil.cpp
     llversioninfo.cpp
+#    llvocache.cpp  
     llworldmap.cpp
     llworldmipmap.cpp
   )
@@ -2349,6 +2366,13 @@ if (LL_TESTS)
     tests/llviewertexture_stub.cpp
     #llviewertexturelist.cpp
   )
+
+#  set_source_files_properties(
+#    llvocache.cpp
+#    PROPERTIES
+#    LL_TEST_ADDITIONAL_SOURCE_FILES ../llmessage/lldatapacker.cpp
+#    LL_TEST_ADDITIONAL_PROJECTS "llprimitive"
+#  )
 
   set(test_libs
           llcommon
@@ -2367,7 +2391,6 @@ if (LL_TESTS)
     PROPERTIES
     LL_TEST_ADDITIONAL_LIBRARIES "${test_libs}"
   )
-
 
   set_source_files_properties(
     llworldmap.cpp
@@ -2388,6 +2411,7 @@ if (LL_TESTS)
     PROPERTIES
     LL_TEST_ADDITIONAL_SOURCE_FILES llversioninfo.cpp
   )
+
   set_property( SOURCE
           ${viewer_TEST_SOURCE_FILES}
           PROPERTY
@@ -2435,6 +2459,19 @@ if (LL_TESTS)
 
   LL_ADD_INTEGRATION_TEST(llslurl
      "${llslurl_test_sources}"
+    "${test_libs}"
+    )
+
+  set(llviewercontrollistener_test_sources
+    llviewercontrollistener.cpp
+    ../llxml/llcontrol.cpp
+    ../llxml/llxmltree.cpp
+    ../llxml/llxmlparser.cpp
+    ../llcommon/commoncontrol.cpp
+    )
+
+  LL_ADD_INTEGRATION_TEST(llviewercontrollistener
+    "${llviewercontrollistener_test_sources}"
     "${test_libs}"
     )
 

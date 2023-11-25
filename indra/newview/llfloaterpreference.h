@@ -112,8 +112,8 @@ public:
 	void updateClickActionViews();
     void updateSearchableItems();
 
-    void		onBtnOK(const LLSD& userdata);
-    void		onBtnCancel(const LLSD& userdata);
+	void		onBtnOK(const LLSD& userdata);
+	void		onBtnCancel(const LLSD& userdata);
 
 protected:	
 
@@ -163,8 +163,6 @@ protected:
 	// <FS:Ansariel> Properly disable avatar tag setting
 	void onAvatarTagSettingsChanged();
 
-	// <FS:Ansariel> Dynamic texture memory calculation
-	void handleDynamicTextureMemoryChanged();
 public:
 	// This function squirrels away the current values of the controls so that
 	// cancel() can restore them.	
@@ -208,6 +206,7 @@ public:
 	void applyResolution();
 	void onChangeMaturity();
 	void onChangeModelFolder();
+    void onChangePBRFolder();
 	void onChangeTextureFolder();
 	void onChangeSoundFolder();
 	void onChangeAnimationFolder();

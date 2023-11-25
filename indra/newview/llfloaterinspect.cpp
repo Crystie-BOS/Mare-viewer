@@ -568,7 +568,7 @@ void LLFloaterInspect::refresh()
 				++volume_texture)
 			{
 				// add the cost of each individual texture in the linkset
-				attachment_texture_cost += volume_texture->second;
+				attachment_texture_cost += LLVOVolume::getTextureCost(*volume_texture);
 			}
 			attachment_total_cost = attachment_volume_cost + attachment_texture_cost + attachment_children_cost;
 

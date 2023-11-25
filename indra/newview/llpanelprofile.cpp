@@ -2030,13 +2030,12 @@ void LLPanelProfileSecondLife::onShowTexturePicker()
                 "SELECT PHOTO",
                 PERM_NONE,
                 PERM_NONE,
-                PERM_NONE,
                 FALSE,
                 NULL);
 
             mFloaterTexturePickerHandle = texture_floaterp->getHandle();
 
-            texture_floaterp->setOnFloaterCommitCallback([this](LLTextureCtrl::ETexturePickOp op, LLPickerSource source, const LLUUID& asset_id, const LLUUID&)
+            texture_floaterp->setOnFloaterCommitCallback([this](LLTextureCtrl::ETexturePickOp op, LLPickerSource source, const LLUUID& asset_id, const LLUUID&, const LLUUID&)
             {
                 if (op == LLTextureCtrl::TEXTURE_SELECT)
                 {
@@ -2357,13 +2356,12 @@ void LLPanelProfileFirstLife::onChangePhoto()
                 "SELECT PHOTO",
                 PERM_NONE,
                 PERM_NONE,
-                PERM_NONE,
                 FALSE,
                 NULL);
 
             mFloaterTexturePickerHandle = texture_floaterp->getHandle();
 
-            texture_floaterp->setOnFloaterCommitCallback([this](LLTextureCtrl::ETexturePickOp op, LLPickerSource source, const LLUUID& asset_id, const LLUUID&)
+            texture_floaterp->setOnFloaterCommitCallback([this](LLTextureCtrl::ETexturePickOp op, LLPickerSource source, const LLUUID& asset_id, const LLUUID&, const LLUUID&)
             {
                 if (op == LLTextureCtrl::TEXTURE_SELECT)
                 {

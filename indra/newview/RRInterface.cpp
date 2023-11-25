@@ -1378,7 +1378,6 @@ BOOL RRInterface::add (LLUUID object_uuid, std::string action, std::string optio
 			gSavedSettings.setBOOL("RenderObjectBump", TRUE); // make sure to render "Bump Mapping and Shiny"
 			gSavedSettings.setBOOL("RenderTransparentWater", TRUE); // make sure to render "Transparent Water"
 			gSavedSettings.setBOOL("WindLightUseAtmosShaders", TRUE); // make sure the atmospheric shaders are turned on
-			gSavedSettings.setBOOL("RenderDeferred", TRUE); // make sure Advanced Lighting Model is on
 			gSavedSettings.setBOOL("RenderDepthOfField", FALSE); // make sure DoF is off otherwise we can see through the sphere by looking through alpha-blended rigged surfaces
 			doRefreshEnabledState();
 			updateSetsphere();
@@ -1398,18 +1397,6 @@ BOOL RRInterface::add (LLUUID object_uuid, std::string action, std::string optio
 			if (gUseWireframe)
 			{
 				gUseWireframe = FALSE;
-				// Copied from LLAdvancedToggleWireframe::handle_event() in llviewermenu.cpp
-				gWindowResized = TRUE;
-				LLPipeline::updateRenderDeferred();
-				gPipeline.resetVertexBuffers();
-
-				if (!gUseWireframe && !gInitialDeferredModeForWireframe && LLPipeline::sRenderDeferred != ((bool)gInitialDeferredModeForWireframe && gPipeline.isInit()))
-				{
-					LLPipeline::refreshCachedSettings();
-					gPipeline.releaseGLBuffers();
-					gPipeline.createGLBuffers();
-					LLViewerShaderMgr::instance()->setShaders();
-				}
 			}
 		}
 
@@ -6683,18 +6670,6 @@ BOOL RRInterface::updateSetsphere()
 		end for
 	*/
 
-	// If we're not using deferred but are using Windlight shaders we need to force use of FBO and depthmap texture
-	if ((!LLPipeline::RenderDeferred) && (LLPipeline::WindLightUseAtmosShaders) && (!LLPipeline::sUseDepthTexture))
-	{
-		LLRenderTarget::sUseFBO = true;
-		LLPipeline::sUseDepthTexture = true;
-
-		gPipeline.releaseGLBuffers();
-		gPipeline.createGLBuffers();
-		gPipeline.resetVertexBuffers();
-		LLViewerShaderMgr::instance()->setShaders();
-	}
-	
 	//KKA-835 as part of extending mVisionRestricted to include setsphere, we need generally accessible min and max values
 	mSetsphereDistMin = EXTREMUM;
 	mSetsphereDistMax = EXTREMUM;

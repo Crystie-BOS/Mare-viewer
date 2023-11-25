@@ -127,8 +127,7 @@ const F32 MAX_FIDGET_TIME = 20.f; // seconds
 
 const S32 UI_FEATURE_VERSION = 1;
 // For version 1: 1 - inventory, 2 - gltf
-// Will need to change to 3 once either inventory or gltf releases and cause a conflict
-const S32 UI_FEATURE_FLAGS = 1;
+const S32 UI_FEATURE_FLAGS = 3;
 
 // The agent instance.
 LLAgent gAgent;
@@ -1350,11 +1349,7 @@ void LLAgent::setRegion(LLViewerRegion *regionp)
 			{
 				gSky.mVOSkyp->setRegion(regionp);
 			}
-			if (gSky.mVOGroundp)
-			{
-				gSky.mVOGroundp->setRegion(regionp);
-			}
-
+			
             if (regionp->capabilitiesReceived())
             {
                 regionp->requestSimulatorFeatures();
@@ -4521,10 +4516,6 @@ bool LLAgent::teleportCore(bool is_local)
 		gTeleportDisplay = TRUE;
 		LL_INFOS("Teleport") << "Non-local, setting teleport state to TELEPORT_START" << LL_ENDL;
 		gAgent.setTeleportState( LLAgent::TELEPORT_START );
-
-		//release geometry from old location
-		gPipeline.resetVertexBuffers();
-		LLSpatialPartition::sTeleportRequested = TRUE;
 	}
 	make_ui_sound("UISndTeleportOut");
 	
@@ -4897,7 +4888,6 @@ void LLAgent::teleportCancel()
 	}
 	clearTeleportRequest();
 	gAgent.setTeleportState( LLAgent::TELEPORT_NONE );
-	gPipeline.resetVertexBuffers(); 
 }
 
 void LLAgent::restoreCanceledTeleportRequest()

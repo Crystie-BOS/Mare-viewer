@@ -16,15 +16,28 @@ ca_*.sh
 *.rej
 *.bz2
 *.zip
+*.vcxproj
+*.filters
+*.sln
+*.depend
+*.stamp
+*.rc
+
 *.dll
 *.diff
 
 # Specific folders (use leading / to reference from .gitignore's location)
+CMakeCache.txt
+cmake_install.cmake
 /build-*
 /debian/files
 /debian/secondlife-appearance-utility*
 /debian/secondlife-viewer*
 /indra/.distcc
+indra/cmake/*
+indra/out/*
+
+indra/packages/*
 /indra/build-vc[0-9]*
 /indra/CMakeFiles
 /indra/lib/mono/1.0/*.dll

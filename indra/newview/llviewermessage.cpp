@@ -153,6 +153,8 @@
 
 extern void on_new_message(const LLSD& msg);
 
+extern BOOL gCubeSnapshot;
+
 //
 // Constants
 //
@@ -1607,12 +1609,13 @@ bool check_offer_throttle(const std::string& from_name, bool check_only)
 // Return "true" if we have a preview method for that asset type, "false" otherwise
 bool check_asset_previewable(const LLAssetType::EType asset_type)
 {
-	return	(asset_type == LLAssetType::AT_NOTECARD) ||
-		(asset_type == LLAssetType::AT_LANDMARK) ||
-		(asset_type == LLAssetType::AT_TEXTURE) ||
-		(asset_type == LLAssetType::AT_ANIMATION) ||
-		(asset_type == LLAssetType::AT_SCRIPT) ||
-		(asset_type == LLAssetType::AT_SOUND);
+	return	(asset_type == LLAssetType::AT_NOTECARD)  || 
+			(asset_type == LLAssetType::AT_LANDMARK)  ||
+			(asset_type == LLAssetType::AT_TEXTURE)   ||
+			(asset_type == LLAssetType::AT_ANIMATION) ||
+			(asset_type == LLAssetType::AT_SCRIPT)    ||
+			(asset_type == LLAssetType::AT_SOUND) ||
+            (asset_type == LLAssetType::AT_MATERIAL);
 }
 
 // <FS:Ansariel> FIRE-15886
@@ -1736,6 +1739,9 @@ void open_inventory_offer(const uuid_vec_t& objects, const std::string& from_nam
 				case LLAssetType::AT_SOUND:
 					LLFloaterReg::showInstance("preview_sound", LLSD(obj_id), take_focus);
 					break;
+                    case LLAssetType::AT_MATERIAL:
+                        // Explicitly do nothing -- we don't want to open the material editor every time you add a material to inventory
+                        break;
 				default:
 					LL_DEBUGS("Messaging") << "No preview method for previewable asset type : " << LLAssetType::lookupHumanReadable(asset_type) << LL_ENDL;
 					break;
@@ -3593,8 +3599,6 @@ void process_teleport_finish(LLMessageSystem* msg, void**)
 	// Teleport is finished; it can't be cancelled now.
 	gViewerWindow->setProgressCancelButtonVisible(FALSE);
 
-	gPipeline.doResetVertexBuffers(true);
-
 	// Do teleport effect for where you're leaving
 	// VEFFECT: TeleportStart
 	LLHUDEffectSpiral *effectp = (LLHUDEffectSpiral *)LLHUDManager::getInstance()->createViewerEffect(LLHUDObject::LL_HUD_EFFECT_POINT, TRUE);
@@ -3987,6 +3991,8 @@ const F32 MAX_HEAD_ROT_QDOT = 0.99999f;			// ~= 0.5 degrees -- if its greater th
 void send_agent_update(BOOL force_send, BOOL send_reliable)
 {
     LL_PROFILE_ZONE_SCOPED;
+    llassert(!gCubeSnapshot);
+
 	if (gAgent.getTeleportState() != LLAgent::TELEPORT_NONE)
 	{
 		// We don't care if they want to send an agent update, they're not allowed to until the simulator
@@ -5176,7 +5182,7 @@ void process_object_animation(LLMessageSystem *mesgsys, void **user_data)
         //if (!avatarp->mRootVolp->isAnySelected())
         {
             avatarp->updateVolumeGeom();
-            avatarp->mRootVolp->recursiveMarkForUpdate(TRUE);
+            avatarp->mRootVolp->recursiveMarkForUpdate();
         }
     }
         

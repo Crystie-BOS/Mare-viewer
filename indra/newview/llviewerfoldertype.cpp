@@ -133,11 +133,8 @@ LLViewerFolderDictionary::LLViewerFolderDictionary()
 	addEntry(LLFolderType::FT_OUTFIT, 				new ViewerFolderEntry("New Outfit",				"Inv_LookFolderOpen",	"Inv_LookFolderClosed",	TRUE,      false));
 	addEntry(LLFolderType::FT_MY_OUTFITS, 			new ViewerFolderEntry("My Outfits",				"Inv_SysOpen",			"Inv_SysClosed",		TRUE,      true));
 	addEntry(LLFolderType::FT_MESH, 				new ViewerFolderEntry("Meshes",					"Inv_SysOpen",			"Inv_SysClosed",		FALSE,     true));
-//MK
-	// How do we add environment settings to a folder if we can't see it ?
-///	addEntry(LLFolderType::FT_SETTINGS, 		    new ViewerFolderEntry("Settings",			    "Inv_SysOpen",			"Inv_SysClosed",		FALSE,     true));
-	addEntry(LLFolderType::FT_SETTINGS, new ViewerFolderEntry("Settings", "Inv_SysOpen", "Inv_SysClosed", FALSE, false));
-//mk
+	addEntry(LLFolderType::FT_SETTINGS, 		    new ViewerFolderEntry("Settings",			    "Inv_SysOpen",			"Inv_SysClosed",		FALSE,     true));
+	addEntry(LLFolderType::FT_MATERIAL, 		    new ViewerFolderEntry("Materials",			    "Inv_SysOpen",			"Inv_SysClosed",		FALSE,     true));
 
 	bool boxes_invisible = !gSavedSettings.getBOOL("InventoryOutboxMakeVisible");
 	addEntry(LLFolderType::FT_INBOX, 				new ViewerFolderEntry("Received Items",			"Inv_SysOpen",			"Inv_SysClosed",		FALSE,     boxes_invisible));

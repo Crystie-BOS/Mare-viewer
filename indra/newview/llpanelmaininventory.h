@@ -251,6 +251,7 @@ protected:
 
 	bool handleDragAndDropToTrash(BOOL drop, EDragAndDropType cargo_type, EAcceptance* accept);
     static bool hasSettingsInventory();
+    static bool hasMaterialsInventory();
     void updateTitle();
     void updateNavButtons();
     
