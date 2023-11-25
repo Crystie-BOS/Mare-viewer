@@ -112,8 +112,8 @@ public:
 	void updateClickActionViews();
     void updateSearchableItems();
 
-    void		onBtnOK(const LLSD& userdata);
-    void		onBtnCancel(const LLSD& userdata);
+	void		onBtnOK(const LLSD& userdata);
+	void		onBtnCancel(const LLSD& userdata);
 
 protected:	
 
@@ -206,6 +206,7 @@ public:
 	void applyResolution();
 	void onChangeMaturity();
 	void onChangeModelFolder();
+    void onChangePBRFolder();
 	void onChangeTextureFolder();
 	void onChangeSoundFolder();
 	void onChangeAnimationFolder();

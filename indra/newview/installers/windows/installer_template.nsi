@@ -523,7 +523,6 @@ Function CheckIfAdministrator
         Quit
 lbl_is_admin:
     Return
-
 FunctionEnd
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
