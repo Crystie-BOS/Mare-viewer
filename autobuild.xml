@@ -2085,9 +2085,9 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>e246d66cd72d0fb9a8946e9ca0b38ae5</string>
+              <string>7a413db32c331f613cc08b42cad7d7e3</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-ogg_vorbis/downloads/ogg_vorbis-1.3.3-1.3.6.233230841-linux64-233230841.tar.bz2</string>
+              <string>http://bitbucket.org/kokua/3p-ogg_vorbis/downloads/ogg_vorbis-1.3.3-1.3.6.231560612-linux64-231560612.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
