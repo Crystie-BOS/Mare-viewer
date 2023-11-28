@@ -969,6 +969,16 @@ name="Dummy Menu">
 ###                 parameter="noon" />
 ###            </menu_item_check>
 ###            <menu_item_check
+###             label="Midday (Legacy)"
+###             name="legacy noon">
+###            <menu_item_check.on_click
+###             function="World.EnvSettings"
+###             parameter="legacy noon" />
+###            <menu_item_check.on_check
+###             function="World.EnableEnvSettings"
+###             parameter="legacy noon" />
+###          </menu_item_check>
+###            <menu_item_check
 ###             label="Sunset"
 ###             name="Sunset"
 ###             shortcut="control|shift|N">
@@ -1473,6 +1483,24 @@ name="Dummy Menu">
 ###                     parameter="movable" />
 ###                </menu_item_check>
 ###                <menu_item_check
+###                 label="Select Invisible Objects"
+###                 name="Select Invisible Objects">
+###                    <menu_item_check.on_check
+###                     control="SelectInvisibleObjects" />
+###                    <menu_item_check.on_click
+###                     function="Tools.SelectInvisibleObjects"
+###                     parameter="invisible" />
+###            </menu_item_check>
+###            <menu_item_check
+###                 label="Select Reflection Probes"
+###                 name="Select Reflection Probes">
+###                    <menu_item_check.on_check
+###                     control="SelectReflectionProbes" />
+###                    <menu_item_check.on_click
+###                     function="Tools.SelectReflectionProbes"
+###                     parameter="reflection_probes" />
+###            </menu_item_check>
+###                <menu_item_check
 ###                 label="Select By Surrounding"
 ###                 name="Select By Surrounding">
 ###                    <menu_item_check.on_check
@@ -1510,6 +1538,15 @@ name="Dummy Menu">
 ###                     function="Tools.ShowSelectionLightRadius" />
 ###                </menu_item_check>
 ###                <menu_item_check
+###                       label="Show Reflection Probe Volumes"
+###                       name="Show Reflection Probe Volumes">
+###                  <menu_item_check.on_check
+###                   control="RenderReflectionProbeVolumes" />
+###                  <menu_item_check.on_click
+###                     function="ToggleControl"
+###                     parameter="RenderReflectionProbeVolumes" />
+###                </menu_item_check>
+###                <menu_item_check
 ###                 label="Show Selection Beam"
 ###                 name="Show Selection Beam">
 ###                    <menu_item_check.on_check
@@ -1518,7 +1555,28 @@ name="Dummy Menu">
 ###                     function="ToggleControl"
 ###                     parameter="ShowSelectionBeam" />
 ###                </menu_item_check>
-###
+###                <menu_item_check
+###                       label="Highlight Transparent"
+###                       name="Highlight Transparent"
+###                       shortcut="control|alt|T"
+###                       use_mac_ctrl="true">
+###                  <menu_item_check.on_check
+###                   function="View.CheckHighlightTransparent" />
+###                  <menu_item_check.on_click
+###                   function="View.HighlightTransparent" />
+###                </menu_item_check>
+###        <menu_item_separator/>
+###          
+###          <menu_item_check
+###            label="No Post-processing"
+###            name="No Post">
+###            <menu_item_check.on_check
+###             control="RenderDisablePostProcessing" />
+###            <menu_item_check.on_click
+###             function="ToggleControl"
+###             parameter="RenderDisablePostProcessing" />
+###          </menu_item_check>
+###          
 ###        <menu_item_separator/>
 ###
 ###                <menu_item_check
@@ -1630,6 +1688,16 @@ name="Dummy Menu">
 ###            function="File.VisibleUploadModel"/>
 ###            </menu_item_call>
 ###	   <menu_item_call
+###           label="Material..."
+###           layout="topleft"
+###           name="Upload Material">
+###            <menu_item_call.on_click
+###             function="File.UploadMaterial"
+###             parameter="" />
+###            <menu_item_call.on_enable
+###             function="File.EnableUploadMaterial" />
+###          </menu_item_call>
+###	   <menu_item_call
 ###             label="Bulk..."
 ###             layout="topleft"
 ###             name="Bulk Upload">
@@ -1641,6 +1709,7 @@ name="Dummy Menu">
 ###                 parameter="" />
 ###            </menu_item_call>
 ###        </menu>
+###
 ###        <menu_item_separator/>
 ###        <menu_item_call
 ###         enabled="false"
@@ -2953,6 +3022,16 @@ name="Dummy Menu">
 ###           parameter="triangle count" />
 ###        </menu_item_check>
 ###        <menu_item_check
+###         label="Lights"
+###         name="Lights">
+###          <menu_item_check.on_check
+###           function="Advanced.CheckInfoDisplay"
+###           parameter="lights" />
+###          <menu_item_check.on_click
+###           function="Advanced.ToggleInfoDisplay"
+###           parameter="lights" />
+###        </menu_item_check>
+###        <menu_item_check
 ###         label="Build Queue"
 ###         name="Build Queue">
 ###          <menu_item_check.on_check
@@ -3301,6 +3380,7 @@ name="Dummy Menu">
 ###                 function="Advanced.HandleAttachedLightParticles"
 ###                 parameter="RenderAttachedParticles" />
 ###            </menu_item_check>
+###          <menu_item_separator />
 ###            <menu_item_check
 ###             label="Hover Glow Objects"
 ###             name="Hover Glow Objects">
@@ -3311,6 +3391,13 @@ name="Dummy Menu">
 ###                 function="ToggleControl"
 ###                 parameter="RenderHoverGlowEnable" />
 ###            </menu_item_check>
+###          <menu_item_call
+###            enabled="true"
+###            label="Clear Shader Cache"
+###            name="Shader Cache Clear">
+###            <menu_item_call.on_click
+###             function="Advanced.ClearShaderCache" />
+###          </menu_item_call>
 ###          <menu_item_separator />
 ###          
 ###          <menu_item_call
