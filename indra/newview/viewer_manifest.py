@@ -1415,10 +1415,10 @@ class LinuxManifest(ViewerManifest):
             self.path( "libcef.so" )
             self.path( "libminigbm.so" )
             
-#        with self.prefix(src=os.path.join(pkgdir, 'lib', config, 'swiftshader'), dst=os.path.join("bin", "swiftshader") ):
-#            self.path( "*.so" )
-#        with self.prefix(src=os.path.join(pkgdir, 'lib', config, 'swiftshader'), dst=os.path.join("lib", "swiftshader") ):
-#            self.path( "*.so" )
+        with self.prefix(src=os.path.join(pkgdir, 'lib', config, 'swiftshader'), dst=os.path.join("bin", "swiftshader") ):
+            self.path( "*.so" )
+        with self.prefix(src=os.path.join(pkgdir, 'lib', config, 'swiftshader'), dst=os.path.join("lib", "swiftshader") ):
+            self.path( "*.so" )
 
         with self.prefix(src=os.path.join(pkgdir, 'bin', config), dst="bin"):
             self.path( "chrome-sandbox" )
