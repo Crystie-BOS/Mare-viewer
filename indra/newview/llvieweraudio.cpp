@@ -143,7 +143,7 @@ void LLViewerAudio::startInternetStreamWithAutoFade(const std::string &streamURI
 
 			LLStreamingAudioInterface *stream = gAudiop->getStreamingAudioImpl();
 			if (stream && stream->supportsAdjustableBufferSizes())
-				stream->setBufferSizes(gSavedSettings.getU32("FMODExStreamBufferSize"), gSavedSettings.getU32("FMODExDecodeBufferSize"));
+				stream->setBufferSizes(gSavedSettings.getU32("FMODStreamBufferSize"), gSavedSettings.getU32("FMODDecodeBufferSize"));
 
 			gAudiop->startInternetStream(mNextStreamURI);
 		}
