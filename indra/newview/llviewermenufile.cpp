@@ -876,6 +876,7 @@ class LLFileTakeSnapshotToDisk : public view_listener_t
 		S32 width = gViewerWindow->getWindowWidthRaw();
 		S32 height = gViewerWindow->getWindowHeightRaw();
 
+		BOOL render_no_post = gSavedSettings.getBOOL("RenderSnapshotNoPost");
 		bool render_ui = gSavedSettings.getBOOL("RenderUIInSnapshot");
 		bool render_hud = gSavedSettings.getBOOL("RenderHUDInSnapshot");
 		bool no_force_low = gSavedSettings.getBOOL("KokuaRLVNoForceLowResSnapshots");
@@ -908,6 +909,7 @@ class LLFileTakeSnapshotToDisk : public view_listener_t
 									   render_ui,
 									   render_hud,
 									   FALSE,
+									   render_no_post,
 									   LLSnapshotModel::SNAPSHOT_TYPE_COLOR,
 									   high_res ? S32_MAX : MAX_SNAPSHOT_IMAGE_SIZE)) //per side
 		{
