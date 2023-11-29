@@ -11383,6 +11383,9 @@
     <key>Persist</key>
     <integer>1</integer>
     <key>Type</key>
+    <string>S32</string>
+    <key>Value</key>
+    <integer>256</integer>
   </map>
   <key>RenderShadowSplitExponent</key>
   <map>
