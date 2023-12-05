@@ -7424,6 +7424,19 @@ void LLPipeline::renderFinalize()
 
     combineGlow(&mPostMap, &mRT->screen);
 
+	// [RLVa:KB] - @setsphere
+	LLRenderTarget* pRenderBuffer = &mRT->screen;
+	if (gRRenabled)
+	{
+		if (gAgent.mRRInterface.mContainsSetsphere)
+		{
+			LLShaderEffectParams params(pRenderBuffer, &mRT->screen, false);
+			LLVfxManager::instance().runEffect(EVisualEffect::RlvSphere, &params);
+			pRenderBuffer = params.m_pDstBuffer;
+		}
+	}
+	// [/RLVa:KB]
+
 	gGLViewport[0] = gViewerWindow->getWorldViewRectRaw().mLeft;
 	gGLViewport[1] = gViewerWindow->getWorldViewRectRaw().mBottom;
 	gGLViewport[2] = gViewerWindow->getWorldViewRectRaw().getWidth();
