@@ -27,7 +27,7 @@
 #ifndef LL_LLGLHEADERS_H
 #define LL_LLGLHEADERS_H
 
-#if LL_MESA
+#if LL_MESA || LL_LINUX
 //----------------------------------------------------------------------------
 // MESA headers
 // quotes so we get libraries/.../GL/ version
