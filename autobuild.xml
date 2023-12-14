@@ -491,9 +491,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>0e95cd410ccf90e5da155ca0f3d15783</string>
+              <string>8a623b991412f7b5f53b474413771fb4</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/dullahan/downloads/dullahan-1.14.0.202311240918_118.7.1_g99817d2_chromium-118.0.5993.119-linux64-233280918.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/dullahan/downloads/dullahan-1.14.0.202312110855_118.7.1_g99817d2_chromium-118.0.5993.119-linux64-233450855.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -1850,6 +1850,18 @@
             </map>
             <key>name</key>
             <string>darwin64</string>
+          </map>
+          <key>linux64</key>
+          <map>
+            <key>archive</key>
+            <map>
+              <key>hash</key>
+              <string>b48b7ac0792d3ea8f087d99d9e4a29d8</string>
+              <key>url</key>
+              <string>https://automated-builds-secondlife-com.s3.amazonaws.com/ct2/104415/914944/mikktspace-1-darwin64-574859.tar.bz2</string>
+            </map>
+            <key>name</key>
+            <string>linux64</string>
           </map>
           <key>windows</key>
           <map>

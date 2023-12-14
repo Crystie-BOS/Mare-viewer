@@ -452,7 +452,11 @@ ElementT LLThreadSafeQueue<ElementT, QueueT>::pop(void)
         // so we can finish draining the queue.
         pop_result popped = pop_(lock1, value);
         if (popped == POPPED)
+#if LL_LINUX
+            return value;
+#else
             return std::move(value);
+#endif
 
         // Once the queue is DONE, there will never be any more coming.
         if (popped == DONE)

@@ -1625,7 +1625,7 @@ BOOL LLFilePicker::getOpenFile( ELoadFilter filter, bool blocking )
 			filtername = add_xml_filter_to_gtkchooser(picker);
 			break;
         case FFLOAD_GLTF:
-            filtername = dead_code_should_blow_up_here(picker);
+            //filtername = dead_code_should_blow_up_here(picker);
             break;
         case FFLOAD_COLLADA:
             filtername = add_collada_filter_to_gtkchooser(picker);

@@ -1149,6 +1149,12 @@ F32 LLWindowSDL::getPixelAspectRatio()
 	return pixel_aspect;
 }
 
+U32 LLWindowSDL::getAvailableVRAMMegabytes()
+{
+    static const U32 mb = 1024*1024;
+    static const U32 total_factor = 2;
+    return gGLManager.mVRAM - (LLImageGL::getTextureBytesAllocated() * total_factor/mb);
+}
 
 // This is to support 'temporarily windowed' mode so that
 // dialogs are still usable in fullscreen.
