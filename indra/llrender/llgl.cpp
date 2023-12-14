@@ -199,7 +199,7 @@ LLMatrix4 gGLObliqueProjectionInverse;
 
 std::list<LLGLUpdate*> LLGLUpdate::sGLQ;
 
-#if (LL_WINDOWS || LL_LINUX)  && !LL_MESA_HEADLESS
+#if LL_WINDOWS && !LL_MESA_HEADLESS
 
 #if LL_WINDOWS
 // WGL_ARB_create_context
@@ -1402,7 +1402,7 @@ void LLGLManager::initExtensions()
 
     mInited = TRUE;
 
-#if (LL_WINDOWS || LL_LINUX) && !LL_MESA_HEADLESS
+#if LL_WINDOWS && !LL_MESA_HEADLESS
 	LL_DEBUGS("RenderInit") << "GL Probe: Getting symbols" << LL_ENDL;
 	
 #if LL_WINDOWS
