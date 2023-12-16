@@ -286,6 +286,9 @@ public:
 	void			setBgImage(LLPointer<LLUIImage> image) { mBgImage = image; }
 	void			setBgImageFocused(LLPointer<LLUIImage> image) { mBgImageFocused = image; }
 
+    void setShowContextMenu(bool show) { mShowContextMenu = show; }
+    bool getShowContextMenu() const { return mShowContextMenu; }
+
 	// <FS:Ansariel> Make these protected
 	void			removeChar();
 	void			removeWord(bool prev);
@@ -412,6 +415,8 @@ protected:
 	LLPreeditor::standouts_t mPreeditStandouts;
 
 	LLHandle<LLContextMenu> mContextMenuHandle;
+
+    bool mShowContextMenu;
 
 private:
 	// Instances that by default point to the statics but can be overidden in XML.
