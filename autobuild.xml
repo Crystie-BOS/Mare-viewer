@@ -491,9 +491,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>8a623b991412f7b5f53b474413771fb4</string>
+              <string>4b4202153e469766ba1d1fa9d5318898</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/dullahan/downloads/dullahan-1.14.0.202312110855_118.7.1_g99817d2_chromium-118.0.5993.119-linux64-233450855.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/dullahan/downloads/dullahan-1.14.0.202312240958_118.7.1_g99817d2_chromium-118.0.5993.119-linux64-233580957.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
