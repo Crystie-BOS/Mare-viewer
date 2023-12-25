@@ -2056,6 +2056,11 @@ endif()
 set(ARTWORK_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE PATH
     "Path to artwork files.")
 
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+  set_source_files_properties(llviewerstats.cpp PROPERTIES
+    COMPILE_FLAGS -Wno-unused-value)
+endif ()
+
 if (LINUX)
   set(product kokua-${ARCH}-${VIEWER_SHORT_VERSION}.${VIEWER_VERSION_REVISION})
 
