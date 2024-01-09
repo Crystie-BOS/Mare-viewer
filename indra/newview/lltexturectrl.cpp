@@ -1740,6 +1740,12 @@ void LLTextureCtrl::setImmediateFilterPermMask(PermissionMask mask)
     }
 }
 
+void LLTextureCtrl::setFilterPermissionMasks(PermissionMask mask) 
+{
+    setImmediateFilterPermMask(mask);
+    setDnDFilterPermMask(mask);
+}
+
 void LLTextureCtrl::setVisible( BOOL visible ) 
 {
 	if( !visible )

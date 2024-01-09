@@ -207,7 +207,7 @@ void LLDrawPoolWater::renderPostDeferred(S32 pass)
             }
         }
 
-        gPipeline.bindDeferredShader(*shader);
+        gPipeline.bindDeferredShader(*shader, nullptr, &gPipeline.mWaterDis);
 
         //bind normal map
         S32 bumpTex = shader->enableTexture(LLViewerShaderMgr::BUMP_MAP);
@@ -239,7 +239,6 @@ void LLDrawPoolWater::renderPostDeferred(S32 pass)
 
         // bind reflection texture from RenderTarget
         S32 screentex = shader->enableTexture(LLShaderMgr::WATER_SCREENTEX);
-        S32 screenDepth = shader->enableTexture(LLShaderMgr::WATER_SCREENDEPTH);
 
         F32 screenRes[] = { 1.f / gGLViewport[2], 1.f / gGLViewport[3] };
 
@@ -254,11 +253,6 @@ void LLDrawPoolWater::renderPostDeferred(S32 pass)
         {
             shader->uniform1f(LLShaderMgr::WATER_FOGDENSITY, fog_density);
             gGL.getTexUnit(screentex)->bind(&gPipeline.mWaterDis);
-        }
-
-        if (screenDepth > -1)
-        {
-            gGL.getTexUnit(screenDepth)->bind(&gPipeline.mWaterDis, true);
         }
 
         if (mShaderLevel == 1)
@@ -343,7 +337,6 @@ void LLDrawPoolWater::renderPostDeferred(S32 pass)
         shader->disableTexture(LLShaderMgr::BUMP_MAP);
         shader->disableTexture(LLShaderMgr::DIFFUSE_MAP);
         shader->disableTexture(LLShaderMgr::WATER_REFTEX);
-        shader->disableTexture(LLShaderMgr::WATER_SCREENDEPTH);
 
         // clean up
         gPipeline.unbindDeferredShader(*shader);
