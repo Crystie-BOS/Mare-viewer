@@ -827,7 +827,11 @@ bool LLPipeline::allocateScreenBuffer(U32 resX, U32 resY, U32 samples)
 
     mRT->deferredScreen.shareDepthBuffer(mRT->screen);
 
-	if (samples > 0)
+	//MK : For some reason, allocating the FXAA buffer while RenderResolutionDivisor is > 1 won't let the engine render the scene properly,
+	// it would render only a fraction of the screen from 0 to width/divisor and from 0 to height/divisor.
+	////if (samples > 0)
+	if (samples > 0 && res_mod <= 1)
+	//mk
 	{
 		if (!mRT->fxaaBuffer.allocate(resX, resY, GL_RGBA)) return false;
 	}
