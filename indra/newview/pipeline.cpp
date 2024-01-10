@@ -695,12 +695,8 @@ void LLPipeline::resizeScreenTexture()
 	{
 		GLuint resX = gViewerWindow->getWorldViewWidthRaw();
 		GLuint resY = gViewerWindow->getWorldViewHeightRaw();
-//MK
-		// No need to check the current resolution against the new one, this method is called only
-		// when a setting changes. Checking the values breaks RenderResolutionDivisor since the actual
-		// resolution wouldn't change when that debug setting is modified.
-////		if (gResizeScreenTexture || (resX != mRT->screen.getWidth()) || (resY != mRT->screen.getHeight()))
-//mk
+
+		if (gResizeScreenTexture || (resX != mRT->screen.getWidth()) || (resY != mRT->screen.getHeight()))
 		{
 			releaseScreenBuffers();
             releaseSunShadowTargets();
