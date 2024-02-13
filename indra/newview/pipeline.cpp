@@ -7438,18 +7438,22 @@ void LLPipeline::renderFinalize()
 
     combineGlow(&mPostMap, &mRT->screen);
 
-	// [RLVa:KB] - @setsphere
-	LLRenderTarget* pRenderBuffer = &mRT->screen;
-	if (gRRenabled)
-	{
-		if (gAgent.mRRInterface.mContainsSetsphere)
-		{
-			LLShaderEffectParams params(pRenderBuffer, &mRT->screen, false);
-			LLVfxManager::instance().runEffect(EVisualEffect::RlvSphere, &params);
-			pRenderBuffer = params.m_pDstBuffer;
-		}
-	}
-	// [/RLVa:KB]
+	//// [RLVa:KB] - @setsphere
+	//LLRenderTarget* pRenderBuffer = &mRT->screen;
+	//if (gRRenabled)
+	//{
+	//	if (gAgent.mRRInterface.mContainsSetsphere)
+	//	{
+	//		LLShaderEffectParams params(pRenderBuffer, &mRT->screen, false);
+	//		LLVfxManager::instance().runEffect(EVisualEffect::RlvSphere, &params);
+	//		pRenderBuffer = params.m_pDstBuffer;
+	//	}
+	//}
+	//// [/RLVa:KB]
+
+//MK
+	renderSpheres();
+//mk
 
 	gGLViewport[0] = gViewerWindow->getWorldViewRectRaw().mLeft;
 	gGLViewport[1] = gViewerWindow->getWorldViewRectRaw().mBottom;
@@ -7502,7 +7506,7 @@ void LLPipeline::renderFinalize()
         renderPhysicsDisplay();
     }
 
-    /*if (LLRenderTarget::sUseFBO && !gCubeSnapshot)
+	/*if (LLRenderTarget::sUseFBO && !gCubeSnapshot)
     { // copy depth buffer from mRT->screen to framebuffer
         LLRenderTarget::copyContentsToFramebuffer(mRT->screen, 0, 0, mRT->screen.getWidth(), mRT->screen.getHeight(), 0, 0,
                                                   mRT->screen.getWidth(), mRT->screen.getHeight(),
@@ -7517,7 +7521,23 @@ void LLPipeline::renderFinalize()
     recordTrianglesDrawn();
 }
 
-
+//MK
+void LLPipeline::renderSpheres()
+{
+	// [RLVa:KB] - @setsphere
+	LLRenderTarget* pRenderBuffer = &mRT->screen;
+	if (gRRenabled)
+	{
+		if (gAgent.mRRInterface.mContainsSetsphere)
+		{
+			LLShaderEffectParams params(pRenderBuffer, &mRT->screen, false);
+			LLVfxManager::instance().runEffect(EVisualEffect::RlvSphere, &params);
+			pRenderBuffer = params.m_pDstBuffer;
+		}
+	}
+	// [/RLVa:KB]
+}
+//mk
 
 void LLPipeline::bindLightFunc(LLGLSLShader& shader)
 {
