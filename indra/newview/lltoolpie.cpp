@@ -472,6 +472,7 @@ BOOL LLToolPie::handleLeftClickPick()
 			LLToolMgr::getInstance()->setTransientTool(LLToolCamera::getInstance());
 			gViewerWindow->hideCursor();
 			LLToolCamera::getInstance()->setMouseCapture(TRUE);
+			LLToolCamera::getInstance()->setClickPickPending();
 			mPick.mObjectID = gAgentAvatarp->getID(); // UGLY HACK : pretend the ID of the picked object is the avatar, so it works through HUDs as well (otherwise we can't mouse-steer through a HUD)
 			LLToolCamera::getInstance()->pickCallback(mPick);
 			gAgentCamera.setFocusOnAvatar(TRUE, TRUE);
@@ -531,6 +532,7 @@ BOOL LLToolPie::handleLeftClickPick()
 			{
 				if (!(mask & MASK_SHIFT) && !gSavedSettings.getBOOL("RestrainedLoveBreakFocusOnClick"))
 				{
+					LLToolCamera::getInstance()->setClickPickPending();
 					return TRUE;
 				}
 			}
