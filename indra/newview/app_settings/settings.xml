@@ -13,6 +13,17 @@
       <key>Value</key>
       <integer>0</integer>
     </map>
+    <key>KokuaTerseInventoryLabelSuffix</key>
+    <map>
+      <key>Comment</key>
+      <string>Enables terse inventory item permissions display (a change only takes effect on newly created inventory floaters; restart to change the main inventory floater)</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
     <key>KokuaPersistInterestListMode</key>
     <map>
       <key>Comment</key>

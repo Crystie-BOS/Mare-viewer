@@ -2109,11 +2109,19 @@ LLFontGL::StyleFlags LLItemBridge::getLabelStyle() const
 
 std::string LLItemBridge::getLabelSuffix() const
 {
+	// KKA-1058 Terse display
+	static LLCachedControl<bool> terseInventoryLabelSuffix(gSavedSettings, "KokuaTerseInventoryLabelSuffix");
+
 	// String table is loaded before login screen and inventory items are
 	// loaded after login, so LLTrans should be ready.
 	static std::string NO_COPY = LLTrans::getString("no_copy_lbl");
 	static std::string NO_MOD = LLTrans::getString("no_modify_lbl");
 	static std::string NO_XFER = LLTrans::getString("no_transfer_lbl");
+	// KKA-1058 The Terse display shows what can be done, rather than what can't
+	static std::string TERSE_COPY = LLTrans::getString("can_copy_terse_lbl");
+	static std::string TERSE_MOD = LLTrans::getString("can_modify_terse_lbl");
+	static std::string TERSE_XFER = LLTrans::getString("can_transfer_terse_lbl");
+
 	static std::string LINK = LLTrans::getString("link");
 	static std::string BROKEN_LINK = LLTrans::getString("broken_link");
 	std::string suffix;
@@ -2131,24 +2139,47 @@ std::string LLItemBridge::getLabelSuffix() const
 		if(LLAssetType::AT_CALLINGCARD != item->getType()
 		   && item->getPermissions().getOwner() == gAgent.getID())
 		{
+			// KKA-1058 restructure this for terse option
 			BOOL copy = item->getPermissions().allowCopyBy(gAgent.getID());
-			if (!copy)
-			{
-                suffix += " ";
-				suffix += NO_COPY;
-			}
 			BOOL mod = item->getPermissions().allowModifyBy(gAgent.getID());
-			if (!mod)
+			BOOL xfer = item->getPermissions().allowOperationBy(PERM_TRANSFER,gAgent.getID());
+
+			if (terseInventoryLabelSuffix)
 			{
-                suffix += suffix.empty() ? " " : ",";
-                suffix += NO_MOD;
+				// KKA-1058 terse version shows what can be done
+				if (copy)
+				{
+	        suffix += " ";
+					suffix += TERSE_COPY;
+				}
+				if (mod)
+				{
+	        suffix += suffix.empty() ? " " : "";
+	        suffix += TERSE_MOD;
+				}
+				if (xfer)
+				{
+	        suffix += suffix.empty() ? " " : "";
+					suffix += TERSE_XFER;
+				}					
 			}
-			BOOL xfer = item->getPermissions().allowOperationBy(PERM_TRANSFER,
-																gAgent.getID());
-			if (!xfer)
+			else
 			{
-                suffix += suffix.empty() ? " " : ",";
-				suffix += NO_XFER;
+				if (!copy)
+				{
+	                suffix += " ";
+					suffix += NO_COPY;
+				}
+				if (!mod)
+				{
+	                suffix += suffix.empty() ? " " : ",";
+	                suffix += NO_MOD;
+				}
+				if (!xfer)
+				{
+	                suffix += suffix.empty() ? " " : ",";
+					suffix += NO_XFER;
+				}					
 			}
 		}
 	}
@@ -6983,6 +7014,8 @@ void LLObjectBridge::openItem()
 
 std::string LLObjectBridge::getLabelSuffix() const
 {
+	// KKA-1058 Terse display
+	static LLCachedControl<bool> terseInventoryAttachLabelSuffix(gSavedSettings, "KokuaTerseInventoryLabelSuffix");
 	if (get_is_item_worn(mUUID))
 	{
 		if (!isAgentAvatarValid()) // Error condition, can't figure out attach point
@@ -6994,8 +7027,16 @@ std::string LLObjectBridge::getLabelSuffix() const
 		{
 			LLStringUtil::format_map_t args;
 			args["[ATTACHMENT_POINT]"] =  LLTrans::getString(attachment_point_name);
-
-			return LLItemBridge::getLabelSuffix() + LLTrans::getString("WornOnAttachmentPoint", args);
+			if (terseInventoryAttachLabelSuffix)
+			{
+				// KKA-1058 Terse version just returns attach point name
+				
+				return LLItemBridge::getLabelSuffix() + LLTrans::getString("WornOnAttachmentPointTerse", args);
+			}
+			else
+			{
+				return LLItemBridge::getLabelSuffix() + LLTrans::getString("WornOnAttachmentPoint", args);
+			}
 		}
 		else
 		{
