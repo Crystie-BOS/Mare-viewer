@@ -2453,6 +2453,10 @@ If you continue to receive this message, please contact Second Life support for 
 	<string name="WornOnAttachmentPoint" value=" (worn on [ATTACHMENT_POINT])" />
 	<string name="AttachmentErrorMessage" value=" ([ATTACHMENT_ERROR])" />
 	<string name="ActiveGesture" value="[GESLABEL] (active)"/>
+    <string name="can_transfer_terse_lbl" value="T" />
+    <string name="can_modify_terse_lbl" value="M" />
+    <string name="can_copy_terse_lbl" value="C" />
+	<string name="WornOnAttachmentPointTerse" value=" ([ATTACHMENT_POINT])" />
 	<!-- Inventory permissions -->
 	<string name="PermYes">Yes</string>
 	<string name="PermNo">No</string>
