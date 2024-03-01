@@ -3643,10 +3643,16 @@ name="Dummy Menu">
 ###             parameter="http://duckduckgo.com"/>
 ###          </menu_item_call>
 ###          <menu_item_call
-###           label="FB Connect Test"
-###           name="FB Connect Test">
+###           label="Dump Fonts"
+###           name="Dump Fonts">
 ###            <menu_item_call.on_click
-###             function="Advanced.WebContentTest"
+###             function="Develop.Fonts.Dump" />
+###          </menu_item_call>
+###          <menu_item_call
+###           label="Dump Font Textures"
+###           name="Dump Font Textures">
+###            <menu_item_call.on_click
+###             function="Develop.Fonts.DumpTextures" />
 ###             parameter="https://cryptic-ridge-1632.herokuapp.com/"/>
 ###          </menu_item_call>
 ###          <menu_item_call
@@ -3716,6 +3722,14 @@ name="Dummy Menu">
 ###                 function="Advanced.CheckDebugViews" />
 ###                <menu_item_check.on_click
 ###                 function="Advanced.ToggleDebugViews" />
+###            </menu_item_check>
+###            <menu_item_check
+###             label="Debug Unicode"
+###             name="Debug Unicode">
+###                <menu_item_check.on_check
+###                 function="Advanced.CheckDebugUnicode" />
+###                <menu_item_check.on_click
+###                 function="Advanced.ToggleDebugUnicode" />
 ###            </menu_item_check>
 ###            <menu_item_check
 ###             label="Debug Name Tooltips"

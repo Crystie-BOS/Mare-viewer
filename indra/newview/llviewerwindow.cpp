@@ -974,8 +974,7 @@ public:
 		{
 			const Line& line = *iter;
 			LLFontGL::getFontMonospace()->renderUTF8(line.text, 0, (F32)line.x, (F32)line.y, mTextColor,
-											 LLFontGL::LEFT, LLFontGL::TOP,
-											 LLFontGL::NORMAL, LLFontGL::NO_SHADOW, S32_MAX, S32_MAX, NULL, FALSE);
+					LLFontGL::LEFT, LLFontGL::TOP, LLFontGL::NORMAL, LLFontGL::NO_SHADOW);
 		}
 	}
 
@@ -3091,6 +3090,7 @@ BOOL LLViewerWindow::handleKey(KEY key, MASK mask)
 					case KEY_PAGE_UP:
 					case KEY_PAGE_DOWN:
 					case KEY_HOME:
+					case KEY_END:
 						// when chatbar is empty or ArrowKeysAlwaysMove set,
 						// pass arrow keys on to avatar...
 						return FALSE;

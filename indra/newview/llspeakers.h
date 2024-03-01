@@ -338,7 +338,7 @@ class LLActiveSpeakerMgr : public LLSpeakerMgr, public LLSingleton<LLActiveSpeak
 	LOG_CLASS(LLActiveSpeakerMgr);
 
 protected:
-	virtual void updateSpeakerList();
+	virtual void updateSpeakerList() override;
 };
 
 class LLLocalSpeakerMgr : public LLSpeakerMgr, public LLSingleton<LLLocalSpeakerMgr>
@@ -350,7 +350,7 @@ class LLLocalSpeakerMgr : public LLSpeakerMgr, public LLSingleton<LLLocalSpeaker
 ////protected:
 public:
 //mk
-	virtual void updateSpeakerList();
+	virtual void updateSpeakerList() override;
 };
 
 #endif // LL_LLSPEAKERS_H
