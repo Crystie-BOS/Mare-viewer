@@ -740,11 +740,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>4a999279562e8f3e4ba02d3e78a844ddf6fe18f1</string>
-              <key>hash_algorithm</key>
-              <string>sha1</string>
+              <string>978b1f11da6e70eafe81a41b7adc2450</string>
               <key>url</key>
-              <string>https://github.com/secondlife/3p-freetype/releases/download/v.2.12.1.557becd/freetype-2.12.1.557becd-linux64-557becd.tar.zst</string>
+              <string>http://bitbucket.org/kokua/3p-freetype/downloads/freetype-2.10.4.202305250622-linux64-202305250622.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
