@@ -41,8 +41,8 @@ public:
 	virtual BOOL	handleMouseDown(S32 x, S32 y, MASK mask) override;
 	virtual BOOL	handleMouseUp(S32 x, S32 y, MASK mask) override;
 	virtual BOOL	handleHover(S32 x, S32 y, MASK mask) override;
-	virtual BOOL	handleRightMouseDown(S32 x, S32 y, MASK mask);//<FS:JL> Mouse movement by Singularity
-	virtual BOOL	handleRightMouseUp(S32 x, S32 y, MASK mask);//<FS:JL> Mouse movement by Singularity
+	virtual BOOL	handleRightMouseDown(S32 x, S32 y, MASK mask) override;//<FS:JL> Mouse movement by Singularity
+	virtual BOOL	handleRightMouseUp(S32 x, S32 y, MASK mask) override;//<FS:JL> Mouse movement by Singularity
 
 	virtual void	onMouseCaptureLost() override;
 

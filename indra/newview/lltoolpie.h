@@ -44,8 +44,8 @@ public:
 	// Virtual functions inherited from LLMouseHandler
 	virtual BOOL		handleAnyMouseClick(S32 x, S32 y, MASK mask, EMouseClickType clicktype, BOOL down) override;
 	virtual BOOL		handleMouseDown(S32 x, S32 y, MASK mask) override;
-	virtual BOOL		handleMiddleMouseDown(S32 x, S32 y, MASK mask);
-	virtual BOOL		handleMiddleMouseUp(S32 x, S32 y, MASK mask);
+	virtual BOOL		handleMiddleMouseDown(S32 x, S32 y, MASK mask) override;
+	virtual BOOL		handleMiddleMouseUp(S32 x, S32 y, MASK mask) override;
 	virtual BOOL		handleRightMouseDown(S32 x, S32 y, MASK mask) override;
 	virtual BOOL		handleMouseUp(S32 x, S32 y, MASK mask) override;
 	virtual BOOL		handleRightMouseUp(S32 x, S32 y, MASK mask) override;

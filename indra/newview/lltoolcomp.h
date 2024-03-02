@@ -232,7 +232,7 @@ public:
 	virtual BOOL			handleDoubleClick(S32 x, S32 y, MASK mask) override;
 	virtual BOOL			handleRightMouseDown(S32 x, S32 y, MASK mask) override;
 	// NaCl - Rightclick-mousewheel zoom
-	virtual BOOL			handleRightMouseUp(S32 x, S32 y, MASK mask);
+	virtual BOOL			handleRightMouseUp(S32 x, S32 y, MASK mask) override;
 	// NaCl End
 	virtual BOOL			handleMouseUp(S32 x, S32 y, MASK mask) override;
 	virtual BOOL			handleScrollWheel(S32 x, S32 y, S32 clicks) override;

@@ -172,7 +172,7 @@ void LLFloaterIMSessionTab::setFocus(BOOL focus)
 {
 	super::setFocus(focus);
 
-    //Redirect focus to input editor
+	// Redirect focus to input editor
 	if (focus)
 	{
 		updateMessages();

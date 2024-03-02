@@ -307,18 +307,6 @@
             <key>name</key>
             <string>windows64</string>
           </map>
-	  <!-- bonus linux64 section
-          <key>linux64</key>
-          <map>
-            <key>archive</key>
-            <map>
-              <key>hash</key>
-              <string>ac54672e0b38f52726f5c99047c913e4</string>
-              <key>url</key>
-              <string>https://automated-builds-secondlife-com.s3.amazonaws.com/ct2/89306/815431/cubemaptoequirectangular-1.1.0-windows64-564841.tar.bz2</string>
-            </map>
-          </map>
-	  -->
         </map>
         <key>license</key>
         <string>MIT</string>
@@ -758,20 +746,6 @@
             </map>
             <key>name</key>
             <string>linux64</string>
-          </map>
-          <key>windows</key>
-          <map>
-            <key>archive</key>
-            <map>
-              <key>hash</key>
-              <string>4fecff41a38d67d6b1c97c7c73980667b6a8a1bd</string>
-              <key>hash_algorithm</key>
-              <string>sha1</string>
-              <key>url</key>
-              <string>https://github.com/secondlife/3p-freetype/releases/download/v.2.12.1.557becd/freetype-2.12.1.557becd-windows-557becd.tar.zst</string>
-            </map>
-            <key>name</key>
-            <string>windows</string>
           </map>
           <key>windows64</key>
           <map>

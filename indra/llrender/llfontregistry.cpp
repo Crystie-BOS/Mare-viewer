@@ -519,6 +519,7 @@ LLFontGL *LLFontRegistry::createFont(const LLFontDescriptor& desc)
 	string_vec_t font_search_paths;
 	font_search_paths.push_back(LLFontGL::getFontPathLocal());
 	font_search_paths.push_back(LLFontGL::getFontPathSystem());
+	// <FS:Kadah> User fonts: Also load from user_settings/fonts
 	font_search_paths.push_back(gDirUtilp->getExpandedFilename(LL_PATH_USER_SETTINGS , "fonts", ""));
 #if LL_DARWIN
 	font_search_paths.push_back(MACOSX_FONT_PATH_LIBRARY);
