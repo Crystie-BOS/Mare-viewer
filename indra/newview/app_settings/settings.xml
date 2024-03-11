@@ -134,6 +134,17 @@
       <key>Value</key>
       <integer>0</integer>
     </map>
+    <key>UpdateCategoryDebugOutput</key>
+    <map>
+      <key>Comment</key>
+      <string>Enables logging output for LLInventoryModel::updateCategory for ease of tracing AIS reversion issues</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
     <key>KokuaPreventChatShout</key>
     <map>
       <key>Comment</key>
