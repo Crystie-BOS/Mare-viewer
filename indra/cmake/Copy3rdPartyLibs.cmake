@@ -249,7 +249,7 @@ elseif(LINUX)
                  libapr-1.so.0
                  libaprutil-1.so.0
 		 #libatk-1.0.so
-                 libfreetype.so.6.17.4
+                 libfreetype.so.6.18.3
                  libfreetype.so.6
                  libhunspell-1.3.so.0.0.0
         	 libopenjp2.so
