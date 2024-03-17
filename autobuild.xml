@@ -1538,9 +1538,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>b8b0c54cedcf1b77b9dfdfdcd6221cfb</string>
+              <string>fda5d399c21c3ad29a78f29599523ca4ecf76bd2</string>
+              <key>hash_algorithm</key>
+              <string>sha1</string>
               <key>url</key>
-              <string>http://bitbucket.org/kokua/3p-libxml/downloads/libxml2-2.9.1.201505161544-linux64-201505161544.tar.bz2</string>
+              <string>https://github.com/secondlife/3p-libxml2/releases/download/v2.9.4-2db4418/libxml2-2.9.4.2db4418-linux64-2db4418.tar.zst</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -1996,9 +1998,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>2c3cec1dfb0758aec7f90a41a1473cc2</string>
+              <string>d4f35ebcea53ab6e9f2e6cbc0d680b10d10b9c53</string>
+              <key>hash_algorithm</key>
+              <string>sha1</string>
               <key>url</key>
-	      <string>http://bitbucket.org/kokua/3p-minizip-ng/downloads/minizip_ng-3.0.2.231560052-linux64-231560052.tar.bz2</string>
+              <string>https://github.com/secondlife/3p-minizip-ng/releases/download/v3.0.2.3e9876e/minizip_ng-3.0.2.3e9876e-linux64-3e9876e.tar.zst</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -2571,9 +2575,11 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>4707e7dcee810c401eb65c79d93bd8ee</string>
+              <string>3a722c508a9278a49317e3f749f3256768f1c50b</string>
+              <key>hash_algorithm</key>
+              <string>sha1</string>
               <key>url</key>
-              <string>http://bitbucket.org/kokua/3p-pcre/downloads/pcre-8.35.-linux64-201505161257.tar.bz2</string>
+              <string>https://github.com/secondlife/3p-pcre/releases/download/v8.35-3c0eb51/pcre-8.35.3c0eb51-linux64-3c0eb51.tar.zst</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -3296,9 +3302,11 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>3c2bf9469dda100aa5bede905e5d49bc</string>
+              <string>fba88375e12454ae19f4528e11ffc7ddf7d879ec</string>
+              <key>hash_algorithm</key>
+              <string>sha1</string>
               <key>url</key>
-              <string>http://bitbucket.org/kokua/3p-zlib-ng/downloads/zlib_ng-2.0.5.231540321-linux64-231540321.tar.bz2</string>
+              <string>https://github.com/secondlife/3p-zlib-ng/releases/download/v1.2.11.zlib-ng.32fd361/zlib_ng-1.2.11.zlib-ng.32fd361-linux64-32fd361.tar.zst</string>
             </map>
             <key>name</key>
             <string>linux64</string>
