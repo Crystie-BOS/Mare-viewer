@@ -120,11 +120,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>690927798e3200dc8ae8fa0c7b18abf5</string>
+              <string>d12d582b4cdaca66a38fb50ac679a63dacfc50cd</string>
               <key>hash_algorithm</key>
-              <string>md5</string>
+              <string>sha1</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-boost-git/downloads/boost-1.72-linux64-201601907.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-boost-git/downloads/boost-1.81-linux64-240770040.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -226,11 +226,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>780bf46a8e93000378a0896dd0c3cd63</string>
+              <string>38963b0889b880b7f57ac0c09a74547d</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-colladadom-git/downloads/colladadom-2.3.201621932-linux64-201621932.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-colladadom-git/downloads/colladadom-2.3.240770303-linux64-240770303.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
