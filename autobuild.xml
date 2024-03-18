@@ -1243,9 +1243,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>f1ff52d6515f83b99fb1ae8218992b99</string>
+              <string>06bc9268db335f2eb4f1526817f9968b</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-jsoncpp/downloads/jsoncpp-0.5.0.231570155-linux64-231570155.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-jsoncpp/downloads/jsoncpp-0.5.0.240770004-linux64-240770004.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
