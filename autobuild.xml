@@ -878,7 +878,7 @@
             <key>name</key>
             <string>darwin64</string>
           </map>
-          <key>linux64</key>
+          <!--key>linux64</key>
           <map>
             <key>archive</key>
             <map>
@@ -891,7 +891,7 @@
             </map>
             <key>name</key>
             <string>linux64</string>
-          </map>
+          </map-->
           <key>windows64</key>
           <map>
             <key>archive</key>
