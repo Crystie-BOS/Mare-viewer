@@ -780,13 +780,8 @@ void display(BOOL rebuild, F32 zoom_factor, int subfield, BOOL for_snapshot)
 			LL_PROFILE_ZONE_NAMED_CATEGORY_DISPLAY("display - 2")
 			if (gResizeScreenTexture)
 			{
-				//MK : This should be set to FALSE AFTER the function that checks if it is TRUE... Otherwise there's no need to bother.
-				////gResizeScreenTexture = FALSE;
-				//mk
 				gPipeline.resizeScreenTexture();
-				//MK
-				gResizeScreenTexture = FALSE;
-				//mk
+                gResizeScreenTexture = FALSE;
 			}
 
 			gGL.setColorMask(true, true);

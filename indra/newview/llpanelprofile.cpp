@@ -2045,7 +2045,8 @@ void LLPanelProfileSecondLife::onShowTexturePicker()
                 PERM_NONE,
                 PERM_NONE,
                 FALSE,
-                NULL);
+                NULL,
+                PICK_TEXTURE);
 
             mFloaterTexturePickerHandle = texture_floaterp->getHandle();
 
@@ -2380,7 +2381,8 @@ void LLPanelProfileFirstLife::onChangePhoto()
                 PERM_NONE,
                 PERM_NONE,
                 FALSE,
-                NULL);
+                NULL,
+                PICK_TEXTURE);
 
             mFloaterTexturePickerHandle = texture_floaterp->getHandle();
 

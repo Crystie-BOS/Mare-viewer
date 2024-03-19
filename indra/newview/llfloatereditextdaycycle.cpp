@@ -1731,7 +1731,9 @@ void LLFloaterEditExtDayCycle::showHDRNotification(const LLSettingsDay::ptr_t &p
         while (iter != end)
         {
             LLSettingsSky::ptr_t sky = std::static_pointer_cast<LLSettingsSky>(iter->second);
-            if (sky && sky->canAutoAdjust()) 
+            if (sky
+                && sky->canAutoAdjust()
+                && sky->getReflectionProbeAmbiance(true) != 0.f) 
             {
                 LLNotificationsUtil::add("AutoAdjustHDRSky");
                 return;
