@@ -3,7 +3,9 @@
 project(llmessage)
 
 include(00-Common)
+if (LL_TESTS)
 include(GoogleMock)
+endif ()
 include(LLAddBuildTest)
 include(LLCommon)
 include(LLCoreHttp)

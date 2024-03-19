@@ -62,7 +62,9 @@
 #include "llsdserialize.h"
 #include "llsdutil.h"
 #include "llcorehttputil.h"
+#if !LL_LINUX
 #include "llvoicevivox.h"
+#endif
 #include "llinventorymodel.h"
 #include "lluiusage.h"
 #include "lltranslate.h"

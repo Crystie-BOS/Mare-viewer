@@ -120,11 +120,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>690927798e3200dc8ae8fa0c7b18abf5</string>
+              <string>d12d582b4cdaca66a38fb50ac679a63dacfc50cd</string>
               <key>hash_algorithm</key>
-              <string>md5</string>
+              <string>sha1</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-boost-git/downloads/boost-1.72-linux64-201601907.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-boost-git/downloads/boost-1.81-linux64-240770040.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -226,11 +226,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>780bf46a8e93000378a0896dd0c3cd63</string>
+              <string>38963b0889b880b7f57ac0c09a74547d</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-colladadom-git/downloads/colladadom-2.3.201621932-linux64-201621932.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-colladadom-git/downloads/colladadom-2.3.240770303-linux64-240770303.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -479,9 +479,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>4b4202153e469766ba1d1fa9d5318898</string>
+              <string>2d69df49234dbb9a9b27b01c6a2e6678</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/dullahan/downloads/dullahan-1.14.0.202312240958_118.7.1_g99817d2_chromium-118.0.5993.119-linux64-233580957.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/dullahan/downloads/dullahan-1.14.0.202403190345_118.7.1_g99817d2_chromium-118.0.5993.119-linux64-240790345.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -541,6 +541,20 @@
             </map>
             <key>name</key>
             <string>darwin64</string>
+          </map>
+          <key>linux64</key>
+          <map>
+            <key>archive</key>
+            <map>
+              <key>hash</key>
+              <string>5b957aa7f353b10ae17b7119e5b3668f48a35325</string>
+              <key>hash_algorithm</key>
+              <string>sha1</string>
+              <key>url</key>
+              <string>https://github.com/secondlife/3p-emoji-shortcodes/releases/download/v6.1.0.5413f58/emoji_shortcodes-6.1.0.5413f58-linux64-5413f58.tar.zst</string>
+            </map>
+            <key>name</key>
+            <string>linux64</string>
           </map>
           <key>windows64</key>
           <map>
@@ -686,9 +700,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>3bec7d1a92a66b70eefaab4cb12d5a8f</string>
+              <string>5b79a84d87b32d328ed8cfd7a896417e</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-fontconfig/downloads/fontconfig-2.13.1-linux64-202005151055.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-fontconfig/downloads/fontconfig-2.13.1-linux64-202403190858.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -740,9 +754,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>978b1f11da6e70eafe81a41b7adc2450</string>
+              <string>915db5d5e47f5d13d88ce9c7d49f4fe70f92d55d</string>
+              <key>hash_algorithm</key>
+              <string>sha1</string>
               <key>url</key>
-              <string>http://bitbucket.org/kokua/3p-freetype/downloads/freetype-2.10.4.202305250622-linux64-202305250622.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-freetype/downloads/freetype-2.12.1.240730406-linux64-240730406.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -862,7 +878,7 @@
             <key>name</key>
             <string>darwin64</string>
           </map>
-          <key>linux64</key>
+          <!--key>linux64</key>
           <map>
             <key>archive</key>
             <map>
@@ -875,7 +891,7 @@
             </map>
             <key>name</key>
             <string>linux64</string>
-          </map>
+          </map-->
           <key>windows64</key>
           <map>
             <key>archive</key>
@@ -1056,6 +1072,20 @@
             <key>name</key>
             <string>darwin64</string>
           </map>
+          <key>linux64</key>
+          <map>
+            <key>archive</key>
+            <map>
+              <key>hash</key>
+              <string>a6cf913a74987cab02b23376053100e537538c2a</string>
+              <key>hash_algorithm</key>
+              <string>sha1</string>
+              <key>url</key>
+              <string>https://bitbucket.org/kokua/3p-icu4c/downloads/icu4c-4.8.1-linux64-240741027.tar.bz2</string>
+            </map>
+            <key>name</key>
+            <string>linux64</string>
+          </map>
           <key>windows64</key>
           <map>
             <key>archive</key>
@@ -1213,9 +1243,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>f1ff52d6515f83b99fb1ae8218992b99</string>
+              <string>06bc9268db335f2eb4f1526817f9968b</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-jsoncpp/downloads/jsoncpp-0.5.0.231570155-linux64-231570155.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-jsoncpp/downloads/jsoncpp-0.5.0.240770004-linux64-240770004.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -1536,9 +1566,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>b8b0c54cedcf1b77b9dfdfdcd6221cfb</string>
+              <string>fda5d399c21c3ad29a78f29599523ca4ecf76bd2</string>
+              <key>hash_algorithm</key>
+              <string>sha1</string>
               <key>url</key>
-              <string>http://bitbucket.org/kokua/3p-libxml/downloads/libxml2-2.9.1.201505161544-linux64-201505161544.tar.bz2</string>
+              <string>https://github.com/secondlife/3p-libxml2/releases/download/v2.9.4-2db4418/libxml2-2.9.4.2db4418-linux64-2db4418.tar.zst</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -1994,9 +2026,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>2c3cec1dfb0758aec7f90a41a1473cc2</string>
+              <string>d4f35ebcea53ab6e9f2e6cbc0d680b10d10b9c53</string>
+              <key>hash_algorithm</key>
+              <string>sha1</string>
               <key>url</key>
-	      <string>http://bitbucket.org/kokua/3p-minizip-ng/downloads/minizip_ng-3.0.2.231560052-linux64-231560052.tar.bz2</string>
+              <string>https://github.com/secondlife/3p-minizip-ng/releases/download/v3.0.2.3e9876e/minizip_ng-3.0.2.3e9876e-linux64-3e9876e.tar.zst</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -2569,9 +2603,11 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>4707e7dcee810c401eb65c79d93bd8ee</string>
+              <string>3a722c508a9278a49317e3f749f3256768f1c50b</string>
+              <key>hash_algorithm</key>
+              <string>sha1</string>
               <key>url</key>
-              <string>http://bitbucket.org/kokua/3p-pcre/downloads/pcre-8.35.-linux64-201505161257.tar.bz2</string>
+              <string>https://github.com/secondlife/3p-pcre/releases/download/v8.35-3c0eb51/pcre-8.35.3c0eb51-linux64-3c0eb51.tar.zst</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -2960,6 +2996,18 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
             <key>name</key>
             <string>darwin64</string>
           </map>
+          <key>linux64</key>
+          <map>
+            <key>archive</key>
+            <map>
+              <key>hash</key>
+              <string>6041bbd4001e3951f96ac3456c7906da</string>
+              <key>url</key>
+              <string>https://automated-builds-secondlife-com.s3.amazonaws.com/ct2/113314/980656/viewer_fonts-1.579464-darwin64-579464.tar.bz2</string>
+            </map>
+            <key>name</key>
+            <string>linux64</string>
+          </map>
           <key>windows64</key>
           <map>
             <key>archive</key>
@@ -3185,6 +3233,20 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
             <key>name</key>
             <string>darwin64</string>
           </map>
+          <key>linux64</key>
+          <map>
+            <key>archive</key>
+            <map>
+              <key>hash</key>
+              <string>8e365eff8dcace48d91e2530f8b13e420849aefc</string>
+              <key>hash_algorithm</key>
+              <string>sha1</string>
+              <key>url</key>
+              <string>https://github.com/secondlife/3p-vulkan-gltf-pbr/releases/download/v1.0.0-d7c372f/vulkan_gltf-1.0.0-common-d7c372f.tar.zst</string>
+            </map>
+            <key>name</key>
+            <string>linux64</string>
+          </map>
           <key>windows</key>
           <map>
             <key>archive</key>
@@ -3294,9 +3356,11 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>3c2bf9469dda100aa5bede905e5d49bc</string>
+              <string>fba88375e12454ae19f4528e11ffc7ddf7d879ec</string>
+              <key>hash_algorithm</key>
+              <string>sha1</string>
               <key>url</key>
-              <string>http://bitbucket.org/kokua/3p-zlib-ng/downloads/zlib_ng-2.0.5.231540321-linux64-231540321.tar.bz2</string>
+              <string>https://github.com/secondlife/3p-zlib-ng/releases/download/v1.2.11.zlib-ng.32fd361/zlib_ng-1.2.11.zlib-ng.32fd361-linux64-32fd361.tar.zst</string>
             </map>
             <key>name</key>
             <string>linux64</string>
