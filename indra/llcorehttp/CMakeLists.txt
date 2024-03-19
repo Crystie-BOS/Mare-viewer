@@ -3,7 +3,9 @@
 project(llcorehttp)
 
 include(00-Common)
+if (LL_TESTS)
 include(GoogleMock)
+endif ()
 include(CURL)
 include(OpenSSL)
 include(NGHTTP2)
