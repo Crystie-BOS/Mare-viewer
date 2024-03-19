@@ -700,9 +700,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>150720397138563152dbe16e640595db</string>
+              <string>5b79a84d87b32d328ed8cfd7a896417e</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-fontconfig/downloads/fontconfig-2.13.1-linux64-202005151055.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-fontconfig/downloads/fontconfig-2.13.1-linux64-202403190858.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
