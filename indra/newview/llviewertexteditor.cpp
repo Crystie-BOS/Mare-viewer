@@ -1192,10 +1192,18 @@ BOOL LLViewerTextEditor::openEmbeddedItemAtPos(S32 pos)
 
 BOOL LLViewerTextEditor::openEmbeddedItem(LLPointer<LLInventoryItem> item, llwchar wc)
 {
+//MK(CA)
+    // Open notecards don't get closed when @viewnote comes into effect so it's still
+    // possible to try to open an embedded item which then results in a crash, so prevent
+    // it here
+//mk(ca)
 
 	switch( item->getType() )
 	{
 		case LLAssetType::AT_TEXTURE:
+//MK(CA)
+		    if (gRRenabled && gAgent.mRRInterface.contains ("viewtexture")) return FALSE;
+//mk(ca)
 			openEmbeddedTexture( item, wc );
 			return TRUE;
 
@@ -1217,7 +1225,17 @@ BOOL LLViewerTextEditor::openEmbeddedItem(LLPointer<LLInventoryItem> item, llwch
             openEmbeddedGLTFMaterial(item, wc);
             return TRUE;
 		case LLAssetType::AT_NOTECARD:
+//MK(CA)
+		    if (gRRenabled && gAgent.mRRInterface.contains ("viewnotecard")) return FALSE;
+			showCopyToInvDialog( item, wc );
+			return TRUE;
+//mk(ca)
 		case LLAssetType::AT_LSL_TEXT:
+//MK(CA)
+		    if (gRRenabled && gAgent.mRRInterface.contains ("viewscript")) return FALSE;
+			showCopyToInvDialog( item, wc );
+			return TRUE;
+//mk(ca)
 		case LLAssetType::AT_CLOTHING:
 		case LLAssetType::AT_OBJECT:
 		case LLAssetType::AT_BODYPART:
