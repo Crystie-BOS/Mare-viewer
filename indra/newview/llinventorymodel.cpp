@@ -87,6 +87,10 @@
 #include "llviewercontrol.h"
 //mk
 
+//CA
+	std::map<LLUUID, std::string> rlv_folders;
+//ca
+
 // Increment this if the inventory contents change in a non-backwards-compatible way.
 // For viewer 2, the addition of link items makes a pre-viewer-2 cache incorrect.
 const S32 LLInventoryModel::sCurrentInvCacheVersion = 3;
@@ -1707,6 +1711,10 @@ LLInventoryModel::item_array_t* LLInventoryModel::getUnlockedItemArray(const LLU
 // an existing item with the matching id, or it will add the category.
 void LLInventoryModel::updateCategory(const LLViewerInventoryCategory* cat, U32 mask)
 {
+	// CA: Add in runtime enabled debugging output so we can check for other cases of
+	//     AIS misbehaviour
+	static LLCachedControl<bool> ais_debug_output(gSavedSettings, "UpdateCategoryDebugOutput");
+
 	if(!cat || cat->getUUID().isNull())
 	{
 		return;
@@ -1721,38 +1729,101 @@ void LLInventoryModel::updateCategory(const LLViewerInventoryCategory* cat, U32 
 	LLPointer<LLViewerInventoryCategory> old_cat = getCategory(cat->getUUID());
 	if(old_cat)
 	{
+		if (ais_debug_output)
+		{
+			LL_INFOS() << "Doing updateCategory for existing item " << old_cat->getUUID() << " local name " << old_cat->getName() << " local parent " << old_cat->getParentUUID() << LL_ENDL;
+			LL_INFOS() << "Incoming rom AIS name " << cat->getName() << " ID " << cat->getUUID() << " parent " << cat->getParentUUID() << LL_ENDL;			
+		}
+		//CA: There's currently an AIS bug where the parent category update after a renaming has occurred may carry
+		//    the pre-rename name for the category, so reverting the rename. A similar bug is
+		//    responsible for moves appearing to fail.
+		//
+		//    The workround for renaming we do here is to check whether the category id and its original name
+		//    (eg #RLV/~A/B/C) are present in the rlv_folders map which holds the last shared folder operation
+		//    processed. If that happens we reinstate the original name.
+		//
+		//    The workround for moving is to check the category id as above and if the new parent is #RLV
+		//    then the change of parent is suppressed, leaving it where it's supposed to be.
+
+		bool avoid_ais_name_reversion_bug = false;
+		bool avoid_ais_location_reversion_bug = false;
+		LLInventoryCategory* rlv_root = gAgent.mRRInterface.getRlvShare();
+		LLUUID rlv_share_id = rlv_root->getUUID();
+
 		// We already have an old category, modify its values
 		LLUUID old_parent_id = old_cat->getParentUUID();
 		LLUUID new_parent_id = cat->getParentUUID();
+		std::string old_cat_name = old_cat->getName();
+
 		if(old_parent_id != new_parent_id)
 		{
-			// need to update the parent-child tree
-			cat_array_t* cat_array;
-			cat_array = getUnlockedCatArray(old_parent_id);
-			if(cat_array)
+			if (ais_debug_output)
 			{
-				vector_replace_with_last(*cat_array, old_cat);
+				LL_INFOS() << "Moving cat " << cat->getUUID() << " local name = " << old_cat->getName() << " from " << old_parent_id << " to " << new_parent_id << LL_ENDL;			
 			}
-			cat_array = getUnlockedCatArray(new_parent_id);
-			if(cat_array)
+			// CA: Check to see if this would revert a move operation we've done
+			std::map<LLUUID,std::string>::iterator rlv_it;
+			if (new_parent_id == rlv_share_id)
 			{
-				cat_array->push_back(old_cat);
+				for (rlv_it = rlv_folders.begin(); rlv_it != rlv_folders.end(); ++rlv_it)
+				{
+					if (rlv_it->first == cat->getUUID())
+					{
+						LL_WARNS() << "AIS bug workround - ignoring move reversion of " << old_cat->getName() << " back to #RLV" << LL_ENDL;
+						avoid_ais_location_reversion_bug = true;
+					}
+				}
 			}
-			mask |= LLInventoryObserver::STRUCTURE;
-            mask |= LLInventoryObserver::INTERNAL;
+			if (!avoid_ais_location_reversion_bug)
+			{
+				// need to update the parent-child tree
+				cat_array_t* cat_array;
+				cat_array = getUnlockedCatArray(old_parent_id);
+				if(cat_array)
+				{
+					vector_replace_with_last(*cat_array, old_cat);
+				}
+				cat_array = getUnlockedCatArray(new_parent_id);
+				if(cat_array)
+				{
+					cat_array->push_back(old_cat);
+				}
+				mask |= LLInventoryObserver::STRUCTURE;
+	            mask |= LLInventoryObserver::INTERNAL;
+	    }
 		}
 		if(old_cat->getName() != cat->getName())
 		{
+			if (ais_debug_output)
+			{
+				LL_INFOS() << "Renaming cat from local name " << old_cat->getName() << " to AIS name " << cat->getName() << LL_ENDL;			
+			}
+			// CA: Check to see if this would revert a rename operation we've done
+			std::map<LLUUID,std::string>::iterator rlv_it;
+			for (rlv_it = rlv_folders.begin(); rlv_it != rlv_folders.end(); ++rlv_it)
+			{
+				if (rlv_it->first == cat->getUUID() && rlv_it->second == cat->getName())
+				{
+					LL_WARNS() << "AIS bug workround - ignoring rename reversion of " << old_cat->getName() << " back to " << cat->getName() << LL_ENDL;
+					avoid_ais_name_reversion_bug = true;
+				}
+			}
+			if (!avoid_ais_name_reversion_bug) mask |= LLInventoryObserver::LABEL;
+		}
+		// Under marketplace, category labels are quite complex and need extra upate
+		const LLUUID marketplace_id = findCategoryUUIDForType(LLFolderType::FT_MARKETPLACE_LISTINGS);
+		if (marketplace_id.notNull() && isObjectDescendentOf(cat->getUUID(), marketplace_id))
+		{
 			mask |= LLInventoryObserver::LABEL;
 		}
-        // Under marketplace, category labels are quite complex and need extra upate
-        const LLUUID marketplace_id = findCategoryUUIDForType(LLFolderType::FT_MARKETPLACE_LISTINGS);
-        if (marketplace_id.notNull() && isObjectDescendentOf(cat->getUUID(), marketplace_id))
-        {
-			mask |= LLInventoryObserver::LABEL;
-        }
-        old_cat->copyViewerCategory(cat);
-		addChangedMask(mask, cat->getUUID());
+		if (!avoid_ais_name_reversion_bug && !avoid_ais_location_reversion_bug)
+		{
+			old_cat->copyViewerCategory(cat);
+			// CA: Apply corrections to neutralise reversions coming from AIS
+			if (avoid_ais_name_reversion_bug) old_cat->rename(old_cat_name); // reinstate the right name
+			if (avoid_ais_location_reversion_bug) old_cat->setParent(old_parent_id); // reinstate the right parent
+			addChangedMask(mask, cat->getUUID());
+		}			
 	}
 	else
 	{
@@ -3930,6 +4001,134 @@ void LLInventoryModel::processSaveAssetIntoInventory(LLMessageSystem* msg,
 	}
 }
 
+void buildRLVPathAndMove(std::deque<std::string> hierarchy, const LLUUID& parent_category_uuid, const LLUUID& this_category_uuid)
+{
+		std::string this_folder_name = hierarchy.front();
+		//LL_WARNS() << "Into recursion for " << this_folder_name << " parent " << parent_category_uuid << LL_ENDL;
+		LLViewerInventoryCategory* tfolder = gInventory.getCategory(this_category_uuid);
+		hierarchy.pop_front();
+		if (hierarchy.size())
+		{
+				// does this level of the hierarchy exist under this parent_category
+				LLInventoryModel::cat_array_t* cats;
+				LLInventoryModel::item_array_t* items;
+				gInventory.getDirectDescendentsOf(parent_category_uuid, cats, items);
+				// Try to find the first folder among the descendents which name matches the one we're examining.
+				LLInventoryCategory* found = NULL;
+				for (int tokj = 0; tokj < cats->size (); tokj++)
+				{
+					LLInventoryCategory* category = cats->at(tokj);
+					S32 compare = LLStringUtil::compareInsensitive(category->getName(), this_folder_name);
+					if (category && compare == 0) // we found it so we won't need to create it
+					{
+						//LL_INFOS() << "Already exists and attached to parent: " << category->getName() << ". Going straight down..." << LL_ENDL;
+						found = category;
+						break;
+					}
+				}
+				if (found != NULL) // we found a folder of the same name under the parent => use this one as the parent for the next folder to examine in the path
+				{
+						//LL_INFO() << "Recursing down" << LL_ENDL;
+						buildRLVPathAndMove(hierarchy, found->getUUID(), this_category_uuid); // call down with ourselves as parent
+				}
+				else
+				{
+						//LL_INFOS() << "Creating " << this_folder_name << LL_ENDL;
+						LLFolderType::EType preferred_type = LLFolderType::FT_NONE;
+			            gInventory.createNewCategory(
+			                parent_category_uuid,
+			                preferred_type,
+			                this_folder_name,
+			                [&,preferred_type, hierarchy, this_category_uuid](const LLUUID &folder_uuid)
+			            {
+			            		//LL_INFOS() << "lambda returned" << LL_ENDL;
+	                    if (folder_uuid.isNull())
+	                    {
+	                        LL_WARNS("Inventory")
+	                            << "Failed to create folder of type " << preferred_type
+	                            << LL_ENDL;
+	                    }
+	                    else
+	                    {
+	                    		// and go down again
+	                    		//LL_INFOS() << "Recursing down from lambda after creating " << folder_uuid << LL_ENDL;
+	                    		buildRLVPathAndMove(hierarchy, folder_uuid, this_category_uuid);
+			                }
+			            }
+			            );						
+				}			
+		}
+		else
+		{
+				//LL_INFOS() << "Done recursing - attaching to parent" << LL_ENDL;
+				
+				// check if we need to move it - not if this is a top level folder
+				LLUUID pre_move_parent = tfolder->getParentUUID();
+				if (tfolder->getParentUUID() != parent_category_uuid)
+				{
+							// adapted from LLInvFVBridge::removeBatchNoCheck to move a single category with
+							// all necessary accounting in place
+
+							LLMessageSystem* msg = gMessageSystem;
+							LLInventoryModel::update_map_t update;
+							bool start_new_message = true;
+
+							if(tfolder)
+							{
+									if(tfolder->getParentUUID() != parent_category_uuid)
+									{
+											LL_INFOS() << "setting up move from " << tfolder->getParentUUID() << " to " << parent_category_uuid << LL_ENDL;
+											--update[tfolder->getParentUUID()];
+											++update[parent_category_uuid];
+											if(start_new_message)
+											{
+													start_new_message = false;
+													msg->newMessageFast(_PREHASH_MoveInventoryFolder);
+													msg->nextBlockFast(_PREHASH_AgentData);
+													msg->addUUIDFast(_PREHASH_AgentID, gAgent.getID());
+													msg->addUUIDFast(_PREHASH_SessionID, gAgent.getSessionID());
+													msg->addBOOL("Stamp", TRUE);
+											}
+											msg->nextBlockFast(_PREHASH_InventoryData);
+											msg->addUUIDFast(_PREHASH_FolderID, this_category_uuid);
+											msg->addUUIDFast(_PREHASH_ParentID, parent_category_uuid);
+											if(msg->isSendFullFast(_PREHASH_InventoryData))
+											{
+													start_new_message = true;
+													gAgent.sendReliableMessage();
+													gInventory.accountForUpdate(update);
+													update.clear();
+											}
+									}
+							}
+							if(!start_new_message)
+							{
+									gAgent.sendReliableMessage();
+									gInventory.accountForUpdate(update);
+							}
+
+							// move everything.
+							gInventory.moveObject(this_category_uuid, parent_category_uuid);
+
+							// notify inventory observers.
+							gInventory.notifyObservers();
+				}
+
+				// This really shouldn't be needed. However, AIS has a bug where right after a move or rename the update that
+				// it sends for the parent category can revert either the move or rename. We have specific workrounds in place for both
+				// observed scenarios. Although that initial message from AIS causes reversion, AIS sorts itself out and 
+				// future fetches will be right so we do a new fetch here to get the latest state from AIS.
+				
+        LLInventoryModelBackgroundFetch::instance().scheduleFolderFetch(pre_move_parent, true /*force, since it has changes*/);
+
+				if (pre_move_parent != parent_category_uuid)
+				{
+		        LLInventoryModelBackgroundFetch::instance().scheduleFolderFetch(parent_category_uuid, true /*force, since it has changes*/);
+				}
+		}
+}
+
+
 // static
 void LLInventoryModel::processBulkUpdateInventory(LLMessageSystem* msg, void**)
 {
@@ -3945,7 +4144,12 @@ void LLInventoryModel::processBulkUpdateInventory(LLMessageSystem* msg, void**)
 #ifndef LL_RELEASE_FOR_DOWNLOAD
 	LL_DEBUGS("Inventory") << "Bulk inventory: " << tid << LL_ENDL;
 #endif
-
+//CA
+	// This is intentionally static and left behind when this routine exits for the AIS
+	// rename bug workround so we need to clear it here
+	rlv_folders.clear();
+	LLInventoryCategory* rlv_root = gAgent.mRRInterface.getRlvShare();
+//ca
 	update_map_t update;
 	cat_array_t folders;
 	S32 count;
@@ -3971,95 +4175,23 @@ void LLInventoryModel::processBulkUpdateInventory(LLMessageSystem* msg, void**)
         }
 		else if(tfolder->getUUID().notNull())
 		{
-//MK
-			LLInventoryCategory* rlv_root = gAgent.mRRInterface.getRlvShare();
+//CA
+			// Set things up for later - don't change anything at this point since the arriving category could
+			// be spread over multiple packets, plus performing inventory modifications at this point can
+			// cause inconsistencies with this routine's original operations
 			if (gRRenabled && rlv_root && !gSavedSettings.getBOOL("RestrainedLoveForbidGiveToRLV"))
 			{
 				std::string folder_name = tfolder->getName();
 				if (folder_name.find(RR_RLV_REDIR_FOLDER_PREFIX) == 0)
 				{
-					folder_name.erase(0, RR_HRLVS_LENGTH); // folder_name becomes "~A/B/C"
-					tfolder->rename(folder_name);
-					tfolder->updateServer(FALSE);
-					// We are receiving a "#RLV/~A/B/C" folder so we want to put it under #RLV. To avoid cluttering the #RLV folder with many sub-folders of the same name, we try to unify the hierarchy like this :
-					// - The last folder in the string must be created even if it already exists so we don't pollute an existing folder with new items.
-					// - All its parents must be unified with existing folders if possible, created if not possible.
-					// Make sure the parent folder of this folder is not the trash, which would mean it has been declined so no need to rename and reparent here.
-					LLUUID trash_id = gInventory.findCategoryUUIDForType(LLFolderType::FT_TRASH);
-					if (tfolder->getParentUUID() != trash_id)
+					// a category could be split across multiple message blocks so make sure we only add it once
+					if (rlv_folders.find(tfolder->getUUID()) == rlv_folders.end())
 					{
-						LLInventoryObject::correctInventoryName(folder_name); // sanitize just in case there are some unholy characters like "|" in the name (but maybe it was already done before, I don't know)
-						std::deque<std::string> hierarchy = gAgent.mRRInterface.parse (folder_name, "/");
-						if (hierarchy.size() == 1) // if there is only one token, just create the folder
-						{
-							tfolder->setParent(rlv_root->getUUID());
-							tfolder->updateParentOnServer(FALSE);
-						}
-						else // if there's more than one token, unify all the folders except the last one (create those we don't find), then create the last one
-						{
-							LLInventoryCategory* target_folder = rlv_root; // by default, we will put this folder under #RLV directly
-							for (int toki = 0; toki < hierarchy.size()-1; toki++) // for each parent folder in the name from left to right (if any, meaning if there is at least one "/" in the name of the folder we've received), unify or create that folder and make it the parent of the folder on its right
-							{
-								std::string this_folder_name = hierarchy.at(toki);
-								LLInventoryModel::cat_array_t* cats;
-								LLInventoryModel::item_array_t* items;
-								gInventory.getDirectDescendentsOf(target_folder->getUUID(), cats, items);
-								// Try to find the first folder among the descendents which name matches the one we're examining.
-								LLInventoryCategory* found = NULL;
-								for (int tokj = 0; tokj < cats->size (); tokj++)
-								{
-									LLInventoryCategory* category = cats->at(tokj);
-									S32 compare = LLStringUtil::compareInsensitive(category->getName(), this_folder_name);
-									if (category && compare == 0) // we found it so we won't need to create it
-									{
-										found = category;
-										break;
-									}
-								}
-								if (found != NULL) // we found a folder of the same name under the parent => use this one as the parent for the next folder to examine in the path
-								{
-									target_folder = found;
-        							// Finally, rename the folder we've created first (the one with all the items in it)
-        							tfolder->rename(hierarchy.at(hierarchy.size()-1));
-        							tfolder->updateServer(FALSE);
-        							tfolder->setParent(target_folder->getUUID()); // and hook it to the folder before it in the path (we've reused an existing one)
-        							tfolder->updateParentOnServer(FALSE);
-								}
-								else // we didn't find a folder of the same name => create it
-								{
-								    LLFolderType::EType preferred_type = LLFolderType::FT_NONE;
-								    gInventory.createNewCategory(
-								        target_folder->getUUID(),
-								        preferred_type,
-								        this_folder_name,
-								        [&,preferred_type](const LLUUID & folder_uuid)
-								    {
-								        if (folder_uuid.isNull())
-								        {
-								            LL_WARNS("Inventory")
-								                << "Failed to create folder of type " << preferred_type
-								                << LL_ENDL;
-								        }
-								        else
-								        {
-    										target_folder = gInventory.getCategory(folder_uuid); // the new parent for the next folder is the one we've just created							            
-                							// Finally, rename the folder we've created first (the one with all the items in it)
-                							tfolder->rename(hierarchy.at(hierarchy.size()-1));
-                							tfolder->updateServer(FALSE);
-                							tfolder->setParent(target_folder->getUUID()); // and hook it to the folder before it in the path (we've created a new one)
-                							tfolder->updateParentOnServer(FALSE);
-								        }
-								    }
-								    );
-								}
-							}
-						}
+						rlv_folders[tfolder->getUUID()] = folder_name;
 					}
-
-					tfolder->updateServer(FALSE); // do this here too because in some cases there seems to be a race condition that prevents the renaming from actually reaching the server
 				}
 			}
-//mk
+//ca
 			folders.push_back(tfolder);
 			LLViewerInventoryCategory* folderp = gInventory.getCategory(tfolder->getUUID());
 			if(folderp)
@@ -4206,6 +4338,48 @@ void LLInventoryModel::processBulkUpdateInventory(LLMessageSystem* msg, void**)
 		InventoryCallbackInfo cbinfo = (*inv_it);
 		gInventoryCallbacks.fire(cbinfo.mCallback, cbinfo.mInvID);
 	}
+//CA	
+	if (gRRenabled && rlv_root && !gSavedSettings.getBOOL("RestrainedLoveForbidGiveToRLV") && rlv_folders.size())
+	{
+		std::map<LLUUID,std::string>::iterator rlv_it;
+		for (rlv_it = rlv_folders.begin(); rlv_it != rlv_folders.end(); ++rlv_it)
+		{
+			LL_INFOS() << "Procesing #RLV shared folder: " << rlv_it->second << " uuid " << rlv_it->first << LL_ENDL;
+			
+			LLViewerInventoryCategory* tfolder = gInventory.getCategory(rlv_it->first);
+			
+			std::string folder_name = rlv_it->second;
+			if (folder_name.find(RR_RLV_REDIR_FOLDER_PREFIX) == 0)
+			{
+				folder_name.erase(0, RR_HRLVS_LENGTH); // folder_name becomes "~A/B/C"
+				// We are receiving a "#RLV/~A/B/C" folder so we want to put it under #RLV. To avoid cluttering the #RLV folder with many sub-folders of the same name, we try to unify the hierarchy like this :
+				// - The last folder in the string must be created even if it already exists so we don't pollute an existing folder with new items.
+				// - All its parents must be unified with existing folders if possible, created if not possible.
+				// Make sure the parent folder of this folder is not the trash, which would mean it has been declined so no need to rename and reparent here.
+				LLUUID trash_id = gInventory.findCategoryUUIDForType(LLFolderType::FT_TRASH);
+				if (tfolder->getParentUUID() != trash_id)
+				{
+					const LLUUID& this_category_uuid = rlv_it->first;
+					LLInventoryObject::correctInventoryName(folder_name); // sanitize just in case there are some unholy characters like "|" in the name (but maybe it was already done before, I don't know)
+					std::deque<std::string> hierarchy = gAgent.mRRInterface.parse (folder_name, "/");
+
+					LL_INFOS() << "Renaming to " << hierarchy.back() << LL_ENDL;
+					// There's a bug where AIS seem slow at noticing changes to parent categories
+					// eg a category is renamed or moved and AIS will report that back with an update to the category concerned
+					// but then follows up with a refresh on the parent category which may show previous state and revert the rename or move
+					// AIS itself has the correct state, so fetching again straighens things out. Additionally, there's a workround in LInventoryModel::updateCategory
+					// that prevents the renaming back if the uuid and original name are contained in the rlv_folders map.
+					// For that reason the rlv_folders map is static and intentionally not cleared when this routine exits so that
+					// the last category processed remains available when coroutines/callbacks occur
+					rename_category(&gInventory, this_category_uuid, hierarchy.back());	
+					gInventory.notifyObservers();
+					
+					buildRLVPathAndMove(hierarchy, rlv_root->getUUID(), this_category_uuid);
+				}
+			}
+		}
+	}
+//ca
 }
 
 // static
