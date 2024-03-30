@@ -846,12 +846,14 @@ bool LLAppViewerWin32::init()
                 DWORD dwFlags = dwAsk | // allow for prompting
                                 MDSF_PREVENTHIJACKING; // disallow swiping Exception filter
 
-                bool needs_log_file = !isSecondInstance() && debugLoggingEnabled("BUGSPLAT");
-                if (needs_log_file)
+								bool needs_log_file = false;
+                if (!isSecondInstance())
                 {
                     // Startup only!
-                    LL_INFOS("BUGSPLAT") << "Engaged BugSplat logging to bugsplat.log" << LL_ENDL;
+                    LL_INFOS("BUGSPLAT") << "Engaged BugSplat logging to bugsplat.log";
+                    needs_log_file = true;
                     dwFlags |= MDSF_LOGFILE | MDSF_LOG_VERBOSE;
+                    LL_ENDL;
                 }
 
 				// have to convert normal wide strings to strings of __wchar_t
