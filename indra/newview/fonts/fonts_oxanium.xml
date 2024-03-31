@@ -74,6 +74,11 @@
     <file>Oxanium-Bold.ttf</file>
   </font>
 
+  <font name="Emoji"
+	comment="Name of emoji font">
+    <file>TwemojiSVG.ttf</file>
+  </font>
+
   <font name="Monospace"
 	comment="Name of monospace font">
     <file>DejaVuSansMono.ttf</file>
