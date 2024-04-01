@@ -469,7 +469,9 @@ LLInventoryModel::LLInventoryModel()
 	mCategoryLock(),
 	mItemLock(),
 	mValidationInfo(new LLInventoryValidationInfo)
-{}
+{
+	rlv_folders.clear();	
+}
 
 
 // Destroys the object
@@ -1747,9 +1749,13 @@ void LLInventoryModel::updateCategory(const LLViewerInventoryCategory* cat, U32 
 
 		bool avoid_ais_name_reversion_bug = false;
 		bool avoid_ais_location_reversion_bug = false;
+		LLUUID rlv_share_id = LLUUID::null;
 		LLInventoryCategory* rlv_root = gAgent.mRRInterface.getRlvShare();
-		LLUUID rlv_share_id = rlv_root->getUUID();
-
+		if (rlv_root)
+		{
+			rlv_share_id = rlv_root->getUUID();
+		}
+		
 		// We already have an old category, modify its values
 		LLUUID old_parent_id = old_cat->getParentUUID();
 		LLUUID new_parent_id = cat->getParentUUID();
@@ -1827,6 +1833,10 @@ void LLInventoryModel::updateCategory(const LLViewerInventoryCategory* cat, U32 
 	}
 	else
 	{
+		if (ais_debug_output)
+		{
+			LL_INFOS() << "New category" << LL_ENDL;			
+		}
 		// add this category
 		LLPointer<LLViewerInventoryCategory> new_cat = new LLViewerInventoryCategory(cat->getOwnerID());
 		new_cat->copyViewerCategory(cat);
@@ -1851,6 +1861,10 @@ void LLInventoryModel::updateCategory(const LLViewerInventoryCategory* cat, U32 
 		mParentChildItemTree[new_cat->getUUID()] = itemsp;
 		mask |= LLInventoryObserver::ADD;
 		addChangedMask(mask, cat->getUUID());
+	}
+	if (ais_debug_output)
+	{
+		LL_INFOS() << "Done"<< LL_ENDL;			
 	}
 }
 
