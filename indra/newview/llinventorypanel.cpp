@@ -2022,47 +2022,53 @@ LLInventoryPanel* LLInventoryPanel::getActiveInventoryPanel(BOOL auto_open)
 }
 
 //static
-void LLInventoryPanel::openInventoryPanelAndSetSelection(BOOL auto_open, const LLUUID& obj_id, BOOL use_main_panel, BOOL take_keyboard_focus, BOOL reset_filter)
+void LLInventoryPanel::openInventoryPanelAndSetSelection(bool auto_open, const LLUUID& obj_id,
+	bool use_main_panel, bool take_keyboard_focus, bool reset_filter)
 {
 	LLSidepanelInventory* sidepanel_inventory = LLFloaterSidePanelContainer::getPanel<LLSidepanelInventory>("inventory");
 	sidepanel_inventory->showInventoryPanel();
 
-	bool in_inbox = (gInventory.isObjectDescendentOf(obj_id, gInventory.findCategoryUUIDForType(LLFolderType::FT_INBOX)));
+	LLUUID cat_id = gInventory.findCategoryUUIDForType(LLFolderType::FT_INBOX);
 	bool show_inbox = gSavedSettings.getBOOL("FSShowInboxFolder"); // <FS:Ansariel> Optional hiding of Received Items folder aka Inbox
-
-	if (!in_inbox && (use_main_panel || !sidepanel_inventory->getMainInventoryPanel()->isRecentItemsPanelSelected()))
+	bool in_inbox = gInventory.isObjectDescendentOf(obj_id, cat_id);
+	if (!in_inbox && use_main_panel)
 	{
 		sidepanel_inventory->selectAllItemsPanel();
 	}
 
-    LLFloater* inventory_floater = LLFloaterSidePanelContainer::getTopmostInventoryFloater();
-    if(!auto_open && inventory_floater && inventory_floater->getVisible())
+    if (!auto_open)
     {
-        LLSidepanelInventory *inventory_panel = inventory_floater->findChild<LLSidepanelInventory>("main_panel");
-        LLPanelMainInventory* main_panel = inventory_panel->getMainInventoryPanel();
-        if(main_panel->isSingleFolderMode() && main_panel->isGalleryViewMode())
+        LLFloater* inventory_floater = LLFloaterSidePanelContainer::getTopmostInventoryFloater();
+        if (inventory_floater && inventory_floater->getVisible())
         {
-            LL_DEBUGS("Inventory") << "Opening gallery panel for item" << obj_id << LL_ENDL;
-            main_panel->setGallerySelection(obj_id);
-            return;
+            LLSidepanelInventory *inventory_panel = inventory_floater->findChild<LLSidepanelInventory>("main_panel");
+            LLPanelMainInventory* main_panel = inventory_panel->getMainInventoryPanel();
+            if (main_panel->isSingleFolderMode() && main_panel->isGalleryViewMode())
+            {
+                LL_DEBUGS("Inventory") << "Opening gallery panel for item" << obj_id << LL_ENDL;
+                main_panel->setGallerySelection(obj_id);
+                return;
+            }
         }
     }
 
-    LLPanelMainInventory* main_inventory = sidepanel_inventory->getMainInventoryPanel();
-    if (main_inventory && main_inventory->isSingleFolderMode()
-        && use_main_panel)
+    if (use_main_panel)
     {
-        const LLInventoryObject *obj = gInventory.getObject(obj_id);
-        if (obj)
+        LLPanelMainInventory* main_inventory = sidepanel_inventory->getMainInventoryPanel();
+        if (main_inventory && main_inventory->isSingleFolderMode())
         {
-            LL_DEBUGS("Inventory") << "Opening main inventory panel for item" << obj_id << LL_ENDL;
-            main_inventory->setSingleFolderViewRoot(obj->getParentUUID(), false);
-            main_inventory->setGallerySelection(obj_id);
-            return;
+            const LLInventoryObject *obj = gInventory.getObject(obj_id);
+            if (obj)
+            {
+                LL_DEBUGS("Inventory") << "Opening main inventory panel for item" << obj_id << LL_ENDL;
+                main_inventory->setSingleFolderViewRoot(obj->getParentUUID(), false);
+                main_inventory->setGallerySelection(obj_id);
+                return;
+            }
         }
     }
+
 	LLInventoryPanel *active_panel = LLInventoryPanel::getActiveInventoryPanel(auto_open);
-
 	if (active_panel)
 	{
 		LL_DEBUGS("Messaging", "Inventory") << "Highlighting" << obj_id  << LL_ENDL;
@@ -2077,11 +2083,8 @@ void LLInventoryPanel::openInventoryPanelAndSetSelection(BOOL auto_open, const L
 		if (in_inbox && !show_inbox)
 		// </FS:Ansariel>
 		{
-			LLSidepanelInventory* sidepanel_inventory = LLFloaterSidePanelContainer::getPanel<LLSidepanelInventory>("inventory"); // <FS:Ansariel> Use correct inventory floater
-			LLInventoryPanel * inventory_panel = NULL;
-				sidepanel_inventory->openInbox();
-				inventory_panel = sidepanel_inventory->getInboxPanel();
-
+			sidepanel_inventory->openInbox();
+			LLInventoryPanel* inventory_panel = sidepanel_inventory->getInboxPanel();
 			if (inventory_panel)
 			{
 				inventory_panel->setSelection(obj_id, take_keyboard_focus);
@@ -2106,7 +2109,6 @@ void LLInventoryPanel::openInventoryPanelAndSetSelection(BOOL auto_open, const L
 
 void LLInventoryPanel::setSFViewAndOpenFolder(const LLInventoryPanel* panel, const LLUUID& folder_id)
 {
-
     LLFloaterReg::const_instance_list_t& inst_list = LLFloaterReg::getFloaterList("inventory");
     for (LLFloaterReg::const_instance_list_t::const_iterator iter = inst_list.begin(); iter != inst_list.end(); ++iter)
     {

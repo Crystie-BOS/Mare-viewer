@@ -280,9 +280,13 @@ BOOL LLFloaterIMSessionTab::postBuild()
 	mEmojiRecentEmptyText->setToolTip(mEmojiRecentEmptyText->getText());
 	mEmojiRecentEmptyText->setVisible(false);
 
+	mEmojiRecentContainer = getChild<LLPanel>("emoji_recent_container");
+	mEmojiRecentContainer->setVisible(false);
+
 	mEmojiRecentIconsCtrl = getChild<LLPanelEmojiComplete>("emoji_recent_icons_ctrl");
+	mEmojiRecentIconsCtrl->setFocusReceivedCallback([this](LLFocusableElement*) { onEmojiRecentPanelFocusReceived(); });
+	mEmojiRecentIconsCtrl->setFocusLostCallback([this](LLFocusableElement*) { onEmojiRecentPanelFocusLost(); });
 	mEmojiRecentIconsCtrl->setCommitCallback([this](LLUICtrl*, const LLSD& value) { onRecentEmojiPicked(value); });
-	mEmojiRecentIconsCtrl->setVisible(false);
 
 	mEmojiPickerShowBtn = getChild<LLButton>("emoji_picker_show_btn");
 	mEmojiPickerShowBtn->setClickedCallback([this](LLUICtrl*, const LLSD&) { onEmojiPickerShowBtnClicked(); });
@@ -488,7 +492,7 @@ void LLFloaterIMSessionTab::initEmojiRecentPanel()
     if (recentlyUsed.empty())
     {
         mEmojiRecentEmptyText->setVisible(TRUE);
-        mEmojiRecentIconsCtrl->setVisible(FALSE);
+        mEmojiRecentContainer->setVisible(FALSE);
     }
     else
     {
@@ -499,8 +503,20 @@ void LLFloaterIMSessionTab::initEmojiRecentPanel()
         }
         mEmojiRecentIconsCtrl->setEmojis(emojis);
         mEmojiRecentEmptyText->setVisible(FALSE);
-        mEmojiRecentIconsCtrl->setVisible(TRUE);
+        mEmojiRecentContainer->setVisible(TRUE);
     }
+}
+
+// static
+void LLFloaterIMSessionTab::onEmojiRecentPanelFocusReceived()
+{
+    mEmojiRecentContainer->addBorder();
+}
+
+// static
+void LLFloaterIMSessionTab::onEmojiRecentPanelFocusLost()
+{
+    mEmojiRecentContainer->removeBorder();
 }
 
 void LLFloaterIMSessionTab::onRecentEmojiPicked(const LLSD& value)

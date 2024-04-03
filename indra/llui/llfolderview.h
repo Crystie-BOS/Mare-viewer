@@ -348,6 +348,8 @@ protected:
 	LLUICtrl::CommitCallbackRegistry::ScopedRegistrar* mCallbackRegistrar;
 	LLUICtrl::EnableCallbackRegistry::ScopedRegistrar* mEnableRegistrar;
 
+    boost::signals2::connection mRenamerTopLostSignalConnection;
+
     bool mForceArrange;
 // [SL:KB] - Patch: MultiWearables-WearOn | Checked: 2010-05-13 (Catznip-2.0)
 	LLUICtrl::EnableCallbackRegistry::ScopedRegistrar* mEnableCallbackRegistrar;
