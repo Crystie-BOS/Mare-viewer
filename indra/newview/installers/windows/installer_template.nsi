@@ -399,10 +399,20 @@ CreateShortCut	"$SMPROGRAMS\$INSTSHORTCUT\Uninstall $INSTSHORTCUT.lnk" \
 
 # Other shortcuts
 SetOutPath "$INSTDIR"
-CreateShortCut "$DESKTOP\$INSTSHORTCUT.lnk" \
+
+Push $0
+${GetParameters} $COMMANDLINE
+${GetOptionsS} $COMMANDLINE "/marker" $0
+# Returns error if option does not exist
+IfErrors 0 DESKTOP_SHORTCUT_DONE
+  # "/marker" is set by updater, do not recreate desktop shortcut
+  CreateShortCut "$DESKTOP\$INSTSHORTCUT.lnk" \
         "$INSTDIR\$VIEWER_EXE" "$SHORTCUT_LANG_PARAM"
         # <FS:Ansariel> Remove VMP
         #"$INSTDIR\$VIEWER_EXE" "$SHORTCUT_LANG_PARAM" "$INSTDIR\$VIEWER_EXE"
+
+DESKTOP_SHORTCUT_DONE:
+Pop $0
 CreateShortCut "$INSTDIR\$INSTSHORTCUT.lnk" \
         "$INSTDIR\$VIEWER_EXE" "$SHORTCUT_LANG_PARAM"
         # <FS:Ansariel> Remove VMP
@@ -591,7 +601,7 @@ FunctionEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Function un.CloseSecondLife
   Push $0
-  FindWindow $0 "Kokua" ""
+  FindWindow $0 Kokua" ""
   IntCmp $0 0 DONE
   MessageBox MB_OKCANCEL $(CloseSecondLifeUnInstMB) IDOK CLOSE IDCANCEL CANCEL_UNINSTALL
 
@@ -665,8 +675,8 @@ PREINSTALL_FAIL:
 PREINSTALL_DONE:
 
 # We are no longer including release notes with the viewer, so remove them.
-;Delete "$SMPROGRAMS\$INSTSHORTCUT\SL Release Notes.lnk"
-;Delete "$INSTDIR\releasenotes.txt"
+Delete "$SMPROGRAMS\$INSTSHORTCUT\SL Release Notes.lnk"
+Delete "$INSTDIR\releasenotes.txt"
 
 Pop $0
 
@@ -826,7 +836,7 @@ Function .onInstSuccess
         # </FS:Ansariel>
         Push $R0					# Option value, unused# 
 
-       Call CheckWindowsServPack		# Warn if not on the latest SP before asking to launch.
+        Call CheckWindowsServPack		# Warn if not on the latest SP before asking to launch.
 		StrCmp $SKIP_DIALOGS "true" label_launch 
 
 		${GetOptions} $COMMANDLINE "/AUTOSTART" $R0
@@ -841,7 +851,7 @@ label_ask_launch:
 			IDYES label_launch IDNO label_no_launch
         
 label_launch:
-# Assumes SetOutPath $INSTDIR
+        # Assumes SetOutPath $INSTDIR
         # Run INSTEXE (our updater), passing VIEWER_EXE plus the command-line
         # arguments built into our shortcuts. This gives the updater a chance
         # to verify that the viewer we just installed is appropriate for the
@@ -860,6 +870,7 @@ label_launch:
         Exec '"$WINDIR\explorer.exe" "$INSTDIR\$INSTSHORTCUT.lnk"'
 label_no_launch:
 		Pop $R0
+# 
 FunctionEnd
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

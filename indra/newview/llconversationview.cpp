@@ -110,6 +110,8 @@ LLConversationViewSession::~LLConversationViewSession()
     }
 
 	mFlashTimer->unset();
+    delete mFlashTimer;
+    mFlashStateOn = false;
 }
 
 void LLConversationViewSession::destroyView()

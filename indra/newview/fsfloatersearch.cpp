@@ -32,7 +32,7 @@
 #include "fsavatarsearchmenu.h"
 #include "fsdispatchclassifiedclickthrough.h"
 #include "fspanelclassified.h"
-#include "fspanelprofile.h"
+//##include "fspanelprofile.h"
 #include "fsscrolllistctrl.h"
 //#include "lfsimfeaturehandler.h"
 #include "llagent.h"

@@ -528,10 +528,6 @@ class WindowsManifest(ViewerManifest):
                 self.path("OpenAL32.dll")
                 self.path("alut.dll")
 
-            # For ICU4C
-            self.path("icudt48.dll")
-            self.path("icuuc48.dll")
-
             # For textures
             self.path("openjp2.dll")
 
