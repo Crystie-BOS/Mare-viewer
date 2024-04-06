@@ -60,6 +60,10 @@ bool LLFindOutfitItems::operator()(LLInventoryCategory* cat,
 		if((item->getType() == LLAssetType::AT_CLOTHING)
 		   || (item->getType() == LLAssetType::AT_BODYPART)
 		   || (item->getType() == LLAssetType::AT_OBJECT)
+// KKA-1059 if the inventory is uncached the type will remain as AT_LINK, letting that through
+// too gets the outfits floater to populate properly. On the next login the inventory will
+// sort itself out and report the right type
+		   || (item->getType() == LLAssetType::AT_LINK)
 		   || (item->getType() == LLAssetType::AT_GESTURE))
 		{
 			return TRUE;
