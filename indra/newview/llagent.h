@@ -45,9 +45,9 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/signals2.hpp>
 
- //MK
- #include "RRInterface.h"
- //mk
+//MK
+#include "RRInterface.h"
+//mk
 
 extern const BOOL 	ANIMATE;
 extern const U8 	AGENT_STATE_TYPING;  // Typing indication
@@ -356,6 +356,9 @@ private:
 public:
 	void			fidget();
 	static void		stopFidget();
+	static bool		isRLVSwitchable(const LLSD& name);  // Don't inline this - it'll trigger recompiling many files
+	static bool		isRLVEnabled(const LLSD& name);     // Don't inline this either
+
 private:
 	LLFrameTimer	mFidgetTimer;
 	LLFrameTimer	mFocusObjectFadeTimer;

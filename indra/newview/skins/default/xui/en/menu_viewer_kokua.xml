@@ -3702,8 +3702,20 @@
         </menu> <!--Shortcuts-->
 
         <menu_item_separator/>
+     <menu_item_check
+         label="RLV Active Next Login"
+         name="RLV_next_login">
+            <menu_item_check.on_check
+             function="CheckControl"
+             parameter="RestrainedLove" />
+            <menu_item_check.on_click
+             function="ToggleControl"
+             parameter="RestrainedLove" />
+            <menu_item_check.on_enable
+                 function="Agent.RLVSwitchable" />
+        </menu_item_check>
         <menu_item_check
-         label="RLV Enable / Disable"
+         label="Show RLV Menu"
          name="Show RLV Menu">
             <menu_item_check.on_check
              function="CheckControl"
@@ -3711,6 +3723,8 @@
             <menu_item_check.on_click
              function="ToggleControl"
              parameter="ShowRlvMenu" />
+            <menu_item_check.on_enable
+                 function="Agent.RLVEnabled" />
         </menu_item_check>
         <menu_item_call
          label="Show Debug Settings"

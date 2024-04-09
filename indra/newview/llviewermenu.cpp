@@ -7029,31 +7029,11 @@ void show_debug_menus()
 	{
 		BOOL debug = gSavedSettings.getBOOL("UseDebugMenus");
 		BOOL qamode = gSavedSettings.getBOOL("QAMode");
-#if RLV_ALWAYS_ON		
- 		gMenuBarView->setItemVisible("RLV", TRUE);
-#else
-        BOOL rlvmode = gSavedSettings.getBOOL("ShowRlvMenu");
-		if (rlvmode)
-		{
-			gSavedSettings.setBOOL("RestrainedLove", true );
-		}
-		else
-		{
-			gSavedSettings.setBOOL("RestrainedLove", false );
-		}
-		if (rlvmode != gRRenabled) //XOR to determine if change is needed
-		{	
-			LLSD args;
-			args["MESSAGE"] = 
-			llformat("RestrainedLove Support will be %s after you restart", (rlvmode) ? "enabled" : "disabled" );
-			LLNotificationsUtil::add("GenericAlert", args);	
-		}	
- 		gMenuBarView->setItemVisible("RLV", rlvmode);
-#endif        
+
+ 		gMenuBarView->setItemVisible("RLV", gSavedSettings.getBOOL("ShowRlvMenu") && gRRenabled);
 		gMenuBarView->setItemVisible("Advanced", debug);
 // 		gMenuBarView->setItemEnabled("Advanced", debug); // Don't disable Advanced keyboard shortcuts when hidden
 
-//		gMenuBarView->setItemEnabled("RLV", rlvmode); // Don't disable RLV when hidden
 		gMenuBarView->setItemVisible("Debug", qamode);
 		gMenuBarView->setItemEnabled("Debug", qamode);
 
@@ -11328,6 +11308,8 @@ void initialize_menus()
 	commit.add("Agent.ToggleMicrophone", boost::bind(&LLAgent::toggleMicrophone, _2));
 	enable.add("Agent.IsMicrophoneOn", boost::bind(&LLAgent::isMicrophoneOn, _2));
 	enable.add("Agent.IsActionAllowed", boost::bind(&LLAgent::isActionAllowed, _2));
+	enable.add("Agent.RLVEnabled", boost::bind(&LLAgent::isRLVEnabled, _2));
+	enable.add("Agent.RLVSwitchable", boost::bind(&LLAgent::isRLVSwitchable, _2));
 
 	// File menu
 	init_menu_file();

@@ -1073,6 +1073,22 @@ BOOL LLAgent::isMovementLocked() const
 		return mMovementKeysLocked;
 }
 
+// RLV management - don't put these in the header because changes there trigger many files to recompile
+// static
+bool LLAgent::isRLVSwitchable(const LLSD& sdname)
+{
+#if RLV_ALWAYS_ON
+    return false;
+#else
+    return true;
+#endif
+}
+
+// static
+bool LLAgent::isRLVEnabled(const LLSD& sdname)
+{
+    return gRRenabled;
+}
 
 // Does this parcel allow you to fly?
 BOOL LLAgent::canFly()

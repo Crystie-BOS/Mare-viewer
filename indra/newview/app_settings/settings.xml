@@ -1296,7 +1296,7 @@
     <key>RestrainedLove</key>
     <map>
       <key>Comment</key>
-      <string>Toggles the RestrainedLove features (LSL control of viewer features). Needs a restart of the viewer.</string>
+    <string>Toggles the RestrainedLove features (LSL control of viewer features). Needs a restart of the viewer. This control is read once very early in initialisation in the RLV version and never read in the FTRLV version</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
