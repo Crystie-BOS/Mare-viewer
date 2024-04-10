@@ -2076,6 +2076,7 @@ class LLAdvancedRebakeTextures : public view_listener_t
 //MK from KB
 void handle_refresh_attachments()
 {
+	LL_WARNS("Rendering") << "Performing refresh attachments" << LL_ENDL; //Purpose is to also kill a little time without sleeping.
 	LLAttachmentsMgr::instance().refreshAttachments();
 }
 //mk from kb
@@ -9416,7 +9417,7 @@ void handle_buy_currency_test(void*)
 void handle_rebake_textures(void*)
 {
 	if (!isAgentAvatarValid()) return;
-
+	LL_WARNS("Rendering") << "Performing texture rebake" << LL_ENDL;
 	// Slam pending upload count to "unstick" things
 	bool slam_for_debug = true;
 	gAgentAvatarp->forceBakeAllTextures(slam_for_debug);
