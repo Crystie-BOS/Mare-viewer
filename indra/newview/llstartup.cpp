@@ -569,43 +569,6 @@ bool idle_startup()
 
 	//static bool stipend_since_login = false;
 
-//MK
-#if RLV_ALWAYS_ON
-	gRRenabled = TRUE;
-#else
-	gRRenabled = gSavedSettings.getBOOL("RestrainedLove");
-#endif
-	RRInterface::sRRNoSetEnv = gSavedSettings.getBOOL("RestrainedLoveNoSetEnv");
-	RRInterface::sRestrainedLoveDebug = gSavedSettings.getBOOL("RestrainedLoveDebug");
-	RRInterface::sRestrainedLoveLogging = gSavedSettings.getBOOL("RestrainedLoveLogging");
-	RRInterface::sRestrainedLoveCommandLogging = gSavedSettings.getBOOL("RestrainedLoveCommandLogging"); // KKA-914 (making previous KKA-901 logging optional and default off)
-	RRInterface::sRestrainedLoveHeadMouselookRenderRigged = gSavedSettings.getBOOL("RestrainedLoveHeadMouselookRenderRigged");
-	RRInterface::sRestrainedLoveRenderInvisibleSurfaces = gSavedSettings.getBOOL("RestrainedLoveRenderInvisibleSurfaces");
-#if RLV_ALWAYS_ON
-	RRInterface::sCanOoc = FALSE;
-#else
-	RRInterface::sCanOoc = gSavedSettings.getBOOL("RestrainedLoveCanOoc");
-#endif
-	RRInterface::sRecvimMessage = gSavedSettings.getString("RestrainedLoveRecvimMessage");
-	RRInterface::sSendimMessage = gSavedSettings.getString("RestrainedLoveSendimMessage");
-
-	// MK: Deactivated for now so we can't use the blacklist to remove capabilities.
-	// CA: Instead we use a new debug setting to manage this
-	RRInterface::sBlacklist = gSavedSettings.getString("RestrainedLoveBlacklist");
-	if (gSavedSettings.getBOOL("KokuaRLVDisableBlacklist")) RRInterface::sBlacklist = "";
-#if RLV_ALWAYS_ON
-	RRInterface::sBlacklist = "";
-#endif
-	KokuaRLVExtras::initialise();
-	
-	// Let's keep it constant for now, because there are ways to make the vision restriction less tight by playing with this setting.
-	//RRInterface::mCamDistNbGradients = gSavedSettings.getU32("RestrainedLoveCamDistNbGradients");
-	if (RRInterface::mCamDistNbGradients == 0)
-	{
-		RRInterface::mCamDistNbGradients = 1;
-	}
-	LLDrawPoolBump::sRenderDeferredShowInvisiprims = gSavedSettings.getBOOL("RenderDeferredShowInvisiprims");
-//mk
 	// HACK: These are things from the main loop that usually aren't done
 	// until initialization is complete, but need to be done here for things
 	// to work.
@@ -638,6 +601,48 @@ bool idle_startup()
 			// need to capture the initial state as well.
 			LLStartUp::getPhases().startPhase(LLStartUp::getStartupStateString());
 			first_call = false;
+
+            //CA - Moved here so we only do it once instead of many, many times on each idle
+            //MK
+            #if RLV_ALWAYS_ON
+            	gRRenabled = TRUE;
+            	gSavedSettings.setBOOL("RestrainedLove",TRUE);
+            	LL_INFOS() << "RLV initialisation: FTRLV version" << LL_ENDL;
+            #else
+            	gRRenabled = gSavedSettings.getBOOL("RestrainedLove");
+            	LL_INFOS() << "RLV initialisation: RLV active:" << gRRenabled << LL_ENDL;
+            #endif
+            	RRInterface::sRRNoSetEnv = gSavedSettings.getBOOL("RestrainedLoveNoSetEnv");
+            	RRInterface::sRestrainedLoveDebug = gSavedSettings.getBOOL("RestrainedLoveDebug");
+            	RRInterface::sRestrainedLoveLogging = gSavedSettings.getBOOL("RestrainedLoveLogging");
+            	RRInterface::sRestrainedLoveCommandLogging = gSavedSettings.getBOOL("RestrainedLoveCommandLogging"); // KKA-914 (making previous KKA-901 logging optional and default off)
+            	RRInterface::sRestrainedLoveHeadMouselookRenderRigged = gSavedSettings.getBOOL("RestrainedLoveHeadMouselookRenderRigged");
+            	RRInterface::sRestrainedLoveRenderInvisibleSurfaces = gSavedSettings.getBOOL("RestrainedLoveRenderInvisibleSurfaces");
+            #if RLV_ALWAYS_ON
+            	RRInterface::sCanOoc = FALSE;
+            #else
+            	RRInterface::sCanOoc = gSavedSettings.getBOOL("RestrainedLoveCanOoc");
+            #endif
+            	RRInterface::sRecvimMessage = gSavedSettings.getString("RestrainedLoveRecvimMessage");
+            	RRInterface::sSendimMessage = gSavedSettings.getString("RestrainedLoveSendimMessage");
+
+            	// MK: Deactivated for now so we can't use the blacklist to remove capabilities.
+            	// CA: Instead we use a new debug setting to manage this
+            	RRInterface::sBlacklist = gSavedSettings.getString("RestrainedLoveBlacklist");
+            	if (gSavedSettings.getBOOL("KokuaRLVDisableBlacklist")) RRInterface::sBlacklist = "";
+            #if RLV_ALWAYS_ON
+            	RRInterface::sBlacklist = "";
+            #endif
+            	KokuaRLVExtras::initialise();
+            	
+            	// Let's keep it constant for now, because there are ways to make the vision restriction less tight by playing with this setting.
+            	//RRInterface::mCamDistNbGradients = gSavedSettings.getU32("RestrainedLoveCamDistNbGradients");
+            	if (RRInterface::mCamDistNbGradients == 0)
+            	{
+            		RRInterface::mCamDistNbGradients = 1;
+            	}
+            	LLDrawPoolBump::sRenderDeferredShowInvisiprims = gSavedSettings.getBOOL("RenderDeferredShowInvisiprims");
+            //mk
 		}
 
 		gViewerWindow->showCursor(); 
@@ -3634,7 +3639,9 @@ void LLStartUp::setStartSLURL(const LLSLURL& slurl)
 #if RLV_ALWAYS_ON
 		if (true)
 #else
-        if (gSavedSettings.getBOOL("RestrainedLove"))
+        // gRRenabled has been set up by now, so use it
+        // if (gSavedSettings.getBOOL("RestrainedLove"))
+        if (gRRenabled)
 #endif
         {
     		new_start = LLSLURL::SIM_LOCATION_LAST;

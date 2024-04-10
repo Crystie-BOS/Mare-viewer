@@ -42,6 +42,7 @@
 #include "llwindow.h"
 #include "llfloaterreg.h"
 #include "lltexteditor.h"
+#include "kokuarlvmode.h"
 
 
 LLFloaterSettingsDebug::LLFloaterSettingsDebug(const LLSD& key) 
@@ -126,6 +127,14 @@ void LLFloaterSettingsDebug::onCommitSettings()
 			return;
 		}
 	}
+
+#if RLV_ALWAYS_ON
+	if (gRRenabled && controlp->getName() == "RestrainedLove")
+	{
+	    getChild<LLUICtrl>("boolean_combo")->setValue(true);
+		return;
+	}
+#endif
 //mk
 
 	LLVector3 vector;

@@ -571,7 +571,8 @@ BOOL LLFloaterPreference::postBuild()
 	fov_slider->setMaxValue(LLViewerCamera::getInstance()->getMaxView());
 
 #if RLV_ALWAYS_ON
-	getChild<LLUICtrl>("ShowRlvMenu")->setEnabled(FALSE);
+    // leave the ShowRLVMenu control active, delete the rest, fade out enable RLV
+	getChild<LLCheckBoxCtrl>("EnableRLV")->setEnabled(FALSE);
 	delete getChild<LLUICtrl>("RlvBlinding");
 	delete getChild<LLUICtrl>("RlvCanOoc");
 	delete getChild<LLUICtrl>("KokuaRLVOOCChatIsRedirected");
@@ -582,6 +583,19 @@ BOOL LLFloaterPreference::postBuild()
 	delete getChild<LLUICtrl>("KokuaIMRestrictionWarning");
 	delete getChild<LLUICtrl>("KokuaRLVShowlocHidesMaturity");
 	delete getChild<LLUICtrl>("RestrainedLoveShowRedirectChatTyping");
+#else
+    // set the controls depending on the status of RLV using gRRenabled, not the debug setting
+    getChild<LLUICtrl>("ShowRlvMenu")->setEnabled(gRRenabled);
+    getChild<LLUICtrl>("RlvBlinding")->setEnabled(gRRenabled);
+    getChild<LLUICtrl>("RlvCanOoc")->setEnabled(gRRenabled);
+    getChild<LLUICtrl>("KokuaRLVOOCChatIsRedirected")->setEnabled(gRRenabled);
+    getChild<LLUICtrl>("RlvNoBlacklist")->setEnabled(gRRenabled);
+    getChild<LLUICtrl>("RlvDefeatStandTP")->setEnabled(gRRenabled);
+    getChild<LLUICtrl>("RestrainedLoveHeadMouselookRenderRigged")->setEnabled(gRRenabled);
+    getChild<LLUICtrl>("KokuaRLVShowOtherNameTags")->setEnabled(gRRenabled);
+    getChild<LLUICtrl>("KokuaIMRestrictionWarning")->setEnabled(gRRenabled);
+    getChild<LLUICtrl>("KokuaRLVShowlocHidesMaturity")->setEnabled(gRRenabled);
+    getChild<LLUICtrl>("RestrainedLoveShowRedirectChatTyping")->setEnabled(gRRenabled);
 #endif
 	
 	// Hook up and init for filtering

@@ -35,6 +35,7 @@
 #include "llmd5.h"
 #include "v4color.h"
 
+#include "llagent.h"                // for gRRenabaled
 #include "llappviewer.h"
 #include "llbutton.h"
 #include "llcheckboxctrl.h"
@@ -944,7 +945,9 @@ void LLPanelLogin::onClickConnect(bool commit_fields)
 #if RLV_ALWAYS_ON
 		{
 #else
-		if (gSavedSettings.getBOOL("RestrainedLove"))
+        // CA: gRRenabled has been set up by now, so use it
+		//if (gSavedSettings.getBOOL("RestrainedLove"))
+		if (gRRenabled)
 		{
 #endif
 			std::string location = LLSLURL::SIM_LOCATION_LAST;
