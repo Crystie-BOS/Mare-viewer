@@ -222,8 +222,8 @@ public:
 
     BOOL handleKeyHere(KEY key, MASK mask);
 
-	// // <FS:Ansariel> FIRE-16740: Color syntax highlighting changes don't immediately appear in script window
-	// void updateStyle();
+	// <FS:Ansariel> FIRE-16740: Color syntax highlighting changes don't immediately appear in script window
+	void updateStyle();
 protected:
 	std::string		getTmpFileName(const std::string& script_name);
 	bool			onExternalChange(const std::string& filename);
