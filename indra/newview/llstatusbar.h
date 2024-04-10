@@ -279,7 +279,7 @@ private:
 	void setParcelInfoText(const std::string& new_text);
 
 private:
-	LLTextBox	*mTextHealth;
+//unused	LLTextBox	*mTextHealth;
 	LLTextBox	*mTextTime;
 	LLTextBox	*mFPSText;
 
@@ -329,7 +329,7 @@ private:
 	LLTextBox* 				mDamageText;
 	LLIconCtrl*				mParcelIcon[ICON_COUNT];
 	LLParcelChangeObserver*	mParcelChangedObserver;
-	LLButton* 				mPWLBtn;
+//unused	LLButton* 				mPWLBtn;
 	LLButton* 				mAvatarHeightOffsetResetBtn;
 //mk
 
