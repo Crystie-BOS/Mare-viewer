@@ -737,7 +737,16 @@ void LLInventoryModel::lockDirectDescendentArrays(const LLUUID& cat_id,
 												  cat_array_t*& categories,
 												  item_array_t*& items)
 {
+	//LL_WARNS() << "====== getting descendents of " << cat_id << LL_ENDL;
 	getDirectDescendentsOf(cat_id, categories, items);
+	if (items)
+	{
+	    //LL_WARNS() << "====== items " << items->size() << LL_ENDL;
+	}
+	if (categories)
+	{
+    	//LL_WARNS() << "====== categories " << categories->size() << LL_ENDL;
+	}
 
 #ifdef LL_DEBUG
 	if (categories)

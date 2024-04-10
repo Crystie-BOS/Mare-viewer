@@ -337,6 +337,7 @@ void force_error_llerror_msg(void*);
 void force_error_bad_memory_access(void *);
 void force_error_infinite_loop(void *);
 void force_error_software_exception(void *);
+void force_error_os_exception(void*);
 void force_error_driver_crash(void *);
 void force_error_coroutine_crash(void *);
 void force_error_thread_crash(void *);
@@ -2075,6 +2076,7 @@ class LLAdvancedRebakeTextures : public view_listener_t
 //MK from KB
 void handle_refresh_attachments()
 {
+	LL_WARNS("Rendering") << "Performing refresh attachments" << LL_ENDL; //Purpose is to also kill a little time without sleeping.
 	LLAttachmentsMgr::instance().refreshAttachments();
 }
 //mk from kb
@@ -2512,6 +2514,15 @@ class LLAdvancedForceErrorSoftwareException : public view_listener_t
 		force_error_software_exception(NULL);
 		return true;
 	}
+};
+
+class LLAdvancedForceOSException: public view_listener_t
+{
+    bool handleEvent(const LLSD& userdata)
+    {
+        force_error_os_exception(NULL);
+        return true;
+    }
 };
 
 class LLAdvancedForceErrorSoftwareExceptionCoro : public view_listener_t
@@ -3432,6 +3443,15 @@ bool visible_object_select_in_pathfinding_linksets()
 bool enable_object_select_in_pathfinding_characters()
 {
 	return LLPathfindingManager::getInstance()->isPathfindingEnabledForCurrentRegion() &&  LLSelectMgr::getInstance()->selectGetViewableCharacters();
+}
+
+bool enable_os_exception()
+{
+#if LL_DARWIN
+    return true;
+#else
+    return false;
+#endif
 }
 
 class LLSelfRemoveAllAttachments : public view_listener_t
@@ -6535,8 +6555,9 @@ class LLCommunicateNearbyChat : public view_listener_t
 	bool handleEvent(const LLSD& userdata)
 	{
 		LLFloaterIMContainer* im_box = LLFloaterIMContainer::getInstance();
-		bool nearby_visible	= LLFloaterReg::getTypedInstance<LLFloaterIMNearbyChat>("nearby_chat")->isInVisibleChain();
-		if(nearby_visible && im_box->getSelectedSession() == LLUUID() && im_box->getConversationListItemSize() > 1)
+        LLFloaterIMNearbyChat* floater_nearby = LLFloaterReg::getTypedInstance<LLFloaterIMNearbyChat>("nearby_chat");
+        if (floater_nearby->isInVisibleChain() && !floater_nearby->isTornOff() 
+            && im_box->getSelectedSession() == LLUUID() && im_box->getConversationListItemSize() > 1)
 		{
 			im_box->selectNextorPreviousConversation(false);
 		}
@@ -9248,6 +9269,11 @@ void force_error_software_exception(void *)
     LLAppViewer::instance()->forceErrorSoftwareException();
 }
 
+void force_error_os_exception(void*)
+{
+    LLAppViewer::instance()->forceErrorOSSpecificException();
+}
+
 void force_error_driver_crash(void *)
 {
     LLAppViewer::instance()->forceErrorDriverCrash();
@@ -9424,7 +9450,7 @@ void handle_buy_currency_test(void*)
 void handle_rebake_textures(void*)
 {
 	if (!isAgentAvatarValid()) return;
-
+	LL_WARNS("Rendering") << "Performing texture rebake" << LL_ENDL;
 	// Slam pending upload count to "unstick" things
 	bool slam_for_debug = true;
 	gAgentAvatarp->forceBakeAllTextures(slam_for_debug);
@@ -10579,6 +10605,7 @@ void initialize_menus()
 	view_listener_t::addMenu(new LLAdvancedForceErrorBadMemoryAccessCoro(), "Advanced.ForceErrorBadMemoryAccessCoro");
 	view_listener_t::addMenu(new LLAdvancedForceErrorInfiniteLoop(), "Advanced.ForceErrorInfiniteLoop");
 	view_listener_t::addMenu(new LLAdvancedForceErrorSoftwareException(), "Advanced.ForceErrorSoftwareException");
+    view_listener_t::addMenu(new LLAdvancedForceOSException(), "Advanced.ForceErrorOSException");
 	view_listener_t::addMenu(new LLAdvancedForceErrorSoftwareExceptionCoro(), "Advanced.ForceErrorSoftwareExceptionCoro");
 	view_listener_t::addMenu(new LLAdvancedForceErrorDriverCrash(), "Advanced.ForceErrorDriverCrash");
     view_listener_t::addMenu(new LLAdvancedForceErrorCoroutineCrash(), "Advanced.ForceErrorCoroutineCrash");
@@ -10793,6 +10820,7 @@ void initialize_menus()
 	enable.add("VisibleSelectInPathfindingLinksets", boost::bind(&visible_object_select_in_pathfinding_linksets));
 	commit.add("Pathfinding.Characters.Select", boost::bind(&LLFloaterPathfindingCharacters::openCharactersWithSelectedObjects));
 	enable.add("EnableSelectInPathfindingCharacters", boost::bind(&enable_object_select_in_pathfinding_characters));
+    enable.add("Advanced.EnableErrorOSException", boost::bind(&enable_os_exception));
 
 	view_listener_t::addMenu(new LLFloaterVisible(), "FloaterVisible");
 //NP	view_listener_t::addMenu(new LLShowSidetrayPanel(), "ShowSidetrayPanel");

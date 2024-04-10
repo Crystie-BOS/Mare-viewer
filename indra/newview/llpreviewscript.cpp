@@ -88,6 +88,9 @@
 #include "llexperiencecache.h"
 #include "llfloaterexperienceprofile.h"
 #include "llviewerassetupload.h"
+#include "lltoggleablemenu.h"
+#include "llmenubutton.h"
+#include "llinventoryfunctions.h"
 
 //kokua
 #include "llcompilequeue.h"
@@ -330,6 +333,38 @@ void LLFloaterScriptSearch::onSearchBoxCommit()
 // </FS>
 
 /// ---------------------------------------------------------------------------
+
+class LLScriptMovedObserver : public LLInventoryObserver
+{
+  public:
+    LLScriptMovedObserver(LLPreviewLSL *floater) : mPreview(floater) { gInventory.addObserver(this); }
+    virtual ~LLScriptMovedObserver() { gInventory.removeObserver(this); }
+    virtual void changed(U32 mask);
+
+  private:
+    LLPreviewLSL *mPreview;
+};
+
+void LLScriptMovedObserver::changed(U32 mask)
+{
+    const std::set<LLUUID> &mChangedItemIDs = gInventory.getChangedIDs();
+    std::set<LLUUID>::const_iterator it;
+
+    const LLUUID &item_id = mPreview->getScriptID();
+
+    for (it = mChangedItemIDs.begin(); it != mChangedItemIDs.end(); it++)
+    {
+        if (*it == item_id)
+        {
+            if ((mask & (LLInventoryObserver::STRUCTURE)) != 0)
+            {
+                mPreview->setDirty();
+            }
+        }
+    }
+}
+
+/// ---------------------------------------------------------------------------
 /// LLScriptEdCore
 /// ---------------------------------------------------------------------------
 
@@ -367,10 +402,6 @@ LLScriptEdCore::LLScriptEdCore(
 	mLive(live),
 	mContainer(container),
 	mCurrentEditor(NULL),
-	// <FS:Ansariel> FIRE-20818: User-selectable font and size for script editor
-	mFontNameChangedCallbackConnection(),
-	mFontSizeChangedCallbackConnection(),
-	// </FS:Ansariel>
 	mHasScriptData(FALSE),
 	mScriptRemoved(FALSE),
 	mSaveDialogShown(FALSE)
@@ -400,16 +431,6 @@ LLScriptEdCore::~LLScriptEdCore()
 	{
 		mSyntaxIDConnection.disconnect();
 	}
-	// <FS:Ansariel> FIRE-20818: User-selectable font and size for script editor
-	if (mFontNameChangedCallbackConnection.connected())
-	{
-		mFontNameChangedCallbackConnection.disconnect();
-	}
-	if (mFontSizeChangedCallbackConnection.connected())
-	{
-		mFontSizeChangedCallbackConnection.disconnect();
-	}
-	// </FS:Ansariel>
 }
 
 void LLLiveLSLEditor::experienceChanged()
@@ -472,11 +493,6 @@ BOOL LLScriptEdCore::postBuild()
 	mEditor = getChild<LLScriptEditor>("Script Editor");
 
 	mCurrentEditor = mEditor;
-	// <FS:Ansariel> FIRE-20818: User-selectable font and size for script editor
-	mFontNameChangedCallbackConnection = gSavedSettings.getControl("FSScriptingFontName")->getSignal()->connect(boost::bind(&LLScriptEdCore::onFontChanged, this));
-	mFontSizeChangedCallbackConnection = gSavedSettings.getControl("FSScriptingFontSize")->getSignal()->connect(boost::bind(&LLScriptEdCore::onFontChanged, this));
-	onFontChanged();
-	// </FS:Ansariel>
 	childSetCommitCallback("lsl errors", &LLScriptEdCore::onErrorList, this);
 	childSetAction("Save_btn", boost::bind(&LLScriptEdCore::doSave,this,FALSE));
 	childSetAction("Edit_btn", boost::bind(&LLScriptEdCore::openInExternalEditor, this));
@@ -488,6 +504,13 @@ BOOL LLScriptEdCore::postBuild()
 	// Intialise keyword highlighting for the current simulator's version of LSL
 	LLSyntaxIdLSL::getInstance()->initialize();
 	processKeywords();
+
+//    mCommitCallbackRegistrar.add("FontSize.Set", boost::bind(&LLScriptEdCore::onChangeFontSize, this, _2));
+//    mEnableCallbackRegistrar.add("FontSize.Check", boost::bind(&LLScriptEdCore::isFontSizeChecked, this, _2));
+
+//    LLToggleableMenu *context_menu = LLUICtrlFactory::getInstance()->createFromFile<LLToggleableMenu>(
+//        "menu_lsl_font_size.xml", gMenuHolder, LLViewerMenuHolderGL::child_registry_t::instance());
+//    getChild<LLMenuButton>("font_btn")->setMenu(context_menu, LLMenuButton::MP_BOTTOM_LEFT, true);
 
 	return TRUE;
 }
@@ -820,7 +843,7 @@ void LLScriptEdCore::setHelpPage(const std::string& help_string)
 
 	LLUIString url_string = gSavedSettings.getString("LSLHelpURL");
 
-	url_string.setArg("[LSL_STRING]", help_string);
+	url_string.setArg("[LSL_STRING]", help_string.empty() ? HELP_LSL_PORTAL_TOPIC : help_string);
 
 	addHelpItemToHistory(help_string);
 
@@ -1320,23 +1343,6 @@ LLUUID LLScriptEdCore::getAssociatedExperience()const
 	return mAssociatedExperience;
 }
 
-// <FS:Ansariel> FIRE-20818: User-selectable font and size for script editor
-void LLScriptEdCore::onFontChanged()
-{
-	LLFontGL* font = LLFontGL::getFont(LLFontDescriptor(gSavedSettings.getString("FSScriptingFontName"), gSavedSettings.getString("FSScriptingFontSize"), LLFontGL::NORMAL));
-	if (font)
-	{
-		mEditor->setFont(font);
-		mEditor->needsReflow();
-		//if (mPostEditor)
-		//{
-		//	mPostEditor->setFont(font);
-		//	mPostEditor->needsReflow();
-		//}
-	}
-}
-// </FS:Ansariel>
-
 void LLLiveLSLEditor::setExperienceIds( const LLSD& experience_ids )
 {
 	mExperienceIds=experience_ids;
@@ -1532,11 +1538,26 @@ void LLScriptEdContainer::updateStyle()
 	{
 		mScriptEd->mEditor->initKeywords();
 		mScriptEd->mEditor->loadKeywords();
-	}
+ 	}
 }
 // </FS:Ansariel>
 
 /// ---------------------------------------------------------------------------
+BOOL LLScriptEdContainer::handleKeyHere(KEY key, MASK mask) 
+{
+    if (('A' == key) && (MASK_CONTROL == (mask & MASK_MODIFIERS)))
+    {
+        mScriptEd->selectAll();
+        return TRUE;
+    }
+
+    if (!LLPreview::handleKeyHere(key, mask)) 
+    {
+        return mScriptEd->handleKeyHere(key, mask);
+    }
+    return TRUE;
+}
+    /// ---------------------------------------------------------------------------
 /// LLPreviewLSL
 /// ---------------------------------------------------------------------------
 
@@ -1577,6 +1598,14 @@ LLPreviewLSL::LLPreviewLSL(const LLSD& key )
 	mPendingUploads(0)
 {
 	mFactoryMap["script panel"] = LLCallbackMap(LLPreviewLSL::createScriptEdPanel, this);
+
+    mItemObserver = new LLScriptMovedObserver(this);
+}
+
+LLPreviewLSL::~LLPreviewLSL() 
+{ 
+    delete mItemObserver;
+    mItemObserver = NULL;
 }
 
 // virtual
@@ -1588,10 +1617,14 @@ BOOL LLPreviewLSL::postBuild()
 	if (item)
 	{
 		getChild<LLUICtrl>("desc")->setValue(item->getDescription());
+
+        std::string item_path = get_category_path(item->getParentUUID());
+        getChild<LLUICtrl>("path_txt")->setValue(item_path);
+        getChild<LLUICtrl>("path_txt")->setToolTip(item_path);
 	}
 	childSetCommitCallback("desc", LLPreview::onText, this);
 	getChild<LLLineEditor>("desc")->setPrevalidate(&LLTextValidate::validateASCIIPrintableNoPipe);
-
+ 
 	return LLPreview::postBuild();
 }
 
@@ -1603,7 +1636,12 @@ void LLPreviewLSL::draw()
 		setTitle(LLTrans::getString("ScriptWasDeleted"));
 		mScriptEd->setItemRemoved(TRUE);
 	}
-
+    else if (mDirty) 
+    {
+        std::string item_path = get_category_path(item->getParentUUID());
+        getChild<LLUICtrl>("path_txt")->setValue(item_path);
+        getChild<LLUICtrl>("path_txt")->setToolTip(item_path);
+    }
 	LLPreview::draw();
 }
 // virtual
@@ -2047,7 +2085,8 @@ LLLiveLSLEditor::LLLiveLSLEditor(const LLSD& key) :
 	mPendingUploads(0),
 	mIsModifiable(FALSE),
 	mIsNew(false),
-	mIsSaving(FALSE)
+	mIsSaving(FALSE),
+    mObjectName("")
 {
 	mFactoryMap["script ed panel"] = LLCallbackMap(LLLiveLSLEditor::createScriptEdPanel, this);
 }
@@ -2184,6 +2223,7 @@ void LLLiveLSLEditor::loadAsset()
 			}
 
 			refreshFromItem();
+            getChild<LLUICtrl>("obj_name")->setValue(mObjectName);
 			// This is commented out, because we don't completely
 			// handle script exports yet.
 			/*

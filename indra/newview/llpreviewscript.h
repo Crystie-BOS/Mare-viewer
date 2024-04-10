@@ -36,6 +36,7 @@
 #include "llfloatergotoline.h"
 #include "lllivefile.h"
 #include "llsyntaxid.h"
+#include "llscripteditor.h"
 #include <boost/signals2.hpp>
 
 class LLLiveLSLFile;
@@ -53,6 +54,7 @@ class LLViewerInventoryItem;
 class LLScriptEdContainer;
 class LLFloaterGotoLine;
 class LLFloaterExperienceProfile;
+class LLScriptMovedObserver;
 
 class LLLiveLSLFile : public LLLiveFile
 {
@@ -146,7 +148,13 @@ public:
     void 			setAssetID( const LLUUID& asset_id){ mAssetID = asset_id; };
     LLUUID 			getAssetID() { return mAssetID; }
 
-private:
+//    bool isFontSizeChecked(const LLSD &userdata);
+//    void onChangeFontSize(const LLSD &size_name);
+
+    virtual BOOL handleKeyHere(KEY key, MASK mask);
+    void selectAll() { mEditor->selectAll(); }
+
+  private:
 	void		onBtnDynamicHelp();
 	void		onBtnUndoChanges();
 
@@ -154,8 +162,6 @@ private:
 
 	void selectFirstError();
 
-	virtual BOOL handleKeyHere(KEY key, MASK mask);
-	
 	void enableSave(BOOL b) {mEnableSave = b;}
 	// <FS:Ansariel> FIRE-20818: User-selectable font and size for script editor
 	boost::signals2::connection mFontNameChangedCallbackConnection;
@@ -214,6 +220,8 @@ public:
 	LLScriptEdContainer(const LLSD& key);
 	LLScriptEdContainer(const LLSD& key, const bool live);
 
+    BOOL handleKeyHere(KEY key, MASK mask);
+
 	// <FS:Ansariel> FIRE-16740: Color syntax highlighting changes don't immediately appear in script window
 	void updateStyle();
 protected:
@@ -229,6 +237,12 @@ class LLPreviewLSL : public LLScriptEdContainer
 {
 public:
 	LLPreviewLSL(const LLSD& key );
+    ~LLPreviewLSL();
+
+    LLUUID getScriptID() { return mItemUUID; }
+
+    void setDirty() { mDirty = true; }
+
 	virtual void callbackLSLCompileSucceeded();
 	virtual void callbackLSLCompileFailed(const LLSD& compile_errors);
 
@@ -269,6 +283,8 @@ protected:
 	// Can safely close only after both text and bytecode are uploaded
 	S32 mPendingUploads;
 
+    LLScriptMovedObserver* mItemObserver;
+
 };
 
 
@@ -305,6 +321,8 @@ public:
 	void requestExperiences();
 	void experienceChanged();
 	void addAssociatedExperience(const LLSD& experience);
+
+    void setObjectName(std::string name) { mObjectName = name; }
 	
 private:
 	virtual BOOL canClose();
@@ -371,6 +389,7 @@ private:
 	LLSD			mExperienceIds;
 
 	LLHandle<LLFloater> mExperienceProfile;
+    std::string mObjectName;
 };
 
 #endif  // LL_LLPREVIEWSCRIPT_H

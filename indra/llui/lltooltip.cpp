@@ -155,7 +155,8 @@ LLToolTip::Params::Params()
 	text_color("text_color"),
 	time_based_media("time_based_media", false),
 	web_based_media("web_based_media", false),
-	media_playing("media_playing", false)
+	media_playing("media_playing", false),
+    allow_paste_tooltip("allow_paste_tooltip", false)
 {
 	changeDefault(chrome, true);
 }
@@ -168,7 +169,8 @@ LLToolTip::LLToolTip(const LLToolTip::Params& p)
 	mTextBox(NULL),
 	mInfoButton(NULL),
 	mPlayMediaButton(NULL),
-	mHomePageButton(NULL)
+	mHomePageButton(NULL),
+    mIsTooltipPastable(p.allow_paste_tooltip)
 {
 	LLTextBox::Params params;
 	params.name = params.initial_value().asString();
@@ -292,6 +294,8 @@ void LLToolTip::initFromParams(const LLToolTip::Params& p)
 		LLStringUtil::replaceString(message, "\\n", "\n");
 		mTextBox->setText(message);
 	}
+
+	mIsTooltipPastable = p.allow_paste_tooltip;
 
 	updateTextBox();
 	snapToChildren();
@@ -487,9 +491,9 @@ void LLToolTipMgr::createToolTip(const LLToolTip::Params& params)
 }
 
 
-void LLToolTipMgr::show(const std::string& msg)
+void LLToolTipMgr::show(const std::string& msg, bool allow_paste_tooltip)
 {
-	show(LLToolTip::Params().message(msg));
+    show(LLToolTip::Params().message(msg).allow_paste_tooltip(allow_paste_tooltip));
 }
 
 void LLToolTipMgr::show(const LLToolTip::Params& params)
@@ -630,5 +634,13 @@ void LLToolTipMgr::getToolTipMessage(std::string & message)
 	}
 }
 
+bool LLToolTipMgr::isTooltipPastable()
+{
+    if (toolTipVisible())
+    {
+        return mToolTip->isTooltipPastable();
+    }
+    return false;
+ }
 
 // EOF
