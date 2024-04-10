@@ -208,11 +208,6 @@ protected:
     void resetDirty() override;
 
     /**
-     * Callback for "Set Location" button click
-     */
-    void onClickSetLocation();
-
-    /**
      * Callback for "Save" and "Create" button click
      */
     void onClickSave();
@@ -234,7 +229,6 @@ protected:
     LLTextureCtrl*      mSnapshotCtrl;
     LLLineEditor*       mPickName;
     LLTextEditor*       mPickDescription;
-    LLButton*           mSetCurrentLocationButton;
     LLButton*           mSaveButton;
     LLButton*           mCreateButton;
     LLButton*           mCancelButton;
