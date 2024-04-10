@@ -153,7 +153,7 @@ private:
 	LLTextBox	*mBoxBalance;
 	LLButton	*mStreamToggle;		// ## Zi: Media/Stream separation
 	LLButton	*mMediaToggle;
-	LLButton	*mBandwidthButton;
+//unused	LLButton	*mBandwidthButton;
 	LLView		*mScriptOut;
 	LLFrameTimer	mStatusBarUpdateTimer;
 	LLFrameTimer	mClockUpdateTimer;
