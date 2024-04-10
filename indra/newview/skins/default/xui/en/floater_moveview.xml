@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
-<!-- you also want to edit panel_stand_stop_flying.xml code in llmoveview.* -->
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <floater
  positioning="specified"
  right="-905"

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <panel
  border="true"
  follows="all"
@@ -129,7 +129,7 @@
 		is_toggle="true"
 		layout="topleft"
 		left_pad="5"
-		name="mute_audio"
+		name="mute_audio_ui"
 		tab_stop="false"
 		width="16" />
     <slider
@@ -163,7 +163,7 @@
      is_toggle="true"
      layout="topleft"
      left_pad="5"
-     name="mute_audio"
+     name="mute_audio_ambient"
      tab_stop="false"
      width="16" />
     <slider
@@ -197,7 +197,7 @@
      is_toggle="true"
      layout="topleft"
      left_pad="5"
-     name="mute_audio"
+     name="mute_audio_sounds"
      tab_stop="false"
      width="16">
       <button.commit_callback
@@ -234,7 +234,7 @@
      is_toggle="true"
      layout="topleft"
 	   left_pad="5"
-     name="mute_audio"
+     name="mute_audio_music"
      tab_stop="false"
 	 width="16" />
 	<check_box
@@ -280,7 +280,7 @@
 		is_toggle="true"
 		layout="topleft"
 		left_pad="5"
-		name="mute_audio"
+		name="mute_audio_media"
 		tab_stop="false"
 		width="16" />
 	<check_box
@@ -328,7 +328,7 @@
 		is_toggle="true"
 		layout="topleft"
 		left_pad="5"
-		name="mute_audio"
+		name="mute_audio_voice"
 		tab_stop="false"
 		width="16" />
 	<check_box
