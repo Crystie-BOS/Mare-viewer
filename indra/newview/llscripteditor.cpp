@@ -58,7 +58,9 @@ LLScriptEditor::LLScriptEditor(const Params& p)
 
 BOOL LLScriptEditor::postBuild()
 {
-    gSavedSettings.getControl("LSLFontSizeName")->getCommitSignal()->connect(boost::bind(&LLScriptEditor::onFontSizeChange, this));
+//    gSavedSettings.getControl("LSLFontSizeName")->getCommitSignal()->connect(boost::bind(&LLScriptEditor::onFontSizeChange, this));
+    gSavedSettings.getControl("FSScriptingFontSize")->getCommitSignal()->connect(boost::bind(&LLScriptEditor::onFontSizeChange, this));
+    gSavedSettings.getControl("FSScriptingFontName")->getCommitSignal()->connect(boost::bind(&LLScriptEditor::onFontSizeChange, this));
     return LLTextEditor::postBuild();
 }
 
@@ -121,10 +123,6 @@ void LLScriptEditor::drawLineNumbers()
 			// draw the line numbers
 			if(line.mLineNum != last_line_num && line.mRect.mTop <= scrolled_view_rect.mTop)
 			{
-				// // <FS:Ansariel> Script editor ignoring font selection
-				// //const LLFontGL *num_font = LLFontGL::getFontMonospace();
-				// const LLFontGL *num_font = getFont();
-				// // </FS:Ansariel>
 				const LLWString ltext = utf8str_to_wstring(llformat("%d", line.mLineNum ));
 				BOOL is_cur_line = cursor_line == line.mLineNum;
 				const U8 style = is_cur_line ? LLFontGL::BOLD : LLFontGL::NORMAL;
@@ -233,19 +231,21 @@ void LLScriptEditor::drawSelectionBackground()
 
 std::string LLScriptEditor::getScriptFontSize()
 { 
-    static LLCachedControl<std::string> size_name(gSavedSettings, "LSLFontSizeName", "Monospace");
-    return size_name;
+//    static LLCachedControl<std::string> size_name(gSavedSettings, "LSLFontSizeName", "Monospace");
+//    return size_name;
+		return gSavedSettings.getString("FSScriptingFontSize");
 }
 
 LLFontGL* LLScriptEditor::getScriptFont()
 {
     std::string font_size_name = mUseDefaultFontSize ? "Monospace" : getScriptFontSize();
-    return LLFontGL::getFont(LLFontDescriptor("Monospace", font_size_name, 0));
+    //return LLFontGL::getFont(LLFontDescriptor("Monospace", font_size_name, 0));
+    return LLFontGL::getFont(LLFontDescriptor(gSavedSettings.getString("FSScriptingFontName"), font_size_name, 0));
 }
 
 void LLScriptEditor::onFontSizeChange() 
 {
-    if (!mUseDefaultFontSize)
+//    if (!mUseDefaultFontSize)
     {
         needsReflow();
     }

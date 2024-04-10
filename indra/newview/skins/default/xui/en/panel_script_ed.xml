@@ -145,6 +145,7 @@
         name="Keyword Help..." />
     </menu>
   </menu_bar>
+<!--
   <menu_button
    follows="right|top"
    height="24"
@@ -154,6 +155,57 @@
    right="453"
    name="font_btn"
    width="32" />
+-->
+        <text
+         top_pad="12"
+        layout="topleft"
+        follows="right|top"
+         left="10"
+         name="text_box_scripting_font"
+         width="190">
+          Script Editor Font Name and Size:
+        </text>
+        <combo_box
+         allow_text_entry="false"
+         top_pad="-14"
+         left_pad="4"
+         height="24"
+        layout="topleft"
+        follows="right|top"
+         max_chars="20"
+         mouse_opaque="true"
+         name="FSScriptingFontName"
+         width="120"
+         control_name="FSScriptingFontName"
+         tool_tip="Name of the font used in the LSL script editor">
+             <combo_item name="Monospace" value="Monospace" label="Monospace"/>
+             <combo_item name="Scripting" value="Scripting" label="Scripting"/>
+             <combo_item name="Cascadia" value="Cascadia" label="Cascadia"/>
+             <combo_item name="LektonCode" value="LektonCode" label="LektonCode"/>
+        </combo_box>
+        <combo_box
+         allow_text_entry="false"
+         top_pad="-24"
+         left_pad="4"
+        layout="topleft"
+        follows="right|top"
+        height="24"
+         max_chars="20"
+         mouse_opaque="true"
+         name="FSScriptingFontSize"
+         width="120"
+         control_name="FSScriptingFontSize"
+         tool_tip="Size of the font used in the LSL script editor">
+             <combo_item name="Monospace" value="Monospace" label="Monospace"/>
+             <combo_item name="Scripting" value="Scripting" label="Scripting"/>
+             <combo_item name="Cascadia" value="Cascadia" label="Cascadia"/>
+             <combo_item name="LektonCode" value="LektonCode" label="LektonCode"/>
+             <combo_item name="SmallLSL" value="SmallLSL" label="SmallLSL"/>
+             <combo_item name="Small" value="Small" label="Small"/>
+             <combo_item name="Medium" value="Medium" label="Medium"/>
+             <combo_item name="Large" value="Large" label="Large"/>
+             <combo_item name="HugeLSL" value="HugeLSL" label="HugeLSL"/>
+        </combo_box>
   <button
    follows="right|top"
    height="24"

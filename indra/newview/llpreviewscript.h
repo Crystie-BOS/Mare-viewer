@@ -148,8 +148,8 @@ public:
     void 			setAssetID( const LLUUID& asset_id){ mAssetID = asset_id; };
     LLUUID 			getAssetID() { return mAssetID; }
 
-    bool isFontSizeChecked(const LLSD &userdata);
-    void onChangeFontSize(const LLSD &size_name);
+//    bool isFontSizeChecked(const LLSD &userdata);
+//    void onChangeFontSize(const LLSD &size_name);
 
     virtual BOOL handleKeyHere(KEY key, MASK mask);
     void selectAll() { mEditor->selectAll(); }
@@ -163,11 +163,11 @@ public:
 	void selectFirstError();
 
 	void enableSave(BOOL b) {mEnableSave = b;}
-	// // <FS:Ansariel> FIRE-20818: User-selectable font and size for script editor
-	// boost::signals2::connection mFontNameChangedCallbackConnection;
-	// boost::signals2::connection mFontSizeChangedCallbackConnection;
-	// void	onFontChanged();
-	// // </FS:Ansariel>
+	// <FS:Ansariel> FIRE-20818: User-selectable font and size for script editor
+	boost::signals2::connection mFontNameChangedCallbackConnection;
+	boost::signals2::connection mFontSizeChangedCallbackConnection;
+	void	onFontChanged();
+	// </FS:Ansariel>
 
 protected:
 	void deleteBridges();
