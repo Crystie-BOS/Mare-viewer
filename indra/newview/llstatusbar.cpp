@@ -297,6 +297,12 @@ BOOL LLStatusBar::postBuild()
 	//NP graphics presets no longer disabled
 	gSavedSettings.getControl("ShowMediaPopupsOnRollover")->getSignal()->connect(boost::bind(&LLStatusBar::onPopupRolloverChanged, this, _2));    
 
+    if (!gSavedSettings.getBOOL("EnableVoiceChat") && LLAppViewer::instance()->isSecondInstance())
+    {
+        // Indicate that second instance started without sound
+        mBtnVolume->setImageUnselected(LLUI::getUIImage("VoiceMute_Off"));
+    }
+
 	mSGBandwidth = getChild<LLStatGraph>("bandwidth_graph");
 	if (mSGBandwidth) {
 		mSGBandwidth->setStat(&LLStatViewer::ACTIVE_MESSAGE_DATA_RECEIVED);
@@ -969,6 +975,16 @@ void LLStatusBar::onPopupRolloverChanged(const LLSD& newvalue)
 			mMouseEnterNearbyMediaConnection.disconnect();
 		}
 	}
+}
+
+void LLStatusBar::onVoiceChanged(const LLSD& newvalue)
+{
+    if (newvalue.asBoolean())
+    {
+        // Second instance starts with "VoiceMute_Off" icon, fix it
+        mBtnVolume->setImageUnselected(LLUI::getUIImage("Audio_Off"));
+    }
+    refresh();
 }
 
 void LLStatusBar::onUpdateFilterTerm()

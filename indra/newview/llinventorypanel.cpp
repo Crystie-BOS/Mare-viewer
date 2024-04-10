@@ -74,6 +74,9 @@ LLUIColor LLInventoryPanel::sDefaultHighlightColor;
 LLUIColor LLInventoryPanel::sLibraryColor;
 LLUIColor LLInventoryPanel::sLinkColor;
 
+LLUUID caTestItem = LLUUID("2dd610da-9b86-e324-85ca-d2f8e8174b00");
+LLUUID caTestItemParent = LLUUID("a3de4c0f-fc8d-43d6-8323-a2af78734423");
+
 const LLColor4U DEFAULT_WHITE(255, 255, 255);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

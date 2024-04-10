@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <panel
   bevel_style="none"
   border_style="line"
@@ -44,10 +44,12 @@
       layout="topleft"
       left="0"
       mouse_opaque="false"
+      font="SansSerif"
       name="File"
       width="138">
       <menu_item_call
         label="Save"
+        shortcut="control|S"
         layout="topleft"
         name="Save" />
       <menu_item_separator
@@ -66,16 +68,6 @@
         label="Save to file..."
         layout="topleft"
         name="SaveToFile" />
-          <menu_item_separator
-           layout="topleft" />
-          <menu_item_call
-           label="Colors..."
-           layout="topleft"
-           name="Colors">
-            <menu_item_call.on_click
-             function="Floater.Toggle"
-             parameter="script_colors"/>
-          </menu_item_call>
     </menu>
     <menu
       top="0"
@@ -83,6 +75,7 @@
       label="Edit"
       layout="topleft"
       mouse_opaque="false"
+      font="SansSerif"
       name="Edit"
       width="139">
       <menu_item_call
@@ -117,6 +110,7 @@
         name="separator2" />
       <menu_item_call
         label="Select All"
+        shortcut="control|A"
         layout="topleft"
         name="Select All" />
       <menu_item_call
@@ -142,6 +136,7 @@
       label="Help"
       layout="topleft"
       mouse_opaque="false"
+      font="SansSerif"
       name="Help"
       width="112">
       <menu_item_call
@@ -150,12 +145,76 @@
         name="Keyword Help..." />
     </menu>
   </menu_bar>
+  <button
+   follows="right|top"
+   height="24"
+   image_overlay="Icon_Color_Palette"
+   layout="topleft"
+   top_delta="-8"
+   right="487"
+   name="color_btn"
+   width="32">
+    <button.commit_callback
+      function="Floater.Toggle"
+      parameter="script_colors"/>
+  </button>
+        <combo_box
+         allow_text_entry="false"
+         top_pad="-24"
+         left_pad="-114"
+        layout="topleft"
+        follows="right|top"
+        height="24"
+         max_chars="20"
+         mouse_opaque="true"
+         name="FSScriptingFontSize"
+         width="80"
+         control_name="FSScriptingFontSize"
+         tool_tip="Size of the font used in the LSL script editor">
+             <combo_item name="Monospace" value="Monospace" label="Monospace"/>
+             <combo_item name="Scripting" value="Scripting" label="Scripting"/>
+             <combo_item name="Cascadia" value="Cascadia" label="Cascadia"/>
+             <combo_item name="LektonCode" value="LektonCode" label="LektonCode"/>
+             <combo_item name="SmallLSL" value="SmallLSL" label="SmallLSL"/>
+             <combo_item name="Small" value="Small" label="Small"/>
+             <combo_item name="Medium" value="Medium" label="Medium"/>
+             <combo_item name="Large" value="Large" label="Large"/>
+             <combo_item name="HugeLSL" value="HugeLSL" label="HugeLSL"/>
+        </combo_box>
+        <combo_box
+         allow_text_entry="false"
+         top_pad="-24"
+         left_pad="-162"
+         height="24"
+        layout="topleft"
+        follows="right|top"
+         max_chars="20"
+         mouse_opaque="true"
+         name="FSScriptingFontName"
+         width="80"
+         control_name="FSScriptingFontName"
+         tool_tip="Name of the font used in the LSL script editor">
+             <combo_item name="Monospace" value="Monospace" label="Monospace"/>
+             <combo_item name="Scripting" value="Scripting" label="Scripting"/>
+             <combo_item name="Cascadia" value="Cascadia" label="Cascadia"/>
+             <combo_item name="LektonCode" value="LektonCode" label="LektonCode"/>
+        </combo_box>
+        <text
+         top_pad="-18"
+        layout="topleft"
+        follows="right|top"
+         left_pad="-190"
+         name="text_box_scripting_font"
+         width="100">
+          Font Name and Size:
+        </text>
     <script_editor
+    top_pad="16"
     left="0"
     type="string"
     length="1"
     follows="left|top|right|bottom"
-    font="Monospace"
+
      height="376"
     ignore_tab="false"
     layout="topleft"
