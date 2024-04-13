@@ -439,6 +439,15 @@
    name="mouse_movement"
    top_pad="3"
    width="400" />
+  <check_box
+   control_name="KokuaBlockLeftClickSit"
+   height="16"
+   label="Disable sitting on objects by left mouse click"
+   layout="topleft"
+   left="83"
+   name="block_left_click_sit"
+   top_pad="3"
+   width="400" />
   <button
    height="23"
    label="Other Devices"
