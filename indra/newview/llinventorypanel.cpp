@@ -283,7 +283,6 @@ void LLInventoryPanel::initFolderRoot()
     LLUUID root_id = getRootFolderID();
     if (mFolderRoot.get())
     {
-    	LL_WARNS() << "%%%%%%%%%%%%%%%%%%%%%% calling removeItemId for root id" << LL_ENDL;
         removeItemID(root_id);
         mFolderRoot.get()->destroyView();
     }
@@ -576,19 +575,7 @@ LLInventoryFilter::EFolderShow LLInventoryPanel::getShowFolderState()
 
 void LLInventoryPanel::itemChanged(const LLUUID& item_id, U32 mask, const LLInventoryObject* model_item)
 {
-	if (mask & LLInventoryObserver::REBUILD)
-	{
-		LL_WARNS() << "%%%%%%%%%%%%%%% rebuild operation with item_id " << item_id << " model_item " << model_item << LL_ENDL;
-	}
 	LLFolderViewItem* view_item = getItemByID(item_id);
-	if (mask & LLInventoryObserver::REBUILD)
-	{
-		LL_WARNS() << "%%%%%%%%%%%%%%% view_item is " << view_item << LL_ENDL;
-		if (view_item)
-			{
-				LL_WARNS() << "%%%%%%%%%%%%%%%%%% viewmodel_item will be " << view_item->getViewModelItem() << LL_ENDL;
-			}
-	}
 	LLFolderViewModelItemInventory* viewmodel_item = 
 		static_cast<LLFolderViewModelItemInventory*>(view_item ? view_item->getViewModelItem() : NULL);
 
@@ -612,10 +599,6 @@ void LLInventoryPanel::itemChanged(const LLUUID& item_id, U32 mask, const LLInve
         LLInventoryObject const* objectp = mInventory->getObject(item_id);
         if (objectp)
         {
-		if (objectp->getName() == "Landmarks" || objectp->getName() == "Welcome to Cariad!")
-		{
-			LL_WARNS() << "####### calling buildNewViews for test item, name, parent " << objectp->getUUID() << " " << objectp->getName() << " " << objectp->getParentUUID() << LL_ENDL;
-		}
             view_item = buildNewViews(item_id, objectp, view_item, BUILD_ONE_FOLDER);
         }
     }
@@ -649,14 +632,10 @@ void LLInventoryPanel::itemChanged(const LLUUID& item_id, U32 mask, const LLInve
 	// Destroy and regenerate the UI.
 	if (mask & LLInventoryObserver::REBUILD)
 	{
-		LL_WARNS() << "%%%%%%%%%%%%%%%%%%%%%%% itemChanged with item_id " << item_id << " mask " << mask << " model_item " << model_item << " viewmodel_item " << viewmodel_item << LL_ENDL;
 		if (model_item && view_item && viewmodel_item)
 		{
 			const LLUUID& idp = viewmodel_item->getUUID();
-			LL_WARNS() << "%%%%%%%%%%%%%%%%%%%%%%%% idp is " << idp << LL_ENDL;
-			// try this after... view_item->destroyView();
-			LL_WARNS() << "%%%%%%%%%%%%%%%%%%%%%%%%%% doing removeItemID for rebuild on " << idp << " model item name " << model_item->getName() << LL_ENDL;
-			removeItemID(idp);
+            removeItemID(idp);
 			view_item->destroyView();
 		}
 
@@ -664,11 +643,6 @@ void LLInventoryPanel::itemChanged(const LLUUID& item_id, U32 mask, const LLInve
         if (objectp)
         {
             // providing NULL directly avoids unnessesary getItemByID calls
-		if (objectp->getName() == "Landmarks" || objectp->getName() == "Welcome to Cariad!")
-		{
-			LL_WARNS() << "####### calling buildNewViews/rebuild for test item, name, parent " << objectp->getUUID() << " " << objectp->getName() << " " << objectp->getParentUUID() << LL_ENDL;
-		}
-
             view_item = buildNewViews(item_id, objectp, NULL, BUILD_ONE_FOLDER);
         }
         else
@@ -722,11 +696,6 @@ void LLInventoryPanel::itemChanged(const LLUUID& item_id, U32 mask, const LLInve
             if (objectp)
             {
                 // providing NULL directly avoids unnessesary getItemByID calls
-		if (objectp->getName() == "Landmarks" || objectp->getName() == "Welcome to Cariad!")
-		{
-			LL_WARNS() << "####### calling buildNewViews/Add for test item, name, parent " << objectp->getUUID() << " " << objectp->getName() << " " << objectp->getParentUUID() << LL_ENDL;
-		}
-
                 buildNewViews(item_id, objectp, NULL, BUILD_ONE_FOLDER);
             }
 
@@ -771,7 +740,6 @@ void LLInventoryPanel::itemChanged(const LLUUID& item_id, U32 mask, const LLInve
 					{
 						// Remove the item ID before destroying the view because the view-model-item gets
 						// destroyed when the view is destroyed
-						LL_WARNS() << "%%%%%%%%%%%%%%%%%%%%%%%%%%% calling removeItemID for structure op on " << viewmodel_item->getUUID() << LL_ENDL;
 						removeItemID(viewmodel_item->getUUID());
 
 						// Item is to be moved outside the panel's directory (e.g. moved to trash for a panel that 
@@ -794,7 +762,6 @@ void LLInventoryPanel::itemChanged(const LLUUID& item_id, U32 mask, const LLInve
 		{
 			// Remove the item's UI.
 			LLFolderViewFolder* parent = view_item->getParentFolder();
-			LL_WARNS() << "%%%%%%%%%%%%%%%%%% remove operation removeItemID on " << viewmodel_item->getUUID() << LL_ENDL;
 			removeItemID(viewmodel_item->getUUID());
 			view_item->destroyView();
 			if(parent)
@@ -829,11 +796,6 @@ void LLInventoryPanel::modelChanged(U32 mask)
 	{
 		const LLUUID& item_id = (*items_iter);
 		const LLInventoryObject* model_item = model->getObject(item_id);
-		LL_WARNS() << "{}{}{}{}{}{}{} calling itemChanged for item_id " << item_id << " mask " << mask << " model_item " << model_item << LL_ENDL;
-		if (model_item)
-		{
-			LL_WARNS() << "{}{}{}{} name " << model_item->getName() << LL_ENDL;
-		}
 		itemChanged(item_id, mask, model_item);
 	}
 }
@@ -949,12 +911,6 @@ void LLInventoryPanel::idle(void* user_data)
                 LLFolderViewItem* folder_view_item = panel->getItemByID(item_id);
                 if (!folder_view_item || !folder_view_item->areChildrenInited())
                 {
-
-		if (objectp->getName() == "Landmarks" || objectp->getName() == "Welcome to Cariad!")
-		{
-			LL_WARNS() << "####### calling buildViewsTree from idle for test item, name, parent " << objectp->getUUID() << " " << objectp->getName() << " " << objectp->getParentUUID() <<  LL_ENDL;
-		}
-
                     const LLUUID &parent_id = objectp->getParentUUID();
                     LLFolderViewFolder* parent_folder = (LLFolderViewFolder*)panel->getItemByID(parent_id);
                     panel->buildViewsTree(item_id, parent_id, objectp, folder_view_item, parent_folder, BUILD_TIMELIMIT);
@@ -1062,15 +1018,9 @@ void LLInventoryPanel::initializeViews(F64 max_time)
 
 LLFolderViewFolder * LLInventoryPanel::createFolderViewFolder(LLInvFVBridge * bridge, bool allow_drop)
 {
-	bool debug = false;
 	LLFolderViewFolder::Params params(mParams.folder);
 
 	params.name = bridge->getDisplayName();
-	if (bridge->getDisplayName() == "Landmarks")
-	{
-		LL_WARNS() << "@@@@@@@ making folder view folder for " <<bridge->getDisplayName() << " under " << mFolderRoot.get() << LL_ENDL;
-		debug = true;
-	}
 	params.root = mFolderRoot.get();
 	params.listener = bridge;
 	params.tool_tip = params.name;
@@ -1079,25 +1029,14 @@ LLFolderViewFolder * LLInventoryPanel::createFolderViewFolder(LLInvFVBridge * br
 	params.font_color = (bridge->isLibraryItem() ? sLibraryColor : (bridge->isLink() ? sLinkColor : sDefaultColor));
 	params.font_highlight_color = (bridge->isLibraryItem() ? sLibraryColor : (bridge->isLink() ? sLinkColor : sDefaultHighlightColor));
 	
-	LLFolderViewFolder* return_value = LLUICtrlFactory::create<LLFolderViewFolder>(params);
-	if (debug)
-	{
-		LL_WARNS() << "@@@@@@@ returning " << return_value << LL_ENDL;
-	}
-	return return_value;
+	return LLUICtrlFactory::create<LLFolderViewFolder>(params);
 }
 
 LLFolderViewItem * LLInventoryPanel::createFolderViewItem(LLInvFVBridge * bridge)
 {
-	bool debug = false;
 	LLFolderViewItem::Params params(mParams.item);
 	
 	params.name = bridge->getDisplayName();
-	if (bridge->getDisplayName() == "Welcome to Cariad!")
-	{
-		LL_WARNS() << "@@@@@@@ making folder view item for " << bridge->getDisplayName() << " under " << mFolderRoot.get() << LL_ENDL;
-		debug = true;
-	}
 	params.creation_date = bridge->getCreationDate();
 	params.root = mFolderRoot.get();
 	params.listener = bridge;
@@ -1107,12 +1046,7 @@ LLFolderViewItem * LLInventoryPanel::createFolderViewItem(LLInvFVBridge * bridge
 	params.font_color = (bridge->isLibraryItem() ? sLibraryColor : (bridge->isLink() ? sLinkColor : sDefaultColor));
 	params.font_highlight_color = (bridge->isLibraryItem() ? sLibraryColor : (bridge->isLink() ? sLinkColor : sDefaultHighlightColor));
 	
-	LLFolderViewItem* return_value =  LLUICtrlFactory::create<LLFolderViewItem>(params);
-	if (debug)
-	{
-		LL_WARNS() << "@@@@@@@ returning " << return_value << LL_ENDL;
-	}
-	return return_value;
+	return LLUICtrlFactory::create<LLFolderViewItem>(params);
 }
 
 LLFolderViewItem* LLInventoryPanel::buildNewViews(const LLUUID& id)
@@ -1137,11 +1071,6 @@ LLFolderViewItem* LLInventoryPanel::buildNewViews(const LLUUID& id, LLInventoryO
     LLFolderViewItem* folder_view_item = getItemByID(id);
     LLFolderViewFolder* parent_folder = (LLFolderViewFolder*)getItemByID(parent_id);
 
-		if (objectp->getName() == "Landmarks" || objectp->getName() == "Welcome to Cariad!")
-		{
-			LL_WARNS() << "####### doing buildViewsTree from buildNewViews for test item, name, parent " << objectp->getUUID() << " " << objectp->getName() << " " << objectp->getParentUUID() << LL_ENDL;
-		}
-
     return buildViewsTree(id, parent_id, objectp, folder_view_item, parent_folder, BUILD_TIMELIMIT);
 }
 
@@ -1163,12 +1092,6 @@ LLFolderViewItem* LLInventoryPanel::buildNewViews(const LLUUID& id,
     const LLUUID &parent_id = objectp->getParentUUID();
     LLFolderViewFolder* parent_folder = (LLFolderViewFolder*)getItemByID(parent_id);
 
-		if (objectp->getName() == "Landmarks" || objectp->getName() == "Welcome to Cariad!")
-		{
-			LL_WARNS() << "####### doing buildViewsTree from buildNewViews for test item, name, parent " << objectp->getUUID() << " " << objectp->getName() << " " << objectp->getParentUUID() << LL_ENDL;
-			LL_WARNS() << "------- getItemByID for " << parent_id << " return parent_folder of " << parent_folder << LL_ENDL;
-		}
-
     return buildViewsTree(id, parent_id, objectp, folder_view_item, parent_folder, mode);
 }
 
@@ -1181,14 +1104,6 @@ LLFolderViewItem* LLInventoryPanel::buildViewsTree(const LLUUID& id,
                                                   S32 depth)
 {
     depth++;
-
-		bool debug = false;
-		if (objectp->getName() == "Landmarks" || objectp->getName() == "Welcome to Cariad!")
-		{
-			LL_WARNS() << "####### doing buildViewsTree for test item, name, parent, depth " << objectp->getUUID() << " " << objectp->getName() << " " << objectp->getParentUUID() << " " << depth << LL_ENDL;
-			LL_WARNS() << "||||||| folder view item " << folder_view_item << " parent view folder " << parent_folder << LL_ENDL;
-			debug = true;
-		}
 
     // Force the creation of an extra root level folder item if required by the inventory panel (default is "false")
     bool allow_drop = true;
@@ -1210,11 +1125,7 @@ LLFolderViewItem* LLInventoryPanel::buildViewsTree(const LLUUID& id,
 
  	if (!folder_view_item && parent_folder)
   		{
-  		    if (debug)
-  		        {
-  		            LL_WARNS() << "~~~~~ parent folder exists, folder view item doesn't" << LL_ENDL;
-  		        }
-			if (object_type <= LLAssetType::AT_NONE)
+			if (objectp->getType() <= LLAssetType::AT_NONE)
 			{
 				LL_WARNS() << "LLInventoryPanel::buildViewsTree called with invalid objectp->mType : "
 					<< ((S32)object_type) << " name " << objectp->getName() << " UUID " << objectp->getUUID()
@@ -1251,10 +1162,6 @@ LLFolderViewItem* LLInventoryPanel::buildViewsTree(const LLUUID& id,
   			if ((object_type == LLAssetType::AT_CATEGORY) &&
   				(objectp->getActualType() != LLAssetType::AT_LINK_FOLDER))
   			{
-  			    if (debug)
-  			        {
-  			            LL_WARNS() << "~~~~~ getting new listener for folder" << LL_ENDL;
-  			        }
   				LLInvFVBridge* new_listener = mInvFVBridgeBuilder->createBridge(LLAssetType::AT_CATEGORY,
                                             (mParams.use_marketplace_folders ? LLAssetType::AT_MARKETPLACE_FOLDER : LLAssetType::AT_CATEGORY),
   																				LLInventoryType::IT_CATEGORY,
@@ -1264,19 +1171,11 @@ LLFolderViewItem* LLInventoryPanel::buildViewsTree(const LLUUID& id,
   																				objectp->getUUID());
   				if (new_listener)
   				{
-  				    if (debug)
-  				        {
-  				            LL_WARNS() << "~~~~~ got new listener, calling createFolderViewFolder" << LL_ENDL;
-  				        }
                     folder_view_item = createFolderViewFolder(new_listener,allow_drop);
   				}
   			}
   			else
   			{
-  			    if (debug)
-  			        {
-  			            LL_WARNS() << "~~~~~ getting new listener for item" << LL_ENDL;
-  			        }
   				// Build new view for item.
   				LLInventoryItem* item = (LLInventoryItem*)objectp;
   				LLInvFVBridge* new_listener = mInvFVBridgeBuilder->createBridge(item->getType(),
@@ -1290,20 +1189,12 @@ LLFolderViewItem* LLInventoryPanel::buildViewsTree(const LLUUID& id,
  
   				if (new_listener)
   				{
-  			    if (debug)
-  			        {
-  			            LL_WARNS() << "~~~~~ got new listener, calling createFolderViewItem" << LL_ENDL;
-  			        }
 				folder_view_item = createFolderViewItem(new_listener);
   				}
   			}
  
   	    if (folder_view_item)
         {
-            if (debug)
-                {
-                    LL_WARNS() << "~~~~~ new item created, adding to parent" << LL_ENDL;
-                }
             llassert(parent_folder != NULL);
             folder_view_item->addToFolder(parent_folder);
 			addItemID(id, folder_view_item);
@@ -1314,33 +1205,16 @@ LLFolderViewItem* LLInventoryPanel::buildViewsTree(const LLUUID& id,
             }
         }
 	}
-	else if (debug)
-		{
-			LL_WARNS() << "!!!!!!! no parent or item already existed" << LL_ENDL;
-		}
 
     bool create_children = folder_view_item && objectp->getType() == LLAssetType::AT_CATEGORY
                             && (mBuildChildrenViews || depth == 0);
 
-		if (debug)
-			{
-				LL_WARNS() << "create_children inputs - folder_view_item " << folder_view_item << " mBuildChildrenViews " << mBuildChildrenViews << " depth " << depth << " create_children is " << create_children << LL_ENDL;
-			}
-
     if (create_children)
     {
-    		if (debug)
-    		{
-		    		LL_WARNS() << "##### Doing create children for " << objectp->getUUID() << " name " << objectp->getName() << LL_ENDL;
-		    }
         switch (mode)
         {
             case BUILD_TIMELIMIT:
             {
-				    		if (debug)
-				    		{
-						    		LL_WARNS() << "##### timelimit for " << objectp->getUUID() << " name " << objectp->getName() << LL_ENDL;
-						    }
                 F64 curent_time = LLTimer::getTotalSeconds();
                 // If function is out of time, we want to shedule it into mBuildViewsQueue
                 // If we have time, no matter how little, create views for all children
@@ -1367,10 +1241,6 @@ LLFolderViewItem* LLInventoryPanel::buildViewsTree(const LLUUID& id,
             }
             case BUILD_NO_CHILDREN:
             {
-				    		if (debug)
-				    		{
-						    		LL_WARNS() << "##### no children for " << objectp->getUUID() << " name " << objectp->getName() << LL_ENDL;
-						    }
                 create_children = false;
                 // run it to create children, current caller is only interested in current view
                 if (mBuildChildrenViews || depth == 0)
@@ -1381,10 +1251,6 @@ LLFolderViewItem* LLInventoryPanel::buildViewsTree(const LLUUID& id,
             }
             case BUILD_ONE_FOLDER:
             {
-				    		if (debug)
-				    		{
-						    		LL_WARNS() << "##### one folder for " << objectp->getUUID() << " name " << objectp->getName() << LL_ENDL;
-						    }
                 // This view loads chindren, following ones don't
                 // Note: Might be better idea to do 'depth' instead,
                 // It also will help to prioritize root folder's content
@@ -1395,10 +1261,6 @@ LLFolderViewItem* LLInventoryPanel::buildViewsTree(const LLUUID& id,
             case BUILD_NO_LIMIT:
             default:
             {
-				    		if (debug)
-				    		{
-						    		LL_WARNS() << "##### build no limit for " << objectp->getUUID() << " name " << objectp->getName() << LL_ENDL;
-						    }
                 // keep working till everything exists
                 create_children = true;
                 folder_view_item->setChildrenInited(true);
@@ -1410,11 +1272,6 @@ LLFolderViewItem* LLInventoryPanel::buildViewsTree(const LLUUID& id,
 	// child folders.
 	if (create_children)
 	{
-		if (debug)
-		{
-    		LL_WARNS() << "##### create children for " << objectp->getUUID() << " name " << objectp->getName() << LL_ENDL;
-    }
-
 		LLViewerInventoryCategory::cat_array_t* categories;
 		LLViewerInventoryItem::item_array_t* items;
 		//KKA-827 Optimise by defining and reusing these. The routine recurses so the scope has to stay internal though
@@ -1437,10 +1294,6 @@ LLFolderViewItem* LLInventoryPanel::buildViewsTree(const LLUUID& id,
 		if(categories)
         {
             bool has_folders = parentp->getFoldersCount() > 0;
-            if (debug)
-            	{
-            		LL_WARNS() << "!!!!!! parent reports " << parentp->getFoldersCount() << " folder children" << LL_ENDL;
-            	}
 			for (LLViewerInventoryCategory::cat_array_t::const_iterator cat_iter = categories->begin();
 				 cat_iter != categories->end();
 				 ++cat_iter)
@@ -1458,10 +1311,6 @@ LLFolderViewItem* LLInventoryPanel::buildViewsTree(const LLUUID& id,
                 {
                     if (has_folders)
                     {
-                    		if (debug)
-                    			{
-                    				LL_WARNS() << "######## recursing down" << LL_ENDL;
-                    			}
                         // This can be optimized: we don't need to call getItemByID()
                         // each time, especially since content is growing, we can just
                         // iter over copy of mItemMap in some way
@@ -1495,10 +1344,6 @@ LLFolderViewItem* LLInventoryPanel::buildViewsTree(const LLUUID& id,
                     F64 curent_time = LLTimer::getTotalSeconds();
                     if (mBuildViewsEndTime < curent_time)
                     {
-                    		if (debug)
-                    			{
-                    				LL_WARNS() << "##### adding to buildViewsQueue" << LL_ENDL;
-                    			}
                         mBuildViewsQueue.push_back(id);
                         done = false;
                         break;
@@ -1506,20 +1351,9 @@ LLFolderViewItem* LLInventoryPanel::buildViewsTree(const LLUUID& id,
                 }
 			}
 		}
-		if (debug)
-			{
-				LL_WARNS() << "!!!!!! items flag " << items << LL_ENDL;
-				if (items->begin() == items->end())
-				{
-					LL_WARNS() << "!!!!!! items list is empty" << LL_ENDL;
-				}
-			}
+		
 		if(items)
         {
-        	if (debug)
-        		{
-        			LL_WARNS() << "!!!!! starting items loop" << LL_ENDL;
-        		}
 			for (LLViewerInventoryItem::item_array_t::const_iterator item_iter = items->begin();
 				 item_iter != items->end();
 				 ++item_iter)
@@ -1569,10 +1403,6 @@ LLFolderViewItem* LLInventoryPanel::buildViewsTree(const LLUUID& id,
                     F64 curent_time = LLTimer::getTotalSeconds();
                     if (mBuildViewsEndTime < curent_time)
                     {
-                    		if (debug)
-                    			{
-                    				LL_WARNS() << "##### adding to queue" << LL_ENDL;
-                    			}
                         mBuildViewsQueue.push_back(id);
                         done = false;
                         break;
@@ -1584,10 +1414,6 @@ LLFolderViewItem* LLInventoryPanel::buildViewsTree(const LLUUID& id,
         if (!mBuildChildrenViews && done)
         {
             // flat list is done initializing folder
-            if (debug)
-            	{
-            		LL_WARNS() << "####### done for " << objectp->getName() << LL_ENDL;
-            	}
             folder_view_item->setChildrenInited(true);
         }
 //KKA-827 This function does nothing unless LL_DEBUG is defined so only call it then
@@ -2327,31 +2153,11 @@ BOOL LLInventoryPanel::getIsHiddenFolderType(LLFolderType::EType folder_type) co
 
 void LLInventoryPanel::addItemID( const LLUUID& id, LLFolderViewItem*   itemp )
 {
-	//LL_WARNS() << "++++++++ map is at " << &mItemMap << " and size " << mItemMap.size() << LL_ENDL;
-	
-	if (id == LLUUID::null)
-		{
-			LL_WARNS() << "<><><><><><><><> inserting a null id into item map" << LL_ENDL;
-		}
-
-	if (id == LLUUID("a3de4c0f-fc8d-43d6-8323-a2af78734423"))
-		{
-
-			LL_WARNS() << "****** adding item id " << itemp << " for " << id <<LL_ENDL;
-		}
 	mItemMap[id] = itemp;
 }
 
 void LLInventoryPanel::removeItemID(const LLUUID& id)
 {
-	LL_WARNS() << "++++++++ removing " << id << " map is at " << &mItemMap << " and size " << mItemMap.size() << LL_ENDL;
-
-	if (id == LLUUID("a3de4c0f-fc8d-43d6-8323-a2af78734423"))
-		{
-
-			LL_WARNS() << "****** removing from map" << LL_ENDL;
-		}
-
 	LLInventoryModel::cat_array_t categories;
 	LLInventoryModel::item_array_t items;
 	gInventory.collectDescendents(id, categories, items, TRUE);
@@ -2375,35 +2181,20 @@ void LLInventoryPanel::removeItemID(const LLUUID& id)
 
 LLFolderViewItem* LLInventoryPanel::getItemByID(const LLUUID& id)
 {
-	//LL_WARNS() << "++++++++ map is at " << &mItemMap << " and size " << mItemMap.size() << LL_ENDL;
-	bool debug = false;
-	if (id == LLUUID("a3de4c0f-fc8d-43d6-8323-a2af78734423"))
-		{
-			debug = true;
-			LL_WARNS() << "++++++++ map is at " << &mItemMap << " and size " << mItemMap.size() << LL_ENDL;
-		}
     LL_PROFILE_ZONE_SCOPED;
 
 	std::map<LLUUID, LLFolderViewItem*>::iterator map_it;
 	map_it = mItemMap.find(id);
 	if (map_it != mItemMap.end())
 	{
-		if (debug)
-		{
-			LL_WARNS() << "****** " << id << "found in map, returning " << map_it->second << LL_ENDL;			
-		}
 		return map_it->second;
 	}
-	if (debug)
-		{
-			LL_WARNS() << "****** " << id << "not found in map" << LL_ENDL;
-		}
+
 	return NULL;
 }
 
 LLFolderViewFolder* LLInventoryPanel::getFolderByID(const LLUUID& id)
 {
-	//LL_WARNS() << "++++++++ map is at " << &mItemMap << " and size " << mItemMap.size() << LL_ENDL;
 	LLFolderViewItem* item = getItemByID(id);
 	return dynamic_cast<LLFolderViewFolder*>(item);
 }
