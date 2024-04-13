@@ -628,11 +628,7 @@ void LLInventoryPanel::itemChanged(const LLUUID& item_id, U32 mask, const LLInve
 		if (model_item && view_item && viewmodel_item)
 		{
 			const LLUUID& idp = viewmodel_item->getUUID();
-			// KKA-1059 On a Mac this can cause idp to lose its value and become NULL, which in turn means we wipe out
-			// the whole item map, resulting in a partly populated inventory view if it's still building at this point
-			// Do the call after instead.
-			//view_item->destroyView();
-			removeItemID(idp);
+            removeItemID(idp);
 			view_item->destroyView();
 		}
 
@@ -1122,7 +1118,7 @@ LLFolderViewItem* LLInventoryPanel::buildViewsTree(const LLUUID& id,
 
  	if (!folder_view_item && parent_folder)
   		{
-			if (object_type <= LLAssetType::AT_NONE)
+			if (objectp->getType() <= LLAssetType::AT_NONE)
 			{
 				LL_WARNS() << "LLInventoryPanel::buildViewsTree called with invalid objectp->mType : "
 					<< ((S32)object_type) << " name " << objectp->getName() << " UUID " << objectp->getUUID()
