@@ -320,7 +320,7 @@ BOOL LLToolPie::handleLeftClickPick()
 			break;
 		case CLICK_ACTION_SIT:
 			{
-				if (isAgentAvatarValid() && !gAgentAvatarp->isSitting()) // agent not already sitting
+				if (isAgentAvatarValid() && !gAgentAvatarp->isSitting() && !gSavedSettings.getBOOL("KokuaBlockLeftClickSit")) // agent not already sitting
 				{
 					handle_object_sit_or_stand();
 					// put focus in world when sitting on an object
@@ -799,7 +799,8 @@ BOOL LLToolPie::handleHover(S32 x, S32 y, MASK mask)
 
 		LLViewerObject* click_action_object = click_action_pick.getObject();
 
-		if (click_action_object && useClickAction(mask, click_action_object, click_action_object->getRootEdit()))
+		if (click_action_object && useClickAction(mask, click_action_object, click_action_object->getRootEdit())
+		    && !(gSavedSettings.getBOOL("KokuaBlockLeftClickSit") && cursorFromObject(click_action_object) == UI_CURSOR_TOOLSIT))
 		{
 			ECursorType cursor = cursorFromObject(click_action_object);
 			gViewerWindow->setCursor(cursor);
