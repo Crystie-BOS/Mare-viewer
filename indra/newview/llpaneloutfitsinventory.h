@@ -70,6 +70,7 @@ public:
 
 	void openApearanceTab(const std::string& tab_name);
 
+    bool isCOFPanelActive() const;
 	// <FS:Ansariel> Show avatar complexity in appearance floater
 	void updateAvatarComplexity(U32 complexity);
 
@@ -89,7 +90,6 @@ private:
 protected:
 	void 					initTabPanels();
 	void 					onTabChange();
-	bool 					isCOFPanelActive() const;
 	bool 					isOutfitsListPanelActive() const;
 	bool 					isOutfitsGalleryPanelActive() const;
 

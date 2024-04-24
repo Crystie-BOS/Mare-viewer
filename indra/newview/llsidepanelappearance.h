@@ -66,6 +66,8 @@ public:
 	void updateToVisibility( const LLSD& new_visibility );
 	LLPanelEditWearable* getWearable(){ return mEditWearable; }
 
+    bool isCOFPanelVisible();
+
 	// <FS:Ansariel> Show avatar complexity in appearance floater
 	static void updateAvatarComplexity(U32 complexity);
 private:

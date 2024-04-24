@@ -1261,7 +1261,6 @@ void LLFloaterPreference::onBtnCancel(const LLSD& userdata)
 	if (userdata.asString() == "closeadvanced")
 	{
 		LLFloaterReg::hideInstance("prefs_graphics_advanced");
-		updateMaxComplexity();
 	}
 	else
 	{
