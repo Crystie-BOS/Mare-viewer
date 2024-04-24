@@ -95,7 +95,6 @@
 #include "llworld.h"
 #include "llworldmap.h"
 #include "stringize.h"
-#include "boost/foreach.hpp"
 #include "llcorehttputil.h"
 #include "lluiusage.h"
 
@@ -1549,44 +1548,67 @@ LLVector3 LLAgent::getReferenceUpVector()
 	return up_vector;
 }
 
-
 // Radians, positive is forward into ground
 //-----------------------------------------------------------------------------
 // pitch()
 //-----------------------------------------------------------------------------
 void LLAgent::pitch(F32 angle)
 {
-	// don't let user pitch if pointed almost all the way down or up
+    if (fabs(angle) <= 1e-4)
+        return;
 
-	// A dot B = mag(A) * mag(B) * cos(angle between A and B)
-	// so... cos(angle between A and B) = A dot B / mag(A) / mag(B)
-	//                                  = A dot B for unit vectors
+    LLCoordFrame newCoordFrame(mFrameAgent);
+    newCoordFrame.pitch(angle);
 
-	LLVector3 skyward = getReferenceUpVector();
+    // don't let user pitch if rotated 180 degree around the vertical axis
+    if ((newCoordFrame.getXAxis()[VX] * mFrameAgent.getXAxis()[VX] < 0) &&
+        (newCoordFrame.getXAxis()[VY] * mFrameAgent.getXAxis()[VY] < 0))
+        return;
 
-	// SL-19286 Avatar is upside down when viewed from below
-	// after left-clicking the mouse on the avatar and dragging down
-	//
-	// The issue is observed on angle below 10 degrees
-	const F32 look_down_limit = 179.f * DEG_TO_RAD;
-	const F32 look_up_limit   =  10.f * DEG_TO_RAD;
+    // don't let user pitch if pointed almost all the way down or up
+    LLVector3 skyward = getReferenceUpVector();
 
-	F32 angle_from_skyward = acos(mFrameAgent.getAtAxis() * skyward);
+    // A dot B = mag(A) * mag(B) * cos(angle between A and B)
+    // so... cos(angle between A and B) = A dot B / mag(A) / mag(B)
+    //                                  = A dot B for unit vectors
+    F32 agent_camera_angle_from_skyward = acos(newCoordFrame.getAtAxis() * skyward) * RAD_TO_DEG;
 
-	// clamp pitch to limits
-	if ((angle >= 0.f) && (angle_from_skyward + angle > look_down_limit))
-	{
-		angle = look_down_limit - angle_from_skyward;
-	}
-	else if ((angle < 0.f) && (angle_from_skyward + angle < look_up_limit))
-	{
-		angle = look_up_limit - angle_from_skyward;
-	}
+    F32 min_angle = 1;
+    F32 max_angle = 179;
+    bool check_viewer_camera = false;
 
-	if (fabs(angle) > 1e-4)
-	{
-		mFrameAgent.pitch(angle);
-	}
+    if (gAgentCamera.getCameraMode() == CAMERA_MODE_THIRD_PERSON)
+    {
+        // These values of min_angle and max_angle are obtained purely empirically
+        if (gAgentCamera.getCameraPreset() == CAMERA_PRESET_REAR_VIEW)
+        {
+            min_angle = 10;
+            check_viewer_camera = true;
+        }
+        else if (gAgentCamera.getCameraPreset() == CAMERA_PRESET_GROUP_VIEW)
+        {
+            min_angle = 10;
+            max_angle = 170;
+            check_viewer_camera = true;
+        }
+    }
+
+    if ((angle < 0 && agent_camera_angle_from_skyward < min_angle) ||
+        (angle > 0 && agent_camera_angle_from_skyward > max_angle))
+        return;
+
+    if (check_viewer_camera)
+    {
+        const LLVector3& viewer_camera_pos = LLViewerCamera::getInstance()->getOrigin();
+        LLVector3 agent_focus_pos = getPosAgentFromGlobal(gAgentCamera.calcFocusPositionTargetGlobal());
+        LLVector3 look_dir = agent_focus_pos - viewer_camera_pos;
+        F32 viewer_camera_angle_from_skyward = angle_between(look_dir, skyward) * RAD_TO_DEG;
+        if ((angle < 0 && viewer_camera_angle_from_skyward < min_angle) ||
+            (angle > 0 && viewer_camera_angle_from_skyward > max_angle))
+            return;
+    }
+
+	mFrameAgent = newCoordFrame;
 }
 
 
@@ -2424,7 +2446,7 @@ void LLAgent::endAnimationUpdateUI()
 			LLFloaterIMContainer* im_box = LLFloaterReg::getTypedInstance<LLFloaterIMContainer>("im_container");
 			LLFloaterIMContainer::floater_list_t conversations;
 			im_box->getDetachedConversationFloaters(conversations);
-			BOOST_FOREACH(LLFloater* conversation, conversations)
+			for (LLFloater* conversation : conversations)
 			{
 				LL_INFOS() << "skip_list.insert(session_floater): " << conversation->getTitle() << LL_ENDL;
 				skip_list.insert(conversation);
@@ -4508,6 +4530,10 @@ void LLAgent::teleportRequest(
 // Landmark ID = LLUUID::null means teleport home
 void LLAgent::teleportViaLandmark(const LLUUID& landmark_asset_id)
 {
+    if (landmark_asset_id.isNull())
+    {
+        gAgentCamera.resetView();
+    }
 	mTeleportRequest = LLTeleportRequestPtr(new LLTeleportRequestViaLandmark(landmark_asset_id));
 	startTeleportRequest();
 }
