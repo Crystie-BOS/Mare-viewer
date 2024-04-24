@@ -1295,10 +1295,6 @@ LLFolderViewItem* LLInventoryPanel::buildViewsTree(const LLUUID& id,
 				//const LLViewerInventoryCategory* cat = (*cat_iter);
 				//const LLUUID cat_uuid = cat->getUUID();
 				cat = (*cat_iter);
-				if (debug)
-				{
-		    		LL_WARNS() << "##### category " << cat->getName() << LL_ENDL;
-		    }
 				cat_uuid = cat->getUUID();
 				if (typedViewsFilter(cat_uuid, cat))
                 {
@@ -1356,10 +1352,6 @@ LLFolderViewItem* LLInventoryPanel::buildViewsTree(const LLUUID& id,
 				//const LLUUID item_uuid = item->getUUID();
 				item = (*item_iter);
 				item_uuid = item->getUUID();
-				if (debug)
-				{
-		    		LL_WARNS() << "##### doing create for item " << item->getName() << " uuid " << item_uuid << LL_ENDL;
-		    }
 
 				if (typedViewsFilter(item_uuid, item))
                 {
@@ -1378,10 +1370,6 @@ LLFolderViewItem* LLInventoryPanel::buildViewsTree(const LLUUID& id,
 					{
 						view_itemp = (map_it->second);
 					}
-										if (debug)
-											{
-												LL_WARNS() << "###### calling buildViewsTree (recursing for item) for " << item->getUUID() << " " << item->getName() << " depth " << depth << LL_ENDL;
-											}
                     buildViewsTree(item->getUUID(), id, item, view_itemp, parentp, mode, depth);
                 }
 
