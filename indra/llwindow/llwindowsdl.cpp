@@ -57,6 +57,8 @@ extern "C" {
 # include <unistd.h>
 # include <sys/types.h>
 # include <sys/wait.h>
+# define GLX_GLXEXT_PROTOTYPES 1
+# include <GL/glx.h>
 #endif // LL_LINUX
 
 extern BOOL gDebugWindowProc;
@@ -270,7 +272,7 @@ static SDL_Surface *Load_BMP_Resource(const char *basename)
 	return SDL_LoadBMP(path_buffer);
 }
 
-#if LL_X11
+#if 0
 // This is an XFree86/XOrg-specific hack for detecting the amount of Video RAM
 // on this machine.  It works by searching /var/log/var/log/Xorg.?.log or
 // /var/log/XFree86.?.log for a ': (VideoRAM ?|Memory): (%d+) kB' regex, where
@@ -617,6 +619,7 @@ BOOL LLWindowSDL::createContext(int x, int y, int width, int height, int bits, B
 	}
 	
 	// Detect video memory size.
+/*
 # if LL_X11
 	gGLManager.mVRAM = x11_detect_VRAM_kb() / 1024;
 	if (gGLManager.mVRAM != 0)
@@ -634,6 +637,16 @@ BOOL LLWindowSDL::createContext(int x, int y, int width, int height, int bits, B
 			LL_INFOS() << "SDL detected " << gGLManager.mVRAM << "MB VRAM." << LL_ENDL;
 		}
 	}
+*/
+	PFNGLXQUERYCURRENTRENDERERINTEGERMESAPROC queryInteger;
+	queryInteger = (PFNGLXQUERYCURRENTRENDERERINTEGERMESAPROC)
+		glXGetProcAddressARB((const GLubyte *)
+				"glXQueryCurrentRendererIntegerMESA");
+	unsigned int vram_megabytes = 0;
+	queryInteger(GLX_RENDERER_VIDEO_MEMORY_MESA, &vram_megabytes);
+	gGLManager.mVRAM = vram_megabytes;
+	if (gGLManager.mVRAM)
+		LL_INFOS() << "Detected " << gGLManager.mVRAM << "MB VRAM." << LL_ENDL;
 	// If VRAM is not detected, that is handled later
 
 	// *TODO: Now would be an appropriate time to check for some
