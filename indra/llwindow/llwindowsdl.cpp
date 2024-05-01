@@ -644,6 +644,12 @@ BOOL LLWindowSDL::createContext(int x, int y, int width, int height, int bits, B
 				"glXQueryCurrentRendererIntegerMESA");
 	unsigned int vram_megabytes = 0;
 	queryInteger(GLX_RENDERER_VIDEO_MEMORY_MESA, &vram_megabytes);
+	if (!vram_megabytes)
+		queryInteger(GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX,
+				&vram_megabytes);
+	if (!vram_megabytes)
+		queryInteger(GL_VBO_FREE_MEMORY_ATI, &vram_megabytes);
+
 	gGLManager.mVRAM = vram_megabytes;
 	if (gGLManager.mVRAM)
 		LL_INFOS() << "Detected " << gGLManager.mVRAM << "MB VRAM." << LL_ENDL;
