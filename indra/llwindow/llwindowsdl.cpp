@@ -644,11 +644,15 @@ BOOL LLWindowSDL::createContext(int x, int y, int width, int height, int bits, B
 				"glXQueryCurrentRendererIntegerMESA");
 	unsigned int vram_megabytes = 0;
 	queryInteger(GLX_RENDERER_VIDEO_MEMORY_MESA, &vram_megabytes);
-	if (!vram_megabytes)
+	if (!vram_megabytes) {
 		glGetIntegerv(GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX,
 				(int *)&vram_megabytes);
-	if (!vram_megabytes)
+		vram_megabytes /= 1024;
+	}
+	if (!vram_megabytes) {
 		glGetIntegerv(GL_VBO_FREE_MEMORY_ATI, (int *)&vram_megabytes);
+		vram_megabytes /= 1024;
+	}
 
 	gGLManager.mVRAM = vram_megabytes;
 	if (gGLManager.mVRAM)
