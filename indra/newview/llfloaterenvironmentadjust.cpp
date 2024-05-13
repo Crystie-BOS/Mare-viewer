@@ -1,25 +1,25 @@
-/** 
+/**
  * @file llfloaterfixedenvironment.cpp
  * @brief Floaters to create and edit fixed settings for sky and water.
  *
  * $LicenseInfo:firstyear=2011&license=viewerlgpl$
  * Second Life Viewer Source Code
  * Copyright (C) 2011, Linden Research, Inc.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation;
  * version 2.1 of the License only.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- * 
+ *
  * Linden Research, Inc., 945 Battery Street, San Francisco, CA  94111  USA
  * $/LicenseInfo$
  */
@@ -129,11 +129,11 @@ BOOL LLFloaterEnvironmentAdjust::postBuild()
 void LLFloaterEnvironmentAdjust::onOpen(const LLSD& key)
 {
 //MK by CA
-	if (gRRenabled && gAgent.mRRInterface.mContainsSetenv)
-	{
-		closeFloater();
-		return;
-	}
+    if (gRRenabled && gAgent.mRRInterface.mContainsSetenv)
+    {
+        closeFloater();
+        return;
+    }
 //mk by CA
     if (!mLiveSky)
     {
@@ -268,7 +268,7 @@ void LLFloaterEnvironmentAdjust::onButtonReset()
             LLEnvironment::instance().setSelectedEnvironment(LLEnvironment::ENV_LOCAL);
             LLEnvironment::instance().updateEnvironment();
         }
-    }); 
+    });
 
 }
 //-------------------------------------------------------------------------
@@ -279,8 +279,8 @@ void LLFloaterEnvironmentAdjust::onAmbientLightChanged()
     mLiveSky->setAmbientColor(LLColor3(getChild<LLColorSwatchCtrl>(FIELD_SKY_AMBIENT_LIGHT)->get() * SLIDER_SCALE_SUN_AMBIENT));
     mLiveSky->update();
 //MK
-	// Clear the name of the preset
-	gAgent.mRRInterface.setLastLoadedPreset("Local");
+    // Clear the name of the preset
+    gAgent.mRRInterface.setLastLoadedPreset("Local");
 //mk
 }
 
@@ -291,8 +291,8 @@ void LLFloaterEnvironmentAdjust::onBlueHorizonChanged()
     mLiveSky->setBlueHorizon(LLColor3(getChild<LLColorSwatchCtrl>(FIELD_SKY_BLUE_HORIZON)->get() * SLIDER_SCALE_BLUE_HORIZON_DENSITY));
     mLiveSky->update();
 //MK
-	// Clear the name of the preset
-	gAgent.mRRInterface.setLastLoadedPreset("Local");
+    // Clear the name of the preset
+    gAgent.mRRInterface.setLastLoadedPreset("Local");
 //mk
 }
 
@@ -303,8 +303,8 @@ void LLFloaterEnvironmentAdjust::onBlueDensityChanged()
     mLiveSky->setBlueDensity(LLColor3(getChild<LLColorSwatchCtrl>(FIELD_SKY_BLUE_DENSITY)->get() * SLIDER_SCALE_BLUE_HORIZON_DENSITY));
     mLiveSky->update();
 //MK
-	// Clear the name of the preset
-	gAgent.mRRInterface.setLastLoadedPreset("Local");
+    // Clear the name of the preset
+    gAgent.mRRInterface.setLastLoadedPreset("Local");
 //mk
 }
 
@@ -315,8 +315,8 @@ void LLFloaterEnvironmentAdjust::onHazeHorizonChanged()
     mLiveSky->setHazeHorizon(getChild<LLUICtrl>(FIELD_SKY_HAZE_HORIZON)->getValue().asReal());
     mLiveSky->update();
 //MK
-	// Clear the name of the preset
-	gAgent.mRRInterface.setLastLoadedPreset("Local");
+    // Clear the name of the preset
+    gAgent.mRRInterface.setLastLoadedPreset("Local");
 //mk
 }
 
@@ -327,8 +327,8 @@ void LLFloaterEnvironmentAdjust::onHazeDensityChanged()
     mLiveSky->setHazeDensity(getChild<LLUICtrl>(FIELD_SKY_HAZE_DENSITY)->getValue().asReal());
     mLiveSky->update();
 //MK
-	// Clear the name of the preset
-	gAgent.mRRInterface.setLastLoadedPreset("Local");
+    // Clear the name of the preset
+    gAgent.mRRInterface.setLastLoadedPreset("Local");
 //mk
 }
 
@@ -339,8 +339,8 @@ void LLFloaterEnvironmentAdjust::onSceneGammaChanged()
     mLiveSky->setGamma(getChild<LLUICtrl>(FIELD_SKY_SCENE_GAMMA)->getValue().asReal());
     mLiveSky->update();
 //MK
-	// Clear the name of the preset
-	gAgent.mRRInterface.setLastLoadedPreset("Local");
+    // Clear the name of the preset
+    gAgent.mRRInterface.setLastLoadedPreset("Local");
 //mk
 }
 
@@ -351,8 +351,8 @@ void LLFloaterEnvironmentAdjust::onCloudColorChanged()
     mLiveSky->setCloudColor(LLColor3(getChild<LLColorSwatchCtrl>(FIELD_SKY_CLOUD_COLOR)->get()));
     mLiveSky->update();
 //MK
-	// Clear the name of the preset
-	gAgent.mRRInterface.setLastLoadedPreset("Local");
+    // Clear the name of the preset
+    gAgent.mRRInterface.setLastLoadedPreset("Local");
 //mk
 }
 
@@ -363,8 +363,8 @@ void LLFloaterEnvironmentAdjust::onCloudCoverageChanged()
     mLiveSky->setCloudShadow(getChild<LLUICtrl>(FIELD_SKY_CLOUD_COVERAGE)->getValue().asReal());
     mLiveSky->update();
 //MK
-	// Clear the name of the preset
-	gAgent.mRRInterface.setLastLoadedPreset("Local");
+    // Clear the name of the preset
+    gAgent.mRRInterface.setLastLoadedPreset("Local");
 //mk
 }
 
@@ -375,8 +375,8 @@ void LLFloaterEnvironmentAdjust::onCloudScaleChanged()
     mLiveSky->setCloudScale(getChild<LLUICtrl>(FIELD_SKY_CLOUD_SCALE)->getValue().asReal());
     mLiveSky->update();
 //MK
-	// Clear the name of the preset
-	gAgent.mRRInterface.setLastLoadedPreset("Local");
+    // Clear the name of the preset
+    gAgent.mRRInterface.setLastLoadedPreset("Local");
 //mk
 }
 
@@ -393,8 +393,8 @@ void LLFloaterEnvironmentAdjust::onGlowChanged()
     mLiveSky->setGlow(glow);
     mLiveSky->update();
 //MK
-	// Clear the name of the preset
-	gAgent.mRRInterface.setLastLoadedPreset("Local");
+    // Clear the name of the preset
+    gAgent.mRRInterface.setLastLoadedPreset("Local");
 //mk
 }
 
@@ -405,8 +405,8 @@ void LLFloaterEnvironmentAdjust::onStarBrightnessChanged()
     mLiveSky->setStarBrightness(getChild<LLUICtrl>(FIELD_SKY_STAR_BRIGHTNESS)->getValue().asReal());
     mLiveSky->update();
 //MK
-	// Clear the name of the preset
-	gAgent.mRRInterface.setLastLoadedPreset("Local");
+    // Clear the name of the preset
+    gAgent.mRRInterface.setLastLoadedPreset("Local");
 //mk
 }
 
@@ -452,8 +452,8 @@ void LLFloaterEnvironmentAdjust::onSunAzimElevChanged()
         mLiveSky->update();
     }
 //MK
-	// Clear the name of the preset
-	gAgent.mRRInterface.setLastLoadedPreset("Local");
+    // Clear the name of the preset
+    gAgent.mRRInterface.setLastLoadedPreset("Local");
 //mk
 }
 
@@ -464,8 +464,8 @@ void LLFloaterEnvironmentAdjust::onSunScaleChanged()
     mLiveSky->setSunScale((getChild<LLUICtrl>(FIELD_SKY_SUN_SCALE)->getValue().asReal()));
     mLiveSky->update();
 //MK
-	// Clear the name of the preset
-	gAgent.mRRInterface.setLastLoadedPreset("Local");
+    // Clear the name of the preset
+    gAgent.mRRInterface.setLastLoadedPreset("Local");
 //mk
 }
 
@@ -511,8 +511,8 @@ void LLFloaterEnvironmentAdjust::onMoonAzimElevChanged()
         mLiveSky->update();
     }
 //MK
-	// Clear the name of the preset
-	gAgent.mRRInterface.setLastLoadedPreset("Local");
+    // Clear the name of the preset
+    gAgent.mRRInterface.setLastLoadedPreset("Local");
 //mk
 }
 
@@ -523,8 +523,8 @@ void LLFloaterEnvironmentAdjust::onCloudMapChanged()
     mLiveSky->setCloudNoiseTextureId(getChild<LLTextureCtrl>(FIELD_SKY_CLOUD_MAP)->getValue().asUUID());
     mLiveSky->update();
 //MK
-	// Clear the name of the preset
-	gAgent.mRRInterface.setLastLoadedPreset("Local");
+    // Clear the name of the preset
+    gAgent.mRRInterface.setLastLoadedPreset("Local");
 //mk
 }
 
@@ -535,8 +535,8 @@ void LLFloaterEnvironmentAdjust::onWaterMapChanged()
     mLiveWater->setNormalMapID(getChild<LLTextureCtrl>(FIELD_WATER_NORMAL_MAP)->getValue().asUUID());
     mLiveWater->update();
 //MK
-	// Clear the name of the preset
-	gAgent.mRRInterface.setLastLoadedPreset("Local");
+    // Clear the name of the preset
+    gAgent.mRRInterface.setLastLoadedPreset("Local");
 //mk
 }
 
@@ -551,8 +551,8 @@ void LLFloaterEnvironmentAdjust::onSunColorChanged()
     mLiveSky->setSunlightColor(color);
     mLiveSky->update();
 //MK
-	// Clear the name of the preset
-	gAgent.mRRInterface.setLastLoadedPreset("Local");
+    // Clear the name of the preset
+    gAgent.mRRInterface.setLastLoadedPreset("Local");
 //mk
 }
 

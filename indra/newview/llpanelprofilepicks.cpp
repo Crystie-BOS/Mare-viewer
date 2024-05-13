@@ -149,10 +149,10 @@ LLPanelProfilePicks::LLPanelProfilePicks()
 
 LLPanelProfilePicks::~LLPanelProfilePicks()
 {
-	if (mRlvBehaviorCallbackConnection.connected())
-	{
-		mRlvBehaviorCallbackConnection.disconnect();
-	}
+    if (mRlvBehaviorCallbackConnection.connected())
+    {
+        mRlvBehaviorCallbackConnection.disconnect();
+    }
 }
 
 void LLPanelProfilePicks::onOpen(const LLSD& key)
@@ -234,7 +234,7 @@ BOOL LLPanelProfilePicks::postBuild()
     mNewButton = getChild<LLButton>("new_btn");
     mDeleteButton = getChild<LLButton>("delete_btn");
 
-		mRlvBehaviorCallbackConnection = gAgent.mRRInterface.setBehaviourCallback(boost::bind(&LLPanelProfilePicks::updateRlvRestrictions, this, _1, _2));
+        mRlvBehaviorCallbackConnection = gAgent.mRRInterface.setBehaviourCallback(boost::bind(&LLPanelProfilePicks::updateRlvRestrictions, this, _1, _2));
 
     mNewButton->setCommitCallback(boost::bind(&LLPanelProfilePicks::onClickNewBtn, this));
     mDeleteButton->setCommitCallback(boost::bind(&LLPanelProfilePicks::onClickDelete, this));
@@ -469,19 +469,19 @@ void LLPanelProfilePicks::commitUnsavedChanges()
 
 void LLPanelProfilePicks::updateRlvRestrictions(std::string behavior, bool added)
 {
-	if (behavior == "showloc")
-	{
-		mNewButton->setEnabled(canAddNewPick());
-	}
+    if (behavior == "showloc")
+    {
+        mNewButton->setEnabled(canAddNewPick());
+    }
 }
 
 bool LLPanelProfilePicks::canAddNewPick()
 {
     bool can_add = (!LLAgentPicksInfo::getInstance()->isPickLimitReached() &&
         mTabContainer->getTabCount() < LLAgentPicksInfo::getInstance()->getMaxNumberOfPicks());
-//	bool rlv_can_add = !gRlvHandler.hasBehaviour(RLV_BHVR_SHOWLOC);
-		bool rlv_can_add = !gAgent.mRRInterface.mContainsShowloc;
-		return (can_add && rlv_can_add);
+//  bool rlv_can_add = !gRlvHandler.hasBehaviour(RLV_BHVR_SHOWLOC);
+        bool rlv_can_add = !gAgent.mRRInterface.mContainsShowloc;
+        return (can_add && rlv_can_add);
 }
 
 bool LLPanelProfilePicks::canDeletePick()
@@ -506,7 +506,7 @@ LLPanelProfilePick::LLPanelProfilePick()
  , mIsEditing(false)
  , mRegionCallbackConnection()
  , mParcelCallbackConnection()
-	,mRlvBehaviorCallbackConnection()
+    ,mRlvBehaviorCallbackConnection()
 {
 }
 
@@ -533,10 +533,10 @@ LLPanelProfilePick::~LLPanelProfilePick()
     {
         mParcelCallbackConnection.disconnect();
     }
-		if (mRlvBehaviorCallbackConnection.connected())
-		{
-				mRlvBehaviorCallbackConnection.disconnect();
-		}
+        if (mRlvBehaviorCallbackConnection.connected())
+        {
+                mRlvBehaviorCallbackConnection.disconnect();
+        }
 }
 
 void LLPanelProfilePick::setAvatarId(const LLUUID& avatar_id)
@@ -629,7 +629,7 @@ BOOL LLPanelProfilePick::postBuild()
 
     getChild<LLUICtrl>("pick_location")->setEnabled(FALSE);
 
-		mRlvBehaviorCallbackConnection = gAgent.mRRInterface.setBehaviourCallback(boost::bind(&LLPanelProfilePick::updateRlvRestrictions, this, _1, _2));
+        mRlvBehaviorCallbackConnection = gAgent.mRRInterface.setBehaviourCallback(boost::bind(&LLPanelProfilePick::updateRlvRestrictions, this, _1, _2));
 
     return TRUE;
 }
@@ -928,33 +928,33 @@ void LLPanelProfilePick::updateTabLabel(const std::string& title)
 
 void LLPanelProfilePick::updateRlvRestrictions(std::string behavior, bool added)
 {
-		if (behavior == "showloc" || behavior == "showworldmap")
-		{
-//			bool rlv_can_map = (!gRlvHandler.hasBehaviour(RLV_BHVR_SHOWLOC) &&
-//								(gRlvHandler.hasBehaviour(RLV_BHVR_SHOWWORLDMAP);
-				bool rlv_can_map = (!gAgent.mRRInterface.mContainsShowloc) &&
-									(!gAgent.mRRInterface.mContainsShowworldmap);
-				if (rlv_can_map)
-				{
-					childEnable("show_on_map_btn");
-				}
-				else
-				{
-					childDisable("show_on_map_btn");
-				}
-		}
-		if (behavior == "tploc" || behavior == "tplm")
-		{
-//				bool can_tp_pick = (!gRlvHandler.hasBehaviour(RLV_BHVR_TPLOC) && !gRlvHandler.hasBehaviour(RLV_BHVR_TPLM));
-				bool can_tp_pick = (!gAgent.mRRInterface.containsWithoutException("tploc") && !gAgent.mRRInterface.containsWithoutException("tplm"));
-				if (can_tp_pick)
-				{
-					childEnable("teleport_btn");
-				}
-				else
-				{
-					childDisable("teleport_btn");
-				}
-		}
+        if (behavior == "showloc" || behavior == "showworldmap")
+        {
+//          bool rlv_can_map = (!gRlvHandler.hasBehaviour(RLV_BHVR_SHOWLOC) &&
+//                              (gRlvHandler.hasBehaviour(RLV_BHVR_SHOWWORLDMAP);
+                bool rlv_can_map = (!gAgent.mRRInterface.mContainsShowloc) &&
+                                    (!gAgent.mRRInterface.mContainsShowworldmap);
+                if (rlv_can_map)
+                {
+                    childEnable("show_on_map_btn");
+                }
+                else
+                {
+                    childDisable("show_on_map_btn");
+                }
+        }
+        if (behavior == "tploc" || behavior == "tplm")
+        {
+//              bool can_tp_pick = (!gRlvHandler.hasBehaviour(RLV_BHVR_TPLOC) && !gRlvHandler.hasBehaviour(RLV_BHVR_TPLM));
+                bool can_tp_pick = (!gAgent.mRRInterface.containsWithoutException("tploc") && !gAgent.mRRInterface.containsWithoutException("tplm"));
+                if (can_tp_pick)
+                {
+                    childEnable("teleport_btn");
+                }
+                else
+                {
+                    childDisable("teleport_btn");
+                }
+        }
 }
 

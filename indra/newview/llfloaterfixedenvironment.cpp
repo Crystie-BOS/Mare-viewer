@@ -1,25 +1,25 @@
-/** 
+/**
  * @file llfloaterfixedenvironment.cpp
  * @brief Floaters to create and edit fixed settings for sky and water.
  *
  * $LicenseInfo:firstyear=2011&license=viewerlgpl$
  * Second Life Viewer Source Code
  * Copyright (C) 2011, Linden Research, Inc.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation;
  * version 2.1 of the License only.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- * 
+ *
  * Linden Research, Inc., 945 Battery Street, San Francisco, CA  94111  USA
  * $/LicenseInfo$
  */
@@ -116,13 +116,13 @@ BOOL LLFloaterFixedEnvironment::postBuild()
 void LLFloaterFixedEnvironment::onOpen(const LLSD& key)
 {
 //MK by CA
-	if (gRRenabled && gAgent.mRRInterface.mContainsSetenv)
-	{
-		closeFloater();
-		return;
-	}
+    if (gRRenabled && gAgent.mRRInterface.mContainsSetenv)
+    {
+        closeFloater();
+        return;
+    }
 //mk by CA
-	LLUUID invid;
+    LLUUID invid;
 
     if (key.has(KEY_INVENTORY_ID))
     {
@@ -436,7 +436,7 @@ BOOL LLFloaterFixedEnvironmentWater::postBuild()
 
 void LLFloaterFixedEnvironmentWater::updateEditEnvironment(void)
 {
-    LLEnvironment::instance().setEnvironment(LLEnvironment::ENV_EDIT, 
+    LLEnvironment::instance().setEnvironment(LLEnvironment::ENV_EDIT,
         std::static_pointer_cast<LLSettingsWater>(mSettings));
 }
 
@@ -444,7 +444,7 @@ void LLFloaterFixedEnvironmentWater::onOpen(const LLSD& key)
 {
     if (!mSettings)
     {
-        // Initialize the settings, take a snapshot of the current water. 
+        // Initialize the settings, take a snapshot of the current water.
         mSettings = LLEnvironment::instance().getEnvironmentFixedWater(LLEnvironment::ENV_CURRENT)->buildClone();
         mSettings->setName("Snapshot water (new)");
 
@@ -468,7 +468,7 @@ void LLFloaterFixedEnvironmentWater::loadWaterSettingFromFile(const std::vector<
     LLSettingsWater::ptr_t legacywater = LLEnvironment::createWaterFromLegacyPreset(filename, messages);
 
     if (!legacywater)
-    {   
+    {
         LLNotificationsUtil::add("WLImportFail", messages);
         return;
     }
@@ -515,7 +515,7 @@ BOOL LLFloaterFixedEnvironmentSky::postBuild()
 
 void LLFloaterFixedEnvironmentSky::updateEditEnvironment(void)
 {
-    LLEnvironment::instance().setEnvironment(LLEnvironment::ENV_EDIT, 
+    LLEnvironment::instance().setEnvironment(LLEnvironment::ENV_EDIT,
         std::static_pointer_cast<LLSettingsSky>(mSettings));
 }
 
@@ -523,7 +523,7 @@ void LLFloaterFixedEnvironmentSky::onOpen(const LLSD& key)
 {
     if (!mSettings)
     {
-        // Initialize the settings, take a snapshot of the current water. 
+        // Initialize the settings, take a snapshot of the current water.
         mSettings = LLEnvironment::instance().getEnvironmentFixedSky(LLEnvironment::ENV_CURRENT)->buildClone();
         mSettings->setName("Snapshot sky (new)");
         LLEnvironment::instance().saveBeaconsState();
@@ -555,7 +555,7 @@ void LLFloaterFixedEnvironmentSky::loadSkySettingFromFile(const std::vector<std:
     LLSettingsSky::ptr_t legacysky = LLEnvironment::createSkyFromLegacyPreset(filename, messages);
 
     if (!legacysky)
-    {   
+    {
         LLNotificationsUtil::add("WLImportFail", messages);
 
         return;

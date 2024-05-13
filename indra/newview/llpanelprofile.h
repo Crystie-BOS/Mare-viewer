@@ -45,7 +45,7 @@
 // class LLPanelProfileNotes;
 
 //#include "rlvhandler.h"
-#include "RRInterface.h" 
+#include "RRInterface.h"
 
 class LLAvatarName;
 class LLButton;
@@ -74,7 +74,7 @@ class FSPanelPropertiesObserver : public LLAvatarPropertiesObserver
 public:
     FSPanelPropertiesObserver();
 
-	virtual void processProperties(void* data, EAvatarProcessorType type);
+    virtual void processProperties(void* data, EAvatarProcessorType type);
 
     LLUUID mRequester;
     LLPanelProfileSecondLife* mPanelProfile;
@@ -85,34 +85,34 @@ public:
 * Panel for displaying Avatar's second life related info.
 */
 class LLPanelProfileSecondLife
-	: public LLPanelProfilePropertiesProcessorTab
-	, public LLFriendObserver
-	, public LLVoiceClientStatusObserver
+    : public LLPanelProfilePropertiesProcessorTab
+    , public LLFriendObserver
+    , public LLVoiceClientStatusObserver
 {
 public:
-	LLPanelProfileSecondLife();
-	/*virtual*/ ~LLPanelProfileSecondLife();
+    LLPanelProfileSecondLife();
+    /*virtual*/ ~LLPanelProfileSecondLife();
 
-	void onOpen(const LLSD& key) override;
+    void onOpen(const LLSD& key) override;
 
-	/**
-	 * LLFriendObserver trigger
-	 */
-	void changed(U32 mask) override;
+    /**
+     * LLFriendObserver trigger
+     */
+    void changed(U32 mask) override;
 
-	// Implements LLVoiceClientStatusObserver::onChange() to enable the call
-	// button when voice is available
-	void onChange(EStatusType status, const std::string &channelURI, bool proximal) override;
+    // Implements LLVoiceClientStatusObserver::onChange() to enable the call
+    // button when voice is available
+    void onChange(EStatusType status, const std::string &channelURI, bool proximal) override;
 
-	void setAvatarId(const LLUUID& avatar_id) override;
+    void setAvatarId(const LLUUID& avatar_id) override;
 
-	BOOL postBuild() override;
+    BOOL postBuild() override;
 
-	void resetData() override;
+    void resetData() override;
 
     void refreshName();
 
-	void onAvatarNameCache(const LLUUID& agent_id, const LLAvatarName& av_name);
+    void onAvatarNameCache(const LLUUID& agent_id, const LLAvatarName& av_name);
 
     void setProfileImageUploading(bool loading);
     void setProfileImageUploaded(const LLUUID &image_asset_id);
@@ -126,25 +126,25 @@ public:
     void onAvatarProperties(const LLAvatarData* d);
 
 protected:
-	/**
-	 * Process profile related data received from server.
-	 */
-	void processProfileProperties(const LLAvatarData* avatar_data);
+    /**
+     * Process profile related data received from server.
+     */
+    void processProfileProperties(const LLAvatarData* avatar_data);
 
-	/**
-	 * Fills common for Avatar profile and My Profile fields.
-	 */
-	void fillCommonData(const LLAvatarData* avatar_data);
+    /**
+     * Fills common for Avatar profile and My Profile fields.
+     */
+    void fillCommonData(const LLAvatarData* avatar_data);
 
-	/**
-	 * Fills partner data.
-	 */
-	void fillPartnerData(const LLAvatarData* avatar_data);
+    /**
+     * Fills partner data.
+     */
+    void fillPartnerData(const LLAvatarData* avatar_data);
 
-	/**
-	 * Fills account status.
-	 */
-	void fillAccountStatus(const LLAvatarData* avatar_data);
+    /**
+     * Fills account status.
+     */
+    void fillAccountStatus(const LLAvatarData* avatar_data);
 
     /**
      * Sets permissions specific icon
@@ -158,27 +158,27 @@ protected:
 
     void onImageLoaded(BOOL success, LLViewerFetchedTexture *imagep);
 
-	/**
-	 * Displays avatar's online status if possible.
-	 *
-	 * Requirements from EXT-3880:
-	 * For friends:
-	 * - Online when online and privacy settings allow to show
-	 * - Offline when offline and privacy settings allow to show
-	 * - Else: nothing
-	 * For other avatars:
-	 *	- Online when online and was not set in Preferences/"Only Friends & Groups can see when I am online"
-	 *	- Else: Offline
-	 */
-	void updateOnlineStatus();
-	void processOnlineStatus(bool is_friend, bool show_online, bool online);
+    /**
+     * Displays avatar's online status if possible.
+     *
+     * Requirements from EXT-3880:
+     * For friends:
+     * - Online when online and privacy settings allow to show
+     * - Offline when offline and privacy settings allow to show
+     * - Else: nothing
+     * For other avatars:
+     *  - Online when online and was not set in Preferences/"Only Friends & Groups can see when I am online"
+     *  - Else: Offline
+     */
+    void updateOnlineStatus();
+    void processOnlineStatus(bool is_friend, bool show_online, bool online);
 
 private:
     void setLoaded() override;
     void onCommitMenu(const LLSD& userdata);
     bool onEnableMenu(const LLSD& userdata);
     bool onCheckMenu(const LLSD& userdata);
-	void onAvatarNameCacheSetName(const LLUUID& id, const LLAvatarName& av_name);
+    void onAvatarNameCacheSetName(const LLUUID& id, const LLAvatarName& av_name);
 
     void setDescriptionText(const std::string &text);
     void onSetDescriptionDirty();
@@ -192,39 +192,39 @@ private:
     void onCommitProfileImage(const LLUUID& id);
 
 private:
-	typedef std::map<std::string, LLUUID> group_map_t;
-	group_map_t				mGroups;
-	void					openGroupProfile();
+    typedef std::map<std::string, LLUUID> group_map_t;
+    group_map_t             mGroups;
+    void                    openGroupProfile();
 
-	LLGroupList*		mGroupList;
-    LLComboBox*			mShowInSearchCombo;
-    LLComboBox*			mHideAgeCombo;
-    LLProfileImageCtrl*	mSecondLifePic;
-	LLPanel*			mSecondLifePicLayout;
-    LLTextEditor*		mDescriptionEdit;
-    LLMenuButton*		mAgentActionMenuButton;
-    LLButton*			mSaveDescriptionChanges;
-    LLButton*			mDiscardDescriptionChanges;
-    LLIconCtrl*			mCanSeeOnlineIcon;
-    LLIconCtrl*			mCantSeeOnlineIcon;
-    LLIconCtrl*			mCanSeeOnMapIcon;
-    LLIconCtrl*			mCantSeeOnMapIcon;
-    LLIconCtrl*			mCanEditObjectsIcon;
-    LLIconCtrl*			mCantEditObjectsIcon;
+    LLGroupList*        mGroupList;
+    LLComboBox*         mShowInSearchCombo;
+    LLComboBox*         mHideAgeCombo;
+    LLProfileImageCtrl* mSecondLifePic;
+    LLPanel*            mSecondLifePicLayout;
+    LLTextEditor*       mDescriptionEdit;
+    LLMenuButton*       mAgentActionMenuButton;
+    LLButton*           mSaveDescriptionChanges;
+    LLButton*           mDiscardDescriptionChanges;
+    LLIconCtrl*         mCanSeeOnlineIcon;
+    LLIconCtrl*         mCantSeeOnlineIcon;
+    LLIconCtrl*         mCanSeeOnMapIcon;
+    LLIconCtrl*         mCantSeeOnMapIcon;
+    LLIconCtrl*         mCanEditObjectsIcon;
+    LLIconCtrl*         mCantEditObjectsIcon;
 
-    LLHandle<LLFloater>	mFloaterPermissionsHandle;
-    LLHandle<LLFloater>	mFloaterProfileTextureHandle;
-    LLHandle<LLFloater>	mFloaterTexturePickerHandle;
+    LLHandle<LLFloater> mFloaterPermissionsHandle;
+    LLHandle<LLFloater> mFloaterProfileTextureHandle;
+    LLHandle<LLFloater> mFloaterTexturePickerHandle;
 
-    bool				mHasUnsavedDescriptionChanges;
-	bool				mVoiceStatus;
-    bool				mWaitingForImageUpload;
-    bool				mAllowPublish;
-    bool				mHideAge;
-    std::string			mDescriptionText;
-	boost::signals2::connection	mAvatarNameCacheConnection;
-	boost::signals2::connection mRlvBehaviorCallbackConnection;
-	void updateRlvRestrictions(std::string behavior);
+    bool                mHasUnsavedDescriptionChanges;
+    bool                mVoiceStatus;
+    bool                mWaitingForImageUpload;
+    bool                mAllowPublish;
+    bool                mHideAge;
+    std::string         mDescriptionText;
+    boost::signals2::connection mAvatarNameCacheConnection;
+    boost::signals2::connection mRlvBehaviorCallbackConnection;
+    void updateRlvRestrictions(std::string behavior);
 
     // <FS:Zi> FIRE-32184: Online/Offline status not working for non-friends
     FSPanelPropertiesObserver mPropertiesObserver;
@@ -235,40 +235,40 @@ private:
 * Panel for displaying Avatar's web profile and home page.
 */
 class LLPanelProfileWeb
-	: public LLPanelProfileTab
-	, public LLViewerMediaObserver
+    : public LLPanelProfileTab
+    , public LLViewerMediaObserver
 {
 public:
-	LLPanelProfileWeb();
-	/*virtual*/ ~LLPanelProfileWeb();
+    LLPanelProfileWeb();
+    /*virtual*/ ~LLPanelProfileWeb();
 
-	void onOpen(const LLSD& key) override;
+    void onOpen(const LLSD& key) override;
 
-	BOOL postBuild() override;
+    BOOL postBuild() override;
 
-	void resetData() override;
+    void resetData() override;
 
-	/**
-	 * Loads web profile.
-	 */
-	void updateData() override;
+    /**
+     * Loads web profile.
+     */
+    void updateData() override;
 
-	void handleMediaEvent(LLPluginClassMedia* self, EMediaEvent event) override;
+    void handleMediaEvent(LLPluginClassMedia* self, EMediaEvent event) override;
 
-	void onAvatarNameCache(const LLUUID& agent_id, const LLAvatarName& av_name);
+    void onAvatarNameCache(const LLUUID& agent_id, const LLAvatarName& av_name);
 
 protected:
-	void onCommitLoad(LLUICtrl* ctrl);
+    void onCommitLoad(LLUICtrl* ctrl);
 
 private:
-	std::string			mURLHome;
-	std::string			mURLWebProfile;
-	LLMediaCtrl*		mWebBrowser;
+    std::string         mURLHome;
+    std::string         mURLWebProfile;
+    LLMediaCtrl*        mWebBrowser;
 
-	LLFrameTimer		mPerformanceTimer;
-	bool				mFirstNavigate;
+    LLFrameTimer        mPerformanceTimer;
+    bool                mFirstNavigate;
 
-	boost::signals2::connection	mAvatarNameCacheConnection;
+    boost::signals2::connection mAvatarNameCacheConnection;
 };
 
 /**
@@ -278,17 +278,17 @@ class LLPanelProfileFirstLife
     : public LLPanelProfilePropertiesProcessorTab
 {
 public:
-	LLPanelProfileFirstLife();
-	/*virtual*/ ~LLPanelProfileFirstLife();
+    LLPanelProfileFirstLife();
+    /*virtual*/ ~LLPanelProfileFirstLife();
 
-	void onOpen(const LLSD& key) override;
+    void onOpen(const LLSD& key) override;
 
-	BOOL postBuild() override;
+    BOOL postBuild() override;
 
     void processProperties(void* data, EAvatarProcessorType type) override;
     void processProperties(const LLAvatarData* avatar_data);
 
-	void resetData() override;
+    void resetData() override;
 
     void setProfileImageUploading(bool loading);
     void setProfileImageUploaded(const LLUUID &image_asset_id);
@@ -297,7 +297,7 @@ public:
     void commitUnsavedChanges() override;
 
 protected:
-	void setLoaded() override;
+    void setLoaded() override;
 
     void onUploadPhoto();
     void onChangePhoto();
@@ -308,7 +308,7 @@ protected:
     void onSaveDescriptionChanges();
     void onDiscardDescriptionChanges();
 
-	LLTextEditor*	mDescriptionEdit;
+    LLTextEditor*   mDescriptionEdit;
     LLProfileImageCtrl* mPicture;
     LLButton* mUploadPhoto;
     LLButton* mChangePhoto;
@@ -316,30 +316,30 @@ protected:
     LLButton* mSaveChanges;
     LLButton* mDiscardChanges;
 
-    LLHandle<LLFloater>	mFloaterTexturePickerHandle;
+    LLHandle<LLFloater> mFloaterTexturePickerHandle;
 
-    std::string		mCurrentDescription;
-    bool			mHasUnsavedChanges;
+    std::string     mCurrentDescription;
+    bool            mHasUnsavedChanges;
 };
 
 /**
  * Panel for displaying Avatar's notes and modifying friend's rights.
  */
 class LLPanelProfileNotes
-	: public LLPanelProfilePropertiesProcessorTab
+    : public LLPanelProfilePropertiesProcessorTab
 {
 public:
-	LLPanelProfileNotes();
-	/*virtual*/ ~LLPanelProfileNotes();
+    LLPanelProfileNotes();
+    /*virtual*/ ~LLPanelProfileNotes();
 
-	void onOpen(const LLSD& key) override;
+    void onOpen(const LLSD& key) override;
 
-	BOOL postBuild() override;
+    BOOL postBuild() override;
 
     void processProperties(void* data, EAvatarProcessorType type) override;
     void processProperties(const LLAvatarData* avatar_data);
 
-	void resetData() override;
+    void resetData() override;
 
     bool hasUnsavedChanges() override { return mHasUnsavedChanges; }
     void commitUnsavedChanges() override;
@@ -350,12 +350,12 @@ protected:
     void onSaveNotesChanges();
     void onDiscardNotesChanges();
 
-	LLTextEditor*       mNotesEditor;
+    LLTextEditor*       mNotesEditor;
     LLButton* mSaveChanges;
     LLButton* mDiscardChanges;
 
-    std::string		mCurrentNotes;
-    bool			mHasUnsavedChanges;
+    std::string     mCurrentNotes;
+    bool            mHasUnsavedChanges;
 };
 
 

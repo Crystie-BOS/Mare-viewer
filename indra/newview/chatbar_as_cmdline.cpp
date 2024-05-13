@@ -77,7 +77,7 @@ class JCZdrop : public LLEventTimer
 {
 public:
     BOOL mRunning;
-    
+
     JCZdrop(std::stack<LLViewerInventoryItem*> stack, LLUUID dest, std::string sFolder, std::string sUUID, bool package = false) : LLEventTimer(1.0), mRunning(FALSE)
     {
         mPackage = package;
@@ -251,14 +251,14 @@ public:
                                 report_to_nearby_chat("Do not have the destination prim selected while transfer is running to reduce the chances of \"Inventory creation on in-world object failed.\"");
                                 LLUUID sdest = LLUUID(mPackageDest);
                                 new JCZdrop(lolstack, sdest, mFolderName.c_str(), mPackageDest.asString().c_str(), true);
-                            } 
+                            }
                             doZtCleanup();
                         }
                         else
                         {
                             report_to_nearby_chat("Ztake has taken all selected objects.  Say \"ztake off\" to deactivate ztake or select more objects to continue.");
                         }
-                    } 
+                    }
                     else
                     {
                         if(mPackage)
@@ -353,7 +353,7 @@ public:
                     primY = primY.substr(0,zeroClearY);
                     zeroClearZ = primZ.find_last_not_of(".")+1;
                     primZ = primZ.substr(0,zeroClearZ);
-                    std::string name = llformat("%sx%sx%s",primX.c_str(),primY.c_str(),primZ.c_str()); 
+                    std::string name = llformat("%sx%sx%s",primX.c_str(),primY.c_str(),primZ.c_str());
                     msg->newMessageFast(_PREHASH_ObjectName);
                     msg->nextBlockFast(_PREHASH_AgentData);
                     msg->addUUIDFast(_PREHASH_AgentID, gAgent.getID());
@@ -388,18 +388,18 @@ public:
                 msg->addU32Fast(_PREHASH_ObjectLocalID, mToTake[0]);
                 gAgent.sendReliableMessage();
                 mToTake.erase(mToTake.begin());
-                if(mToTake.size() % 10 == 0) 
+                if(mToTake.size() % 10 == 0)
                 {
-                    if(mToTake.size() == 0) 
+                    if(mToTake.size() == 0)
                     {
                         report_to_nearby_chat("Mtake has taken all selected objects.  Say \"Mtake off\" to deactivate Mtake or select more objects to continue.");
-                    } 
+                    }
                     else
                     {
                         report_to_nearby_chat(llformat("Mtake: %i objects left to take.", mToTake.size()));
                     }
                 }
-            }    
+            }
         }
         return mRunning;
     }
@@ -449,7 +449,7 @@ bool cmd_line_chat(std::string revised_text, EChatType type, bool from_gesture)
     static LLCachedControl<std::string> sFSCmdLineMedia(gSavedSettings,  "FSCmdLineMedia", "");
     static LLCachedControl<std::string> sFSCmdLineMusic(gSavedSettings,  "FSCmdLineMusic", "");
     static LLCachedControl<std::string> sFSCmdLineBandwidth(gSavedSettings,  "FSCmdLineBandWidth", "bw");
-    
+
     if (sFSCmdLine)
     {
         std::istringstream i(revised_text);
@@ -641,30 +641,30 @@ bool cmd_line_chat(std::string revised_text, EChatType type, bool from_gesture)
                 return false;
             }
             else if (command == std::string(sFSCmdLineOfferTp))
-			{
-				LLUUID target_key;
-				if (i >> target_key)
-				{
-					const std::string tpMsg = "Join me!"; // Intentionally left English because this is the message the other avatar gets
-					LLMessageSystem* msg = gMessageSystem;
-					msg->newMessageFast(_PREHASH_StartLure);
-					msg->nextBlockFast(_PREHASH_AgentData);
-					msg->addUUIDFast(_PREHASH_AgentID, gAgentID);
-					msg->addUUIDFast(_PREHASH_SessionID, gAgentSessionID);
-					msg->nextBlockFast(_PREHASH_Info);
-					msg->addU8Fast(_PREHASH_LureType, (U8)0);
-					msg->addStringFast(_PREHASH_Message, tpMsg);
-					msg->nextBlockFast(_PREHASH_TargetData);
-					msg->addUUIDFast(_PREHASH_TargetID, target_key);
-					gAgent.sendReliableMessage();
-					LLStringUtil::format_map_t args;
-					args["NAME"] = LLSLURL("agent", target_key, "inspect").getSLURLString();
-					report_to_nearby_chat(LLTrans::getString("FSCmdLineTpOffered", args));
-				}
-				return false;
-			}
+            {
+                LLUUID target_key;
+                if (i >> target_key)
+                {
+                    const std::string tpMsg = "Join me!"; // Intentionally left English because this is the message the other avatar gets
+                    LLMessageSystem* msg = gMessageSystem;
+                    msg->newMessageFast(_PREHASH_StartLure);
+                    msg->nextBlockFast(_PREHASH_AgentData);
+                    msg->addUUIDFast(_PREHASH_AgentID, gAgentID);
+                    msg->addUUIDFast(_PREHASH_SessionID, gAgentSessionID);
+                    msg->nextBlockFast(_PREHASH_Info);
+                    msg->addU8Fast(_PREHASH_LureType, (U8)0);
+                    msg->addStringFast(_PREHASH_Message, tpMsg);
+                    msg->nextBlockFast(_PREHASH_TargetData);
+                    msg->addUUIDFast(_PREHASH_TargetID, target_key);
+                    gAgent.sendReliableMessage();
+                    LLStringUtil::format_map_t args;
+                    args["NAME"] = LLSLURL("agent", target_key, "inspect").getSLURLString();
+                    report_to_nearby_chat(LLTrans::getString("FSCmdLineTpOffered", args));
+                }
+                return false;
+            }
 
-            
+
             else if (command == std::string(sFSCmdLineGround))
             {
                 LLVector3 agentPos = gAgent.getPositionAgent();
@@ -758,15 +758,15 @@ bool cmd_line_chat(std::string revised_text, EChatType type, bool from_gesture)
                 report_to_nearby_chat("Displaying Contact Sets Floater.");
                 return false;
             }
-			else if (command == sFSCmdLineTP2())
-			{
-				if (revised_text.length() > command.length() + 1) //Typing this command with no argument was causing a crash. -Madgeek
-				{
-					std::string name = revised_text.substr(command.length() + 1);
-					cmdline_tp2name(name);
-				}
-				return false;
-			}
+            else if (command == sFSCmdLineTP2())
+            {
+                if (revised_text.length() > command.length() + 1) //Typing this command with no argument was causing a crash. -Madgeek
+                {
+                    std::string name = revised_text.substr(command.length() + 1);
+                    cmdline_tp2name(name);
+                }
+                return false;
+            }
             else if (command == "zdrop")
             {
                 std::string setting;
@@ -789,7 +789,7 @@ bool cmd_line_chat(std::string revised_text, EChatType type, bool from_gesture)
                                 {
                                     report_to_nearby_chat("UUID entered is of an invalid length! (Hint: use the \"copy key\" button in the build menu.)");
                                 }
-                                else if (gObjectList.findObject(LLUUID(loldest)) == FALSE) 
+                                else if (gObjectList.findObject(LLUUID(loldest)) == FALSE)
                                 {
                                     report_to_nearby_chat("Unable to locate object.  Please verify the object is rezzed and in view, and that the UUID is correct.");
                                 }
@@ -949,7 +949,7 @@ bool cmd_line_chat(std::string revised_text, EChatType type, bool from_gesture)
                     {
                         report_to_nearby_chat("UUID entered is of an invalid length! (Hint: use the \"copy key\" button in the build menu.)");
                     }
-                    else if (gObjectList.findObject(LLUUID(loldest)) == FALSE) 
+                    else if (gObjectList.findObject(LLUUID(loldest)) == FALSE)
                     {
                         report_to_nearby_chat("Unable to locate object.  Please verify the object is rezzed, in view, and that the UUID is correct.");
                     }
@@ -1067,61 +1067,61 @@ bool cmd_line_chat(std::string revised_text, EChatType type, bool from_gesture)
 
 LLAvatarListItem* getAvatarListItem(const LLUUID& avatar_id)
 {
-	LLPanelPeople* panel_people = getPeoplePanel();
-	if (panel_people)
-	{
-		return panel_people->getNearbyList()->getAvatarListItem(avatar_id);
-	}
+    LLPanelPeople* panel_people = getPeoplePanel();
+    if (panel_people)
+    {
+        return panel_people->getNearbyList()->getAvatarListItem(avatar_id);
+    }
 
-	return NULL;
+    return NULL;
 }
 
 //case insensitive search for avatar in draw distance
 LLUUID cmdline_partial_name2key(std::string partial_name)
 {
-	std::string av_name;
-	LLStringUtil::toLower(partial_name);
+    std::string av_name;
+    LLStringUtil::toLower(partial_name);
 
-	LLPanelPeople* panel_people = getPeoplePanel();
-	if (panel_people)
-	{
-		std::vector<LLPanel*> items;
-		LLAvatarList* nearbyList = panel_people->getNearbyList();
-		nearbyList->getItems(items);
+    LLPanelPeople* panel_people = getPeoplePanel();
+    if (panel_people)
+    {
+        std::vector<LLPanel*> items;
+        LLAvatarList* nearbyList = panel_people->getNearbyList();
+        nearbyList->getItems(items);
 
-		for (std::vector<LLPanel*>::const_iterator itItem = items.begin(); itItem != items.end(); ++itItem)
-		{
-			LLAvatarListItem* av = static_cast<LLAvatarListItem*>(*itItem);
+        for (std::vector<LLPanel*>::const_iterator itItem = items.begin(); itItem != items.end(); ++itItem)
+        {
+            LLAvatarListItem* av = static_cast<LLAvatarListItem*>(*itItem);
 
-			av_name = av->getUserName();
+            av_name = av->getUserName();
 
-			LLStringUtil::toLower(av_name);
-			if (strstr(av_name.c_str(), partial_name.c_str()))
-			{
-				return av->getAvatarId();
-			}
-		}
-	}
-	return LLUUID::null;
+            LLStringUtil::toLower(av_name);
+            if (strstr(av_name.c_str(), partial_name.c_str()))
+            {
+                return av->getAvatarId();
+            }
+        }
+    }
+    return LLUUID::null;
 }
 
 void cmdline_tp2name(std::string target)
 {
-	LLUUID avkey = cmdline_partial_name2key(target);
-	LLPanelPeople* panel_people = getPeoplePanel();
-	if (avkey.notNull() && panel_people)
-	{
-		LLAvatarListItem* avatar_list_item = panel_people->getNearbyList()->getAvatarListItem(avkey);
-		if (avatar_list_item)
-		{
-			LLVector3d pos = avatar_list_item->getPosition();
-			pos.mdV[VZ] += 2.0;
-			gAgent.teleportViaLocation(pos);
-			return;
-		}
-	}
+    LLUUID avkey = cmdline_partial_name2key(target);
+    LLPanelPeople* panel_people = getPeoplePanel();
+    if (avkey.notNull() && panel_people)
+    {
+        LLAvatarListItem* avatar_list_item = panel_people->getNearbyList()->getAvatarListItem(avkey);
+        if (avatar_list_item)
+        {
+            LLVector3d pos = avatar_list_item->getPosition();
+            pos.mdV[VZ] += 2.0;
+            gAgent.teleportViaLocation(pos);
+            return;
+        }
+    }
 
-	report_to_nearby_chat("Avatar not found.");
+    report_to_nearby_chat("Avatar not found.");
 }
 
 void cmdline_rezplat(bool use_saved_value, F32 visual_radius) //cmdline_rezplat() will still work... just will use the saved value

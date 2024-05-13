@@ -1,4 +1,4 @@
-/** 
+/**
  * @file RRInterfaceHelper.h
  * @author Chorazin Allen
  * @brief Isolated header for llui library llfloater.cpp to call
@@ -31,9 +31,9 @@
 class RRHelper
 {
 public:
-	RRHelper ();
-	~RRHelper ();
-	static BOOL preventFloater(std::string floaterName); //used to check if a floater should not be made visible due to a restriction
+    RRHelper ();
+    ~RRHelper ();
+    static BOOL preventFloater(std::string floaterName); //used to check if a floater should not be made visible due to a restriction
 };
 
 #endif // RRINTERFACEHELPER_H

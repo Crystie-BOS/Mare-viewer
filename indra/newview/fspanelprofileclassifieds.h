@@ -1,25 +1,25 @@
-/** 
+/**
  * @file fspanelprofileclassifieds.h
  * @brief FSPanelClassifieds and related class definitions
  *
  * $LicenseInfo:firstyear=2009&license=viewerlgpl$
  * Second Life Viewer Source Code
  * Copyright (C) 2010, Linden Research, Inc.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation;
  * version 2.1 of the License only.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- * 
+ *
  * Linden Research, Inc., 945 Battery Street, San Francisco, CA  94111  USA
  * $/LicenseInfo$
  */
@@ -48,160 +48,160 @@ class FSPanelClassifiedEdit;
 // Panel Picks has been consolidated with Classifieds (EXT-2095), give FSPanelClassifieds
 // and corresponding files (cpp, h, xml) a new name. (new name is TBD at the moment)
 
-class FSPanelClassifieds 
-	: public FSPanelProfileTab
+class FSPanelClassifieds
+    : public FSPanelProfileTab
 {
 public:
-	FSPanelClassifieds();
-	~FSPanelClassifieds();
+    FSPanelClassifieds();
+    ~FSPanelClassifieds();
 
-	/*virtual*/ BOOL postBuild(void);
+    /*virtual*/ BOOL postBuild(void);
 
-	/*virtual*/ void onOpen(const LLSD& key);
+    /*virtual*/ void onOpen(const LLSD& key);
 
-	/*virtual*/ void onClosePanel();
+    /*virtual*/ void onClosePanel();
 
-	void processProperties(void* data, EAvatarProcessorType type);
+    void processProperties(void* data, EAvatarProcessorType type);
 
-	void updateData();
+    void updateData();
 
-	// returns the selected pick item
-	FSClassifiedItem* getSelectedClassifiedItem();
-	FSClassifiedItem* findClassifiedById(const LLUUID& classified_id);
+    // returns the selected pick item
+    FSClassifiedItem* getSelectedClassifiedItem();
+    FSClassifiedItem* findClassifiedById(const LLUUID& classified_id);
 
-	void createNewClassified();
+    void createNewClassified();
 
 protected:
-	/*virtual*/void updateButtons();
+    /*virtual*/void updateButtons();
 
 private:
-	void onClickDelete();
-	void onClickTeleport();
-	void onClickMap();
+    void onClickDelete();
+    void onClickTeleport();
+    void onClickMap();
 
-	bool isClassifiedPublished(FSClassifiedItem* c_item);
+    bool isClassifiedPublished(FSClassifiedItem* c_item);
 
-	void onListCommit(const LLFlatListView* f_list);
+    void onListCommit(const LLFlatListView* f_list);
 
-	boost::signals2::connection mRlvBehaviorCallbackConnection;
-//	void updateRlvRestrictions(ERlvBehaviour behavior, ERlvParamType type);
-	void updateRlvRestrictions(std::string behavior, bool added);
+    boost::signals2::connection mRlvBehaviorCallbackConnection;
+//  void updateRlvRestrictions(ERlvBehaviour behavior, ERlvParamType type);
+    void updateRlvRestrictions(std::string behavior, bool added);
 
-	//------------------------------------------------
-	// Callbacks which require panel toggling
-	//------------------------------------------------
-	void onClickInfo();
-	void onPanelPickClose(LLPanel* panel);
-	void onPanelClassifiedSave(FSPanelClassifiedEdit* panel);
-	void onPanelClassifiedClose(FSPanelClassifiedInfo* panel);
-	void onPanelClassifiedEdit();
-	void editClassified(const LLUUID&  classified_id);
-	void onClickMenuEdit();
+    //------------------------------------------------
+    // Callbacks which require panel toggling
+    //------------------------------------------------
+    void onClickInfo();
+    void onPanelPickClose(LLPanel* panel);
+    void onPanelClassifiedSave(FSPanelClassifiedEdit* panel);
+    void onPanelClassifiedClose(FSPanelClassifiedInfo* panel);
+    void onPanelClassifiedEdit();
+    void editClassified(const LLUUID&  classified_id);
+    void onClickMenuEdit();
 
-	bool onEnableMenuItem(const LLSD& user_data);
+    bool onEnableMenuItem(const LLSD& user_data);
 
-	void openClassifiedInfo();
-	void openClassifiedInfo(const LLSD& params);
-	void openClassifiedEdit(const LLSD& params);
+    void openClassifiedInfo();
+    void openClassifiedInfo(const LLSD& params);
+    void openClassifiedEdit(const LLSD& params);
 
-	bool callbackDeleteClassified(const LLSD& notification, const LLSD& response);
-	bool callbackTeleport(const LLSD& notification, const LLSD& response);
+    bool callbackDeleteClassified(const LLSD& notification, const LLSD& response);
+    bool callbackTeleport(const LLSD& notification, const LLSD& response);
 
 
-	virtual void onDoubleClickClassifiedItem(LLUICtrl* item);
-	virtual void onRightMouseUpItem(LLUICtrl* item, S32 x, S32 y, MASK mask);
+    virtual void onDoubleClickClassifiedItem(LLUICtrl* item);
+    virtual void onRightMouseUpItem(LLUICtrl* item, S32 x, S32 y, MASK mask);
 
-	void createClassifiedInfoPanel();
-	void createClassifiedEditPanel(FSPanelClassifiedEdit** panel);
-    
+    void createClassifiedInfoPanel();
+    void createClassifiedEditPanel(FSPanelClassifiedEdit** panel);
+
     void openPanel(LLPanel* panel, const LLSD& params);
     void closePanel(LLPanel* panel);
 
-	LLMenuGL* mPopupMenu;
-	LLFlatListView* mClassifiedsList;
-	FSPanelClassifiedInfo* mPanelClassifiedInfo;
-	LLUICtrl* mNoItemsLabel;
+    LLMenuGL* mPopupMenu;
+    LLFlatListView* mClassifiedsList;
+    FSPanelClassifiedInfo* mPanelClassifiedInfo;
+    LLUICtrl* mNoItemsLabel;
 
-	// <classified_id, edit_panel>
-	typedef std::map<LLUUID, FSPanelClassifiedEdit*> panel_classified_edit_map_t;
+    // <classified_id, edit_panel>
+    typedef std::map<LLUUID, FSPanelClassifiedEdit*> panel_classified_edit_map_t;
 
-	// This map is needed for newly created classifieds. The purpose of panel is to
-	// sit in this map and listen to FSPanelClassifiedEdit::processProperties callback.
-	panel_classified_edit_map_t mEditClassifiedPanels;
+    // This map is needed for newly created classifieds. The purpose of panel is to
+    // sit in this map and listen to FSPanelClassifiedEdit::processProperties callback.
+    panel_classified_edit_map_t mEditClassifiedPanels;
 
-	//true if classifieds list is empty after processing classifieds
-	bool mNoClassifieds;
+    //true if classifieds list is empty after processing classifieds
+    bool mNoClassifieds;
 };
 
 class FSClassifiedItem : public LLPanel, public LLAvatarPropertiesObserver
 {
 public:
 
-	FSClassifiedItem(const LLUUID& avatar_id, const LLUUID& classified_id);
-	
-	virtual ~FSClassifiedItem();
+    FSClassifiedItem(const LLUUID& avatar_id, const LLUUID& classified_id);
 
-	/*virtual*/ void processProperties(void* data, EAvatarProcessorType type);
+    virtual ~FSClassifiedItem();
 
-	/*virtual*/ BOOL postBuild();
+    /*virtual*/ void processProperties(void* data, EAvatarProcessorType type);
 
-	/*virtual*/ void setValue(const LLSD& value);
+    /*virtual*/ BOOL postBuild();
 
-	void fillIn(FSPanelClassifiedEdit* panel);
+    /*virtual*/ void setValue(const LLSD& value);
 
-	LLUUID getAvatarId() {return mAvatarId;}
-	
-	void setAvatarId(const LLUUID& avatar_id) {mAvatarId = avatar_id;}
+    void fillIn(FSPanelClassifiedEdit* panel);
 
-	LLUUID getClassifiedId() {return mClassifiedId;}
+    LLUUID getAvatarId() {return mAvatarId;}
 
-	void setClassifiedId(const LLUUID& classified_id) {mClassifiedId = classified_id;}
+    void setAvatarId(const LLUUID& avatar_id) {mAvatarId = avatar_id;}
 
-	void setPosGlobal(const LLVector3d& pos) { mPosGlobal = pos; }
+    LLUUID getClassifiedId() {return mClassifiedId;}
 
-	const LLVector3d getPosGlobal() { return mPosGlobal; }
+    void setClassifiedId(const LLUUID& classified_id) {mClassifiedId = classified_id;}
 
-	void setLocationText(const std::string location) { mLocationText = location; }
+    void setPosGlobal(const LLVector3d& pos) { mPosGlobal = pos; }
 
-	std::string getLocationText() { return mLocationText; }
+    const LLVector3d getPosGlobal() { return mPosGlobal; }
 
-	void setClassifiedName (const std::string& name);
+    void setLocationText(const std::string location) { mLocationText = location; }
 
-	std::string getClassifiedName() { return getChild<LLUICtrl>("name")->getValue().asString(); }
+    std::string getLocationText() { return mLocationText; }
 
-	void setDescription(const std::string& desc);
+    void setClassifiedName (const std::string& name);
 
-	std::string getDescription() { return getChild<LLUICtrl>("description")->getValue().asString(); }
+    std::string getClassifiedName() { return getChild<LLUICtrl>("name")->getValue().asString(); }
 
-	void setSnapshotId(const LLUUID& snapshot_id);
+    void setDescription(const std::string& desc);
 
-	LLUUID getSnapshotId();
+    std::string getDescription() { return getChild<LLUICtrl>("description")->getValue().asString(); }
 
-	void setCategory(U32 cat) { mCategory = cat; }
+    void setSnapshotId(const LLUUID& snapshot_id);
 
-	U32 getCategory() { return mCategory; }
+    LLUUID getSnapshotId();
 
-	void setContentType(U32 ct) { mContentType = ct; }
+    void setCategory(U32 cat) { mCategory = cat; }
 
-	U32 getContentType() { return mContentType; }
+    U32 getCategory() { return mCategory; }
 
-	void setAutoRenew(U32 renew) { mAutoRenew = renew; }
+    void setContentType(U32 ct) { mContentType = ct; }
 
-	bool getAutoRenew() { return mAutoRenew; }
+    U32 getContentType() { return mContentType; }
 
-	void setPriceForListing(S32 price) { mPriceForListing = price; }
+    void setAutoRenew(U32 renew) { mAutoRenew = renew; }
 
-	S32 getPriceForListing() { return mPriceForListing; }
+    bool getAutoRenew() { return mAutoRenew; }
+
+    void setPriceForListing(S32 price) { mPriceForListing = price; }
+
+    S32 getPriceForListing() { return mPriceForListing; }
 
 private:
-	LLUUID mAvatarId;
-	LLUUID mClassifiedId;
-	LLVector3d mPosGlobal;
-	std::string mLocationText;
-	U32 mCategory;
-	U32 mContentType;
-	bool mAutoRenew;
-	S32 mPriceForListing;
+    LLUUID mAvatarId;
+    LLUUID mClassifiedId;
+    LLVector3d mPosGlobal;
+    std::string mLocationText;
+    U32 mCategory;
+    U32 mContentType;
+    bool mAutoRenew;
+    S32 mPriceForListing;
 };
 
 #endif // FS_PANELCLASSIFIEDS_H
