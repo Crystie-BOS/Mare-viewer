@@ -1,25 +1,25 @@
-/** 
+/**
  * @file llwindowsdl.h
  * @brief SDL implementation of LLWindow class
  *
  * $LicenseInfo:firstyear=2001&license=viewerlgpl$
  * Second Life Viewer Source Code
  * Copyright (C) 2010, Linden Research, Inc.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation;
  * version 2.1 of the License only.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- * 
+ *
  * Linden Research, Inc., 945 Battery Street, San Francisco, CA  94111  USA
  * $/LicenseInfo$
  */
@@ -49,189 +49,189 @@
 class LLWindowSDL : public LLWindow
 {
 public:
-	void show() override;
-	void hide() override;
-	void close() override;
-	BOOL getVisible() override;
-	BOOL getMinimized() override;
-	BOOL getMaximized() override;
-	BOOL maximize() override;
-	void minimize() override;
-	void restore() override;
-	/*virtual*/ BOOL getFullscreen();
-	BOOL getPosition(LLCoordScreen *position) override;
-	BOOL getSize(LLCoordScreen *size) override;
-	BOOL getSize(LLCoordWindow *size) override;
-	BOOL setPosition(LLCoordScreen position) override;
-	BOOL setSizeImpl(LLCoordScreen size) override;
-	BOOL setSizeImpl(LLCoordWindow size) override;
-	BOOL switchContext(BOOL fullscreen, const LLCoordScreen &size, BOOL enable_vsync, const LLCoordScreen * const posp = NULL) override;
-	void* createSharedContext() override;
-	void makeContextCurrent(void* context) override;
-	void destroySharedContext(void* context) override;
-	void toggleVSync(bool enable_vsync) override;
-	BOOL setCursorPosition(LLCoordWindow position) override;
-	BOOL getCursorPosition(LLCoordWindow *position) override;
-	void showCursor() override;
-	void hideCursor() override;
-	void showCursorFromMouseMove() override;
-	void hideCursorUntilMouseMove() override;
-	BOOL isCursorHidden() override;
-	void updateCursor() override;
-	void captureMouse() override;
-	void releaseMouse() override;
-	void setMouseClipping( BOOL b ) override;
-	void setMinSize(U32 min_width, U32 min_height, bool enforce_immediately = true) override;
+    void show() override;
+    void hide() override;
+    void close() override;
+    BOOL getVisible() override;
+    BOOL getMinimized() override;
+    BOOL getMaximized() override;
+    BOOL maximize() override;
+    void minimize() override;
+    void restore() override;
+    /*virtual*/ BOOL getFullscreen();
+    BOOL getPosition(LLCoordScreen *position) override;
+    BOOL getSize(LLCoordScreen *size) override;
+    BOOL getSize(LLCoordWindow *size) override;
+    BOOL setPosition(LLCoordScreen position) override;
+    BOOL setSizeImpl(LLCoordScreen size) override;
+    BOOL setSizeImpl(LLCoordWindow size) override;
+    BOOL switchContext(BOOL fullscreen, const LLCoordScreen &size, BOOL enable_vsync, const LLCoordScreen * const posp = NULL) override;
+    void* createSharedContext() override;
+    void makeContextCurrent(void* context) override;
+    void destroySharedContext(void* context) override;
+    void toggleVSync(bool enable_vsync) override;
+    BOOL setCursorPosition(LLCoordWindow position) override;
+    BOOL getCursorPosition(LLCoordWindow *position) override;
+    void showCursor() override;
+    void hideCursor() override;
+    void showCursorFromMouseMove() override;
+    void hideCursorUntilMouseMove() override;
+    BOOL isCursorHidden() override;
+    void updateCursor() override;
+    void captureMouse() override;
+    void releaseMouse() override;
+    void setMouseClipping( BOOL b ) override;
+    void setMinSize(U32 min_width, U32 min_height, bool enforce_immediately = true) override;
 
-	BOOL isClipboardTextAvailable() override;
-	BOOL pasteTextFromClipboard(LLWString &dst) override;
-	BOOL copyTextToClipboard(const LLWString & src) override;
+    BOOL isClipboardTextAvailable() override;
+    BOOL pasteTextFromClipboard(LLWString &dst) override;
+    BOOL copyTextToClipboard(const LLWString & src) override;
 
-	BOOL isPrimaryTextAvailable() override;
-	BOOL pasteTextFromPrimary(LLWString &dst) override;
-	BOOL copyTextToPrimary(const LLWString & src) override;
- 
-	void flashIcon(F32 seconds) override;
-	F32 getGamma() override;
-	BOOL setGamma(const F32 gamma) override;
-	U32 getFSAASamples() override;
-	void setFSAASamples(const U32 fsaa_samples) override;
-	BOOL restoreGamma() override;
-	ESwapMethod getSwapMethod() override { return mSwapMethod; }
-	void processMiscNativeEvents() override;
-	void gatherInput() override;
-	void swapBuffers() override;
-	/*virtual*/ void restoreGLContext() {};
+    BOOL isPrimaryTextAvailable() override;
+    BOOL pasteTextFromPrimary(LLWString &dst) override;
+    BOOL copyTextToPrimary(const LLWString & src) override;
 
-	void delayInputProcessing() override {};
+    void flashIcon(F32 seconds) override;
+    F32 getGamma() override;
+    BOOL setGamma(const F32 gamma) override;
+    U32 getFSAASamples() override;
+    void setFSAASamples(const U32 fsaa_samples) override;
+    BOOL restoreGamma() override;
+    ESwapMethod getSwapMethod() override { return mSwapMethod; }
+    void processMiscNativeEvents() override;
+    void gatherInput() override;
+    void swapBuffers() override;
+    /*virtual*/ void restoreGLContext() {};
 
-	// handy coordinate space conversion routines
-	BOOL convertCoords(LLCoordScreen from, LLCoordWindow *to) override;
-	BOOL convertCoords(LLCoordWindow from, LLCoordScreen *to) override;
-	BOOL convertCoords(LLCoordWindow from, LLCoordGL *to) override;
-	BOOL convertCoords(LLCoordGL from, LLCoordWindow *to) override;
-	BOOL convertCoords(LLCoordScreen from, LLCoordGL *to) override;
-	BOOL convertCoords(LLCoordGL from, LLCoordScreen *to) override;
+    void delayInputProcessing() override {};
 
-	LLWindowResolution* getSupportedResolutions(S32 &num_resolutions) override;
-	F32 getNativeAspectRatio() override;
-	F32 getPixelAspectRatio() override;
-	void setNativeAspectRatio(F32 ratio) override { mOverrideAspectRatio = ratio; }
+    // handy coordinate space conversion routines
+    BOOL convertCoords(LLCoordScreen from, LLCoordWindow *to) override;
+    BOOL convertCoords(LLCoordWindow from, LLCoordScreen *to) override;
+    BOOL convertCoords(LLCoordWindow from, LLCoordGL *to) override;
+    BOOL convertCoords(LLCoordGL from, LLCoordWindow *to) override;
+    BOOL convertCoords(LLCoordScreen from, LLCoordGL *to) override;
+    BOOL convertCoords(LLCoordGL from, LLCoordScreen *to) override;
 
-	void beforeDialog() override;
-	void afterDialog() override;
+    LLWindowResolution* getSupportedResolutions(S32 &num_resolutions) override;
+    F32 getNativeAspectRatio() override;
+    F32 getPixelAspectRatio() override;
+    void setNativeAspectRatio(F32 ratio) override { mOverrideAspectRatio = ratio; }
 
-	BOOL dialogColorPicker(F32 *r, F32 *g, F32 *b) override;
+    void beforeDialog() override;
+    void afterDialog() override;
 
-	U32 getAvailableVRAMMegabytes() override;
+    BOOL dialogColorPicker(F32 *r, F32 *g, F32 *b) override;
 
-	/*virtual*/ void *getPlatformWindow();
-	/*virtual*/ void bringToFront();
+    U32 getAvailableVRAMMegabytes() override;
 
-	void spawnWebBrowser(const std::string& escaped_url, bool async) override;
-	/*virtual*/ void openFile(const std::string& file_name);
+    /*virtual*/ void *getPlatformWindow();
+    /*virtual*/ void bringToFront();
+
+    void spawnWebBrowser(const std::string& escaped_url, bool async) override;
+    /*virtual*/ void openFile(const std::string& file_name);
         /*virtual*/ void setTitle(const std::string& title);
-	
-	static std::vector<std::string> getDynamicFallbackFontList();
 
-	// Not great that these are public, but they have to be accessible
-	// by non-class code and it's better than making them global.
+    static std::vector<std::string> getDynamicFallbackFontList();
+
+    // Not great that these are public, but they have to be accessible
+    // by non-class code and it's better than making them global.
 #if LL_X11
-	Window mSDL_XWindowID;
-	Display *mSDL_Display;
+    Window mSDL_XWindowID;
+    Display *mSDL_Display;
 #endif
-	void (*Lock_Display)(void);
-	void (*Unlock_Display)(void);
+    void (*Lock_Display)(void);
+    void (*Unlock_Display)(void);
 
 #if LL_GTK
-	// Lazily initialize and check the runtime GTK version for goodness.
-	static bool ll_try_gtk_init(void);
+    // Lazily initialize and check the runtime GTK version for goodness.
+    static bool ll_try_gtk_init(void);
 #endif // LL_GTK
 
 #if LL_X11
-	static Window get_SDL_XWindowID(void);
-	static Display* get_SDL_Display(void);
-#endif // LL_X11	
+    static Window get_SDL_XWindowID(void);
+    static Display* get_SDL_Display(void);
+#endif // LL_X11
 
 protected:
-	LLWindowSDL(LLWindowCallbacks* callbacks,
-		const std::string& title, int x, int y, int width, int height, U32 flags,
-		BOOL fullscreen, BOOL clearBg, BOOL disable_vsync, BOOL use_gl,
-		BOOL ignore_pixel_depth, U32 fsaa_samples);
-	~LLWindowSDL();
+    LLWindowSDL(LLWindowCallbacks* callbacks,
+        const std::string& title, int x, int y, int width, int height, U32 flags,
+        BOOL fullscreen, BOOL clearBg, BOOL disable_vsync, BOOL use_gl,
+        BOOL ignore_pixel_depth, U32 fsaa_samples);
+    ~LLWindowSDL();
 
-	BOOL	isValid() override;
-	LLSD getNativeKeyData() override;
+    BOOL    isValid() override;
+    LLSD getNativeKeyData() override;
 
-	void	initCursors();
-	void	quitCursors();
-	void	moveWindow(const LLCoordScreen& position,const LLCoordScreen& size);
+    void    initCursors();
+    void    quitCursors();
+    void    moveWindow(const LLCoordScreen& position,const LLCoordScreen& size);
 
-	// Changes display resolution. Returns true if successful
-	BOOL	setDisplayResolution(S32 width, S32 height, S32 bits, S32 refresh);
+    // Changes display resolution. Returns true if successful
+    BOOL    setDisplayResolution(S32 width, S32 height, S32 bits, S32 refresh);
 
-	// Go back to last fullscreen display resolution.
-	BOOL	setFullscreenResolution();
+    // Go back to last fullscreen display resolution.
+    BOOL    setFullscreenResolution();
 
-	BOOL	shouldPostQuit() { return mPostQuit; }
+    BOOL    shouldPostQuit() { return mPostQuit; }
 
 protected:
-	//
-	// Platform specific methods
-	//
+    //
+    // Platform specific methods
+    //
 
-	// create or re-create the GL context/window.  Called from the constructor and switchContext().
-	BOOL createContext(int x, int y, int width, int height, int bits, BOOL fullscreen, BOOL disable_vsync);
-	void destroyContext();
-	void setupFailure(const std::string& text, const std::string& caption, U32 type);
-	void fixWindowSize(void);
-	U32 SDLCheckGrabbyKeys(SDLKey keysym, BOOL gain);
-	BOOL SDLReallyCaptureInput(BOOL capture);
+    // create or re-create the GL context/window.  Called from the constructor and switchContext().
+    BOOL createContext(int x, int y, int width, int height, int bits, BOOL fullscreen, BOOL disable_vsync);
+    void destroyContext();
+    void setupFailure(const std::string& text, const std::string& caption, U32 type);
+    void fixWindowSize(void);
+    U32 SDLCheckGrabbyKeys(SDLKey keysym, BOOL gain);
+    BOOL SDLReallyCaptureInput(BOOL capture);
 
-	//
-	// Platform specific variables
-	//
-	U32             mGrabbyKeyFlags;
-	int			mReallyCapturedCount;
-	SDL_Surface *	mWindow;
-	std::string mWindowTitle;
-	double		mOriginalAspectRatio;
-	BOOL		mNeedsResize;		// Constructor figured out the window is too big, it needs a resize.
-	LLCoordScreen   mNeedsResizeSize;
-	F32			mOverrideAspectRatio;
-	F32		mGamma;
-	U32		mFSAASamples;
+    //
+    // Platform specific variables
+    //
+    U32             mGrabbyKeyFlags;
+    int         mReallyCapturedCount;
+    SDL_Surface *   mWindow;
+    std::string mWindowTitle;
+    double      mOriginalAspectRatio;
+    BOOL        mNeedsResize;       // Constructor figured out the window is too big, it needs a resize.
+    LLCoordScreen   mNeedsResizeSize;
+    F32         mOverrideAspectRatio;
+    F32     mGamma;
+    U32     mFSAASamples;
 
-	int		mSDLFlags;
+    int     mSDLFlags;
 
-	SDL_Cursor*	mSDLCursors[UI_CURSOR_COUNT];
-	int             mHaveInputFocus; /* 0=no, 1=yes, else unknown */
-	int             mIsMinimized; /* 0=no, 1=yes, else unknown */
+    SDL_Cursor* mSDLCursors[UI_CURSOR_COUNT];
+    int             mHaveInputFocus; /* 0=no, 1=yes, else unknown */
+    int             mIsMinimized; /* 0=no, 1=yes, else unknown */
 
-	friend class LLWindowManager;
+    friend class LLWindowManager;
 
 private:
 #if LL_X11
-	void x11_set_urgent(BOOL urgent);
-	BOOL mFlashing;
-	LLTimer mFlashTimer;
+    void x11_set_urgent(BOOL urgent);
+    BOOL mFlashing;
+    LLTimer mFlashTimer;
 #endif //LL_X11
-	
-	U32 mKeyScanCode;
+
+    U32 mKeyScanCode;
         U32 mKeyVirtualKey;
-	SDLMod mKeyModifiers;
+    SDLMod mKeyModifiers;
 };
 
 
 class LLSplashScreenSDL : public LLSplashScreen
 {
 public:
-	LLSplashScreenSDL();
-	virtual ~LLSplashScreenSDL();
+    LLSplashScreenSDL();
+    virtual ~LLSplashScreenSDL();
 
-	/*virtual*/ void showImpl();
-	/*virtual*/ void updateImpl(const std::string& mesg);
-	/*virtual*/ void hideImpl();
+    /*virtual*/ void showImpl();
+    /*virtual*/ void updateImpl(const std::string& mesg);
+    /*virtual*/ void hideImpl();
 };
 
 S32 OSMessageBoxSDL(const std::string& text, const std::string& caption, U32 type);

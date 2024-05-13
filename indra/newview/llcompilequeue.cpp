@@ -1,25 +1,25 @@
-/** 
+/**
  * @file llcompilequeue.cpp
  * @brief LLCompileQueueData class implementation
  *
  * $LicenseInfo:firstyear=2002&license=viewerlgpl$
  * Second Life Viewer Source Code
  * Copyright (C) 2010, Linden Research, Inc.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation;
  * version 2.1 of the License only.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- * 
+ *
  * Linden Research, Inc., 945 Battery Street, San Francisco, CA  94111  USA
  * $/LicenseInfo$
  */
@@ -27,7 +27,7 @@
 /**
  *
  * Implementation of the script queue which keeps an array of object
- * UUIDs and manipulates all of the scripts on each of them. 
+ * UUIDs and manipulates all of the scripts on each of them.
  *
  */
 
@@ -67,15 +67,15 @@
 typedef std::map<std::string, LLHandle<LLFloaterScriptQueue>> CQMAP;
 // KKA-678 Add initialisation
 CQMAP compile_queue_floater_handles = {};
-	
+
 namespace
 {
 
     const std::string QUEUE_EVENTPUMP_NAME("ScriptActionQueue");
     const F32 QUEUE_INVENTORY_FETCH_TIMEOUT = 300.f;
 
-    // ObjectIventoryFetcher is an adapter between the LLVOInventoryListener::inventoryChanged 
-    // callback mechanism and the LLEventPump coroutine architecture allowing the 
+    // ObjectIventoryFetcher is an adapter between the LLVOInventoryListener::inventoryChanged
+    // callback mechanism and the LLEventPump coroutine architecture allowing the
     // coroutine to wait for the inventory event.
     class ObjectInventoryFetcher: public LLVOInventoryListener
     {
@@ -94,7 +94,7 @@ namespace
             S32 serial_num,
             void* user_data);
 
-        void fetchInventory() 
+        void fetchInventory()
         {
             requestVOInventory();
         }
@@ -122,15 +122,15 @@ namespace
 
 }
 
-// *NOTE$: A minor specialization of LLScriptAssetUpload, it does not require a buffer 
-// (and does not save a buffer to the cache) and it finds the compile queue window and 
+// *NOTE$: A minor specialization of LLScriptAssetUpload, it does not require a buffer
+// (and does not save a buffer to the cache) and it finds the compile queue window and
 // displays a compiling message.
 class LLQueuedScriptAssetUpload : public LLScriptAssetUpload
 {
 public:
     LLQueuedScriptAssetUpload(LLUUID taskId, LLUUID itemId, LLUUID assetId, TargetType_t targetType,
             bool isRunning, std::string scriptName, LLUUID queueId, LLUUID exerienceId, taskUploadFinish_f finish) :
-        LLScriptAssetUpload(taskId, itemId, targetType, isRunning, 
+        LLScriptAssetUpload(taskId, itemId, targetType, isRunning,
             exerienceId, std::string(), finish, nullptr),
         mScriptName(scriptName),
         mQueueId(queueId)
@@ -140,8 +140,8 @@ public:
 
     virtual LLSD prepareUpload()
     {
-        /* *NOTE$: The parent class (LLScriptAssetUpload will attempt to save 
-         * the script buffer into to the cache.  Since the resource is already in 
+        /* *NOTE$: The parent class (LLScriptAssetUpload will attempt to save
+         * the script buffer into to the cache.  Since the resource is already in
          * the cache we don't want to do that.  Just put a compiling message in
          * the window and move on
          */
@@ -172,14 +172,14 @@ private:
 
 struct LLScriptQueueData
 {
-	LLUUID mQueueID;
-	LLUUID mTaskId;
-	LLPointer<LLInventoryItem> mItem;
-	LLHost mHost;
-	LLUUID mExperienceId;
-	std::string mExperiencename;
-	LLScriptQueueData(const LLUUID& q_id, const LLUUID& task_id, LLInventoryItem* item) :
-		mQueueID(q_id), mTaskId(task_id), mItem(new LLInventoryItem(item)) {}
+    LLUUID mQueueID;
+    LLUUID mTaskId;
+    LLPointer<LLInventoryItem> mItem;
+    LLHost mHost;
+    LLUUID mExperienceId;
+    std::string mExperiencename;
+    LLScriptQueueData(const LLUUID& q_id, const LLUUID& task_id, LLInventoryItem* item) :
+        mQueueID(q_id), mTaskId(task_id), mItem(new LLInventoryItem(item)) {}
 
 };
 
@@ -189,14 +189,14 @@ struct LLScriptQueueData
 
 // Default constructor
 LLFloaterScriptQueue::LLFloaterScriptQueue(const LLSD& key) :
-	LLFloater(key),
-	mDone(false),
-	mFull(false),
-	mMono(false),
-	mDeleteName(""),
-	mDeleteOnly(false)
+    LLFloater(key),
+    mDone(false),
+    mFull(false),
+    mMono(false),
+    mDeleteName(""),
+    mDeleteOnly(false)
 {
-	
+
 }
 
 // Destroys the object
@@ -206,44 +206,44 @@ LLFloaterScriptQueue::~LLFloaterScriptQueue()
 
 BOOL LLFloaterScriptQueue::postBuild()
 {
-	childSetAction("close",onCloseBtn,this);
-	getChildView("close")->setEnabled(FALSE);
-	getChild<LLUICtrl>("copy_btn")->setCommitCallback(boost::bind(&LLFloaterScriptQueue::onClickCopyToClipboard, this));
-	setVisible(true);
-	return TRUE;
+    childSetAction("close",onCloseBtn,this);
+    getChildView("close")->setEnabled(FALSE);
+    getChild<LLUICtrl>("copy_btn")->setCommitCallback(boost::bind(&LLFloaterScriptQueue::onClickCopyToClipboard, this));
+    setVisible(true);
+    return TRUE;
 }
 
 // static
 void LLFloaterScriptQueue::onCloseBtn(void* user_data)
 {
-	LLFloaterScriptQueue* self = (LLFloaterScriptQueue*)user_data;
-	// if we were doing a Locate Full aka Status we also need to clean up the map
-	// the map is item uuid to floater handle so there is probably more than one entry to clear
-	if (! compile_queue_floater_handles.empty())
-	{
-		CQMAP::iterator it;
-		it = compile_queue_floater_handles.begin();
-		while (it != compile_queue_floater_handles.end())
-		{
-			if (self == it->second.get())
-			{
-				compile_queue_floater_handles.erase(it++);
-			}
-			else
-			{
-				++it;
-			}
-		}
-	}
-	self->closeFloater();
+    LLFloaterScriptQueue* self = (LLFloaterScriptQueue*)user_data;
+    // if we were doing a Locate Full aka Status we also need to clean up the map
+    // the map is item uuid to floater handle so there is probably more than one entry to clear
+    if (! compile_queue_floater_handles.empty())
+    {
+        CQMAP::iterator it;
+        it = compile_queue_floater_handles.begin();
+        while (it != compile_queue_floater_handles.end())
+        {
+            if (self == it->second.get())
+            {
+                compile_queue_floater_handles.erase(it++);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+    }
+    self->closeFloater();
 }
 
 void LLFloaterScriptQueue::onClickCopyToClipboard()
 {
-	LLScrollListCtrl *temp = getChild<LLScrollListCtrl>("queue output", true);
-	temp->selectAll();
-	temp->copy();
-	temp->deselect();
+    LLScrollListCtrl *temp = getChild<LLScrollListCtrl>("queue output", true);
+    temp->selectAll();
+    temp->copy();
+    temp->deselect();
 }
 
 void LLFloaterScriptQueue::addObject(const LLUUID& id, std::string name)
@@ -254,64 +254,64 @@ void LLFloaterScriptQueue::addObject(const LLUUID& id, std::string name)
 
 BOOL LLFloaterScriptQueue::start()
 {
-	// Locate and Locate Full aka Status do not modify, so no need for a notification
-	// Delete is dangerous and needs a stern notification
-	// Change running state or reset also modify state but less seriously than delete
-	
-	if (mStartString == LLTrans::getString("DeleteQueueStart"))
-	{
-			if (mDeleteOnly)
-			{
-				LLSD args;
-				args["[NAME]"] = getDeleteName();
+    // Locate and Locate Full aka Status do not modify, so no need for a notification
+    // Delete is dangerous and needs a stern notification
+    // Change running state or reset also modify state but less seriously than delete
 
-				LLNotificationsUtil::add("ConfirmScriptQueueDeleteOnly", args, LLSD(), boost::bind(&LLFloaterScriptQueue::onScriptQueueConfirmation, this, _1, _2));
-			}
-			else
-			{
-				LLNotificationsUtil::add("ConfirmScriptQueueDelete", LLSD(), LLSD(), boost::bind(&LLFloaterScriptQueue::onScriptQueueConfirmation, this, _1, _2));
-			}
-	}
-	else if (mStartString == LLTrans::getString("LocateQueueStart"))
-	{
-		return confirmedStart();
-	}
-	else
-	{
-		LLNotificationsUtil::add("ConfirmScriptQueueModify", LLSD(), LLSD(), boost::bind(&LLFloaterScriptQueue::onScriptQueueConfirmation, this, _1, _2));
-	}	
-	// this is fibbing a bit; we may actually decide to abort via notification response
-	return TRUE;
+    if (mStartString == LLTrans::getString("DeleteQueueStart"))
+    {
+            if (mDeleteOnly)
+            {
+                LLSD args;
+                args["[NAME]"] = getDeleteName();
+
+                LLNotificationsUtil::add("ConfirmScriptQueueDeleteOnly", args, LLSD(), boost::bind(&LLFloaterScriptQueue::onScriptQueueConfirmation, this, _1, _2));
+            }
+            else
+            {
+                LLNotificationsUtil::add("ConfirmScriptQueueDelete", LLSD(), LLSD(), boost::bind(&LLFloaterScriptQueue::onScriptQueueConfirmation, this, _1, _2));
+            }
+    }
+    else if (mStartString == LLTrans::getString("LocateQueueStart"))
+    {
+        return confirmedStart();
+    }
+    else
+    {
+        LLNotificationsUtil::add("ConfirmScriptQueueModify", LLSD(), LLSD(), boost::bind(&LLFloaterScriptQueue::onScriptQueueConfirmation, this, _1, _2));
+    }
+    // this is fibbing a bit; we may actually decide to abort via notification response
+    return TRUE;
 }
 
 bool LLFloaterScriptQueue::onScriptQueueConfirmation(const LLSD& notification, const LLSD& response)
 {
-	S32 option = LLNotificationsUtil::getSelectedOption(notification, response);
-	if (option != 0)
-	{
-		closeFloater();
-		return true;
-	}
+    S32 option = LLNotificationsUtil::getSelectedOption(notification, response);
+    if (option != 0)
+    {
+        closeFloater();
+        return true;
+    }
 
-	return confirmedStart();
+    return confirmedStart();
 }
 
 // actually start, either after a confirmation or directly depending on the operation
 BOOL LLFloaterScriptQueue::confirmedStart()
-{	
-	std::string buffer;
+{
+    std::string buffer;
 
-	LLStringUtil::format_map_t args;
-	args["[START]"] = mStartString;
-	args["[COUNT]"] = llformat ("%d", mObjectList.size());
-	buffer = getString ("Starting", args);
-	
-	// <FS:Ansariel> Improve log output
-	//getChild<LLScrollListCtrl>("queue output")->addSimpleElement(buffer, ADD_BOTTOM);
-	addStringMessage(buffer);
-	// </FS:Ansariel>
+    LLStringUtil::format_map_t args;
+    args["[START]"] = mStartString;
+    args["[COUNT]"] = llformat ("%d", mObjectList.size());
+    buffer = getString ("Starting", args);
 
-	return startQueue();
+    // <FS:Ansariel> Improve log output
+    //getChild<LLScrollListCtrl>("queue output")->addSimpleElement(buffer, ADD_BOTTOM);
+    addStringMessage(buffer);
+    // </FS:Ansariel>
+
+    return startQueue();
 }
 
 // bring across Ansariel's version that keeps the cursor at the bottom of the scroll list
@@ -342,7 +342,7 @@ void LLFloaterScriptQueue::addStringMessage(const std::string &message)
 
 BOOL LLFloaterScriptQueue::isDone() const
 {
-	return (mCurrentObjectID.isNull() && (mObjectList.size() == 0));
+    return (mCurrentObjectID.isNull() && (mObjectList.size() == 0));
 }
 
 ///----------------------------------------------------------------------------
@@ -351,29 +351,29 @@ BOOL LLFloaterScriptQueue::isDone() const
 LLFloaterCompileQueue::LLFloaterCompileQueue(const LLSD& key)
   : LLFloaterScriptQueue(key)
 {
-	setTitle(LLTrans::getString("CompileQueueTitle"));
-	setStartString(LLTrans::getString("CompileQueueStart"));
-														 															 
+    setTitle(LLTrans::getString("CompileQueueTitle"));
+    setStartString(LLTrans::getString("CompileQueueStart"));
+
 }
 
 LLFloaterCompileQueue::~LLFloaterCompileQueue()
-{ 
+{
 }
 
 void LLFloaterCompileQueue::experienceIdsReceived( const LLSD& content )
 {
-	for(LLSD::array_const_iterator it  = content.beginArray(); it != content.endArray(); ++it)
-	{
-		mExperienceIds.insert(it->asUUID());
-	}
+    for(LLSD::array_const_iterator it  = content.beginArray(); it != content.endArray(); ++it)
+    {
+        mExperienceIds.insert(it->asUUID());
+    }
 }
 
 BOOL LLFloaterCompileQueue::hasExperience( const LLUUID& id ) const
 {
-	return mExperienceIds.find(id) != mExperienceIds.end();
+    return mExperienceIds.find(id) != mExperienceIds.end();
 }
 
-// //Attempt to record this asset ID.  If it can not be inserted into the set 
+// //Attempt to record this asset ID.  If it can not be inserted into the set
 // //then it has already been processed so return false.
 
 void LLFloaterCompileQueue::handleHTTPResponse(std::string pumpName, const LLSD &expresult)
@@ -382,10 +382,10 @@ void LLFloaterCompileQueue::handleHTTPResponse(std::string pumpName, const LLSD 
 }
 
 // *TODO: handleSCriptRetrieval is passed into the cache via a legacy C function pointer
-// future project would be to convert these to C++ callables (std::function<>) so that 
+// future project would be to convert these to C++ callables (std::function<>) so that
 // we can use bind and remove the userData parameter.
-// 
-void LLFloaterCompileQueue::handleScriptRetrieval(const LLUUID& assetId, 
+//
+void LLFloaterCompileQueue::handleScriptRetrieval(const LLUUID& assetId,
     LLAssetType::EType type, void* userData, S32 status, LLExtStat extStatus)
 {
     LLSD result(LLSD::emptyMap());
@@ -394,7 +394,7 @@ void LLFloaterCompileQueue::handleScriptRetrieval(const LLUUID& assetId,
     if (status)
     {
         result["error"] = status;
-     
+
         if (status == LL_ERR_ASSET_REQUEST_NOT_IN_DATABASE)
         {
             result["message"] = LLTrans::getString("CompileQueueProblemDownloading") + (":");
@@ -500,7 +500,7 @@ bool LLFloaterCompileQueue::processScript(LLHandle<LLFloaterCompileQueue> hfloat
             experienceId = result[LLExperienceCache::EXPERIENCE_ID].asUUID();
             if (!floater->hasExperience(experienceId))
             {
-                floater->addProcessingMessage("CompileNoExperiencePerm", 
+                floater->addProcessingMessage("CompileNoExperiencePerm",
                     LLSDMap("SCRIPT", inventory->getName())
                         ("EXPERIENCE", result[LLExperienceCache::NAME].asString()));
                 return true;
@@ -564,14 +564,14 @@ bool LLFloaterCompileQueue::processScript(LLHandle<LLFloaterCompileQueue> hfloat
     std::string url = object->getRegion()->getCapability("UpdateScriptTask");
 
     {
-        LLResourceUploadInfo::ptr_t uploadInfo(new LLQueuedScriptAssetUpload(object->getID(), 
-            inventory->getUUID(), 
-            assetId, 
+        LLResourceUploadInfo::ptr_t uploadInfo(new LLQueuedScriptAssetUpload(object->getID(),
+            inventory->getUUID(),
+            assetId,
             monocompile ? LLScriptAssetUpload::MONO : LLScriptAssetUpload::LSL2,
-            true, 
-            inventory->getName(), 
-            LLUUID(), 
-            experienceId, 
+            true,
+            inventory->getName(),
+            LLUUID(),
+            experienceId,
             boost::bind(&LLFloaterCompileQueue::handleHTTPResponse, pump.getName(), _4)));
 
         LLViewerAssetUpload::EnqueueInventoryUpload(url, uploadInfo);
@@ -648,12 +648,12 @@ bool LLFloaterCompileQueue::startQueue()
 LLFloaterResetQueue::LLFloaterResetQueue(const LLSD& key)
   : LLFloaterScriptQueue(key)
 {
-	setTitle(LLTrans::getString("ResetQueueTitle"));
-	setStartString(LLTrans::getString("ResetQueueStart"));
+    setTitle(LLTrans::getString("ResetQueueTitle"));
+    setStartString(LLTrans::getString("ResetQueueStart"));
 }
 
 LLFloaterResetQueue::~LLFloaterResetQueue()
-{ 
+{
 }
 
 /// This is a utility function to be bound and called from objectScriptProcessingQueueCoro.
@@ -668,7 +668,7 @@ bool LLFloaterResetQueue::resetObjectScripts(LLHandle<LLFloaterScriptQueue> hflo
     std::string buffer;
     buffer = floater->getString("Resetting") + (": ") + inventory->getName();
     floater->addStringMessage(buffer);
-    
+
     LLMessageSystem* msg = gMessageSystem;
     msg->newMessageFast(_PREHASH_ScriptReset);
     msg->nextBlockFast(_PREHASH_AgentData);
@@ -705,12 +705,12 @@ bool LLFloaterResetQueue::startQueue()
 LLFloaterRunQueue::LLFloaterRunQueue(const LLSD& key)
   : LLFloaterScriptQueue(key)
 {
-	setTitle(LLTrans::getString("RunQueueTitle"));
-	setStartString(LLTrans::getString("RunQueueStart"));
+    setTitle(LLTrans::getString("RunQueueTitle"));
+    setStartString(LLTrans::getString("RunQueueStart"));
 }
 
 LLFloaterRunQueue::~LLFloaterRunQueue()
-{ 
+{
 }
 
 /// This is a utility function to be bound and called from objectScriptProcessingQueueCoro.
@@ -762,17 +762,17 @@ bool LLFloaterRunQueue::startQueue()
 LLFloaterNotRunQueue::LLFloaterNotRunQueue(const LLSD& key)
   : LLFloaterScriptQueue(key)
 {
-	setTitle(LLTrans::getString("NotRunQueueTitle"));
-	setStartString(LLTrans::getString("NotRunQueueStart"));
+    setTitle(LLTrans::getString("NotRunQueueTitle"));
+    setStartString(LLTrans::getString("NotRunQueueStart"));
 }
 
 LLFloaterNotRunQueue::~LLFloaterNotRunQueue()
-{ 
+{
 }
 
 /// This is a utility function to be bound and called from objectScriptProcessingQueueCoro.
 /// Do not call directly. It may throw a LLCheckedHandle<>::Stale exception.
-bool LLFloaterNotRunQueue::stopObjectScripts(LLHandle<LLFloaterScriptQueue> hfloater, 
+bool LLFloaterNotRunQueue::stopObjectScripts(LLHandle<LLFloaterScriptQueue> hfloater,
     const LLPointer<LLViewerObject> &object, LLInventoryObject* inventory, LLEventPump &pump)
 {
     LLCheckedHandle<LLFloaterScriptQueue> floater(hfloater);
@@ -818,72 +818,72 @@ bool LLFloaterNotRunQueue::startQueue()
 LLFloaterLocateQueue::LLFloaterLocateQueue(const LLSD& key)
   : LLFloaterScriptQueue(key)
 {
-	setTitle(LLTrans::getString("LocateQueueTitle"));
-	setStartString(LLTrans::getString("LocateQueueStart"));
+    setTitle(LLTrans::getString("LocateQueueTitle"));
+    setStartString(LLTrans::getString("LocateQueueStart"));
 }
 
 LLFloaterLocateQueue::~LLFloaterLocateQueue()
-{ 
+{
 }
 
 // static (passed on by llpreviewscript)
 void LLFloaterLocateQueue::processScriptRunningReply(LLMessageSystem* msg)
 {
-	// KKA-678 We're getting occasional exceptions thrown in the vicinity of this
-	// routine when a script is opened for editing even though compile_queue_floater_handles 
-	// is (should be) empty at the time.
-	// That said, the use of LLCheckedHandle really should have a landing pad
-	// so convert this to a try/catch structure. The overlay paranoid debug
-	// output is there in case the problem somehow still occurs.
-	try
-	{
-		LL_INFOS() << "entry" << LL_ENDL;
-		LLHandle<LLFloaterScriptQueue> hfloater;
-		LLUUID item_id;
-		LLUUID object_id;
-		
-		// KKA-678 add protection for an empty list since this is static
-		// and could get called whilst there are no floaters in existence
-		if (! compile_queue_floater_handles.empty())
-		{
-			LL_INFOS() << "map not empty" << LL_ENDL;
-			msg->getUUIDFast(_PREHASH_Script, _PREHASH_ObjectID, object_id);
-			msg->getUUIDFast(_PREHASH_Script, _PREHASH_ItemID, item_id);
-			
-			CQMAP::iterator it;
-				
-			it = compile_queue_floater_handles.find(object_id.asString());
-			if (it != compile_queue_floater_handles.end())
-			{
-				LL_INFOS() << "matched object id" << LL_ENDL;
-				hfloater=compile_queue_floater_handles[object_id.asString()];
-				LLCheckedHandle<LLFloaterScriptQueue> floater(hfloater);
-				
-				BOOL running;
-				msg->getBOOLFast(_PREHASH_Script, _PREHASH_Running, running);
-				floater->setIsRunning(running);
+    // KKA-678 We're getting occasional exceptions thrown in the vicinity of this
+    // routine when a script is opened for editing even though compile_queue_floater_handles
+    // is (should be) empty at the time.
+    // That said, the use of LLCheckedHandle really should have a landing pad
+    // so convert this to a try/catch structure. The overlay paranoid debug
+    // output is there in case the problem somehow still occurs.
+    try
+    {
+        LL_INFOS() << "entry" << LL_ENDL;
+        LLHandle<LLFloaterScriptQueue> hfloater;
+        LLUUID item_id;
+        LLUUID object_id;
 
-				BOOL mono;
-				msg->getBOOLFast(_PREHASH_Script, "Mono", mono);
-				floater->setIsMono(mono);
+        // KKA-678 add protection for an empty list since this is static
+        // and could get called whilst there are no floaters in existence
+        if (! compile_queue_floater_handles.empty())
+        {
+            LL_INFOS() << "map not empty" << LL_ENDL;
+            msg->getUUIDFast(_PREHASH_Script, _PREHASH_ObjectID, object_id);
+            msg->getUUIDFast(_PREHASH_Script, _PREHASH_ItemID, item_id);
 
-				floater->setWaiting(false);
-				LL_INFOS() << "done object handling" << LL_ENDL;
-			}
-		}
-	}
+            CQMAP::iterator it;
+
+            it = compile_queue_floater_handles.find(object_id.asString());
+            if (it != compile_queue_floater_handles.end())
+            {
+                LL_INFOS() << "matched object id" << LL_ENDL;
+                hfloater=compile_queue_floater_handles[object_id.asString()];
+                LLCheckedHandle<LLFloaterScriptQueue> floater(hfloater);
+
+                BOOL running;
+                msg->getBOOLFast(_PREHASH_Script, _PREHASH_Running, running);
+                floater->setIsRunning(running);
+
+                BOOL mono;
+                msg->getBOOLFast(_PREHASH_Script, "Mono", mono);
+                floater->setIsMono(mono);
+
+                floater->setWaiting(false);
+                LL_INFOS() << "done object handling" << LL_ENDL;
+            }
+        }
+    }
   catch (LLCheckedHandleBase::Stale &)
   {
-      // This is expected.  It means that floater has been closed before 
+      // This is expected.  It means that floater has been closed before
       // processing was completed.
       LL_INFOS() << "LLExeceptionStaleHandle caught in processScriptRunningReply! Floater has most likely been closed." << LL_ENDL;
   }
-	LL_INFOS() << "exit" << LL_ENDL;
+    LL_INFOS() << "exit" << LL_ENDL;
 }
 
 /// This is a utility function to be bound and called from objectScriptProcessingQueueCoro.
 /// Do not call directly. It may throw a LLCheckedHandle<>::Stale exception.
-bool LLFloaterLocateQueue::locateObjectScripts(LLHandle<LLFloaterScriptQueue> hfloater, 
+bool LLFloaterLocateQueue::locateObjectScripts(LLHandle<LLFloaterScriptQueue> hfloater,
     const LLPointer<LLViewerObject> &object, LLInventoryObject* inventory, LLEventPump &pump)
 {
     LLCheckedHandle<LLFloaterScriptQueue> floater(hfloater);
@@ -892,47 +892,47 @@ bool LLFloaterLocateQueue::locateObjectScripts(LLHandle<LLFloaterScriptQueue> hf
 
     if (floater->getFull())
     {
-				LLMessageSystem* msg = gMessageSystem;
-				msg->newMessageFast(_PREHASH_GetScriptRunning);
-				msg->nextBlockFast(_PREHASH_Script);
-				msg->addUUIDFast(_PREHASH_ObjectID, object->getID());
-				msg->addUUIDFast(_PREHASH_ItemID, inventory->getUUID());
-				
-				floater->setWaiting(true);		
-				msg->sendReliable(object->getRegion()->getHost());
-				
-				time_t begin = time(NULL);
-				while (floater->getWaiting() && difftime(time(NULL),begin) < 30) llcoro::suspend();
-				
-				if (floater->getWaiting())
-				{
-						//waiting flag still set, so we timed out
-						floater->setWaiting(false);
+                LLMessageSystem* msg = gMessageSystem;
+                msg->newMessageFast(_PREHASH_GetScriptRunning);
+                msg->nextBlockFast(_PREHASH_Script);
+                msg->addUUIDFast(_PREHASH_ObjectID, object->getID());
+                msg->addUUIDFast(_PREHASH_ItemID, inventory->getUUID());
+
+                floater->setWaiting(true);
+                msg->sendReliable(object->getRegion()->getHost());
+
+                time_t begin = time(NULL);
+                while (floater->getWaiting() && difftime(time(NULL),begin) < 30) llcoro::suspend();
+
+                if (floater->getWaiting())
+                {
+                        //waiting flag still set, so we timed out
+                        floater->setWaiting(false);
 
             LLStringUtil::format_map_t args;
             args["[OBJECT_NAME]"] = inventory->getName();
             // we're borrowing an existing text string here so it doesn't have the usual hyphen prefix
             floater->addStringMessage("- "+floater->getString("Timeout", args));
-				}
-				else
-				{	
+                }
+                else
+                {
             LLStringUtil::format_map_t args;
             args["[STATUS]"] = floater->getString("Status");
-						args["[ITEM]"] = inventory->getName();
-						if (floater->getIsRunning()) args["[RUNNING]"] = floater->getString("StatusRunning");
-						else args["[RUNNING]"] = floater->getString("StatusStopped");
-						if (floater->getIsMono()) args["[MONOLSL]"] = floater->getString("StatusMono");
-						else args["[MONOLSL]"] = floater->getString("StatusLSL");
+                        args["[ITEM]"] = inventory->getName();
+                        if (floater->getIsRunning()) args["[RUNNING]"] = floater->getString("StatusRunning");
+                        else args["[RUNNING]"] = floater->getString("StatusStopped");
+                        if (floater->getIsMono()) args["[MONOLSL]"] = floater->getString("StatusMono");
+                        else args["[MONOLSL]"] = floater->getString("StatusLSL");
             floater->addStringMessage(floater->getString("ItemStatus", args));
-				}
-		}
+                }
+        }
     else
     {
-		    std::string buffer;
-		    buffer = floater->getString("Located") + (": ") + inventory->getName();
-		    floater->addStringMessage(buffer);
-		}
-					
+            std::string buffer;
+            buffer = floater->getString("Located") + (": ") + inventory->getName();
+            floater->addStringMessage(buffer);
+        }
+
     return true;
 }
 
@@ -957,12 +957,12 @@ bool LLFloaterLocateQueue::startQueue()
 LLFloaterDeleteQueue::LLFloaterDeleteQueue(const LLSD& key)
   : LLFloaterScriptQueue(key)
 {
-	setTitle(LLTrans::getString("DeleteQueueTitle"));
-	setStartString(LLTrans::getString("DeleteQueueStart"));
+    setTitle(LLTrans::getString("DeleteQueueTitle"));
+    setStartString(LLTrans::getString("DeleteQueueStart"));
 }
 
 LLFloaterDeleteQueue::~LLFloaterDeleteQueue()
-{ 
+{
 }
 
 /// This is a utility function to be bound and called from objectScriptProcessingQueueCoro.
@@ -975,28 +975,28 @@ bool LLFloaterDeleteQueue::deleteObjectScripts(LLHandle<LLFloaterScriptQueue> hf
     // which is caught in objectScriptProcessingQueueCoro
 
     std::string buffer;
-   	std::string scriptname = inventory->getName();
-   		
-   	if (!floater->getDeleteOnly() || (floater->getDeleteOnly() && floater->getDeleteName() == scriptname))
-   	{
-		    buffer = floater->getString("Deleting") + (": ") + scriptname;
+    std::string scriptname = inventory->getName();
 
-		    LLMessageSystem* msg = gMessageSystem;
-		    msg->newMessageFast(_PREHASH_RemoveTaskInventory);
-		    msg->nextBlockFast(_PREHASH_AgentData);
-		    msg->addUUIDFast(_PREHASH_AgentID, gAgent.getID());
-		    msg->addUUIDFast(_PREHASH_SessionID, gAgent.getSessionID());
-		    msg->nextBlockFast(_PREHASH_InventoryData);
-		    msg->addU32Fast(_PREHASH_LocalID, object->getLocalID());
-		    msg->addUUIDFast(_PREHASH_ItemID, inventory->getUUID());
-		    msg->sendReliable(object->getRegion()->getHost());
-		}
-		else
-		{
-		    buffer = floater->getString("Skipping") + (": ") + scriptname;
-		}
-		floater->addStringMessage(buffer);
-		
+    if (!floater->getDeleteOnly() || (floater->getDeleteOnly() && floater->getDeleteName() == scriptname))
+    {
+            buffer = floater->getString("Deleting") + (": ") + scriptname;
+
+            LLMessageSystem* msg = gMessageSystem;
+            msg->newMessageFast(_PREHASH_RemoveTaskInventory);
+            msg->nextBlockFast(_PREHASH_AgentData);
+            msg->addUUIDFast(_PREHASH_AgentID, gAgent.getID());
+            msg->addUUIDFast(_PREHASH_SessionID, gAgent.getSessionID());
+            msg->nextBlockFast(_PREHASH_InventoryData);
+            msg->addU32Fast(_PREHASH_LocalID, object->getLocalID());
+            msg->addUUIDFast(_PREHASH_ItemID, inventory->getUUID());
+            msg->sendReliable(object->getRegion()->getHost());
+        }
+        else
+        {
+            buffer = floater->getString("Skipping") + (": ") + scriptname;
+        }
+        floater->addStringMessage(buffer);
+
     return true;
 }
 
@@ -1031,8 +1031,8 @@ void LLFloaterScriptQueue::objectScriptProcessingQueueCoro(std::string action, L
     object_data_list_t objectList, fnQueueAction_t func)
 {
     LLCoros::set_consuming(true);
-    LLCheckedHandle<LLFloaterScriptQueue> floater(hfloater);    
-    // Dereferencing floater may fail. If they do they throw LLExeceptionStaleHandle. 
+    LLCheckedHandle<LLFloaterScriptQueue> floater(hfloater);
+    // Dereferencing floater may fail. If they do they throw LLExeceptionStaleHandle.
     // This is expected if the dialog closes.
     LLEventMailDrop        maildrop(QUEUE_EVENTPUMP_NAME, true);
     U32 object_count = 0;
@@ -1045,10 +1045,10 @@ void LLFloaterScriptQueue::objectScriptProcessingQueueCoro(std::string action, L
         for (object_data_list_t::iterator itObj(objectList.begin()); (itObj != objectList.end()); ++itObj)
         {
             bool firstForObject = true;
-            
+
             object_count++;
             this_script_count = 0;
-            
+
             LLUUID object_id = (*itObj).mObjectId;
             compile_queue_floater_handles[object_id.asString()] = hfloater;
             LL_INFOS("SCRIPTQ") << "Next object in queue with ID=" << object_id.asString() << LL_ENDL;
@@ -1064,52 +1064,52 @@ void LLFloaterScriptQueue::objectScriptProcessingQueueCoro(std::string action, L
                 // we don't do our own name lookup here, we rely on it being passed in so we use
                 // slightly different messages if we don't have a name
                 args["[OBJECT_NAME]"] = (*itObj).mObjectName;
-                                    
+
                 // include the link number (link number deriving routine adapated
                 // from FS additions in the edit floater) However if we find it's not a linkset
                 // display the original message instead to reduce visual clutter
-                
+
                 // it appears that the ObjectList we're iterating is reverse ordered in
                 // linkset numbering, but let's not rely on that... don't change the order
                 // to ascending - when performing operations it makes sense to do all the
                 // children before the root since the root is often the main item from a
                 // scripting point of view and it's best to kick that last after operating
                 // on all the subsidiary scripts
-                
-								if (obj && obj->getRootEdit())
-								{
-									LLViewerObject::child_list_t children = obj->getRootEdit()->getChildren();
-									if (children.empty())
-									{
-										// no linked prims so use the original message
-										if ( (*itObj).mObjectName == "" ) floater->addStringMessage(floater->getString("LoadingObjInvNoName", args));
-		                else floater->addStringMessage(floater->getString("LoadingObjInv", args));
-									}
-									else if (obj->getRootEdit() == obj)
-									{
-										// has children but no parent, so it's a root object
-										args["[LINKID]"] = "1";
-										if ( (*itObj).mObjectName == "") floater->addStringMessage(floater->getString("LoadingObjInvLinkNoName", args));
-		                else floater->addStringMessage(floater->getString("LoadingObjInvLink", args));
-									}
-									else
-									{										
-										S32 index = 1;
-										for (LLViewerObject::child_list_t::iterator iter = children.begin(); iter != children.end(); ++iter)
-										{
-											index++;
-											if ((*iter)->getID() == obj->getID())
-											{
-												args["[LINKID]"] = llformat ("%d", index);
-												if ( (*itObj).mObjectName == "") floater->addStringMessage(floater->getString("LoadingObjInvLinkNoName", args));
-				                else floater->addStringMessage(floater->getString("LoadingObjInvLink", args));
-												break;
-											}
-										}
-									}
-								}                
 
-								// no longer displayed, replacement message produced by above code
+                                if (obj && obj->getRootEdit())
+                                {
+                                    LLViewerObject::child_list_t children = obj->getRootEdit()->getChildren();
+                                    if (children.empty())
+                                    {
+                                        // no linked prims so use the original message
+                                        if ( (*itObj).mObjectName == "" ) floater->addStringMessage(floater->getString("LoadingObjInvNoName", args));
+                        else floater->addStringMessage(floater->getString("LoadingObjInv", args));
+                                    }
+                                    else if (obj->getRootEdit() == obj)
+                                    {
+                                        // has children but no parent, so it's a root object
+                                        args["[LINKID]"] = "1";
+                                        if ( (*itObj).mObjectName == "") floater->addStringMessage(floater->getString("LoadingObjInvLinkNoName", args));
+                        else floater->addStringMessage(floater->getString("LoadingObjInvLink", args));
+                                    }
+                                    else
+                                    {
+                                        S32 index = 1;
+                                        for (LLViewerObject::child_list_t::iterator iter = children.begin(); iter != children.end(); ++iter)
+                                        {
+                                            index++;
+                                            if ((*iter)->getID() == obj->getID())
+                                            {
+                                                args["[LINKID]"] = llformat ("%d", index);
+                                                if ( (*itObj).mObjectName == "") floater->addStringMessage(floater->getString("LoadingObjInvLinkNoName", args));
+                                else floater->addStringMessage(floater->getString("LoadingObjInvLink", args));
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // no longer displayed, replacement message produced by above code
                 //LLStringUtil::format_map_t args;
                 //args["[OBJECT_NAME]"] = (*itObj).mObjectName;
                 //floater->addStringMessage(floater->getString("LoadingObjInv", args));
@@ -1138,7 +1138,7 @@ void LLFloaterScriptQueue::objectScriptProcessingQueueCoro(std::string action, L
                 continue;
             }
 
-						// Chorazin: Warning - the commented code below causes a crash, so that'll be why it's commented...
+                        // Chorazin: Warning - the commented code below causes a crash, so that'll be why it's commented...
             // TODO: Get the name of the object we are looking at here so that we can display it below.
             //std::string objName = (dynamic_cast<LLInventoryObject *>(obj.get()))->getName();
             LL_DEBUGS("SCRIPTQ") << "Object has " << inventory.size() << " items." << LL_ENDL;
@@ -1148,13 +1148,13 @@ void LLFloaterScriptQueue::objectScriptProcessingQueueCoro(std::string action, L
             {
                 floater.check();
 
-                // note, we have a smart pointer to the obj above... but if we didn't we'd check that 
+                // note, we have a smart pointer to the obj above... but if we didn't we'd check that
                 // it still exists here.
 
                 if (((*itInv)->getType() == LLAssetType::AT_LSL_TEXT))
                 {
-		                this_script_count++;
-		                object_script_count++;
+                        this_script_count++;
+                        object_script_count++;
 
                     LL_DEBUGS("SCRIPTQ") << "Inventory item " << (*itInv)->getUUID().asString() << "\"" << (*itInv)->getName() << "\"" << LL_ENDL;
                     if (firstForObject)
@@ -1177,18 +1177,18 @@ void LLFloaterScriptQueue::objectScriptProcessingQueueCoro(std::string action, L
             // only emit if this item had any scripts to save display clutter
             if (this_script_count)
             {
-			        LLStringUtil::format_map_t args;
-			        args["[THIS]"] = llformat ("%d", this_script_count);
-			        args["[TOTAL]"] = llformat ("%d", object_script_count);
-			        std::string buffer = floater->getString("KokuaExtDoneOne", args);
-			        floater->addStringMessage(buffer);
-			      }
+                    LLStringUtil::format_map_t args;
+                    args["[THIS]"] = llformat ("%d", this_script_count);
+                    args["[TOTAL]"] = llformat ("%d", object_script_count);
+                    std::string buffer = floater->getString("KokuaExtDoneOne", args);
+                    floater->addStringMessage(buffer);
+                  }
         }
 
-				// replaced by more detailed output below
+                // replaced by more detailed output below
         //floater->addStringMessage("Done");
-		    LLStringUtil::format_map_t args;
-		    std::string buffer;
+            LLStringUtil::format_map_t args;
+            std::string buffer;
 
         args["[COUNT]"] = llformat ("%d", object_count);
         args["[TOTAL]"] = llformat ("%d", object_script_count);
@@ -1197,18 +1197,18 @@ void LLFloaterScriptQueue::objectScriptProcessingQueueCoro(std::string action, L
 
         if (floater->getFull())
         {
-		        args["[LSLTOTAL]"] = llformat ("%d", floater->getLSLCount());
-		        args["[MONOTOTAL]"] = llformat ("%d", floater->getMonoCount());
-		        args["[RUNNINGTOTAL]"] = llformat ("%d", floater->getRunningCount());
-		        buffer = floater->getString("KokuaExtFullDone", args);
-		        floater->addStringMessage(buffer);
-		    }
-            
+                args["[LSLTOTAL]"] = llformat ("%d", floater->getLSLCount());
+                args["[MONOTOTAL]"] = llformat ("%d", floater->getMonoCount());
+                args["[RUNNINGTOTAL]"] = llformat ("%d", floater->getRunningCount());
+                buffer = floater->getString("KokuaExtFullDone", args);
+                floater->addStringMessage(buffer);
+            }
+
         floater->getChildView("close")->setEnabled(TRUE);
     }
     catch (LLCheckedHandleBase::Stale &)
     {
-        // This is expected.  It means that floater has been closed before 
+        // This is expected.  It means that floater has been closed before
         // processing was completed.
         LL_INFOS("SCRIPTQ") << "LLExeceptionStaleHandle caught! Floater has most likely been closed." << LL_ENDL;
     }

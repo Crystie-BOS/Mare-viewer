@@ -1,4 +1,4 @@
-/** 
+/**
  * @file llpanelmaininventory.h
  * @brief llpanelmaininventory.h
  * class definition
@@ -6,21 +6,21 @@
  * $LicenseInfo:firstyear=2001&license=viewerlgpl$
  * Second Life Viewer Source Code
  * Copyright (C) 2010, Linden Research, Inc.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation;
  * version 2.1 of the License only.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- * 
+ *
  * Linden Research, Inc., 945 Battery Street, San Francisco, CA  94111  USA
  * $/LicenseInfo$
  */
@@ -61,12 +61,12 @@ class LLFloaterSidePanelContainer;
 class LLPanelMainInventory : public LLPanel, LLInventoryObserver
 {
 public:
-	friend class LLFloaterInventoryFinder;
+    friend class LLFloaterInventoryFinder;
 
-	LLPanelMainInventory(const LLPanel::Params& p = getDefaultParams());
-	~LLPanelMainInventory();
+    LLPanelMainInventory(const LLPanel::Params& p = getDefaultParams());
+    ~LLPanelMainInventory();
 
-	BOOL postBuild();
+    BOOL postBuild();
 
     enum EViewModeType
     {
@@ -75,43 +75,43 @@ public:
         MODE_COMBINATION
     };
 
-	virtual BOOL handleKeyHere(KEY key, MASK mask);
+    virtual BOOL handleKeyHere(KEY key, MASK mask);
 
-	// Inherited functionality
-	/*virtual*/ BOOL handleDragAndDrop(S32 x, S32 y, MASK mask, BOOL drop,
-									   EDragAndDropType cargo_type,
-									   void* cargo_data,
-									   EAcceptance* accept,
-									   std::string& tooltip_msg);
-	/*virtual*/ void changed(U32);
-	/*virtual*/ void draw();
-	/*virtual*/ void 	onVisibilityChange ( BOOL new_visibility );
+    // Inherited functionality
+    /*virtual*/ BOOL handleDragAndDrop(S32 x, S32 y, MASK mask, BOOL drop,
+                                       EDragAndDropType cargo_type,
+                                       void* cargo_data,
+                                       EAcceptance* accept,
+                                       std::string& tooltip_msg);
+    /*virtual*/ void changed(U32);
+    /*virtual*/ void draw();
+    /*virtual*/ void    onVisibilityChange ( BOOL new_visibility );
 
-	LLInventoryPanel* getPanel() { return mActivePanel; }
-	LLInventoryPanel* getActivePanel() { return mActivePanel; }
-	LLInventoryPanel* getAllItemsPanel();
-	void selectAllItemsPanel();
-	const LLInventoryPanel* getActivePanel() const { return mActivePanel; }
+    LLInventoryPanel* getPanel() { return mActivePanel; }
+    LLInventoryPanel* getActivePanel() { return mActivePanel; }
+    LLInventoryPanel* getAllItemsPanel();
+    void selectAllItemsPanel();
+    const LLInventoryPanel* getActivePanel() const { return mActivePanel; }
     void setActivePanel();
-	void resetFilters();
+    void resetFilters();
 
-	bool isRecentItemsPanelSelected();
+    bool isRecentItemsPanelSelected();
 
-	const std::string& getFilterText() const { return mFilterText; }
-	
-	void setSelectCallback(const LLFolderView::signal_t::slot_type& cb);
+    const std::string& getFilterText() const { return mFilterText; }
 
-	void onFilterEdit(const std::string& search_string );
+    void setSelectCallback(const LLFolderView::signal_t::slot_type& cb);
+
+    void onFilterEdit(const std::string& search_string );
 // [SL:KB] - Patch: Inventory-UserProtectedFolders | Checked: Catznip-5.2
-	void onChangeUserProtectedFolders();
+    void onChangeUserProtectedFolders();
 // [/SL:KB]
 
-	void setFocusFilterEditor();
+    void setFocusFilterEditor();
 
-	static LLFloaterSidePanelContainer* newWindow();
+    static LLFloaterSidePanelContainer* newWindow();
     static void newFolderWindow(LLUUID folder_id = LLUUID(), LLUUID item_to_select = LLUUID());
 
-	void toggleFindOptions();
+    void toggleFindOptions();
 
     //void resetFilters();
     void resetAllItemsFilters();
@@ -141,68 +141,68 @@ public:
     std::string getLocalizedRootName();
 
     LLInventoryFilter& getCurrentFilter();
-	bool isActionVisible(const LLSD& userdata);
+    bool isActionVisible(const LLSD& userdata);
 
 protected:
-	//
-	// Misc functions
-	//
-	void setFilterTextFromFilter();
-	void startSearch();
-	
-	void onSelectionChange(LLInventoryPanel *panel, const std::deque<LLFolderViewItem*>& items, BOOL user_action);
+    //
+    // Misc functions
+    //
+    void setFilterTextFromFilter();
+    void startSearch();
 
-	static BOOL filtersVisible(void* user_data);
-	void onClearSearch();
-	static void onFoldersByName(void *user_data);
-	static BOOL checkFoldersByName(void *user_data);
-	
-	static BOOL incrementalFind(LLFolderViewItem* first_item, const char *find_text, BOOL backward);
-	void onFilterSelected();
+    void onSelectionChange(LLInventoryPanel *panel, const std::deque<LLFolderViewItem*>& items, BOOL user_action);
 
-	const std::string getFilterSubString();
-	void setFilterSubString(const std::string& string);
+    static BOOL filtersVisible(void* user_data);
+    void onClearSearch();
+    static void onFoldersByName(void *user_data);
+    static BOOL checkFoldersByName(void *user_data);
 
-	void updateWornItemsPanel();
+    static BOOL incrementalFind(LLFolderViewItem* first_item, const char *find_text, BOOL backward);
+    void onFilterSelected();
 
-	// menu callbacks
-	void doToSelected(const LLSD& userdata);
-	void closeAllFolders();
-	void doCreate(const LLSD& userdata);
-	void setSortBy(const LLSD& userdata);
-	void saveTexture(const LLSD& userdata);
-	bool isSaveTextureEnabled(const LLSD& userdata);
-	void updateItemcountText();
+    const std::string getFilterSubString();
+    void setFilterSubString(const std::string& string);
+
+    void updateWornItemsPanel();
+
+    // menu callbacks
+    void doToSelected(const LLSD& userdata);
+    void closeAllFolders();
+    void doCreate(const LLSD& userdata);
+    void setSortBy(const LLSD& userdata);
+    void saveTexture(const LLSD& userdata);
+    bool isSaveTextureEnabled(const LLSD& userdata);
+    void updateItemcountText();
 
     void updatePanelVisibility();
     void updateCombinationVisibility();
 
-	void onFocusReceived();
-	void onSelectSearchType();
-	void updateSearchTypeCombo();
+    void onFocusReceived();
+    void onSelectSearchType();
+    void updateSearchTypeCombo();
     void setSearchType(LLInventoryFilter::ESearchType type);
 
     LLSidepanelInventory* getParentSidepanelInventory();
 
 private:
-	LLFloaterInventoryFinder* getFinder();
+    LLFloaterInventoryFinder* getFinder();
 
-	LLFilterEditor*				mFilterEditor;
-	LLTabContainer*				mFilterTabs;
+    LLFilterEditor*             mFilterEditor;
+    LLTabContainer*             mFilterTabs;
     LLUICtrl*                   mCounterCtrl;
-	LLHandle<LLFloater>			mFinderHandle;
-	LLInventoryPanel*			mActivePanel;
-	LLInventoryPanel*			mWornItemsPanel;
-	bool						mResortActivePanel;
-	LLSaveFolderState*			mSavedFolderState;
-	std::string					mFilterText;
-	std::string					mFilterSubString;
-	S32							mItemCount;
-	std::string 				mItemCountString;
-	S32							mCategoryCount;
-	std::string					mCategoryCountString;
-	LLComboBox*					mSearchTypeCombo;
-	LLFrameTimer				mUpdateWornTimer;
+    LLHandle<LLFloater>         mFinderHandle;
+    LLInventoryPanel*           mActivePanel;
+    LLInventoryPanel*           mWornItemsPanel;
+    bool                        mResortActivePanel;
+    LLSaveFolderState*          mSavedFolderState;
+    std::string                 mFilterText;
+    std::string                 mFilterSubString;
+    S32                         mItemCount;
+    std::string                 mItemCountString;
+    S32                         mCategoryCount;
+    std::string                 mCategoryCountString;
+    LLComboBox*                 mSearchTypeCombo;
+    LLFrameTimer                mUpdateWornTimer;
 
     LLButton* mBackBtn;
     LLButton* mForwardBtn;
@@ -225,64 +225,64 @@ private:
     boost::signals2::connection mListViewRootUpdatedConnection;
     boost::signals2::connection mGalleryRootUpdatedConnection;
 
-	//////////////////////////////////////////////////////////////////////////////////
-	// List Commands                                                                //
+    //////////////////////////////////////////////////////////////////////////////////
+    // List Commands                                                                //
 protected:
-	void initListCommandsHandlers();
-	void updateListCommands();
-	void onAddButtonClick();
-	void showActionMenu(LLMenuGL* menu, std::string spawning_view_name);
-	void onTrashButtonClick();
-	void onClipboardAction(const LLSD& userdata);
-	BOOL isActionEnabled(const LLSD& command_name);
-	BOOL isActionChecked(const LLSD& userdata);
-	void onCustomAction(const LLSD& command_name);
+    void initListCommandsHandlers();
+    void updateListCommands();
+    void onAddButtonClick();
+    void showActionMenu(LLMenuGL* menu, std::string spawning_view_name);
+    void onTrashButtonClick();
+    void onClipboardAction(const LLSD& userdata);
+    BOOL isActionEnabled(const LLSD& command_name);
+    BOOL isActionChecked(const LLSD& userdata);
+    void onCustomAction(const LLSD& command_name);
 
-	// ## Zi: Filter Links Menu
-	BOOL isFilterLinksChecked(const LLSD& userdata);
-	void onFilterLinksChecked(const LLSD& userdata);
-	// ## Zi: Filter Links Menu
+    // ## Zi: Filter Links Menu
+    BOOL isFilterLinksChecked(const LLSD& userdata);
+    void onFilterLinksChecked(const LLSD& userdata);
+    // ## Zi: Filter Links Menu
 
-	// ## Zi: Extended Inventory Search
-	BOOL isSearchTargetChecked(const LLSD& userdata);
-	void onSearchTargetChecked(const LLSD& userdata);
-	LLInventoryFilter::EFilterSubstringTarget getSearchTarget() const;
-	// ## Zi: Extended Inventory Search
+    // ## Zi: Extended Inventory Search
+    BOOL isSearchTargetChecked(const LLSD& userdata);
+    void onSearchTargetChecked(const LLSD& userdata);
+    LLInventoryFilter::EFilterSubstringTarget getSearchTarget() const;
+    // ## Zi: Extended Inventory Search
 
-	bool handleDragAndDropToTrash(BOOL drop, EDragAndDropType cargo_type, EAcceptance* accept);
+    bool handleDragAndDropToTrash(BOOL drop, EDragAndDropType cargo_type, EAcceptance* accept);
     static bool hasSettingsInventory();
     static bool hasMaterialsInventory();
     void updateTitle();
     void updateNavButtons();
-    
+
     void onCombinationRootChanged(bool gallery_clicked);
     void onCombinationGallerySelectionChanged(const LLUUID& category_id);
     void onCombinationInventorySelectionChanged(const std::deque<LLFolderViewItem*>& items, BOOL user_action);
-	/**
-	 * Set upload cost in "Upload" sub menu.
-	 */
-	void setUploadCostIfNeeded();
+    /**
+     * Set upload cost in "Upload" sub menu.
+     */
+    void setUploadCostIfNeeded();
     void disableAddIfNeeded();
 private:
-	LLDragAndDropButton*		mTrashButton;
-	LLToggleableMenu*			mMenuGearDefault;
+    LLDragAndDropButton*        mTrashButton;
+    LLToggleableMenu*           mMenuGearDefault;
     LLToggleableMenu*           mMenuViewDefault;
-	LLToggleableMenu*			mMenuVisibility;
-	LLMenuButton*				mGearMenuButton;
+    LLToggleableMenu*           mMenuVisibility;
+    LLMenuButton*               mGearMenuButton;
     LLMenuButton*               mViewMenuButton;
-	LLMenuButton*				mVisibilityMenuButton;
-	LLHandle<LLView>			mMenuAddHandle;
+    LLMenuButton*               mVisibilityMenuButton;
+    LLHandle<LLView>            mMenuAddHandle;
 // [SL:KB] - Patch: Inventory-UserProtectedFolders | Checked: Catznip-5.2
-	boost::signals2::scoped_connection m_UserProtectedFoldersConn;
+    boost::signals2::scoped_connection m_UserProtectedFoldersConn;
 // [/SL:KB]
 
-	bool						mNeedUploadCost;
+    bool                        mNeedUploadCost;
 
     bool                        mForceShowInvLayout;
     bool                        mReshapeInvLayout;
     LLUUID                      mCombInvUUIDNeedsRename;
-	// List Commands                                                              //
-	////////////////////////////////////////////////////////////////////////////////
+    // List Commands                                                              //
+    ////////////////////////////////////////////////////////////////////////////////
 };
 
 #endif // LL_LLPANELMAININVENTORY_H

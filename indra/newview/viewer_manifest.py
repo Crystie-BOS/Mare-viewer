@@ -61,7 +61,7 @@ class ViewerManifest(LLManifest):
         # files during the build (see copy_w_viewer_manifest
         # and copy_l_viewer_manifest targets)
         return 'package' in self.args['actions']
-    
+
     def construct(self):
         super(ViewerManifest, self).construct()
         self.path(src="../../scripts/messages/message_template.msg", dst="app_settings/message_template.msg")
@@ -94,7 +94,7 @@ class ViewerManifest(LLManifest):
 
                 # ... and the entire image filters directory
                 self.path("filters")
-            
+
                 # ... and the included spell checking dictionaries
                 pkgdir = os.path.join(self.args['build'], os.pardir, 'packages')
                 with self.prefix(src=pkgdir):
@@ -268,14 +268,14 @@ class ViewerManifest(LLManifest):
 
     def app_name_oneword(self):
         return ''.join(self.app_name().split())
-    
+
     def icon_path(self):
         return "icons/" + self.channel_type()
 
     def extract_names(self,src):
         """Extract contributor names from source file, returns string"""
         try:
-            with open(src, 'r') as contrib_file: 
+            with open(src, 'r') as contrib_file:
                 lines = contrib_file.readlines()
         except IOError:
             print("Failed to open '%s'" % src)
@@ -482,7 +482,7 @@ class WindowsManifest(ViewerManifest):
                 raise Exception("Directories are not supported by test_CRT_and_copy_action()")
         else:
             print("Doesn't exist:", src)
-        
+
     def construct(self):
         super(WindowsManifest, self).construct()
 
@@ -512,7 +512,7 @@ class WindowsManifest(ViewerManifest):
         self.path2basename(os.path.join(os.pardir,
                                         'llplugin', 'slplugin', self.args['configuration']),
                            "slplugin.exe")
-        
+
         # Get shared libs from the shared libs staging directory
         with self.prefix(src=os.path.join(self.args['build'], os.pardir,
                                           'sharedlibs', self.args['buildtype'])):
@@ -547,7 +547,7 @@ class WindowsManifest(ViewerManifest):
             # Vivox libraries
             self.path("vivoxsdk_x64.dll")
             self.path("ortp_x64.dll")
-            
+
             # OpenSSL
             self.path("libcrypto-1_1-x64.dll")
             self.path("libssl-1_1-x64.dll")
@@ -675,7 +675,7 @@ class WindowsManifest(ViewerManifest):
                 self.path("plugins/")
 
         if not self.is_packaging_viewer():
-            self.package_file = "copied_deps"    
+            self.package_file = "copied_deps"
 
     def nsi_file_commands(self, install=True):
         def wpath(path):
@@ -735,7 +735,7 @@ class WindowsManifest(ViewerManifest):
 
         installer_file = self.installer_base_name() + '_Setup.exe'
         substitution_strings['installer_file'] = installer_file
-        
+
         version_vars = """
         !define INSTEXE "%(final_exe)s"
         !define VERSION "%(version_short)s"
@@ -744,7 +744,7 @@ class WindowsManifest(ViewerManifest):
         !define VERSION_REGISTRY "%(version_registry)s"
         !define VIEWER_EXE "%(final_exe)s"
         """ % substitution_strings
-        
+
         if self.channel_type() == 'release':
             substitution_strings['caption'] = CHANNEL_VENDOR_BASE
         else:
@@ -782,11 +782,11 @@ class WindowsManifest(ViewerManifest):
         # Unlike the viewer binary, the VMP filenames are invariant with respect to version, os, etc.
         for exe in (
             self.final_exe(),
-            
+
             "llplugin/dullahan_host.exe",
             ):
             self.sign(exe)
-            
+
         # Check two paths, one for Program Files, and one for Program Files (x86).
         # Yay 64bit windows.
         nsis_path = "makensis.exe"
@@ -911,7 +911,7 @@ class DarwinManifest(ViewerManifest):
                 # yields a slightly smaller binary but makes crash
                 # logs mostly useless. This may be desirable for the
                 # final release. Or not.
-                if ("package" in self.args['actions'] or 
+                if ("package" in self.args['actions'] or
                     "unpacked" in self.args['actions']):
                     self.run_command(
                         ['strip', '-S', executable])
@@ -936,7 +936,7 @@ class DarwinManifest(ViewerManifest):
 
                 with self.prefix(src=relpkgdir, dst=""):
                     self.path("libndofdev.dylib")
-                    self.path("libhunspell-*.dylib")   
+                    self.path("libhunspell-*.dylib")
 
                 with self.prefix(src_dst="cursors_mac"):
                     self.path("*.tif")
@@ -1190,7 +1190,7 @@ class DarwinManifest(ViewerManifest):
             hdi_output = subprocess.check_output(['hdiutil', 'attach', '-private', sparsename], text=True)
         except subprocess.CalledProcessError as err:
             sys.exit("failed to mount image at '%s'" % sparsename)
-            
+
         try:
             devfile = re.search("/dev/disk([0-9]+)[^s]", hdi_output).group(0).strip()
             volpath = re.search('HFS\s+(.+)', hdi_output).group(1).strip()
@@ -1235,8 +1235,8 @@ class DarwinManifest(ViewerManifest):
             # Set the disk image root's custom icon bit
             self.run_command(['SetFile', '-a', 'C', volpath])
 
-            # Sign the app if requested; 
-            # do this in the copy that's in the .dmg so that the extended attributes used by 
+            # Sign the app if requested;
+            # do this in the copy that's in the .dmg so that the extended attributes used by
             # the signature are preserved; moving the files using python will leave them behind
             # and invalidate the signatures.
             if 'signature' in self.args:
@@ -1333,7 +1333,7 @@ class DarwinManifest(ViewerManifest):
                     self.run_command([self.src_path_of("installers/darwin/apple-notarize.sh"), app_in_dmg])
 
         finally:
-            # Unmount the image even if exceptions from any of the above 
+            # Unmount the image even if exceptions from any of the above
             self.run_command(['hdiutil', 'detach', '-force', devfile])
 
         print("Converting temp disk image to final disk image")
@@ -1390,7 +1390,7 @@ class LinuxManifest(ViewerManifest):
         with self.prefix(src="", dst="bin"):
             self.path("kokua-bin","do-not-directly-run-kokua-bin")
             self.path2basename("../llplugin/slplugin", "SLPlugin")
- 
+
         # recurses, packaged again
         self.path("res-sdl")
 
@@ -1410,11 +1410,11 @@ class LinuxManifest(ViewerManifest):
         # CEF runtime files - not debug (release, relwithdebinfo etc.)
 
         config = 'debug' if self.args['configuration'].lower() == 'debug' else 'release'
- 
+
         with self.prefix(src=os.path.join(pkgdir, 'lib', config), dst="lib"):
             self.path( "libcef.so" )
             self.path( "libminigbm.so" )
-            
+
 #        with self.prefix(src=os.path.join(pkgdir, 'lib', config, 'swiftshader'), dst=os.path.join("bin", "swiftshader") ):
 #            self.path( "*.so" )
 #        with self.prefix(src=os.path.join(pkgdir, 'lib', config, 'swiftshader'), dst=os.path.join("lib", "swiftshader") ):
@@ -1569,31 +1569,31 @@ class Linux_x86_64_Manifest(LinuxManifest):
         pkgdir = os.path.join(self.args['build'], os.pardir, 'packages')
         relpkgdir = os.path.join(pkgdir, "lib", "release")
         debpkgdir = os.path.join(pkgdir, "lib", "debug")
- 
+
        # support file for valgrind debug tool
         self.path("secondlife-i686.supp")
 
         # Arch does not package libpng12 a dependency of Kokua's gtk+ libraries
         #if self.prefix("/lib/x86_64-linux-gnu", dst="lib"):
         #    self.path("libpng12.so.0*")
-        #    self.end_prefix("lib") 
+        #    self.end_prefix("lib")
 
         with self.prefix(src=relpkgdir, dst="lib"):
             if self.args['fmodstudio'] == 'ON':
-	              if self.args['configuration'].lower() == 'debug':
-	                  self.path("libfmodstudio*.so")
-	                  self.path("libfmodstudio.so")
-	                  self.path("libfmodstudio.so*")
-	                  self.path("libfmod*.so")
-	                  self.path("libfmod.so")
-	                  self.path("libfmod.so*")
-	              else:
-	                  self.path("libfmodstudio*.so")
-	                  self.path("libfmodstudio.so")
-	                  self.path("libfmodstudio.so*")
-	                  self.path("libfmod*.so")
-	                  self.path("libfmod.so")
-	                  self.path("libfmod.so*")
+                  if self.args['configuration'].lower() == 'debug':
+                      self.path("libfmodstudio*.so")
+                      self.path("libfmodstudio.so")
+                      self.path("libfmodstudio.so*")
+                      self.path("libfmod*.so")
+                      self.path("libfmod.so")
+                      self.path("libfmod.so*")
+                  else:
+                      self.path("libfmodstudio*.so")
+                      self.path("libfmodstudio.so")
+                      self.path("libfmodstudio.so*")
+                      self.path("libfmod*.so")
+                      self.path("libfmod.so")
+                      self.path("libfmod.so*")
 
             self.path("libapr-1.so*")
             self.path("libaprutil-1.so*")
@@ -1629,7 +1629,7 @@ class Linux_x86_64_Manifest(LinuxManifest):
                     self.path("libsndfile.so.1")
                     self.path("libvivoxsdk.so")
                     self.path("libvivoxplatform.so")
-                    self.path("libvivoxoal.so.1") # vivox's sdk expects this soname 
+                    self.path("libvivoxoal.so.1") # vivox's sdk expects this soname
 
             # 32bit libs needed for voice
             with self.prefix(os.path.join(relpkgdir, "32bit-compat" ), dst="lib32"):

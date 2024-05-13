@@ -6,8 +6,8 @@ if (NOT DEFINED VIEWER_SHORT_VERSION) # will be true in indra/, false in indra/n
     set(VIEWER_GIT_REPO_PRESENCE "${CMAKE_CURRENT_SOURCE_DIR}/../.git")
 
     if ( EXISTS $ENV{AUTOBUILD_VARIABLES_FILE} )
-    		string(REPLACE "/variables" "" VIEWER_VARIABLES_FILE_LOCATION $ENV{AUTOBUILD_VARIABLES_FILE})
-		    set(VIEWER_VARIABLES_GIT_REPO_PRESENCE "${VIEWER_VARIABLES_FILE_LOCATION}/.git")
+            string(REPLACE "/variables" "" VIEWER_VARIABLES_FILE_LOCATION $ENV{AUTOBUILD_VARIABLES_FILE})
+            set(VIEWER_VARIABLES_GIT_REPO_PRESENCE "${VIEWER_VARIABLES_FILE_LOCATION}/.git")
 
         if ( EXISTS ${VIEWER_VARIABLES_GIT_REPO_PRESENCE} )
           find_program(GIT git)
@@ -31,11 +31,11 @@ if (NOT DEFINED VIEWER_SHORT_VERSION) # will be true in indra/, false in indra/n
                 message(SEND_ERROR "Getting Variables revision count failed with output:\n${git_rc_error}")
               else (NOT ${git_rc_result} EQUAL 0)
                 message(STATUS "Variables revision (from git) ${VIEWER_VARIABLES_VERSION_REVISION} on branch ${GIT_CURRENT_VARIABLES_BRANCH}")
-              endif (NOT ${git_rc_result} EQUAL 0)            
+              endif (NOT ${git_rc_result} EQUAL 0)
             endif (NOT ${git_cb_result} EQUAL 0)
          endif (GIT)
-			endif ( EXISTS ${VIEWER_VARIABLES_GIT_REPO_PRESENCE} )
-		endif ( EXISTS $ENV{AUTOBUILD_VARIABLES_FILE} )
+            endif ( EXISTS ${VIEWER_VARIABLES_GIT_REPO_PRESENCE} )
+        endif ( EXISTS $ENV{AUTOBUILD_VARIABLES_FILE} )
 
     if ( EXISTS ${VIEWER_VERSION_BASE_FILE} )
         file(STRINGS ${VIEWER_VERSION_BASE_FILE} VIEWER_SHORT_VERSION REGEX "^[0-9]+\\.[0-9]+\\.[0-9]+")
@@ -51,7 +51,7 @@ if (NOT DEFINED VIEWER_SHORT_VERSION) # will be true in indra/, false in indra/n
         #elseif (DEFINED ENV{AUTOBUILD_BUILD_ID})
         #   set(VIEWER_VERSION_REVISION $ENV{AUTOBUILD_BUILD_ID})
         #   message(STATUS "Revision (from autobuild environment): ${VIEWER_VERSION_REVISION}")
-        
+
         # if this is a git repo we count the commits to the branch tip
         elseif ( EXISTS ${VIEWER_GIT_REPO_PRESENCE} )
           find_program(GIT git)
@@ -75,18 +75,18 @@ if (NOT DEFINED VIEWER_SHORT_VERSION) # will be true in indra/, false in indra/n
                 message(SEND_ERROR "Getting revision count failed with output:\n${git_rc_error}")
               else (NOT ${git_rc_result} EQUAL 0)
                 message(STATUS "Viewer revision (from git) ${VIEWER_VERSION_REVISION} on branch ${GIT_CURRENT_BRANCH}")
-              endif (NOT ${git_rc_result} EQUAL 0)            
+              endif (NOT ${git_rc_result} EQUAL 0)
             endif (NOT ${git_cb_result} EQUAL 0)
           else (GIT)
             if (DEFINED ENV{AUTOBUILD_BUILD_ID})
-	             set(VIEWER_VERSION_REVISION $ENV{AUTOBUILD_BUILD_ID})
-	             message(STATUS "Viewer revision (from autobuild environment under git (git executable not found)): ${VIEWER_VERSION_REVISION}")
+                 set(VIEWER_VERSION_REVISION $ENV{AUTOBUILD_BUILD_ID})
+                 message(STATUS "Viewer revision (from autobuild environment under git (git executable not found)): ${VIEWER_VERSION_REVISION}")
             endif (DEFINED ENV{AUTOBUILD_BUILD_ID})
          endif (GIT)
         endif (DEFINED ENV{revision})
         message(STATUS "Building '${VIEWER_CHANNEL}' Version ${VIEWER_SHORT_VERSION}.${VIEWER_VERSION_REVISION}")
     else ( EXISTS ${VIEWER_VERSION_BASE_FILE} )
-        message(SEND_ERROR "Cannot get viewer version from '${VIEWER_VERSION_BASE_FILE}'") 
+        message(SEND_ERROR "Cannot get viewer version from '${VIEWER_VERSION_BASE_FILE}'")
     endif ( EXISTS ${VIEWER_VERSION_BASE_FILE} )
 
     if ("${VIEWER_VERSION_REVISION}" STREQUAL "")
