@@ -87,7 +87,7 @@ if (WINDOWS)
   if( ADDRESS_SIZE EQUAL 32 )
     add_compile_options( /arch:SSE2 )
   endif()
-     
+
   # Are we using the crummy Visual Studio KDU build workaround?
   if (NOT VS_DISABLE_FATAL_WARNINGS)
     add_compile_options(/WX)
@@ -120,7 +120,7 @@ if (LINUX)
   add_compile_definitions(
           _REENTRANT
           _FORTIFY_SOURCE=2
-	  #EXTERNAL_TOS
+      #EXTERNAL_TOS
           APPID=kokua
           LL_IGNORE_SIGCHLD
   )

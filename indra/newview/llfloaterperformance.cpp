@@ -1,24 +1,24 @@
-/** 
+/**
  * @file llfloaterperformance.cpp
  *
  * $LicenseInfo:firstyear=2021&license=viewerlgpl$
  * Second Life Viewer Source Code
  * Copyright (C) 2021, Linden Research, Inc.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation;
  * version 2.1 of the License only.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- * 
+ *
  * Linden Research, Inc., 945 Battery Street, San Francisco, CA  94111  USA
  * $/LicenseInfo$
  */
@@ -71,11 +71,11 @@ protected:
 //        LLUICtrl::EnableCallbackRegistry::ScopedRegistrar enable_registrar;
 //        registrar.add("Settings.SetRendering", boost::bind(&LLFloaterPerformance::onCustomAction, mFloaterPerformance, _2, mUUIDs.front()));
 //        enable_registrar.add("Settings.IsSelected", boost::bind(&LLFloaterPerformance::isActionChecked, mFloaterPerformance, _2, mUUIDs.front()));
-				LLUICtrl::CommitCallbackRegistry::ScopedRegistrar registrar;
-				registrar.add("Rendering.SetException", boost::bind(&LLFloaterPerformance::onSetException, mFloaterPerformance, mUUIDs.front(), _2));
+                LLUICtrl::CommitCallbackRegistry::ScopedRegistrar registrar;
+                registrar.add("Rendering.SetException", boost::bind(&LLFloaterPerformance::onSetException, mFloaterPerformance, mUUIDs.front(), _2));
 
-				LLUICtrl::EnableCallbackRegistry::ScopedRegistrar enable_registrar;
-				enable_registrar.add("Rendering.HasException", boost::bind(&LLFloaterPerformance::onHasException, mFloaterPerformance, mUUIDs.front(), _2));
+                LLUICtrl::EnableCallbackRegistry::ScopedRegistrar enable_registrar;
+                enable_registrar.add("Rendering.HasException", boost::bind(&LLFloaterPerformance::onHasException, mFloaterPerformance, mUUIDs.front(), _2));
         LLContextMenu* menu = createFromFile("menu_avatar_rendering_settings.xml");
 
         return menu;
@@ -193,7 +193,7 @@ void LLFloaterPerformance::draw()
 {
     enableAutotuneWarning();
 
-    if (mUpdateTimer->hasExpired() && 
+    if (mUpdateTimer->hasExpired() &&
         !LLFloaterReg::instanceVisible("save_pref_preset", PRESETS_GRAPHIC)) // give user a chance to save the graphics settings before updating them
     {
         setFPSText();
@@ -454,7 +454,7 @@ void LLFloaterPerformance::populateNearbyList()
             row[0]["column"] = "complex_visual";
             row[0]["type"] = "bar";
             LLSD& value = row[0]["value"];
-            // The ratio used in the bar is the current cost, as soon as we take action this changes so we keep the 
+            // The ratio used in the bar is the current cost, as soon as we take action this changes so we keep the
             // pre-tune value for the numerical column and sorting.
             value["ratio"] = render_av_gpu_ms / mNearbyMaxGPUTime;
             value["bottom"] = BAR_BOTTOM_PAD;
@@ -542,19 +542,19 @@ void LLFloaterPerformance::detachItem(const LLUUID& item_id)
 
 void LLFloaterPerformance::onClickAdvanced()
 {
-		// bring up the prefs floater
-		LLFloater* prefsfloater = LLFloaterReg::showInstance("preferences");
-		if (prefsfloater)
-		{
-			// grab the 'graphics' panel from the preferences floater and
-			// bring it the front!
-			LLTabContainer* tabcontainer = prefsfloater->getChild<LLTabContainer>("pref core");
-			LLPanel* graphicspanel = prefsfloater->getChild<LLPanel>("display");
-			if (tabcontainer && graphicspanel)
-			{
-				tabcontainer->selectTabPanel(graphicspanel);
-			}
-		}
+        // bring up the prefs floater
+        LLFloater* prefsfloater = LLFloaterReg::showInstance("preferences");
+        if (prefsfloater)
+        {
+            // grab the 'graphics' panel from the preferences floater and
+            // bring it the front!
+            LLTabContainer* tabcontainer = prefsfloater->getChild<LLTabContainer>("pref core");
+            LLPanel* graphicspanel = prefsfloater->getChild<LLPanel>("display");
+            if (tabcontainer && graphicspanel)
+            {
+                tabcontainer->selectTabPanel(graphicspanel);
+            }
+        }
 }
 
 void LLFloaterPerformance::onClickDefaults()
@@ -583,7 +583,7 @@ void LLFloaterPerformance::onClickHideAvatars()
 void LLFloaterPerformance::onClickExceptions()
 {
 // [SL:KB] - Patch: World-RenderExceptions | Checked: Catznip-5.2
-	LLFloaterReg::showInstance("blocked", LLSD("avatar_rendering_tab"));
+    LLFloaterReg::showInstance("blocked", LLSD("avatar_rendering_tab"));
 // [/SL:KB]
 //    LLFloaterReg::showInstance("avatar_render_settings");
 }
@@ -592,7 +592,7 @@ void LLFloaterPerformance::updateMaxRenderTime()
 {
     LLAvatarComplexityControls::updateMaxRenderTime(
         mNearbyPanel->getChild<LLSliderCtrl>("RenderAvatarMaxART"),
-        mNearbyPanel->getChild<LLTextBox>("RenderAvatarMaxARTText"), 
+        mNearbyPanel->getChild<LLTextBox>("RenderAvatarMaxARTText"),
         true);
 }
 
@@ -670,15 +670,15 @@ static LLVOAvatar* find_avatar(const LLUUID& id)
 
 void LLFloaterPerformance::onSetException(const LLUUID& idAgent, const LLSD& sdParamn)
 {
-	const std::string strParam = sdParamn.asString();
+    const std::string strParam = sdParamn.asString();
 
-	LLVOAvatar::VisualMuteSettings nSetting = (LLVOAvatar::VisualMuteSettings)0;
-	if ("default" == strParam)
-		nSetting = LLVOAvatar::AV_RENDER_NORMALLY;
-	else if ("never" == strParam)
-		nSetting = LLVOAvatar::AV_DO_NOT_RENDER;
-	else if ("always" == strParam)
-		nSetting = LLVOAvatar::AV_ALWAYS_RENDER;
+    LLVOAvatar::VisualMuteSettings nSetting = (LLVOAvatar::VisualMuteSettings)0;
+    if ("default" == strParam)
+        nSetting = LLVOAvatar::AV_RENDER_NORMALLY;
+    else if ("never" == strParam)
+        nSetting = LLVOAvatar::AV_DO_NOT_RENDER;
+    else if ("always" == strParam)
+        nSetting = LLVOAvatar::AV_ALWAYS_RENDER;
 
   LLVOAvatar *avatarp = find_avatar(idAgent);
   if (avatarp)
@@ -693,16 +693,16 @@ void LLFloaterPerformance::onSetException(const LLUUID& idAgent, const LLSD& sdP
 
 bool LLFloaterPerformance::onHasException(const LLUUID& idAgent, const LLSD& sdParamn)
 {
-	const std::string strParam = sdParamn.asString();
+    const std::string strParam = sdParamn.asString();
 
-	LLVOAvatar::VisualMuteSettings eSetting = (LLVOAvatar::VisualMuteSettings)LLRenderMuteList::getInstance()->getSavedVisualMuteSetting(idAgent);
-	if ("default" == strParam)
-		return (eSetting == LLVOAvatar::AV_RENDER_NORMALLY);
-	else if ("never" == strParam)
-		return (eSetting == LLVOAvatar::AV_DO_NOT_RENDER);
-	else if ("always" == strParam)
-		return (eSetting == LLVOAvatar::AV_ALWAYS_RENDER);
-	return false;
+    LLVOAvatar::VisualMuteSettings eSetting = (LLVOAvatar::VisualMuteSettings)LLRenderMuteList::getInstance()->getSavedVisualMuteSetting(idAgent);
+    if ("default" == strParam)
+        return (eSetting == LLVOAvatar::AV_RENDER_NORMALLY);
+    else if ("never" == strParam)
+        return (eSetting == LLVOAvatar::AV_DO_NOT_RENDER);
+    else if ("always" == strParam)
+        return (eSetting == LLVOAvatar::AV_ALWAYS_RENDER);
+    return false;
 }
 
 void LLFloaterPerformance::onAvatarListRightClick(LLUICtrl* ctrl, S32 x, S32 y)
@@ -742,7 +742,7 @@ bool is_ALM_available()
 {
     bool bumpshiny = LLCubeMap::sUseCubeMaps && LLFeatureManager::getInstance()->isFeatureAvailable("RenderObjectBump") && gSavedSettings.getBOOL("RenderObjectBump");
     bool shaders = gSavedSettings.getBOOL("WindLightUseAtmosShaders");
-    
+
     return LLFeatureManager::getInstance()->isFeatureAvailable("RenderDeferred") &&
         bumpshiny &&
         shaders;

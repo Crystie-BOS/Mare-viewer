@@ -70,8 +70,8 @@
 //
 //LLFloaterAvatarRenderSettings::LLFloaterAvatarRenderSettings(const LLSD& key)
 //:   LLFloater(key),
-//	mAvatarSettingsList(NULL),
-//	mNeedsUpdate(false)
+//  mAvatarSettingsList(NULL),
+//  mNeedsUpdate(false)
 //{
 //    mContextMenu = new LLSettingsContextMenu(this);
 //    LLRenderMuteList::getInstance()->addObserver(&sAvatarRenderMuteListObserver);
@@ -92,7 +92,7 @@
 //    mAvatarSettingsList->setAlternateSort();
 //    getChild<LLFilterEditor>("people_filter_input")->setCommitCallback(boost::bind(&LLFloaterAvatarRenderSettings::onFilterEdit, this, _2));
 //
-//	return TRUE;
+//  return TRUE;
 //}
 //
 //void LLFloaterAvatarRenderSettings::draw()

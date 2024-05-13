@@ -1,25 +1,25 @@
-/** 
+/**
  * @file llstatusbar.h
  * @brief LLStatusBar class definition
  *
  * $LicenseInfo:firstyear=2002&license=viewerlgpl$
  * Second Life Viewer Source Code
  * Copyright (C) 2010, Linden Research, Inc.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation;
  * version 2.1 of the License only.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- * 
+ *
  * Linden Research, Inc., 945 Battery Street, San Francisco, CA  94111  USA
  * $/LicenseInfo$
  */
@@ -51,130 +51,130 @@ class LLSearchEditor;
 
 namespace ll
 {
-	namespace statusbar
-	{
-		struct SearchData;
-	}
+    namespace statusbar
+    {
+        struct SearchData;
+    }
 }
 class LLStatusBar
-:	public LLPanel
+:   public LLPanel
 {
 public:
-	LLStatusBar(const LLRect& rect );
-	/*virtual*/ ~LLStatusBar();
-	
-	/*virtual*/ void draw();
+    LLStatusBar(const LLRect& rect );
+    /*virtual*/ ~LLStatusBar();
 
-	/*virtual*/ BOOL handleRightMouseDown(S32 x, S32 y, MASK mask);
-	/*virtual*/ BOOL postBuild();
+    /*virtual*/ void draw();
 
-	// MANIPULATORS
-	void		setBalance(S32 balance);
-	void		debitBalance(S32 debit);
-	void		creditBalance(S32 credit);
+    /*virtual*/ BOOL handleRightMouseDown(S32 x, S32 y, MASK mask);
+    /*virtual*/ BOOL postBuild();
 
-	// Request the latest currency balance from the server
-	static void sendMoneyBalanceRequest();
+    // MANIPULATORS
+    void        setBalance(S32 balance);
+    void        debitBalance(S32 debit);
+    void        creditBalance(S32 credit);
 
-	void		setHealth(S32 percent);
+    // Request the latest currency balance from the server
+    static void sendMoneyBalanceRequest();
 
-	void setLandCredit(S32 credit);
-	void setLandCommitted(S32 committed);
+    void        setHealth(S32 percent);
 
-	void		refresh();
-	void setVisibleForMouselook(bool visible);
-		// some elements should hide in mouselook
+    void setLandCredit(S32 credit);
+    void setLandCommitted(S32 committed);
+
+    void        refresh();
+    void setVisibleForMouselook(bool visible);
+        // some elements should hide in mouselook
 
 
-	void hideBalance(bool hide);
+    void hideBalance(bool hide);
 
-	// ACCESSORS
-	S32			getBalance() const;
-	S32			getHealth() const;
+    // ACCESSORS
+    S32         getBalance() const;
+    S32         getHealth() const;
 
-	BOOL isUserTiered() const;
-	S32 getSquareMetersCredit() const;
-	S32 getSquareMetersCommitted() const;
-	S32 getSquareMetersLeft() const;
+    BOOL isUserTiered() const;
+    S32 getSquareMetersCredit() const;
+    S32 getSquareMetersCommitted() const;
+    S32 getSquareMetersLeft() const;
 
-	LLPanelNearByMedia* getNearbyMediaPanel() { return mPanelNearByMedia; }
+    LLPanelNearByMedia* getNearbyMediaPanel() { return mPanelNearByMedia; }
     BOOL getAudioStreamEnabled() const;
-   	// <FS:Zi> External toggles for media and streams
-	void toggleMedia(bool enable);
-	void toggleStream(bool enable);
-	// </FS:Zi>
-    
+    // <FS:Zi> External toggles for media and streams
+    void toggleMedia(bool enable);
+    void toggleStream(bool enable);
+    // </FS:Zi>
+
 private:
-	
-	void onClickBuyCurrency();
-	void onVolumeChanged(const LLSD& newvalue);
+
+    void onClickBuyCurrency();
+    void onVolumeChanged(const LLSD& newvalue);
     void onVoiceChanged(const LLSD& newvalue);
 
-	void onMouseEnterPresetsCamera();
-	void onMouseEnterPresets();
-	void onMouseEnterVolume();
-	void onMouseEnterNearbyMedia();
-	void onClickStatistics();
+    void onMouseEnterPresetsCamera();
+    void onMouseEnterPresets();
+    void onMouseEnterVolume();
+    void onMouseEnterNearbyMedia();
+    void onClickStatistics();
 
-	static void onClickStreamToggle(void* data);		// ## Zi: Media/Stream separation
-	static void onClickMediaToggle(void* data);
-	static void onClickBalance(void* data);
-	// <FS:Ansariel> FIRE-19697: Add setting to disable graphics preset menu popup on mouse over
-	//NP graphics presets no longer disabled
-	void onPopupRolloverChanged(const LLSD& newvalue);
+    static void onClickStreamToggle(void* data);        // ## Zi: Media/Stream separation
+    static void onClickMediaToggle(void* data);
+    static void onClickBalance(void* data);
+    // <FS:Ansariel> FIRE-19697: Add setting to disable graphics preset menu popup on mouse over
+    //NP graphics presets no longer disabled
+    void onPopupRolloverChanged(const LLSD& newvalue);
 
-	LLSearchEditor *mFilterEdit;
-	LLPanel *mSearchPanel;
-	void onUpdateFilterTerm();
+    LLSearchEditor *mFilterEdit;
+    LLPanel *mSearchPanel;
+    void onUpdateFilterTerm();
 
-	std::unique_ptr< ll::statusbar::SearchData > mSearchData;
-	void collectSearchableItems();
-	void updateMenuSearchVisibility( const LLSD& data );
-	void updateMenuSearchPosition(); // depends onto balance position
-	void updateBalancePanelPosition();
+    std::unique_ptr< ll::statusbar::SearchData > mSearchData;
+    void collectSearchableItems();
+    void updateMenuSearchVisibility( const LLSD& data );
+    void updateMenuSearchPosition(); // depends onto balance position
+    void updateBalancePanelPosition();
 
 private:
-	LLTextBox	*mTextTime;
-	LLTextBox	*mFPSText;
+    LLTextBox   *mTextTime;
+    LLTextBox   *mFPSText;
 
-	LLLayoutPanel	*mPurchasePanel;
-	LLLayoutPanel	*mDrawDistancePanel;
-	LLLayoutPanel	*mStatisticsPanel;
-	LLLayoutPanel	*mFPSPanel;
+    LLLayoutPanel   *mPurchasePanel;
+    LLLayoutPanel   *mDrawDistancePanel;
+    LLLayoutPanel   *mStatisticsPanel;
+    LLLayoutPanel   *mFPSPanel;
 
-	LLStatGraph	*mSGBandwidth;
-	LLStatGraph	*mSGPacketLoss;
-	LLStatGraph	*mSGScriptPctRun; // KKA-821
-	LLStatGraph	*mSGSpareTime; // KKA-821
-	LLStatGraph	*mSGScriptTime; // KKA-821
-	LLIconCtrl	*mIconPresetsCamera;
-	LLIconCtrl	*mIconPresetsGraphic;
-	LLButton	*mBtnVolume;
-	LLTextBox	*mBoxBalance;
-	LLButton	*mStreamToggle;		// ## Zi: Media/Stream separation
-	LLButton	*mMediaToggle;
-//unused	LLButton	*mBandwidthButton;
-	LLView		*mScriptOut;
-	LLFrameTimer	mStatusBarUpdateTimer;
-	LLFrameTimer	mClockUpdateTimer;
+    LLStatGraph *mSGBandwidth;
+    LLStatGraph *mSGPacketLoss;
+    LLStatGraph *mSGScriptPctRun; // KKA-821
+    LLStatGraph *mSGSpareTime; // KKA-821
+    LLStatGraph *mSGScriptTime; // KKA-821
+    LLIconCtrl  *mIconPresetsCamera;
+    LLIconCtrl  *mIconPresetsGraphic;
+    LLButton    *mBtnVolume;
+    LLTextBox   *mBoxBalance;
+    LLButton    *mStreamToggle;     // ## Zi: Media/Stream separation
+    LLButton    *mMediaToggle;
+//unused    LLButton    *mBandwidthButton;
+    LLView      *mScriptOut;
+    LLFrameTimer    mStatusBarUpdateTimer;
+    LLFrameTimer    mClockUpdateTimer;
 
-	bool				mInMouselookMode;
-	S32				mBalance;
-	S32				mHealth;
-	S32				mSquareMetersCredit;
-	S32				mSquareMetersCommitted;
-	BOOL			mAudioStreamEnabled;
-	LLFrameTimer*	mBalanceTimer;
-	LLFrameTimer*	mHealthTimer;
-	LLPanelPresetsCameraPulldown* mPanelPresetsCameraPulldown;
-	LLPanelPresetsPulldown* mPanelPresetsPulldown;
-	LLPanelVolumePulldown* mPanelVolumePulldown;
-	LLPanelNearByMedia*	mPanelNearByMedia;
-	// <FS:Ansariel> FIRE-19697: Add setting to disable graphics preset menu popup on mouse over
-	//NP graphics presets no longer disabled
-	boost::signals2::connection mMouseEnterVolumeConnection;
-	boost::signals2::connection mMouseEnterNearbyMediaConnection;
-	// </FS:Ansariel
+    bool                mInMouselookMode;
+    S32             mBalance;
+    S32             mHealth;
+    S32             mSquareMetersCredit;
+    S32             mSquareMetersCommitted;
+    BOOL            mAudioStreamEnabled;
+    LLFrameTimer*   mBalanceTimer;
+    LLFrameTimer*   mHealthTimer;
+    LLPanelPresetsCameraPulldown* mPanelPresetsCameraPulldown;
+    LLPanelPresetsPulldown* mPanelPresetsPulldown;
+    LLPanelVolumePulldown* mPanelVolumePulldown;
+    LLPanelNearByMedia* mPanelNearByMedia;
+    // <FS:Ansariel> FIRE-19697: Add setting to disable graphics preset menu popup on mouse over
+    //NP graphics presets no longer disabled
+    boost::signals2::connection mMouseEnterVolumeConnection;
+    boost::signals2::connection mMouseEnterNearbyMediaConnection;
+    // </FS:Ansariel
 };
 
 // *HACK: Status bar owns your cached money balance. JC

@@ -1,25 +1,25 @@
-/** 
+/**
  * @file llpaneleditwearable.cpp
  * @brief UI panel for editing of a particular wearable item.
  *
  * $LicenseInfo:firstyear=2009&license=viewerlgpl$
  * Second Life Viewer Source Code
  * Copyright (C) 2010, Linden Research, Inc.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation;
  * version 2.1 of the License only.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- * 
+ *
  * Linden Research, Inc., 945 Battery Street, San Francisco, CA  94111  USA
  * $/LicenseInfo$
  */
@@ -219,7 +219,7 @@ LLEditWearableDictionary::LLEditWearableDictionary()
 {
 }
 
-//virtual 
+//virtual
 LLEditWearableDictionary::~LLEditWearableDictionary()
 {
 }
@@ -712,7 +712,7 @@ void LLPanelEditWearable::setWearablePanelVisibilityChangeCallback(LLPanel* body
         }
 }
 
-// virtual 
+// virtual
 BOOL LLPanelEditWearable::postBuild()
 {
         // buttons
@@ -722,8 +722,8 @@ BOOL LLPanelEditWearable::postBuild()
         mBtnBack = getChild<LLButton>("back_btn");
         mBackBtnLabel = mBtnBack->getLabelUnselected();
         mBtnBack->setLabel(LLStringUtil::null);
-	
-		childSetAction("import_btn", boost::bind(&LLPanelEditWearable::onClickedImportBtn, this));	// [FS:CR] FIRE-290
+
+        childSetAction("import_btn", boost::bind(&LLPanelEditWearable::onClickedImportBtn, this));  // [FS:CR] FIRE-290
 
         mBtnBack->setClickedCallback(boost::bind(&LLPanelEditWearable::onBackButtonClicked, this));
 
@@ -833,7 +833,7 @@ BOOL LLPanelEditWearable::postBuild()
         return TRUE;
 }
 
-// virtual 
+// virtual
 // LLUICtrl
 BOOL LLPanelEditWearable::isDirty() const
 {
@@ -885,7 +885,7 @@ void LLPanelEditWearable::setWearable(LLViewerWearable *wearable, BOOL disable_c
         showWearable(mWearablePtr, TRUE, disable_camera_switch);
 }
 
-//static 
+//static
 void LLPanelEditWearable::onBackButtonClicked(void* userdata)
 {
         LLPanelEditWearable* panel = (LLPanelEditWearable*)userdata;
@@ -895,7 +895,7 @@ void LLPanelEditWearable::onBackButtonClicked(void* userdata)
         }
 }
 
-//static 
+//static
 void LLPanelEditWearable::onRevertButtonClicked(void* userdata)
 {
         LLPanelEditWearable *panel = (LLPanelEditWearable*) userdata;
@@ -1485,9 +1485,9 @@ void LLPanelEditWearable::getSortedParams(value_map_t &sorted_params, const std:
         {
                 LLViewerVisualParam *param = (LLViewerVisualParam*) *iter;
 
-                if (param->getID() == -1 
+                if (param->getID() == -1
                         || !param->isTweakable()
-                        || param->getEditGroup() != edit_group 
+                        || param->getEditGroup() != edit_group
                         || !(param->getSex() & avatar_sex))
                 {
                         continue;
@@ -1605,7 +1605,7 @@ void LLPanelEditWearable::onInvisibilityCommit(LLCheckBoxCtrl* checkbox_ctrl, LL
         {
                 LLLocalTextureObject *lto = getWearable()->getLocalTextureObject(te);
                 mPreviousAlphaTexture[te] = lto->getID();
-                
+
                 LLViewerFetchedTexture* image = LLViewerTextureManager::getFetchedTexture( IMG_INVISIBLE );
                 gAgentAvatarp->setLocalTexture(te, image, FALSE, index);
                 gAgentAvatarp->wearableUpdated(getWearable()->getType());
@@ -1671,81 +1671,81 @@ void LLPanelEditWearable::initPreviousAlphaTextureEntry(LLAvatarAppearanceDefine
 // [FS:CR] FIRE-10986
 void LLPanelEditWearable::onClickedImportBtn()
 {
-	LLFilePicker& file_picker = LLFilePicker::instance();
-	if(!file_picker.getOpenFile(LLFilePicker::FFLOAD_XML))
-	{
-		LL_INFOS("ShapeImport") << "User closed the filepicker. Aborting!" << LL_ENDL;
-		return;
-	}
-	
-	const std::string filename = file_picker.getFirstFile();
-	LLXmlTree tree;
-	if (!tree.parseFile(filename, FALSE))
-	{
-		LL_WARNS("ShapeImport") << "Parsing " << filename << "failed miserably." << LL_ENDL;
-		LLNotificationsUtil::add("ShapeImportGenericFail", LLSD().with("FILENAME", filename));
-		return;
-	}
-	LLXmlTreeNode* root = tree.getRoot();
-	if (!root || !root->hasName("linden_genepool"))
-	{
-		LL_WARNS("ShapeImport") << filename << " has an invaid root node (not linden_genepool). Are you sure this is an avatar file?" << LL_ENDL;
-		LLNotificationsUtil::add("ShapeImportVersionFail", LLSD().with("FILENAME", filename));
-		return;
-	}
-	std::string version;
-	static LLStdStringHandle version_string = LLXmlTree::addAttributeString("version");
-	if(!root->getFastAttributeString(version_string, version) || (version != "1.0") )
-	{
-		LL_WARNS("ShapeImport") << "Invalid avatar file version: " << version << " in file: " << filename << LL_ENDL;
-		LLNotificationsUtil::add("ShapeImportVersionFail", LLSD().with("FILENAME", filename));
-		return;
-	}
-	LLXmlTreeNode* archetype = root->getChildByName("archetype");
-	if (archetype)
-	{
-		static const LLStdStringHandle id_handle = LLXmlTree::addAttributeString("id");
-		static const LLStdStringHandle value_handle = LLXmlTree::addAttributeString("value");
-		U32 parse_errors = 0;
-		
-		for (LLXmlTreeNode* child = archetype->getFirstChild(); child != NULL; child = archetype->getNextChild())
-		{
-			if (!child->hasName("param")) continue;
-			S32 id;
-			F32 value;
-			std::string wearable;
-			if (child->getFastAttributeS32(id_handle, id)
-				&& child->getFastAttributeF32(value_handle, value))
-			{
-				LLVisualParam* visual_param = getWearable()->getVisualParam(id);
-				if (visual_param)
-					visual_param->setWeight(value);
-			}
-			else
-			{
-				LL_WARNS("ShapeImport") << "Failed to parse parameters in " << filename << LL_ENDL;
-				++parse_errors;
-			}
-		}
-		if (parse_errors)
-		{
-			LLNotificationsUtil::add("ShapeImportGenericFail", LLSD().with("FILENAME", filename));
-		}
-		if (isAgentAvatarValid())
-		{
-			getWearable()->writeToAvatar(gAgentAvatarp);
-			gAgentAvatarp->updateVisualParams();
-			updateScrollingPanelUI();
-			LL_INFOS("ShapeImport") << "Shape import has finished with great success!" << LL_ENDL;
-		}
-		else
-			LL_WARNS("ShapeImport") << "Agent is not valid. Can't apply shape import changes" << LL_ENDL;
-	}
-	else
-	{
-		LL_WARNS("ShapeImport") << filename << " is missing the archetype." << LL_ENDL;
-		LLNotificationsUtil::add("ShapeImportGenericFail");
-	}
+    LLFilePicker& file_picker = LLFilePicker::instance();
+    if(!file_picker.getOpenFile(LLFilePicker::FFLOAD_XML))
+    {
+        LL_INFOS("ShapeImport") << "User closed the filepicker. Aborting!" << LL_ENDL;
+        return;
+    }
+
+    const std::string filename = file_picker.getFirstFile();
+    LLXmlTree tree;
+    if (!tree.parseFile(filename, FALSE))
+    {
+        LL_WARNS("ShapeImport") << "Parsing " << filename << "failed miserably." << LL_ENDL;
+        LLNotificationsUtil::add("ShapeImportGenericFail", LLSD().with("FILENAME", filename));
+        return;
+    }
+    LLXmlTreeNode* root = tree.getRoot();
+    if (!root || !root->hasName("linden_genepool"))
+    {
+        LL_WARNS("ShapeImport") << filename << " has an invaid root node (not linden_genepool). Are you sure this is an avatar file?" << LL_ENDL;
+        LLNotificationsUtil::add("ShapeImportVersionFail", LLSD().with("FILENAME", filename));
+        return;
+    }
+    std::string version;
+    static LLStdStringHandle version_string = LLXmlTree::addAttributeString("version");
+    if(!root->getFastAttributeString(version_string, version) || (version != "1.0") )
+    {
+        LL_WARNS("ShapeImport") << "Invalid avatar file version: " << version << " in file: " << filename << LL_ENDL;
+        LLNotificationsUtil::add("ShapeImportVersionFail", LLSD().with("FILENAME", filename));
+        return;
+    }
+    LLXmlTreeNode* archetype = root->getChildByName("archetype");
+    if (archetype)
+    {
+        static const LLStdStringHandle id_handle = LLXmlTree::addAttributeString("id");
+        static const LLStdStringHandle value_handle = LLXmlTree::addAttributeString("value");
+        U32 parse_errors = 0;
+
+        for (LLXmlTreeNode* child = archetype->getFirstChild(); child != NULL; child = archetype->getNextChild())
+        {
+            if (!child->hasName("param")) continue;
+            S32 id;
+            F32 value;
+            std::string wearable;
+            if (child->getFastAttributeS32(id_handle, id)
+                && child->getFastAttributeF32(value_handle, value))
+            {
+                LLVisualParam* visual_param = getWearable()->getVisualParam(id);
+                if (visual_param)
+                    visual_param->setWeight(value);
+            }
+            else
+            {
+                LL_WARNS("ShapeImport") << "Failed to parse parameters in " << filename << LL_ENDL;
+                ++parse_errors;
+            }
+        }
+        if (parse_errors)
+        {
+            LLNotificationsUtil::add("ShapeImportGenericFail", LLSD().with("FILENAME", filename));
+        }
+        if (isAgentAvatarValid())
+        {
+            getWearable()->writeToAvatar(gAgentAvatarp);
+            gAgentAvatarp->updateVisualParams();
+            updateScrollingPanelUI();
+            LL_INFOS("ShapeImport") << "Shape import has finished with great success!" << LL_ENDL;
+        }
+        else
+            LL_WARNS("ShapeImport") << "Agent is not valid. Can't apply shape import changes" << LL_ENDL;
+    }
+    else
+    {
+        LL_WARNS("ShapeImport") << filename << " is missing the archetype." << LL_ENDL;
+        LLNotificationsUtil::add("ShapeImportGenericFail");
+    }
 }
 // [/FS:CR] FIRE-10986
 

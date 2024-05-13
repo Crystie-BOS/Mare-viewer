@@ -102,7 +102,7 @@ static const std::string PROFILE_PROPERTIES_CAP = "AgentProfile";
 static const std::string PROFILE_IMAGE_UPLOAD_CAP = "UploadAgentProfileImage";
 
 // <FS:Zi> FIRE-32184: Online/Offline status not working for non-friends
-const U32 AVATAR_ONLINE_UNDEFINED			= 0x1 << 31;
+const U32 AVATAR_ONLINE_UNDEFINED           = 0x1 << 31;
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -116,7 +116,7 @@ LLUUID post_profile_image(std::string cap_url, const LLSD &first_data, std::stri
 
     LLCore::HttpOptions::ptr_t httpOpts(new LLCore::HttpOptions);
     httpOpts->setFollowRedirects(true);
-    
+
     LLSD result = httpAdapter->postAndSuspend(httpRequest, cap_url, first_data, httpOpts, httpHeaders);
 
     LLSD httpResults = result[LLCoreHttpUtil::HttpCoroutineAdapter::HTTP_RESULTS];
@@ -265,22 +265,22 @@ void post_profile_image_coro(std::string cap_url, EProfileImageType type, std::s
 class LLProfileHandler : public LLCommandHandler
 {
 public:
-	// requires trusted browser to trigger
-	LLProfileHandler() : LLCommandHandler("profile", UNTRUSTED_THROTTLE) { }
+    // requires trusted browser to trigger
+    LLProfileHandler() : LLCommandHandler("profile", UNTRUSTED_THROTTLE) { }
 
-	bool handle(const LLSD& params,
+    bool handle(const LLSD& params,
                 const LLSD& query_map,
                 const std::string& grid,
                 LLMediaCtrl* web)
-	{
-		if (params.size() < 1) return false;
-		std::string agent_name = params[0];
-		LL_INFOS() << "Profile, agent_name " << agent_name << LL_ENDL;
-		std::string url = getProfileURL(agent_name);
-		LLWeb::loadURLInternal(url);
+    {
+        if (params.size() < 1) return false;
+        std::string agent_name = params[0];
+        LL_INFOS() << "Profile, agent_name " << agent_name << LL_ENDL;
+        std::string url = getProfileURL(agent_name);
+        LLWeb::loadURLInternal(url);
 
-		return true;
-	}
+        return true;
+    }
 };
 LLProfileHandler gProfileHandler;
 
@@ -291,8 +291,8 @@ LLProfileHandler gProfileHandler;
 class LLAgentHandler : public LLCommandHandler
 {
 public:
-	// requires trusted browser to trigger
-	LLAgentHandler() : LLCommandHandler("agent", UNTRUSTED_THROTTLE) { }
+    // requires trusted browser to trigger
+    LLAgentHandler() : LLCommandHandler("agent", UNTRUSTED_THROTTLE) { }
 
     virtual bool canHandleUntrusted(
         const LLSD& params,
@@ -319,117 +319,117 @@ public:
         return false;
     }
 
-	bool handle(const LLSD& params,
+    bool handle(const LLSD& params,
                 const LLSD& query_map,
                 const std::string& grid,
                 LLMediaCtrl* web)
-	{
-		if (params.size() < 2) return false;
-		LLUUID avatar_id;
-		if (!avatar_id.set(params[0], FALSE))
-		{
-			return false;
-		}
+    {
+        if (params.size() < 2) return false;
+        LLUUID avatar_id;
+        if (!avatar_id.set(params[0], FALSE))
+        {
+            return false;
+        }
 
-		const std::string verb = params[1].asString();
-		if (verb == "about")
-		{
-			LLAvatarActions::showProfile(avatar_id);
-			return true;
-		}
+        const std::string verb = params[1].asString();
+        if (verb == "about")
+        {
+            LLAvatarActions::showProfile(avatar_id);
+            return true;
+        }
 
-		if (verb == "inspect")
-		{
-			LLFloaterReg::showInstance("inspect_avatar", LLSD().with("avatar_id", avatar_id));
-			return true;
-		}
+        if (verb == "inspect")
+        {
+            LLFloaterReg::showInstance("inspect_avatar", LLSD().with("avatar_id", avatar_id));
+            return true;
+        }
 
-		if (verb == "im")
-		{
-			LLAvatarActions::startIM(avatar_id);
-			return true;
-		}
+        if (verb == "im")
+        {
+            LLAvatarActions::startIM(avatar_id);
+            return true;
+        }
 
-		if (verb == "pay")
-		{
-			if (!LLUI::getInstance()->mSettingGroups["config"]->getBOOL("EnableAvatarPay"))
-			{
-				LLNotificationsUtil::add("NoAvatarPay", LLSD(), LLSD(), std::string("SwitchToStandardSkinAndQuit"));
-				return true;
-			}
+        if (verb == "pay")
+        {
+            if (!LLUI::getInstance()->mSettingGroups["config"]->getBOOL("EnableAvatarPay"))
+            {
+                LLNotificationsUtil::add("NoAvatarPay", LLSD(), LLSD(), std::string("SwitchToStandardSkinAndQuit"));
+                return true;
+            }
 
-			LLAvatarActions::pay(avatar_id);
-			return true;
-		}
+            LLAvatarActions::pay(avatar_id);
+            return true;
+        }
 
-		if (verb == "offerteleport")
-		{
-			LLAvatarActions::offerTeleport(avatar_id);
-			return true;
-		}
+        if (verb == "offerteleport")
+        {
+            LLAvatarActions::offerTeleport(avatar_id);
+            return true;
+        }
 
-		if (verb == "requestfriend")
-		{
-			LLAvatarActions::requestFriendshipDialog(avatar_id);
-			return true;
-		}
+        if (verb == "requestfriend")
+        {
+            LLAvatarActions::requestFriendshipDialog(avatar_id);
+            return true;
+        }
 
-		if (verb == "removefriend")
-		{
-			LLAvatarActions::removeFriendDialog(avatar_id);
-			return true;
-		}
+        if (verb == "removefriend")
+        {
+            LLAvatarActions::removeFriendDialog(avatar_id);
+            return true;
+        }
 
-		if (verb == "mute")
-		{
-			if (! LLAvatarActions::isBlocked(avatar_id))
-			{
-				LLAvatarActions::toggleBlock(avatar_id);
+        if (verb == "mute")
+        {
+            if (! LLAvatarActions::isBlocked(avatar_id))
+            {
+                LLAvatarActions::toggleBlock(avatar_id);
 // [SL:KB] - World-Mute | Checked: Catznip-3.6
-				LLFloaterBlocked::showMuteAndSelect(avatar_id);
+                LLFloaterBlocked::showMuteAndSelect(avatar_id);
 // [/SL:KB]
-			}
-			return true;
-		}
+            }
+            return true;
+        }
 
-		if (verb == "unmute")
-		{
-			if (LLAvatarActions::isBlocked(avatar_id))
-			{
-				LLAvatarActions::toggleBlock(avatar_id);
-			}
-			return true;
-		}
+        if (verb == "unmute")
+        {
+            if (LLAvatarActions::isBlocked(avatar_id))
+            {
+                LLAvatarActions::toggleBlock(avatar_id);
+            }
+            return true;
+        }
 
-		if (verb == "block")
-		{
-			if (params.size() > 2)
-			{
-				const std::string object_name = LLURI::unescape(params[2].asString());
-				LLMute mute(avatar_id, object_name, LLMute::OBJECT);
-				LLMuteList::getInstance()->add(mute);
+        if (verb == "block")
+        {
+            if (params.size() > 2)
+            {
+                const std::string object_name = LLURI::unescape(params[2].asString());
+                LLMute mute(avatar_id, object_name, LLMute::OBJECT);
+                LLMuteList::getInstance()->add(mute);
 // [SL:KB] - World-Mute | Checked: Catznip-3.6
-				LLFloaterBlocked::showMuteAndSelect(mute.mID);
+                LLFloaterBlocked::showMuteAndSelect(mute.mID);
 // [/SL:KB]
-//				LLPanelBlockedList::showPanelAndSelect(mute.mID);
-			}
-			return true;
-		}
+//              LLPanelBlockedList::showPanelAndSelect(mute.mID);
+            }
+            return true;
+        }
 
-		if (verb == "unblock")
-		{
-			if (params.size() > 2)
-			{
-				const std::string object_name = params[2].asString();
-				LLMute mute(avatar_id, object_name, LLMute::OBJECT);
-				LLMuteList::getInstance()->remove(mute);
-			}
-			return true;
-		}
+        if (verb == "unblock")
+        {
+            if (params.size() > 2)
+            {
+                const std::string object_name = params[2].asString();
+                LLMute mute(avatar_id, object_name, LLMute::OBJECT);
+                LLMuteList::getInstance()->remove(mute);
+            }
+            return true;
+        }
 
         // reportAbuse is here due to convoluted avatar handling
         // in LLScrollListCtrl and LLTextBase
-        if (verb == "reportAbuse" && web == NULL) 
+        if (verb == "reportAbuse" && web == NULL)
         {
             LLAvatarName av_name;
             if (LLAvatarNameCache::get(avatar_id, &av_name))
@@ -442,8 +442,8 @@ public:
             }
             return true;
         }
-		return false;
-	}
+        return false;
+    }
 };
 LLAgentHandler gAgentHandler;
 
@@ -489,7 +489,7 @@ private:
     bool                mHasUnsavedPermChanges;
     LLHandle<LLView>    mOwnerHandle;
 
-    boost::signals2::connection	mAvatarNameCacheConnection;
+    boost::signals2::connection mAvatarNameCacheConnection;
 };
 
 LLFloaterProfilePermissions::LLFloaterProfilePermissions(LLView * owner, const LLUUID &avatar_id)
@@ -1260,10 +1260,10 @@ void LLPanelProfileSecondLife::processOnlineStatus(bool is_friend, bool show_onl
     // so this is our marker for "undefined"
     if (is_friend && !show_online && online)
     {
-	    childSetVisible("friend_layout", false);
-	    childSetVisible("online_layout", false);
-	    childSetVisible("offline_layout", false);
-	    childSetVisible("unknown_layout", true);
+        childSetVisible("friend_layout", false);
+        childSetVisible("online_layout", false);
+        childSetVisible("offline_layout", false);
+        childSetVisible("unknown_layout", true);
 
         mPropertiesObserver.mPanelProfile = this;
         mPropertiesObserver.mRequester = gAgentID;
@@ -1441,7 +1441,7 @@ void LLPanelProfileSecondLife::onCommitMenu(const LLSD& userdata)
     }
     else if (item_name == "copy_user_uri")
     {
-    		std::string uri = LLSLURL("agent", agent_id, "about").getSLURLString();
+            std::string uri = LLSLURL("agent", agent_id, "about").getSLURLString();
         LLClipboard::instance().copyToClipboard(utf8str_to_wstring(uri), 0, uri.size());
     }
     else if (item_name == "agent_permissions")
@@ -2395,12 +2395,12 @@ void LLPanelProfile::showPick(const LLUUID& pick_id)
 
 bool LLPanelProfile::isPickTabSelected()
 {
-	return (mTabContainer->getCurrentPanel() == mPanelPicks);
+    return (mTabContainer->getCurrentPanel() == mPanelPicks);
 }
 
 bool LLPanelProfile::isNotesTabSelected()
 {
-	return (mTabContainer->getCurrentPanel() == mPanelNotes);
+    return (mTabContainer->getCurrentPanel() == mPanelNotes);
 }
 
 bool LLPanelProfile::hasUnsavedChanges()

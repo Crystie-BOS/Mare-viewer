@@ -50,7 +50,7 @@ if(WINDOWS)
     endif (ADDRESS_SIZE EQUAL 64)
 
     #*******************************
-    # Misc shared libs 
+    # Misc shared libs
 
     set(release_src_dir "${ARCH_PREBUILT_DIRS_RELEASE}")
     set(release_files
@@ -239,17 +239,17 @@ elseif(LINUX)
          list( APPEND release_files
                  libapr-1.so.0
                  libaprutil-1.so.0
-		 #libatk-1.0.so
+         #libatk-1.0.so
                  libfreetype.so.6.18.3
                  libfreetype.so.6
                  libhunspell-1.3.so.0.0.0
-        	 libopenjp2.so
+             libopenjp2.so
                  libuuid.so.16
                  libuuid.so.16.0.22
                  libfontconfig.so.1.12.0
                  libfontconfig.so.1
-		 #libgmodule-2.0.so
-		 #libgobject-2.0.so
+         #libgmodule-2.0.so
+         #libgobject-2.0.so
                  )
      endif()
 
