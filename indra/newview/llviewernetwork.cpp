@@ -87,7 +87,7 @@ LLGridManager::LLGridManager()
     // as that would be a security issue when they are overwritten by
     // an attacker.  Don't want someone snagging a password.
     std::string grid_file = gDirUtilp->getExpandedFilename(LL_PATH_USER_SETTINGS,
-        "grids.xml");
+                                                           "grids.xml");
     LL_DEBUGS("GridManager")<<LL_ENDL;
 
     initialize(grid_file);
@@ -117,21 +117,21 @@ void LLGridManager::initialize(const std::string& grid_file)
     // as we don't want an attacker to override our grid list
     // to point the default grid to an invalid grid
     addSystemGrid(LLTrans::getString("AgniGridLabel"),
-        MAINGRID,
-        MAIN_GRID_LOGIN_URI,
-        "https://secondlife.com/helpers/",
-        DEFAULT_LOGIN_PAGE,
-        SL_UPDATE_QUERY_URL,
+                  MAINGRID,
+                  MAIN_GRID_LOGIN_URI,
+                  "https://secondlife.com/helpers/",
+                  DEFAULT_LOGIN_PAGE,
+                  SL_UPDATE_QUERY_URL,
                   MAIN_GRID_WEB_PROFILE_URL,
-        "Agni");
+                  "Agni");
     addSystemGrid(LLTrans::getString("AditiGridLabel"),
-        "util.aditi.lindenlab.com",
-        "https://login.aditi.lindenlab.com/cgi-bin/login.cgi",
+                  "util.aditi.lindenlab.com",
+                  "https://login.aditi.lindenlab.com/cgi-bin/login.cgi",
                   "https://secondlife.aditi.lindenlab.com/helpers/",
-        DEFAULT_LOGIN_PAGE,
-        SL_UPDATE_QUERY_URL,
+                  DEFAULT_LOGIN_PAGE,
+                  SL_UPDATE_QUERY_URL,
                   "https://my.secondlife-beta.com/",
-        "Aditi");
+                  "Aditi");
 
     LLSD other_grids;
     llifstream llsd_xml;
@@ -196,7 +196,7 @@ void LLGridManager::initialize(const std::string& grid_file)
         mGrid = getGrid(cmd_line_grid);
         if(mGrid.empty())
         {
-            LL_WARNS("GridManager") << "Unknown grid '" << cmd_line_grid << "'" << LL_ENDL;
+            LL_WARNS("GridManager")<<"Unknown grid '"<<cmd_line_grid<<"'"<<LL_ENDL;
         }
         else
         {
@@ -276,7 +276,7 @@ bool LLGridManager::addGrid(LLSD& grid_data)
                 {
                     grid_data[GRID_LOGIN_URI_VALUE] = LLSD::emptyArray();
                     grid_data[GRID_LOGIN_URI_VALUE].append(std::string("https://") +
-                        grid + "/cgi-bin/login.cgi");
+                                                           grid + "/cgi-bin/login.cgi");
                 }
                 // Populate to the default values
                 if (!grid_data.has(GRID_LOGIN_PAGE_VALUE))
@@ -309,8 +309,8 @@ bool LLGridManager::addGrid(LLSD& grid_data)
                                          <<"  web profile: "<<grid_data[GRID_WEB_PROFILE_VALUE].asString()<<"\n";
                 /* still in LL_DEBUGS */
                 for (LLSD::array_const_iterator login_uris = grid_data[GRID_LOGIN_URI_VALUE].beginArray();
-                    login_uris != grid_data[GRID_LOGIN_URI_VALUE].endArray();
-                    login_uris++)
+                     login_uris != grid_data[GRID_LOGIN_URI_VALUE].endArray();
+                     login_uris++)
                 {
                     LL_CONT << "  login uri:   "<<login_uris->asString()<<"\n";
                 }
@@ -338,13 +338,13 @@ bool LLGridManager::addGrid(LLSD& grid_data)
 //
 // LLGridManager::addSystemGrid - helper for adding a system grid.
 void LLGridManager::addSystemGrid(const std::string& label,
-    const std::string& name,
-    const std::string& login_uri,
-    const std::string& helper,
-    const std::string& login_page,
-    const std::string& update_url_base,
+                                  const std::string& name,
+                                  const std::string& login_uri,
+                                  const std::string& helper,
+                                  const std::string& login_page,
+                                  const std::string& update_url_base,
                                   const std::string& web_profile_url,
-    const std::string& login_id)
+                                  const std::string& login_id)
 {
     LLSD grid = LLSD::emptyMap();
     grid[GRID_VALUE] = name;
@@ -435,7 +435,7 @@ std::string LLGridManager::getGrid( const std::string &grid )
             if (grid_iter->second.has(GRID_ID_VALUE))
             {
                 if (0 == (LLStringUtil::compareInsensitive(grid,
-                    grid_iter->second[GRID_ID_VALUE].asString())))
+                                                           grid_iter->second[GRID_ID_VALUE].asString())))
                 {
                     // found a matching label, return this name
                     grid_name = grid_iter->first;
@@ -613,8 +613,8 @@ void LLGridManager::updateIsInProductionGrid()
     {
         for ( std::vector<std::string>::iterator uri_it = uris.begin();
               ! mIsInProductionGrid && uri_it != uris.end();
-            uri_it++
-            )
+              uri_it++
+             )
         {
             if( MAIN_GRID_LOGIN_URI == *uri_it )
             {
@@ -634,10 +634,10 @@ bool LLGridManager::isSystemGrid(const std::string& grid)
     std::string grid_name = getGrid(grid);
 
     return (   !grid_name.empty()
-        && mGridList.has(grid)
-        && mGridList[grid].has(GRID_IS_SYSTEM_GRID_VALUE)
-        && mGridList[grid][GRID_IS_SYSTEM_GRID_VALUE].asBoolean()
-        );
+            && mGridList.has(grid)
+            && mGridList[grid].has(GRID_IS_SYSTEM_GRID_VALUE)
+            && mGridList[grid][GRID_IS_SYSTEM_GRID_VALUE].asBoolean()
+            );
 }
 
 // build a slurl for the given region within the selected grid
