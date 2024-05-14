@@ -109,6 +109,7 @@ public:
     static const char* const GLTF_FILE_EXTENSION_TRANSFORM_OFFSET;
     static const char* const GLTF_FILE_EXTENSION_TRANSFORM_ROTATION;
     static const LLUUID GLTF_OVERRIDE_NULL_UUID;
+public:
 
     // get a UUID based on a hash of this LLGLTFMaterial
     LLUUID getHash() const;
