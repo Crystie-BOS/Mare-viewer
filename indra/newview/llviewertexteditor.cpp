@@ -1226,7 +1226,7 @@ BOOL LLViewerTextEditor::openEmbeddedItem(LLPointer<LLInventoryItem> item, llwch
             return TRUE;
         case LLAssetType::AT_NOTECARD:
 //MK(CA)
-            if (gRRenabled && gAgent.mRRInterface.contains ("viewnotecard")) return FALSE;
+            if (gRRenabled && gAgent.mRRInterface.contains ("viewnote")) return FALSE;
             showCopyToInvDialog( item, wc );
             return TRUE;
 //mk(ca)
