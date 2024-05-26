@@ -688,7 +688,11 @@ void LLSettingsBlender::update(const LLSettingsBase::BlendFactor& blendf)
     F64 res = setBlendFactor(blendf);
     llassert(res >= 0.0 && res <= 1.0);
     (void)res;
-    mTarget->update();
+    //KKA-1085 avoid mTarget being null
+    if (mTarget)
+    {
+        mTarget->update();
+    }
 }
 
 F64 LLSettingsBlender::setBlendFactor(const LLSettingsBase::BlendFactor& blendf_in)
