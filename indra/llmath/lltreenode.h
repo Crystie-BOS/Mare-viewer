@@ -72,7 +72,11 @@ protected:
     {
         for (U32 i = 0; i < mListeners.size(); i++)
         {
-            mListeners[i]->handleDestruction(this);
+            // KKA-1086 - avoid blowing up here
+            if (this && mListeners[i])
+            {
+                mListeners[i]->handleDestruction(this);
+            }
         }
         mListeners.clear();
     }
