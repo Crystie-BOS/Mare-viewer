@@ -3663,7 +3663,7 @@ void LLSplashScreenWin32::showImpl()
     ShowWindow(mWindow, SW_SHOW);
 
     // Should set taskbar text without creating a header for the window (caption)
-    SetWindowTextA(mWindow, "Second Life");
+    SetWindowTextA(mWindow, "Kokua");
 }
 
 
