@@ -882,34 +882,10 @@ width="120">
       name="FSAADisabled"
       value="0" />
     <combo_box.item
-      label="2x"
-      name="2x"
+      label="FXAA"
+      name="FXAA"
       value="2" />
-    <combo_box.item
-     label="4x"
-     name="4x"
-     value="4" />
-    <combo_box.item
-     label="8x"
-     name="8x"
-     value="8" />
-    <combo_box.item
-     label="16x"
-     name="16x"
-     value="16" />
-  </combo_box>
-  <text
-    type="string"
-    length="1"
-    follows="left|top"
-    height="16"
-    layout="topleft"
-    left_pad="10"
-    name="antialiasing restart"
-    top_delta="0"
-    width="130">
-     (requires restart)
-  </text>
+      </combo_box>
   </panel>
 
 <!--LOD/SHaders Settings-->
@@ -919,8 +895,8 @@ width="120">
      left="1"
      right="-1"
      follows="all"
-     label="Level of Detail/Shaders"
-     name="Level of Detail/Shaders" >
+     label="Advanced"
+     name="Advanced" >
   <text
     type="string"
     length="1"
@@ -1032,7 +1008,6 @@ width="120">
     width="65">
        Low
   </text>
-
   <slider
     control_name="RenderFlexTimeFactor"
     follows="left|top"
@@ -1062,7 +1037,29 @@ width="120">
     width="65">
        Low
   </text>
-  
+
+  <text
+    type="string"
+    length="1"
+    follows="left|top"
+    height="16"
+    layout="topleft"
+    left_pad="10"
+    name="antialiasing restart"
+    top_delta="0"
+    width="130">
+     (requires restart)
+  </text>
+<!--
+   <view_border
+      bevel_style="in"
+      height="322"
+      layout="topleft"
+      left="385"
+      name="vert_border"
+      top="16"      
+      width="0"/>
+-->  
   <text
     type="string"
     length="1"
@@ -1082,6 +1079,7 @@ width="120">
     initial_value="true"
     label="Transparent Water"
     layout="topleft"
+    follows="left|top"
     left="30"
     name="TransparentWater"
     top_delta="16"
@@ -1112,6 +1110,7 @@ width="120">
       function="Pref.UpdateSliderText"
       parameter="SkyMeshDetailText" />
   </slider>
+
   <text
     type="string"
     length="1"
@@ -1297,6 +1296,102 @@ width="120">
     width="260">
   </slider>
 
+  <!-- Mirror settings. -->
+  <check_box
+    control_name="RenderMirrors"
+    height="16"
+    initial_value="false"
+    label="Mirrors"
+    layout="topleft"
+    follows="left|top"
+    left="8"
+    name="Mirrors"
+    top_delta="24"
+    width="240">
+    <check_box.commit_callback
+      function="Pref.RenderOptionUpdate" />
+  </check_box>
+
+  <text
+    type="string"
+    length="1"
+    follows="left|top"
+    height="16"
+    layout="topleft"
+    left="12"
+    name="MirrorResolutionText"
+    text_readonly_color="LabelDisabledColor"
+    top_delta="22"
+    width="128">
+    Mirror Resolution:
+  </text>
+
+  <combo_box
+   control_name="RenderHeroProbeResolution"
+   height="18"
+   layout="topleft"
+   left_delta="130"
+   top_delta="0"
+   name="MirrorResolution"
+   width="150">
+    <combo_box.item
+      label="256"
+      name="0"
+      value="256"/>
+    <combo_box.item
+      label="512"
+      name="1"
+      value="512"/>
+    <combo_box.item
+      label="1024"
+      name="2"
+      value="1024"/>
+    <combo_box.item
+      label="2048"
+      name="3"
+      value="2048"/>
+  </combo_box>
+
+  <text
+    type="string"
+    length="1"
+    follows="left|top"
+    height="16"
+    layout="topleft"
+    left="12"
+    name="HeroProbeUpdateText"
+    text_readonly_color="LabelDisabledColor"
+    top_delta="22"
+    width="128">
+    Mirror Update Rate:
+  </text>
+
+  <combo_box
+   control_name="RenderHeroProbeUpdateRate"
+   height="18"
+   layout="topleft"
+   left_delta="130"
+   top_delta="0"
+   name="HeroProbeUpdateRate"
+   width="150">
+    <combo_box.item
+      label="Every Frame"
+      name="0"
+      value="1"/>
+    <combo_box.item
+      label="Every 2nd Frame"
+      name="1"
+      value="2"/>
+    <combo_box.item
+      label="Every 3rd Frame"
+      name="2"
+      value="3"/>
+    <combo_box.item
+      label="Every 4th Frame"
+      name="3"
+      value="4"/>
+  </combo_box>
+  <!-- End of mirror settings -->
     </panel>
 </tab_container>
 </panel>

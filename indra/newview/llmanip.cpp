@@ -364,9 +364,15 @@ LLVector3 LLManip::getPivotPoint()
     static LLCachedControl<F32> sPivotY(gSavedSettings, "BuildPrefs_PivotY", 50.0f);
     static LLCachedControl<F32> sPivotZ(gSavedSettings, "BuildPrefs_PivotZ", 50.0f);
 
+    LLViewerObject* object = mObjectSelection->getFirstObject();
     const BOOL children_ok = TRUE;
     if (mObjectSelection->getFirstRootObject(children_ok) && (mObjectSelection->getObjectCount() == 1 || sActualRoot) && mObjectSelection->getSelectType() != SELECT_TYPE_HUD)
     {
+        LLSelectNode* select_node = mObjectSelection->getFirstNode();
+        if (select_node->mSelectedGLTFNode != -1)
+        {
+            return object->getGLTFNodePositionAgent(select_node->mSelectedGLTFNode);
+        }
         pos = mObjectSelection->getFirstRootObject(children_ok)->getPivotPositionAgent();
         scale = mObjectSelection->getFirstRootObject(children_ok)->getScale();
         rot = mObjectSelection->getFirstRootObject(children_ok)->getRotation();
