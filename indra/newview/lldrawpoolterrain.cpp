@@ -134,7 +134,7 @@ void LLDrawPoolTerrain::endDeferredPass(S32 pass)
 void LLDrawPoolTerrain::renderDeferred(S32 pass)
 {
     LL_PROFILE_ZONE_SCOPED_CATEGORY_DRAWPOOL; //LL_RECORD_BLOCK_TIME(FTM_RENDER_TERRAIN);
-    if (mDrawFace.empty() || (gRRenabled && gAgent.mRRInterface.mContainsCamTextures)) // CA: camtetxures crash avoidance
+    if (mDrawFace.empty())
     {
         return;
     }
@@ -926,7 +926,8 @@ void LLDrawPoolTerrain::renderFull2TU()
 void LLDrawPoolTerrain::renderSimple()
 {
     LLVector4 tp0, tp1;
-
+    sShader = &gDeferredTerrainProgram;
+    sShader->bind();
     //----------------------------------------------------------------------------
     // Pass 1/1
 
