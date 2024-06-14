@@ -98,6 +98,10 @@ namespace LL
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-function"
 #endif
+#if LL_LINUX
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
+#endif
 
         template<>
         void copyScalar<F32, F32>(F32* src, F32& dst)
@@ -215,6 +219,9 @@ namespace LL
 
 #if defined(__clang__)
 #pragma clang diagnostic pop
+#endif
+#if LL_LINUX
+#pragma GCC diagnostic pop
 #endif
 
         //=========================================================================================================
