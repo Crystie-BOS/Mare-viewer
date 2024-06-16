@@ -394,7 +394,12 @@ LLVLComposition::LLVLComposition(LLSurface *surfacep, const U32 width, const F32
 
 LLVLComposition::~LLVLComposition()
 {
+#if (LL_LINUX && GCC_VERSION < 120000)
+		LLTerrainMaterials::unboost();
+#else
+		//CA: GCC 9 doesn't like this. OK on GCC 12 and above
     LLTerrainMaterials::~LLTerrainMaterials();
+#endif
 }
 
 
