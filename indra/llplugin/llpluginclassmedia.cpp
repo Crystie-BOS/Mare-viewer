@@ -1234,6 +1234,10 @@ void LLPluginClassMedia::receivePluginMessage(const LLPluginMessage &message)
             mMediaName = message.getValue("name");
             mediaEvent(LLPluginClassMediaOwner::MEDIA_EVENT_NAME_CHANGED);
         }
+        else if(message_name == "nowplaying_text")
+        {
+            mMediaNowPlaying = message.getValue("nowplaying");
+        }
         else if(message_name == "pick_file")
         {
             mIsMultipleFilePick = message.getValueBoolean("multiple_files");

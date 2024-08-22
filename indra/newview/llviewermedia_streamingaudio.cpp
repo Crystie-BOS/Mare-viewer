@@ -34,6 +34,7 @@
 
 #include "llmimetypes.h"
 #include "lldir.h"
+#include "llnotificationmanager.h"
 
 LLStreamingAudio_MediaPlugins::LLStreamingAudio_MediaPlugins() :
     mMediaPlugin(NULL),
@@ -165,6 +166,12 @@ int LLStreamingAudio_MediaPlugins::isPlaying()
 
     LLPluginClassMediaOwner::EMediaStatus status =
         mMediaPlugin->getStatus();
+    auto nowPlaying = mMediaPlugin->getMediaNowPlaying();
+    if (mNowPlaying != nowPlaying)
+    {
+        LLNotificationsUI::LLNotificationManager::instance().onChat(LLChat{llformat("Now playing %s.", nowPlaying.c_str())}, LLSD{});
+        mNowPlaying = nowPlaying;
+    }
 
     switch (status)
     {
