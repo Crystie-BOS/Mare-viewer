@@ -169,8 +169,12 @@ int LLStreamingAudio_MediaPlugins::isPlaying()
     auto nowPlaying = mMediaPlugin->getMediaNowPlaying();
     if (mNowPlaying != nowPlaying)
     {
-        LLNotificationsUI::LLNotificationManager::instance().onChat(LLChat{llformat("Now playing %s.", nowPlaying.c_str())}, LLSD{});
+        mTitle = mMediaPlugin->getMediaTitle();
         mNowPlaying = nowPlaying;
+        LLChat chat{llformat("Now playing %s.", nowPlaying.c_str())};
+        chat.mFromName = mTitle;
+        chat.mSourceType = CHAT_SOURCE_SYSTEM;
+        LLNotificationsUI::LLNotificationManager::instance().onChat(chat, LLSD{});
     }
 
     switch (status)

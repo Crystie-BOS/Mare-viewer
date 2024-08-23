@@ -1234,6 +1234,10 @@ void LLPluginClassMedia::receivePluginMessage(const LLPluginMessage &message)
             mMediaName = message.getValue("name");
             mediaEvent(LLPluginClassMediaOwner::MEDIA_EVENT_NAME_CHANGED);
         }
+        else if(message_name == "title_text")
+        {
+            mMediaTitle = message.getValue("title");
+        }
         else if(message_name == "nowplaying_text")
         {
             mMediaNowPlaying = message.getValue("nowplaying");

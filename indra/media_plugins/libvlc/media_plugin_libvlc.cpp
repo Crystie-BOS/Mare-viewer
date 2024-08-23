@@ -295,6 +295,13 @@ void MediaPluginLibVLC::eventCallbacks(const libvlc_event_t* event, void* ptr)
     }
     break;
     case libvlc_MediaMetaChanged:
+        auto title = libvlc_media_get_meta(parent->mLibVLCMedia, libvlc_meta_Title);
+        if (title)
+        {
+            LLPluginMessage message(LLPLUGIN_MESSAGE_CLASS_MEDIA, "title_text");
+            message.setValue("title", title);
+            parent->sendMessage(message);
+        }
         auto now_playing = libvlc_media_get_meta(parent->mLibVLCMedia, libvlc_meta_NowPlaying);
         if (now_playing)
         {
