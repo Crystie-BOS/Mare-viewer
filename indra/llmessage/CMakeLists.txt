@@ -3,9 +3,6 @@
 project(llmessage)
 
 include(00-Common)
-if (LL_TESTS)
-include(GoogleMock)
-endif ()
 include(LLAddBuildTest)
 include(LLCommon)
 include(LLCoreHttp)
@@ -13,7 +10,6 @@ include(LLAddBuildTest)
 include(Python)
 include(Tut)
 include(Python)
-include(JsonCpp)
 set(llmessage_SOURCE_FILES
 		fscorehttputil.cpp
     llassetstorage.cpp

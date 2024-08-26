@@ -79,8 +79,8 @@ AOEngine::~AOEngine()
 
 void AOEngine::init()
 {
-    BOOL do_enable = gSavedPerAccountSettings.getBOOL("UseAO");
-    BOOL do_enable_stands = gSavedPerAccountSettings.getBOOL("UseAOStands");
+    bool do_enable = gSavedPerAccountSettings.getBOOL("UseAO");
+    bool do_enable_stands = gSavedPerAccountSettings.getBOOL("UseAOStands");
     if (do_enable)
     {
         // enable_stands() calls enable(), but we need to set the
@@ -108,7 +108,7 @@ void AOEngine::onToggleAOControl()
     if (mEnabled)
     {
         // Enabling the AO always enables stands to start with
-        gSavedPerAccountSettings.setBOOL("UseAOStands", TRUE);
+        gSavedPerAccountSettings.setBOOL("UseAOStands", true);
     }
 }
 
@@ -238,7 +238,7 @@ bool AOEngine::foreignAnimations()
                 // get the source's root prim
                 LLViewerObject* sourceRoot = dynamic_cast<LLViewerObject*>(source->getRoot());
 
-                // if the root prim is the same as the animation source, report back as TRUE
+                // if the root prim is the same as the animation source, report back as true
                 if (sourceRoot && sourceRoot->getID() == seat)
                 {
                     LL_DEBUGS("AOEngine") << "foreign animation " << animation_id << " found on seat." << LL_ENDL;
@@ -969,15 +969,15 @@ void AOEngine::updateSortOrder(AOSet::AOState* state)
             LLPointer<LLViewerInventoryItem> newItem = new LLViewerInventoryItem(item);
 
             newItem->setDescription(numStr.str());
-            newItem->setComplete(TRUE);
-            newItem->updateServer(FALSE);
+            newItem->setComplete(true);
+            newItem->updateServer(false);
 
             gInventory.updateItem(newItem);
         }
     }
 }
 
-bool AOEngine::addSet(const std::string &name, BOOL reload, inventory_func_type callback)
+bool AOEngine::addSet(const std::string &name, bool reload, inventory_func_type callback)
 {
     if (mAOFolder.isNull())
     {
@@ -987,8 +987,8 @@ bool AOEngine::addSet(const std::string &name, BOOL reload, inventory_func_type 
         return false;
     }
 
-    BOOL wasProtected = gSavedPerAccountSettings.getBOOL("LockFolders");
-    gSavedPerAccountSettings.setBOOL("LockFolders", FALSE);
+    bool wasProtected = gSavedPerAccountSettings.getBOOL("LockFolders");
+    gSavedPerAccountSettings.setBOOL("LockFolders", false);
     LL_DEBUGS("AOEngine") << "adding set folder " << name << LL_ENDL;
     // fixme LLUUID newUUID = gInventory.createNewCategory(mAOFolder, LLFolderType::FT_NONE, name);
     gInventory.createNewCategory(mAOFolder, LLFolderType::FT_NONE, name, [callback, wasProtected, reload, this](const LLUUID& new_cat_id)
@@ -997,7 +997,7 @@ bool AOEngine::addSet(const std::string &name, BOOL reload, inventory_func_type 
 
             if (reload)
             {
-                mTimerCollection.enableReloadTimer(TRUE);
+                mTimerCollection.enableReloadTimer(true);
             }
             callback(new_cat_id);
         }
@@ -1052,8 +1052,8 @@ bool AOEngine::addAnimation(const AOSet* set, AOSet::AOState* state, const LLInv
     anim.mSortOrder = state->mAnimations.size() + 1;
     state->mAnimations.push_back(anim);
 
-    BOOL wasProtected = gSavedPerAccountSettings.getBOOL("LockAOFolders");
-    gSavedPerAccountSettings.setBOOL("LockAOFolders", FALSE);
+    bool wasProtected = gSavedPerAccountSettings.getBOOL("LockAOFolders");
+    gSavedPerAccountSettings.setBOOL("LockAOFolders", false);
     createAnimationLink(set, state, item, [reload, wasProtected, this](const LLUUID& new_category)
         {
             gSavedPerAccountSettings.setBOOL("LockAOFolders", wasProtected);
@@ -1087,8 +1087,8 @@ bool AOEngine::findForeignItems(const LLUUID& uuid) const
     }
 
     // count backwards in case we have to remove items
-    BOOL wasProtected = gSavedPerAccountSettings.getBOOL("LockAOFolders");
-    gSavedPerAccountSettings.setBOOL("LockAOFolders", FALSE);
+    bool wasProtected = gSavedPerAccountSettings.getBOOL("LockAOFolders");
+    gSavedPerAccountSettings.setBOOL("LockAOFolders", false);
 
     if (items)
     {
@@ -1133,8 +1133,8 @@ bool AOEngine::findForeignItems(const LLUUID& uuid) const
 void AOEngine::purgeFolder(const LLUUID& uuid) const
 {
     // unprotect it
-    BOOL wasProtected = gSavedPerAccountSettings.getBOOL("LockAOFolders");
-    gSavedPerAccountSettings.setBOOL("LockAOFolders", FALSE);
+    bool wasProtected = gSavedPerAccountSettings.getBOOL("LockAOFolders");
+    gSavedPerAccountSettings.setBOOL("LockAOFolders", false);
 
     // move everything that's not an animation link to "lost and found"
     if (findForeignItems(uuid))
@@ -1247,7 +1247,7 @@ bool AOEngine::removeAnimation(const AOSet* set, AOSet::AOState* state, S32 inde
     }
 
     // we need the UI to resync since we deleted something
-    mTimerCollection.enableReloadTimer(TRUE);
+    mTimerCollection.enableReloadTimer(true);
     return true;
 }
 
@@ -1665,12 +1665,12 @@ void AOEngine::saveSet(const AOSet* set)
     LLViewerInventoryCategory* cat=gInventory.getCategory(set->getInventoryUUID());
     LL_WARNS("AOEngine") << cat << LL_ENDL;
     cat->rename(setParams);
-    cat->updateServer(FALSE);
+    cat->updateServer(false);
     gInventory.addChangedMask(LLInventoryObserver::LABEL, cat->getUUID());
     gInventory.notifyObservers();
 */
-    BOOL wasProtected = gSavedPerAccountSettings.getBOOL("LockAOFolders");
-    gSavedPerAccountSettings.setBOOL("LockAOFolders", FALSE);
+    bool wasProtected = gSavedPerAccountSettings.getBOOL("LockAOFolders");
+    gSavedPerAccountSettings.setBOOL("LockAOFolders", false);
     rename_category(&gInventory, set->getInventoryUUID(), setParams);
     gSavedPerAccountSettings.setBOOL("LockAOFolders", wasProtected);
 
@@ -1709,8 +1709,8 @@ void AOEngine::saveState(const AOSet::AOState* state)
         stateParams += ":RN";
     }
 
-    BOOL wasProtected = gSavedPerAccountSettings.getBOOL("LockAOFolders");
-    gSavedPerAccountSettings.setBOOL("LockAOFolders", FALSE);
+    bool wasProtected = gSavedPerAccountSettings.getBOOL("LockAOFolders");
+    gSavedPerAccountSettings.setBOOL("LockAOFolders", false);
     rename_category(&gInventory, state->mInventoryUUID, stateParams);
     gSavedPerAccountSettings.setBOOL("LockAOFolders", wasProtected);
 }
@@ -1993,7 +1993,7 @@ bool AOEngine::importNotecard(const LLInventoryItem* item)
                 item->getType(),
                 &onNotecardLoadComplete,
                 (void*) newUUID,
-                TRUE
+                true
             );
 
             return true;
@@ -2212,7 +2212,7 @@ void AOEngine::processImportStage2()
         if (mImportRetryCount == 5)
         {
             // NOTE: cleanup is the same as at the end of this function. Needs streamlining.
-            mTimerCollection.enableImportTimer(FALSE);
+            mTimerCollection.enableImportTimer(false);
             delete mImportSet;
             mImportSet = NULL;
             mImportCategory.setNull();
@@ -2274,7 +2274,7 @@ void AOEngine::processImportStage2()
 
     if (allComplete)
     {
-        mTimerCollection.enableImportTimer(FALSE);
+        mTimerCollection.enableImportTimer(false);
         mOldImportSets.push_back(mImportSet);  //<ND/> FIRE-3801; Cannot delete here, or LLInstanceTracker gets upset. Just remember and
                                                // delete mOldImportSets once we can.
         mImportSet = NULL;
@@ -2400,7 +2400,7 @@ void AOSitCancelTimer::stop()
     mEventTimer.stop();
 }
 
-BOOL AOSitCancelTimer::tick()
+bool AOSitCancelTimer::tick()
 {
     mTickCount++;
     AOEngine::instance().checkSitCancel();
@@ -2408,7 +2408,7 @@ BOOL AOSitCancelTimer::tick()
     {
         mEventTimer.stop();
     }
-    return FALSE;
+    return false;
 }
 
 // ----------------------------------------------------
@@ -2427,7 +2427,7 @@ AOTimerCollection::~AOTimerCollection()
 {
 }
 
-BOOL AOTimerCollection::tick()
+bool AOTimerCollection::tick()
 {
     if (mInventoryTimer)
     {
@@ -2450,8 +2450,8 @@ BOOL AOTimerCollection::tick()
         AOEngine::instance().processImport(true);
     }
 
-    // always return FALSE or the LLEventTimer will be deleted -> crash
-    return FALSE;
+    // always return false or the LLEventTimer will be deleted -> crash
+    return false;
 }
 
 void AOTimerCollection::enableInventoryTimer(bool enable)

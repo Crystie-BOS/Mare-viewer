@@ -126,7 +126,7 @@ public:
         }
 
         LLUUID group_id;
-        if (!group_id.set(tokens[0], FALSE))
+        if (!group_id.set(tokens[0], false))
         {
             return false;
         }
@@ -194,7 +194,7 @@ public:
             }
             else if (!gdatap->isMemberDataComplete())
             {
-                LL_WARNS() << "LLGroupMgr::getInstance()->getGroupData()->isMemberDataComplete() was FALSE" << LL_ENDL;
+                LL_WARNS() << "LLGroupMgr::getInstance()->getGroupData()->isMemberDataComplete() was false" << LL_ENDL;
                 processGroupData();
                 mRequestProcessed = true;
             }
@@ -256,7 +256,7 @@ void LLGroupActions::startCall(const LLUUID& group_id)
         return;
     }
 
-    LLUUID session_id = gIMMgr->addSession(gdata.mName, IM_SESSION_GROUP_START, group_id, true);
+    LLUUID session_id = gIMMgr->addSession(gdata.mName, IM_SESSION_GROUP_START, group_id, LLSD());
     if (session_id == LLUUID::null)
     {
         LL_WARNS() << "Error adding session" << LL_ENDL;
@@ -378,8 +378,8 @@ void LLGroupActions::processLeaveGroupDataResponse(const LLUUID group_id)
     if (gdatap->mMembershipFee > 0)
     {
         args["COST"] = gdatap->mMembershipFee;
-        LLNotificationsUtil::add("GroupLeaveConfirmMember", args, payload, onLeaveGroup);
-    }
+    LLNotificationsUtil::add("GroupLeaveConfirmMember", args, payload, onLeaveGroup);
+}
     else
     {
         LLNotificationsUtil::add("GroupLeaveConfirmMemberNoFee", args, payload, onLeaveGroup);
@@ -468,7 +468,7 @@ void LLGroupActions::show(const LLUUID &group_id, bool expand_notices_tab)
         LLFloater *floater = LLFloaterReg::getTypedInstance<LLFloaterSidePanelContainer>("people");
         if (!floater->isFrontmost())
         {
-            floater->setVisibleAndFrontmost(TRUE, params);
+        floater->setVisibleAndFrontmost(true, params);
         }
 // [SL:KB] - Patch: UI-GroupFloaters | Checked: 2011-01-23 (Catznip-2.5)
     }

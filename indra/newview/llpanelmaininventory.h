@@ -66,7 +66,7 @@ public:
     LLPanelMainInventory(const LLPanel::Params& p = getDefaultParams());
     ~LLPanelMainInventory();
 
-    BOOL postBuild();
+    bool postBuild();
 
     enum EViewModeType
     {
@@ -75,17 +75,17 @@ public:
         MODE_COMBINATION
     };
 
-    virtual BOOL handleKeyHere(KEY key, MASK mask);
+    virtual bool handleKeyHere(KEY key, MASK mask);
 
     // Inherited functionality
-    /*virtual*/ BOOL handleDragAndDrop(S32 x, S32 y, MASK mask, BOOL drop,
+    /*virtual*/ bool handleDragAndDrop(S32 x, S32 y, MASK mask, bool drop,
                                        EDragAndDropType cargo_type,
                                        void* cargo_data,
                                        EAcceptance* accept,
                                        std::string& tooltip_msg);
     /*virtual*/ void changed(U32);
     /*virtual*/ void draw();
-    /*virtual*/ void    onVisibilityChange ( BOOL new_visibility );
+    /*virtual*/ void    onVisibilityChange ( bool new_visibility );
 
     LLInventoryPanel* getPanel() { return mActivePanel; }
     LLInventoryPanel* getActivePanel() { return mActivePanel; }
@@ -150,14 +150,14 @@ protected:
     void setFilterTextFromFilter();
     void startSearch();
 
-    void onSelectionChange(LLInventoryPanel *panel, const std::deque<LLFolderViewItem*>& items, BOOL user_action);
+    void onSelectionChange(LLInventoryPanel *panel, const std::deque<LLFolderViewItem*>& items, bool user_action);
 
-    static BOOL filtersVisible(void* user_data);
+    static bool filtersVisible(void* user_data);
     void onClearSearch();
     static void onFoldersByName(void *user_data);
-    static BOOL checkFoldersByName(void *user_data);
+    static bool checkFoldersByName(void *user_data);
 
-    static BOOL incrementalFind(LLFolderViewItem* first_item, const char *find_text, BOOL backward);
+    static bool incrementalFind(LLFolderViewItem* first_item, const char *find_text, bool backward);
     void onFilterSelected();
 
     const std::string getFilterSubString();
@@ -234,17 +234,17 @@ protected:
     void showActionMenu(LLMenuGL* menu, std::string spawning_view_name);
     void onTrashButtonClick();
     void onClipboardAction(const LLSD& userdata);
-    BOOL isActionEnabled(const LLSD& command_name);
-    BOOL isActionChecked(const LLSD& userdata);
+    bool isActionEnabled(const LLSD& command_name);
+    bool isActionChecked(const LLSD& userdata);
     void onCustomAction(const LLSD& command_name);
 
     // ## Zi: Filter Links Menu
-    BOOL isFilterLinksChecked(const LLSD& userdata);
+    bool isFilterLinksChecked(const LLSD& userdata);
     void onFilterLinksChecked(const LLSD& userdata);
     // ## Zi: Filter Links Menu
 
     // ## Zi: Extended Inventory Search
-    BOOL isSearchTargetChecked(const LLSD& userdata);
+    bool isSearchTargetChecked(const LLSD& userdata);
     void onSearchTargetChecked(const LLSD& userdata);
     LLInventoryFilter::EFilterSubstringTarget getSearchTarget() const;
     // ## Zi: Extended Inventory Search
@@ -257,7 +257,7 @@ protected:
 
     void onCombinationRootChanged(bool gallery_clicked);
     void onCombinationGallerySelectionChanged(const LLUUID& category_id);
-    void onCombinationInventorySelectionChanged(const std::deque<LLFolderViewItem*>& items, BOOL user_action);
+    void onCombinationInventorySelectionChanged(const std::deque<LLFolderViewItem*>& items, bool user_action);
     /**
      * Set upload cost in "Upload" sub menu.
      */

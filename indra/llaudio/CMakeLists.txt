@@ -24,14 +24,12 @@ set(llaudio_HEADER_FILES
     llvorbisencode.h
     llwindgen.h
     )
-
 if (TARGET ll::fmodstudio)
     list(APPEND llaudio_SOURCE_FILES
          llaudioengine_fmodstudio.cpp
          lllistener_fmodstudio.cpp
          llstreamingaudio_fmodstudio.cpp
          )
-
     list(APPEND llaudio_HEADER_FILES
          llaudioengine_fmodstudio.h
          lllistener_fmodstudio.h

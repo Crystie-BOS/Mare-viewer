@@ -121,9 +121,9 @@ public:
 private:
     LLTrace::StatType<LLTrace::CountAccumulator>*   mNewStatFloatp;
 
-    BOOL mPerSec;
-    BOOL mLastValue; // KKA_821
-    BOOL mInvertBar; // KKA-821
+    bool mPerSec;
+    bool mLastValue; // KKA_821
+    bool mInvertBar; // KKA-821
 
     F32 mValue;
 
@@ -157,9 +157,9 @@ private:
 
     callback_t mClickedCallback;
 
-    /*virtual*/ BOOL handleMouseDown(S32 x, S32 y, MASK mask);
-    /*virtual*/ BOOL handleMouseUp(S32 x, S32 y, MASK mask);
-    /*virtual*/ BOOL handleHover(S32 x, S32 y, MASK mask);
+    /*virtual*/ bool handleMouseDown(S32 x, S32 y, MASK mask);
+    /*virtual*/ bool handleMouseUp(S32 x, S32 y, MASK mask);
+    /*virtual*/ bool handleHover(S32 x, S32 y, MASK mask);
 };
 
 #endif  // LL_LLSTATGRAPH_H

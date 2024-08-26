@@ -1000,6 +1000,9 @@ void LLRender::syncLightState()
 
 void LLRender::syncMatrices()
 {
+    STOP_GLERROR;
+    LL_PROFILE_ZONE_SCOPED_CATEGORY_DISPLAY;
+
     static const U32 name[] =
     {
         LLShaderMgr::MODELVIEW_MATRIX,
@@ -1022,8 +1025,6 @@ void LLRender::syncMatrices()
 
     if (shader)
     {
-        //llassert(shader);
-
         bool mvp_done = false;
 
         U32 i = MM_MODELVIEW;
@@ -1097,7 +1098,7 @@ void LLRender::syncMatrices()
             if (shader->getUniformLocation(LLShaderMgr::INVERSE_PROJECTION_MATRIX))
             {
                 glh::matrix4f inv_proj = mat.inverse();
-                shader->uniformMatrix4fv(LLShaderMgr::INVERSE_PROJECTION_MATRIX, 1, FALSE, inv_proj.m);
+                shader->uniformMatrix4fv(LLShaderMgr::INVERSE_PROJECTION_MATRIX, 1, false, inv_proj.m);
             }
 
             // Used by some full screen effects - such as full screen lights, glow, etc.
@@ -1144,6 +1145,7 @@ void LLRender::syncMatrices()
             syncLightState();
         }
     }
+    STOP_GLERROR;
 }
 
 void LLRender::translatef(const GLfloat& x, const GLfloat& y, const GLfloat& z)
@@ -1620,6 +1622,7 @@ void LLRender::end()
 }
 void LLRender::flush()
 {
+    STOP_GLERROR;
     if (mCount > 0)
     {
         LL_PROFILE_ZONE_SCOPED_CATEGORY_PIPELINE;
@@ -1722,7 +1725,7 @@ void LLRender::flush()
 
                 if (attribute_mask & LLVertexBuffer::MAP_TEXCOORD0)
                 {
-                    vb->setTexCoordData(mTexcoordsp.get());
+                    vb->setTexCoord0Data(mTexcoordsp.get());
                 }
 
                 if (attribute_mask & LLVertexBuffer::MAP_COLOR)
@@ -1730,6 +1733,9 @@ void LLRender::flush()
                     vb->setColorData(mColorsp.get());
                 }
 
+#if LL_DARWIN
+                vb->unmapBuffer();
+#endif
                 vb->unbind();
 
                 sVBCache[vhash] = { vb , std::chrono::steady_clock::now() };

@@ -335,9 +335,9 @@ public:
         mEventTimer.stop();
     }
 
-    virtual BOOL tick() // from LLEventTimer
+    virtual bool tick() // from LLEventTimer
     {
-        return FALSE;
+        return false;
     }
 };
 
@@ -360,7 +360,7 @@ public:
         LLAvatarTracker::instance().addObserver(this);
 
         // For notification when SIP online status changes.
-        LLVoiceClient::getInstance()->addObserver(this);
+        LLVoiceClient::addObserver(this);
         mInvObserver = new LLInventoryFriendCardObserver(this);
     }
 
@@ -368,10 +368,7 @@ public:
     {
         // will be deleted by ~LLInventoryModel
         //delete mInvObserver;
-        if (LLVoiceClient::instanceExists())
-        {
-            LLVoiceClient::getInstance()->removeObserver(this);
-        }
+        LLVoiceClient::removeObserver(this);
         LLAvatarTracker::instance().removeObserver(this);
     }
 
@@ -389,9 +386,9 @@ public:
     }
 
 
-    /*virtual*/ BOOL tick()
+    /*virtual*/ bool tick()
     {
-        if (!mIsActive) return FALSE;
+        if (!mIsActive) return false;
 
         if (mMask & (LLFriendObserver::ADD | LLFriendObserver::REMOVE | LLFriendObserver::ONLINE))
         {
@@ -402,7 +399,7 @@ public:
         mEventTimer.stop();
         mMask = 0;
 
-        return FALSE;
+        return false;
     }
 
     // virtual
@@ -530,10 +527,10 @@ public:
         }
     }
 
-    /*virtual*/ BOOL tick()
+    /*virtual*/ bool tick()
     {
         update();
-        return FALSE;
+        return false;
     }
 private:
 };
@@ -612,10 +609,13 @@ LLPanelPeople::~LLPanelPeople()
     delete mFriendListUpdater;
     delete mRecentListUpdater;
 
-    if(LLVoiceClient::instanceExists())
-    {
-        LLVoiceClient::getInstance()->removeObserver(this);
-    }
+    LLVoiceClient::removeObserver(this);
+
+    mNearbyFilterCommitConnection.disconnect();
+    mFriedsFilterCommitConnection.disconnect();
+    mGroupsFilterCommitConnection.disconnect();
+    mRecentFilterCommitConnection.disconnect();
+
 
     // [FS:CR] Contact sets
     if (mContactSetChangedConnection.connected())
@@ -649,14 +649,14 @@ void LLPanelPeople::removePicker()
     }
 }
 
-BOOL LLPanelPeople::postBuild()
+bool LLPanelPeople::postBuild()
 {
     S32 max_premium = LLAgentBenefitsMgr::get("Premium").getGroupMembershipLimit();
 
-    getChild<LLFilterEditor>("nearby_filter_input")->setCommitCallback(boost::bind(&LLPanelPeople::onFilterEdit, this, _2));
-    getChild<LLFilterEditor>("friends_filter_input")->setCommitCallback(boost::bind(&LLPanelPeople::onFilterEdit, this, _2));
-    getChild<LLFilterEditor>("groups_filter_input")->setCommitCallback(boost::bind(&LLPanelPeople::onFilterEdit, this, _2));
-    getChild<LLFilterEditor>("recent_filter_input")->setCommitCallback(boost::bind(&LLPanelPeople::onFilterEdit, this, _2));
+    mNearbyFilterCommitConnection = getChild<LLFilterEditor>("nearby_filter_input")->setCommitCallback(boost::bind(&LLPanelPeople::onFilterEdit, this, _2));
+    mFriedsFilterCommitConnection = getChild<LLFilterEditor>("friends_filter_input")->setCommitCallback(boost::bind(&LLPanelPeople::onFilterEdit, this, _2));
+    mGroupsFilterCommitConnection = getChild<LLFilterEditor>("groups_filter_input")->setCommitCallback(boost::bind(&LLPanelPeople::onFilterEdit, this, _2));
+    mRecentFilterCommitConnection = getChild<LLFilterEditor>("recent_filter_input")->setCommitCallback(boost::bind(&LLPanelPeople::onFilterEdit, this, _2));
 
     if(LLAgentBenefitsMgr::current().getGroupMembershipLimit() < max_premium)
     {
@@ -804,7 +804,7 @@ BOOL LLPanelPeople::postBuild()
     // Must go after setting commit callback and initializing all pointers to children.
     mTabContainer->selectTabByName(NEARBY_TAB_NAME);
 
-    LLVoiceClient::getInstance()->addObserver(this);
+    LLVoiceClient::addObserver(this);
 
     // call this method in case some list is empty and buttons can be in inconsistent state
     updateButtons();
@@ -812,11 +812,11 @@ BOOL LLPanelPeople::postBuild()
     mOnlineFriendList->setRefreshCompleteCallback(boost::bind(&LLPanelPeople::onFriendListRefreshComplete, this, _1, _2));
     mAllFriendList->setRefreshCompleteCallback(boost::bind(&LLPanelPeople::onFriendListRefreshComplete, this, _1, _2));
 
-    return TRUE;
+    return true;
 }
 
 // virtual
-void LLPanelPeople::onChange(EStatusType status, const std::string &channelURI, bool proximal)
+void LLPanelPeople::onChange(EStatusType status, const LLSD& channelInfo, bool proximal)
 {
     if(status == STATUS_JOINING || status == STATUS_LEFT_CHANNEL)
     {
@@ -991,18 +991,18 @@ void LLPanelPeople::updateNearbyList()
             {
 //CA it doesn't look pretty getting all three messages if someone pops up within chat range, so add logic to only give the
 //   closest active message
-                BOOL messaged = FALSE;
+                bool messaged = false;
                 if (gSavedSettings.getBOOL("RadarReportChatRange"))
                 {
                     if ((r <= CHAT_NORMAL_RADIUS) && (lastRadarSweep[avId].lastDistance > CHAT_NORMAL_RADIUS))
                     {
                         LLAvatarNameCache::get(avId, boost::bind(&LLPanelPeople::giveMessage, this, _1, _2, "entered chat range"));
-                        messaged = TRUE;
+                        messaged = true;
                     }
                     else if ((r > CHAT_NORMAL_RADIUS) && (lastRadarSweep[avId].lastDistance <= CHAT_NORMAL_RADIUS))
                     {
                         LLAvatarNameCache::get(avId, boost::bind(&LLPanelPeople::giveMessage, this, _1, _2, "left chat range"));
-                        messaged = TRUE;
+                        messaged = true;
                     }
                 }
                 if (! messaged && gSavedSettings.getBOOL("RadarReportDrawRange"))
@@ -1010,12 +1010,12 @@ void LLPanelPeople::updateNearbyList()
                     if ((r <= drawRadius) && (lastRadarSweep[avId].lastDistance > drawRadius))
                     {
                         LLAvatarNameCache::get(avId, boost::bind(&LLPanelPeople::giveMessage, this, _1, _2, "entered draw distance"));
-                        messaged = TRUE;
+                        messaged = true;
                     }
                     else if ((r > drawRadius) && (lastRadarSweep[avId].lastDistance <= drawRadius))
                     {
                         LLAvatarNameCache::get(avId, boost::bind(&LLPanelPeople::giveMessage, this, _1, _2, "left draw distance"));
-                        messaged = TRUE;
+                        messaged = true;
                     }
                 }
 //CA add sim range
@@ -1048,16 +1048,16 @@ void LLPanelPeople::updateNearbyList()
 
             if ( 1 )
             {
-                BOOL messaged = FALSE;
+                bool messaged = false;
                 if (gSavedSettings.getBOOL("RadarReportChatRange") && (r <= CHAT_NORMAL_RADIUS))
                 {
                     LLAvatarNameCache::get(avId, boost::bind(&LLPanelPeople::giveMessage, this, _1, _2, llformat("entered chat range (%3.2f m)",r)));
-                    messaged = TRUE;
+                    messaged = true;
                 }
                 if (!messaged && gSavedSettings.getBOOL("RadarReportDrawRange") && (r <= drawRadius))
                 {
                     LLAvatarNameCache::get(avId, boost::bind(&LLPanelPeople::giveMessage, this, _1, _2, llformat("entered draw distance (%3.2f m)",r)));
-                    messaged = TRUE;
+                    messaged = true;
                 }
 //CA add sim range
                 if (!messaged && gSavedSettings.getBOOL("RadarReportSimRange"))
@@ -1086,7 +1086,7 @@ void LLPanelPeople::updateNearbyList()
 
         if ( 1 )
         {
-            BOOL messaged = FALSE;
+            bool messaged = FALSE;
 //CA in the case of departures it makes more sense to prioritise these the other may around so if someone leaves
 //   the region you don't get chat and drawdistance too, or just chat as was the case before this change
 //CA add region alerts
@@ -1096,13 +1096,13 @@ void LLPanelPeople::updateNearbyList()
                 if (rf.lastRegion == regionSelf)
                 {
                     LLAvatarNameCache::get(i->first, boost::bind(&LLPanelPeople::giveMessage, this, _1, _2, "left the region"));
-                    messaged = TRUE;
+                    messaged = true;
                 }
             }
             if (!messaged && gSavedSettings.getBOOL("RadarReportDrawRange") && (rf.lastDistance <= drawRadius))
             {
                 LLAvatarNameCache::get(i->first, boost::bind(&LLPanelPeople::giveMessage, this, _1, _2, "left draw distance"));
-                messaged = TRUE;
+                messaged = true;
             }
             if (!messaged && gSavedSettings.getBOOL("RadarReportChatRange") && (rf.lastDistance <= CHAT_NORMAL_RADIUS))
             {
@@ -1146,7 +1146,7 @@ void LLPanelPeople::updateNearbyList()
     //CA now done earlier because we need it for the arrival tests
     //    updateNearbyRange();
     //
-    LLActiveSpeakerMgr::instance().update(TRUE);
+    LLActiveSpeakerMgr::instance().update(true);
     //mk
     //CA merge error - these are duplicated above where they're used for the radar messages
     //    LLWorld::getInstance()->getAvatars(&mNearbyList->getIDs(), &positions, gAgent.getPositionGlobal(), gSavedSettings.getF32("NearMeRange"));
@@ -1230,8 +1230,8 @@ void LLPanelPeople::updateButtons()
         LLPanel* groups_panel = mTabContainer->getCurrentPanel();
         groups_panel->getChildView("minus_btn")->setEnabled(item_selected && selected_id.notNull()); // a real group selected
 
-        U32 groups_count = gAgent.mGroups.size();
-        S32 max_groups = LLAgentBenefitsMgr::current().getGroupMembershipLimit();
+        U32 groups_count = static_cast<U32>(gAgent.mGroups.size());
+        U32 max_groups = LLAgentBenefitsMgr::current().getGroupMembershipLimit();
         U32 groups_remaining = max_groups > groups_count ? max_groups - groups_count : 0;
         groups_panel->getChild<LLUICtrl>("groupcount")->setTextArg("[COUNT]", llformat("%d", groups_count));
         groups_panel->getChild<LLUICtrl>("groupcount")->setTextArg("[REMAINING]", llformat("%d", groups_remaining));
@@ -1254,8 +1254,9 @@ void LLPanelPeople::updateButtons()
         LLPanel* cur_panel = mTabContainer->getCurrentPanel();
         if (cur_panel)
         {
-            if (cur_panel->hasChild("add_friend_btn", TRUE))
+            if (cur_panel->hasChild("add_friend_btn", true))
                 cur_panel->getChildView("add_friend_btn")->setEnabled(item_selected && !is_friend && !is_self);
+
             if (friends_tab_active)
             {
                 cur_panel->getChildView("friends_del_btn")->setEnabled(multiple_selected);
@@ -1333,25 +1334,6 @@ void LLPanelPeople::getCurrentItemIDs(uuid_vec_t& selected_uuids) const
     else
         llassert(0 && "unknown tab selected");
 
-}
-
-void LLPanelPeople::showGroupMenu(LLMenuGL* menu)
-{
-    // Shows the menu at the top of the button bar.
-
-    // Calculate its coordinates.
-    // (assumes that groups panel is the current tab)
-    LLPanel* bottom_panel = mTabContainer->getCurrentPanel()->getChild<LLPanel>("bottom_panel");
-    LLPanel* parent_panel = mTabContainer->getCurrentPanel();
-    menu->arrangeAndClear();
-    S32 menu_height = menu->getRect().getHeight();
-    S32 menu_x = -2; // *HACK: compensates HPAD in showPopup()
-    S32 menu_y = bottom_panel->getRect().mTop + menu_height;
-
-    // Actually show the menu.
-    menu->buildDrawLabels();
-    menu->updateParent(LLMenuGL::sMenuContainer);
-    LLMenuGL::showPopup(parent_panel, menu, menu_x, menu_y);
 }
 
 void LLPanelPeople::setSortOrder(LLAvatarList* list, ESortOrder order, bool save)
@@ -1605,11 +1587,11 @@ bool LLPanelPeople::isItemsFreeOfFriends(const uuid_vec_t& uuids)
 void LLPanelPeople::onAddFriendWizButtonClicked()
 {
     LLPanel* cur_panel = mTabContainer->getCurrentPanel();
-    LLView * button = cur_panel->findChild<LLButton>("friends_add_btn", TRUE);
+    LLView * button = cur_panel->findChild<LLButton>("friends_add_btn", true);
 
     // Show add friend wizard.
     LLFloater* root_floater = gFloaterView->getParentFloater(this);
-    LLFloaterAvatarPicker* picker = LLFloaterAvatarPicker::show(boost::bind(&LLPanelPeople::onAvatarPicked, _1, _2), FALSE, TRUE, FALSE, root_floater->getName(), button);
+    LLFloaterAvatarPicker* picker = LLFloaterAvatarPicker::show(boost::bind(&LLPanelPeople::onAvatarPicked, _1, _2), false, true, false, root_floater->getName(), button);
     if (!picker)
     {
         return;

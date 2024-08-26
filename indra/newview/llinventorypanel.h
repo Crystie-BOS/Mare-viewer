@@ -161,16 +161,16 @@ public:
     LLFolderViewModelInventory& getRootViewModel() { return mInventoryViewModel; }
 
     // LLView methods
-    /*virtual*/ void onVisibilityChange(BOOL new_visibility) override;
+    /*virtual*/ void onVisibilityChange(bool new_visibility) override;
     void draw() override;
-    /*virtual*/ BOOL handleKeyHere( KEY key, MASK mask ) override;
-    BOOL handleHover(S32 x, S32 y, MASK mask) override;
-    /*virtual*/ BOOL handleDragAndDrop(S32 x, S32 y, MASK mask, BOOL drop,
+    /*virtual*/ bool handleKeyHere( KEY key, MASK mask ) override;
+    bool handleHover(S32 x, S32 y, MASK mask) override;
+    /*virtual*/ bool handleDragAndDrop(S32 x, S32 y, MASK mask, bool drop,
                                    EDragAndDropType cargo_type,
                                    void* cargo_data,
                                    EAcceptance* accept,
                                    std::string& tooltip_msg) override;
-                BOOL handleToolTip(S32 x, S32 y, MASK mask) override;
+                bool handleToolTip(S32 x, S32 y, MASK mask) override;
     // LLUICtrl methods
      /*virtual*/ void onFocusLost() override;
      /*virtual*/ void onFocusReceived() override;
@@ -181,8 +181,8 @@ public:
 
     // Call this method to set the selection.
     void openAllFolders();
-    void setSelection(const LLUUID& obj_id, BOOL take_keyboard_focus);
-    void setSelectCallback(const boost::function<void (const std::deque<LLFolderViewItem*>& items, BOOL user_action)>& cb);
+    void setSelection(const LLUUID& obj_id, bool take_keyboard_focus);
+    void setSelectCallback(const boost::function<void (const std::deque<LLFolderViewItem*>& items, bool user_action)>& cb);
     void clearSelection();
     selected_items_t getSelectedItems() const;
 
@@ -202,10 +202,10 @@ public:
     void setFilterSubStringTarget(const std::string& target);
     LLInventoryFilter::EFilterSubstringTarget getFilterSubStringTarget() const;
     // ## Zi: Extended Inventory Search
-    void setSinceLogoff(BOOL sl);
+    void setSinceLogoff(bool sl);
     void setHoursAgo(U32 hours);
     void setDateSearchDirection(U32 direction);
-    BOOL getSinceLogoff();
+    bool getSinceLogoff();
     void setFilterLinks(U64 filter_links);
     U64 getFilterLinks();       // ## Zi: Filter Links Menu
     void setSearchType(LLInventoryFilter::ESearchType type);
@@ -221,7 +221,7 @@ public:
     bool getAllowDropOnRoot() { return mParams.allow_drop_on_root; }
     bool areViewsInitialized() { return mViewsInitialized == VIEWS_INITIALIZED && mFolderRoot.get() && !mFolderRoot.get()->needsArrange(); }
 
-    void onSelectionChange(const std::deque<LLFolderViewItem*> &items, BOOL user_action);
+    void onSelectionChange(const std::deque<LLFolderViewItem*> &items, bool user_action);
 
     LLHandle<LLInventoryPanel> getInventoryPanelHandle() const { return getDerivedHandle<LLInventoryPanel>(); }
 
@@ -255,7 +255,7 @@ public:
 
     // Find whichever inventory panel is active / on top.
     // "Auto_open" determines if we open an inventory panel if none are open.
-    static LLInventoryPanel *getActiveInventoryPanel(BOOL auto_open = TRUE);
+    static LLInventoryPanel *getActiveInventoryPanel(bool auto_open = true);
 
     static void openInventoryPanelAndSetSelection(bool auto_open,
                                                     const LLUUID& obj_id,
@@ -267,7 +267,7 @@ public:
     void removeItemID(const LLUUID& id);
     LLFolderViewItem* getItemByID(const LLUUID& id);
     LLFolderViewFolder* getFolderByID(const LLUUID& id);
-    void setSelectionByID(const LLUUID& obj_id, BOOL take_keyboard_focus);
+    void setSelectionByID(const LLUUID& obj_id, bool take_keyboard_focus);
     void updateSelection();
 
     void setSuppressOpenItemAction(bool supress_open_item) { mSuppressOpenItemAction = supress_open_item; }
@@ -377,13 +377,13 @@ protected:
     virtual bool                typedViewsFilter(const LLUUID& id, LLInventoryObject const* objectp) { return true; }
 
     virtual void                itemChanged(const LLUUID& item_id, U32 mask, const LLInventoryObject* model_item);
-    BOOL                getIsHiddenFolderType(LLFolderType::EType folder_type) const;
+    bool                getIsHiddenFolderType(LLFolderType::EType folder_type) const;
 
     virtual LLFolderView * createFolderRoot(LLUUID root_id );
     virtual LLFolderViewFolder* createFolderViewFolder(LLInvFVBridge * bridge, bool allow_drop);
     virtual LLFolderViewItem*   createFolderViewItem(LLInvFVBridge * bridge);
 
-    boost::function<void(const std::deque<LLFolderViewItem*>& items, BOOL user_action)> mSelectionCallback;
+    boost::function<void(const std::deque<LLFolderViewItem*>& items, bool user_action)> mSelectionCallback;
 private:
     // buildViewsTree does not include some checks and is meant
     // for recursive use, use buildNewViews() for first call
@@ -484,7 +484,7 @@ protected:
 public:
     ~LLAssetFilteredInventoryPanel() {}
 
-    /*virtual*/ BOOL handleDragAndDrop(S32 x, S32 y, MASK mask, BOOL drop,
+    /*virtual*/ bool handleDragAndDrop(S32 x, S32 y, MASK mask, bool drop,
         EDragAndDropType cargo_type,
         void* cargo_data,
         EAcceptance* accept,

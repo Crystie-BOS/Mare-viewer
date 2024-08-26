@@ -53,7 +53,7 @@
 
 KokuaFloaterBulkRename::KokuaFloaterBulkRename(const LLSD& seed)
 :   LLFloater(seed),
-    mDone(FALSE)
+    mDone(false)
 {
     mID.generate();
     mCommitCallbackRegistrar.add("BulkRename.Ok",       boost::bind(&KokuaFloaterBulkRename::onOkBtn, this));
@@ -63,7 +63,7 @@ KokuaFloaterBulkRename::KokuaFloaterBulkRename(const LLSD& seed)
     mCommitCallbackRegistrar.add("BulkRename.UncheckAll",   boost::bind(&KokuaFloaterBulkRename::onUncheckAll, this));
 }
 
-BOOL KokuaFloaterBulkRename::postBuild()
+bool KokuaFloaterBulkRename::postBuild()
 {
     //with these being named BulkChange rather than BulkPermissions I'm inclined to not create my own set for renaming
     mBulkChangeIncludeAnimations = gSavedSettings.getBOOL("BulkChangeIncludeAnimations");
@@ -77,7 +77,7 @@ BOOL KokuaFloaterBulkRename::postBuild()
     mBulkChangeIncludeTextures = gSavedSettings.getBOOL("BulkChangeIncludeTextures");
     mBulkChangeIncludeSettings = gSavedSettings.getBOOL("BulkChangeIncludeSettings");
 
-    return TRUE;
+    return true;
 }
 
 void KokuaFloaterBulkRename::doApply()
@@ -109,7 +109,7 @@ void KokuaFloaterBulkRename::doApply()
     }
     else
     {
-        mDone = FALSE;
+        mDone = false;
         if (!start())
         {
             LL_WARNS() << "Unexpected bulk permission change failure." << LL_ENDL;
@@ -182,7 +182,7 @@ void KokuaFloaterBulkRename::onCloseBtn()
     closeFloater();
 }
 
-BOOL KokuaFloaterBulkRename::start()
+bool KokuaFloaterBulkRename::start()
 {
     mSearchRegExp = getChild<LLUICtrl>("search_term")->getValue().asString();
     //LL_INFOS() << "Search term is " << mSearchRegExp << LL_ENDL;
@@ -194,10 +194,10 @@ BOOL KokuaFloaterBulkRename::start()
 }
 
 // Go to the next object and start if found. Returns false if no objects left, true otherwise.
-BOOL KokuaFloaterBulkRename::nextObject()
+bool KokuaFloaterBulkRename::nextObject()
 {
     S32 count;
-    BOOL successful_start = FALSE;
+    bool successful_start = false;
     do
     {
         count = mObjectIDs.size();
@@ -213,17 +213,17 @@ BOOL KokuaFloaterBulkRename::nextObject()
     if(isDone() && !mDone)
     {
         getChild<LLScrollListCtrl>("queue output")->addCommentText(getString("done_text"));
-        mDone = TRUE;
+        mDone = true;
     }
     return successful_start;
 }
 
 // Pop the top object off of the queue.
-// Return TRUE if the queue has started, otherwise FALSE.
-BOOL KokuaFloaterBulkRename::popNext()
+// Return true if the queue has started, otherwise false.
+bool KokuaFloaterBulkRename::popNext()
 {
     // get the head element from the container, and attempt to get its inventory.
-    BOOL rv = FALSE;
+    bool rv = false;
     S32 count = mObjectIDs.size();
     if(mCurrentObjectID.isNull() && (count > 0))
     {
@@ -237,7 +237,7 @@ BOOL KokuaFloaterBulkRename::popNext()
             LLUUID* id = new LLUUID(mID);
             registerVOInventoryListener(obj,id);
             requestVOInventory();
-            rv = TRUE;
+            rv = true;
         }
         else
         {
@@ -248,7 +248,7 @@ BOOL KokuaFloaterBulkRename::popNext()
 }
 
 
-void KokuaFloaterBulkRename::doCheckUncheckAll(BOOL check)
+void KokuaFloaterBulkRename::doCheckUncheckAll(bool check)
 {
     gSavedSettings.setBOOL("BulkChangeIncludeAnimations", check);
     gSavedSettings.setBOOL("BulkChangeIncludeBodyParts" , check);
@@ -308,7 +308,7 @@ void KokuaFloaterBulkRename::handleInventory(LLViewerObject* viewer_obj, LLInven
                         status_text = getString("renaming_text");
                         status_text.setArg("[NEWNAME]", new_name);
                     }
-                    updateInventory(object,new_item,TASK_INVENTORY_ITEM_KEY,FALSE);
+                    updateInventory(object,new_item,TASK_INVENTORY_ITEM_KEY,false);
                 }
                 else
                 {

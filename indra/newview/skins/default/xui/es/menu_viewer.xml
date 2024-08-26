@@ -39,12 +39,9 @@
 		<menu_item_check label="Chat..." name="Nearby Chat"/>
 		<menu_item_check label="Hablar" name="Speak"/>
 		<menu_item_check label="Registro de conversación..." name="Conversation Log..."/>
-		<menu label="Transformación de voz" name="VoiceMorphing">
-			<menu_item_check label="Sin transformación de voz" name="NoVoiceMorphing"/>
-			<menu_item_check label="Probar..." name="Preview"/>
-			<menu_item_call label="Suscribir..." name="Subscribe"/>
-			<menu_item_call label="Ventaja Premium..." name="PremiumPerk"/>
-		</menu>
+		<menu_item_call label="Facebook..." name="Facebook"/>
+		<menu_item_call label="Twitter..." name="Twitter"/>
+		<menu_item_call label="Flickr..." name="Flickr"/>
 		<menu_item_check label="Gestos..." name="Gestures"/>
 		<menu_item_check label="Amigos" name="My Friends"/>
 		<menu_item_check label="Grupos" name="My Groups"/>
@@ -142,15 +139,15 @@
 			<menu_item_check label="Ajustar a la cuadrícula" name="Snap to Grid"/>
 			<menu_item_call label="Ajustar a la cuadrícula los ejes X e Y" name="Snap Object XY to Grid"/>
 			<menu_item_call label="Usar lo seleccionado como cuadrícula" name="Use Selection for Grid"/>
-			<menu_item_call label="Opciones de la cuadrícula" name="Grid Options"/>
+			<menu_item_call label="Opciones de la cuadrícula..." name="Grid Options"/>
+			<menu_item_call label="Definir permisos predeterminados..." name="Set default permissions"/>
 		</menu>
 		<menu label="Subir" name="Upload">
-			<menu_item_call label="Imagen ([COST])..." name="Upload Image"/>
-			<menu_item_call label="Sonido ([COST])..." name="Upload Sound"/>
-			<menu_item_call label="Animación ([COST])..." name="Upload Animation"/>
+			<menu_item_call label="Imagen ([COST] L$)..." name="Upload Image"/>
+			<menu_item_call label="Sonido ([COST] L$)..." name="Upload Sound"/>
+			<menu_item_call label="Animación ([COST] L$)..." name="Upload Animation"/>
 			<menu_item_call label="Modelo..." name="Upload Model"/>
-			<menu_item_call label="Masivo ([COST] por archivo)..." name="Bulk Upload"/>
-			<menu_item_call label="Configurar los permisos por defecto de subida" name="perm prefs"/>
+			<menu_item_call label="Masivo ([COST] L$ por archivo)..." name="Bulk Upload"/>
 		</menu>
 		<menu_item_call label="Deshacer" name="Undo"/>
 		<menu_item_call label="Rehacer" name="Redo"/>
@@ -284,6 +281,7 @@
 			<menu_item_check label="Información sobre el nivel de detalle" name="LOD Info"/>
 			<menu_item_check label="Recuento de triángulo" name="Triangle Count"/>
 			<menu_item_check label="Crear cola" name="Build Queue"/>
+			<menu_item_check label="Partículas" name="Particles"/>
 			<menu_item_check label="Articulaciones" name="Joints"/>
 			<menu_item_check label="Vectores de viento" name="Wind Vectors"/>
 			<menu_item_check label="Esculpir" name="Sculpt"/>

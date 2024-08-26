@@ -215,7 +215,7 @@ FSFloaterObjectExport::~FSFloaterObjectExport()
     }
 }
 
-BOOL FSFloaterObjectExport::postBuild()
+bool FSFloaterObjectExport::postBuild()
 {
     mObjectList = getChild<LLScrollListCtrl>("selected_objects");
     mTexturePanel = getChild<LLPanel>("textures_panel");
@@ -664,7 +664,7 @@ bool FSFloaterObjectExport::exportTexture(const LLUUID& texture_id)
 }
 
 // static
-void FSFloaterObjectExport::onImageLoaded(BOOL success, LLViewerFetchedTexture* src_vi, LLImageRaw* src, LLImageRaw* aux_src, S32 discard_level, BOOL final, void* userdata)
+void FSFloaterObjectExport::onImageLoaded(bool success, LLViewerFetchedTexture* src_vi, LLImageRaw* src, LLImageRaw* aux_src, S32 discard_level, bool final, void* userdata)
 {
     if(final && success)
     {
@@ -1212,7 +1212,7 @@ mParent(parent)
     setImage(image);
 }
 
-void FSFloaterObjectExport::FSExportCacheReadResponder::setData(U8* data, S32 datasize, S32 imagesize, S32 imageformat, BOOL imagelocal)
+void FSFloaterObjectExport::FSExportCacheReadResponder::setData(U8* data, S32 datasize, S32 imagesize, S32 imageformat, bool imagelocal)
 {
     if (imageformat != IMG_CODEC_J2C)
     {

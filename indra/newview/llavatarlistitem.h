@@ -80,12 +80,12 @@ public:
     LLAvatarListItem(bool not_from_ui_factory = true);
     virtual ~LLAvatarListItem();
 
-    virtual BOOL postBuild();
+    virtual bool postBuild();
 
     /**
      * Processes notification from speaker indicator to update children when indicator's visibility is changed.
      */
-    virtual void handleVisibilityChange ( BOOL new_visibility );
+    virtual void handleVisibilityChange ( bool new_visibility );
     virtual S32 notifyParent(const LLSD& info);
     virtual void onMouseLeave(S32 x, S32 y, MASK mask);
     virtual void onMouseEnter(S32 x, S32 y, MASK mask);
@@ -146,7 +146,7 @@ public:
     //colouring based on contact sets
     void setUseContactColors(bool use) { mUseContactColors = use;};
 
-    /*virtual*/ BOOL handleDoubleClick(S32 x, S32 y, MASK mask);
+    /*virtual*/ bool handleDoubleClick(S32 x, S32 y, MASK mask);
 
 protected:
     /**

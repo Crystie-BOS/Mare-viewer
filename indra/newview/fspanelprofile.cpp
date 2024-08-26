@@ -119,7 +119,7 @@ public:
 
     //
     // LLView functionality
-    virtual BOOL handleDragAndDrop(S32 x, S32 y, MASK mask, BOOL drop,
+    virtual bool handleDragAndDrop(S32 x, S32 y, MASK mask, bool drop,
                                    EDragAndDropType cargo_type,
                                    void* cargo_data,
                                    EAcceptance* accept,
@@ -142,7 +142,7 @@ void FSDropTarget::doDrop(EDragAndDropType cargo_type, void* cargo_data)
     LL_INFOS() << "FSDropTarget::doDrop()" << LL_ENDL;
 }
 
-BOOL FSDropTarget::handleDragAndDrop(S32 x, S32 y, MASK mask, BOOL drop,
+bool FSDropTarget::handleDragAndDrop(S32 x, S32 y, MASK mask, bool drop,
                                      EDragAndDropType cargo_type,
                                      void* cargo_data,
                                      EAcceptance* accept,
@@ -265,7 +265,7 @@ FSPanelProfileSecondLife::~FSPanelProfileSecondLife()
 //  }
 }
 
-BOOL FSPanelProfileSecondLife::postBuild()
+bool FSPanelProfileSecondLife::postBuild()
 {
     mStatusText = getChild<LLTextBox>("status");
     mGroupList = getChild<LLGroupList>("group_list");
@@ -362,7 +362,7 @@ void FSPanelProfileSecondLife::onOpen(const LLSD& key)
     LLUUID avatar_id = getAvatarId();
     LLAvatarPropertiesProcessor::getInstance()->addObserver(avatar_id, this);
 
-    BOOL own_profile = getSelfProfile();
+    bool own_profile = getSelfProfile();
 
     mGroupInviteButton->setVisible(!own_profile);
     mShowOnMapButton->setVisible(!own_profile);
@@ -564,7 +564,7 @@ void FSPanelProfileSecondLife::fillCommonData(const LLAvatarData* avatar_data)
 
     if (getSelfProfile())
     {
-        mShowInSearchCheckbox->setValue((BOOL)(avatar_data->flags & AVATAR_ALLOW_PUBLISH));
+        mShowInSearchCheckbox->setValue((bool)(avatar_data->flags & AVATAR_ALLOW_PUBLISH));
     }
 }
 
@@ -869,7 +869,7 @@ void FSPanelProfileWeb::onOpen(const LLSD& key)
     resetData();
 }
 
-BOOL FSPanelProfileWeb::postBuild()
+bool FSPanelProfileWeb::postBuild()
 {
     mWebProfileButton = getChild<LLUICtrl>("web_profile");
     mLoadButton = getChild<LLUICtrl>("load");
@@ -1080,7 +1080,7 @@ void FSPanelProfileInterests::onOpen(const LLSD& key)
     resetData();
 }
 
-BOOL FSPanelProfileInterests::postBuild()
+bool FSPanelProfileInterests::postBuild()
 {
     mWantToEditor = getChild<LLLineEditor>("want_to_edit");
     mSkillsEditor = getChild<LLLineEditor>("skills_edit");
@@ -1312,7 +1312,7 @@ void FSPanelPick::setAvatarId(const LLUUID& avatar_id)
     }
 }
 
-BOOL FSPanelPick::postBuild()
+bool FSPanelPick::postBuild()
 {
     mPickName = getChild<LLLineEditor>("pick_name");
     mPickDescription = getChild<LLTextEditor>("pick_desc");
@@ -1428,7 +1428,7 @@ void FSPanelPick::onClickTeleport()
     }
 }
 
-void FSPanelPick::enableSaveButton(BOOL enable)
+void FSPanelPick::enableSaveButton(bool enable)
 {
     mSaveButton->setEnabled(enable);
     mSaveButton->setVisible(enable);
@@ -1459,7 +1459,7 @@ void FSPanelPick::resetDirty()
     mLocationChanged = false;
 }
 
-BOOL FSPanelPick::isDirty() const
+bool FSPanelPick::isDirty() const
 {
     if (mNewPick
         || LLPanel::isDirty()
@@ -1666,7 +1666,7 @@ void FSPanelProfilePicks::onOpen(const LLSD& key)
     }
 }
 
-BOOL FSPanelProfilePicks::postBuild()
+bool FSPanelProfilePicks::postBuild()
 {
     mTabContainer = getChild<LLTabContainer>("tab_picks");
     mNoItemsLabel = getChild<LLUICtrl>("picks_panel_text");
@@ -1783,7 +1783,7 @@ void FSPanelProfilePicks::processProperties(void* data, EAvatarProcessorType typ
             mNewButton->setEnabled(canAddNewPick());
             mDeleteButton->setEnabled(canDeletePick());
 
-            BOOL no_data = !mTabContainer->getTabCount();
+            bool no_data = !mTabContainer->getTabCount();
             mNoItemsLabel->setVisible(no_data);
             if (no_data)
             {
@@ -1875,7 +1875,7 @@ FSPanelProfileFirstLife::~FSPanelProfileFirstLife()
 {
 }
 
-BOOL FSPanelProfileFirstLife::postBuild()
+bool FSPanelProfileFirstLife::postBuild()
 {
     mDescriptionEdit = getChild<LLTextEditor>("fl_description_edit");
     mPicture = getChild<LLTextureCtrl>("real_world_pic");
@@ -1961,7 +1961,7 @@ void FSPanelAvatarNotes::updateData()
     }
 }
 
-BOOL FSPanelAvatarNotes::postBuild()
+bool FSPanelAvatarNotes::postBuild()
 {
     mOnlineStatus = getChild<LLCheckBoxCtrl>("status_check");
     mMapRights = getChild<LLCheckBoxCtrl>("map_check");
@@ -2181,7 +2181,7 @@ FSPanelProfile::~FSPanelProfile()
     }
 }
 
-BOOL FSPanelProfile::postBuild()
+bool FSPanelProfile::postBuild()
 {
     return TRUE;
 }

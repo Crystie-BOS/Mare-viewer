@@ -58,12 +58,12 @@ public:
     LLPanelPeople();
     virtual ~LLPanelPeople();
 
-    /*virtual*/ BOOL    postBuild();
-    /*virtual*/ void    onOpen(const LLSD& key);
-    /*virtual*/ bool    notifyChildren(const LLSD& info);
+    bool postBuild() override;
+    void onOpen(const LLSD& key) override;
+    bool notifyChildren(const LLSD& info) override;
     // Implements LLVoiceClientStatusObserver::onChange() to enable call buttons
     // when voice is available
-    /*virtual*/ void onChange(EStatusType status, const std::string &channelURI, bool proximal);
+    void onChange(EStatusType status, const LLSD& channelInfo, bool proximal) override;
 
     LLAvatarList* getNearbyList() { return mNearbyList; }
 
@@ -115,7 +115,6 @@ private:
 //MK
     void                    reportToNearbyChat(std::string message);
 //mk
-    void                    showGroupMenu(LLMenuGL* menu);
     void                    setSortOrder(LLAvatarList* list, ESortOrder order, bool save = true);
 
     // UI callbacks
@@ -191,6 +190,10 @@ private:
     Updater*                mRecentListUpdater;
     Updater*                mButtonsUpdater;
     LLHandle< LLFloater >   mPicker;
+    boost::signals2::connection mNearbyFilterCommitConnection;
+    boost::signals2::connection mFriedsFilterCommitConnection;
+    boost::signals2::connection mGroupsFilterCommitConnection;
+    boost::signals2::connection mRecentFilterCommitConnection;
     //MK
     LLMenuButton*            mNearbyGearButton;
     LLMenuButton*            mFriendsGearButton;

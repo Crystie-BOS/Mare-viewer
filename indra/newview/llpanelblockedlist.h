@@ -92,9 +92,9 @@ class LLFloaterGetBlockedObjectName : public LLFloater
 public:
     typedef boost::function<void (const std::string&)> get_object_name_callback_t;
 
-    virtual BOOL postBuild();
+    bool postBuild() override;
 
-    virtual BOOL handleKeyHere(KEY key, MASK mask);
+    bool handleKeyHere(KEY key, MASK mask) override;
 
     static LLFloaterGetBlockedObjectName* show(get_object_name_callback_t callback);
 

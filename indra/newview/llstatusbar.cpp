@@ -135,7 +135,7 @@ LLStatusBar::LLStatusBar(const LLRect& rect)
     setRect(rect);
 
     // status bar can possible overlay menus?
-    setMouseOpaque(FALSE);
+    setMouseOpaque(false);
 
     mBalanceTimer = new LLFrameTimer();
     mHealthTimer = new LLFrameTimer();
@@ -176,13 +176,13 @@ void LLStatusBar::draw()
     LLPanel::draw();
 }
 
-BOOL LLStatusBar::handleRightMouseDown(S32 x, S32 y, MASK mask)
+bool LLStatusBar::handleRightMouseDown(S32 x, S32 y, MASK mask)
 {
     show_navbar_context_menu(this,x,y);
-    return TRUE;
+    return true;
 }
 
-BOOL LLStatusBar::postBuild()
+bool LLStatusBar::postBuild()
 {
     gMenuBarView->setRightMouseDownCallback(boost::bind(&show_navbar_context_menu, _1, _2, _3));
 
@@ -282,22 +282,22 @@ BOOL LLStatusBar::postBuild()
     mPanelPresetsCameraPulldown = new LLPanelPresetsCameraPulldown();
     addChild(mPanelPresetsCameraPulldown);
     mPanelPresetsCameraPulldown->setFollows(FOLLOWS_TOP|FOLLOWS_RIGHT);
-    mPanelPresetsCameraPulldown->setVisible(FALSE);
+    mPanelPresetsCameraPulldown->setVisible(false);
 
     mPanelPresetsPulldown = new LLPanelPresetsPulldown();
     addChild(mPanelPresetsPulldown);
     mPanelPresetsPulldown->setFollows(FOLLOWS_TOP|FOLLOWS_RIGHT);
-    mPanelPresetsPulldown->setVisible(FALSE);
+    mPanelPresetsPulldown->setVisible(false);
 
     mPanelVolumePulldown = new LLPanelVolumePulldown();
     addChild(mPanelVolumePulldown);
     mPanelVolumePulldown->setFollows(FOLLOWS_TOP|FOLLOWS_RIGHT);
-    mPanelVolumePulldown->setVisible(FALSE);
+    mPanelVolumePulldown->setVisible(false);
 
     mPanelNearByMedia = new LLPanelNearByMedia();
     addChild(mPanelNearByMedia);
     mPanelNearByMedia->setFollows(FOLLOWS_TOP|FOLLOWS_RIGHT);
-    mPanelNearByMedia->setVisible(FALSE);
+    mPanelNearByMedia->setVisible(false);
 
     mScriptOut = getChildView("scriptout");
     updateBalancePanelPosition();
@@ -306,7 +306,7 @@ BOOL LLStatusBar::postBuild()
     mFilterEdit = getChild<LLSearchEditor>( "search_menu_edit" );
     mSearchPanel = getChild<LLPanel>( "menu_search_panel" );
 
-    BOOL search_panel_visible = gSavedSettings.getBOOL("MenuSearch");
+    bool search_panel_visible = gSavedSettings.getBOOL("MenuSearch");
     mSearchPanel->setVisible(search_panel_visible);
     mFilterEdit->setKeystrokeCallback(boost::bind(&LLStatusBar::onUpdateFilterTerm, this));
     mFilterEdit->setCommitCallback(boost::bind(&LLStatusBar::onUpdateFilterTerm, this));
@@ -318,7 +318,7 @@ BOOL LLStatusBar::postBuild()
         updateMenuSearchPosition();
     }
 
-    return TRUE;
+    return true;
 }
 
 // Per-frame updates of visibility
@@ -544,7 +544,7 @@ void LLStatusBar::sendMoneyBalanceRequest()
     }
     // Double amount of retries due to this request initially happening during busy stage
     // Ideally this should be turned into a capability
-    gMessageSystem->sendReliable(gAgent.getRegionHost(), LL_DEFAULT_RELIABLE_RETRIES * 2, TRUE, LL_PING_BASED_TIMEOUT_DUMMY, NULL, NULL);
+    gMessageSystem->sendReliable(gAgent.getRegionHost(), LL_DEFAULT_RELIABLE_RETRIES * 2, true, LL_PING_BASED_TIMEOUT_DUMMY, NULL, NULL);
 }
 
 
@@ -600,7 +600,7 @@ void LLStatusBar::setLandCommitted(S32 committed)
     mSquareMetersCommitted = committed;
 }
 
-BOOL LLStatusBar::isUserTiered() const
+bool LLStatusBar::isUserTiered() const
 {
     return (mSquareMetersCredit > 0);
 }
@@ -646,10 +646,10 @@ void LLStatusBar::onMouseEnterPresetsCamera()
     // show the master presets pull-down
     LLUI::getInstance()->clearPopups();
     LLUI::getInstance()->addPopup(mPanelPresetsCameraPulldown);
-    mPanelNearByMedia->setVisible(FALSE);
-    mPanelVolumePulldown->setVisible(FALSE);
-    mPanelPresetsPulldown->setVisible(FALSE);
-    mPanelPresetsCameraPulldown->setVisible(TRUE);
+    mPanelNearByMedia->setVisible(false);
+    mPanelVolumePulldown->setVisible(false);
+    mPanelPresetsPulldown->setVisible(false);
+    mPanelPresetsCameraPulldown->setVisible(true);
 }
 
 void LLStatusBar::onMouseEnterPresets()
@@ -670,9 +670,9 @@ void LLStatusBar::onMouseEnterPresets()
     // show the master presets pull-down
     LLUI::getInstance()->clearPopups();
     LLUI::getInstance()->addPopup(mPanelPresetsPulldown);
-    mPanelNearByMedia->setVisible(FALSE);
-    mPanelVolumePulldown->setVisible(FALSE);
-    mPanelPresetsPulldown->setVisible(TRUE);
+    mPanelNearByMedia->setVisible(false);
+    mPanelVolumePulldown->setVisible(false);
+    mPanelPresetsPulldown->setVisible(true);
 }
 
 void LLStatusBar::onMouseEnterVolume()
@@ -697,10 +697,10 @@ void LLStatusBar::onMouseEnterVolume()
     // show the master volume pull-down
     LLUI::getInstance()->clearPopups();
     LLUI::getInstance()->addPopup(mPanelVolumePulldown);
-    mPanelPresetsCameraPulldown->setVisible(FALSE);
-    mPanelPresetsPulldown->setVisible(FALSE);
-    mPanelNearByMedia->setVisible(FALSE);
-    mPanelVolumePulldown->setVisible(TRUE);
+    mPanelPresetsCameraPulldown->setVisible(false);
+    mPanelPresetsPulldown->setVisible(false);
+    mPanelNearByMedia->setVisible(false);
+    mPanelVolumePulldown->setVisible(true);
 }
 
 void LLStatusBar::onMouseEnterNearbyMedia()
@@ -725,10 +725,10 @@ void LLStatusBar::onMouseEnterNearbyMedia()
     LLUI::getInstance()->clearPopups();
     LLUI::getInstance()->addPopup(mPanelNearByMedia);
 
-    mPanelPresetsCameraPulldown->setVisible(FALSE);
-    mPanelPresetsPulldown->setVisible(FALSE);
-    mPanelVolumePulldown->setVisible(FALSE);
-    mPanelNearByMedia->setVisible(TRUE);
+    mPanelPresetsCameraPulldown->setVisible(false);
+    mPanelPresetsPulldown->setVisible(false);
+    mPanelVolumePulldown->setVisible(false);
+    mPanelNearByMedia->setVisible(true);
 }
 
 
@@ -823,7 +823,7 @@ BOOL LLStatusBar::getAudioStreamEnabled() const
 }
 // ## Zi: Media/Stream separation
 
-BOOL can_afford_transaction(S32 cost)
+bool can_afford_transaction(S32 cost)
 {
     return((cost <= 0)||((gStatusBar) && (gStatusBar->getBalance() >=cost)));
 }

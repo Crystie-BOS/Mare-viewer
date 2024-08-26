@@ -27,9 +27,10 @@
 #include "llviewerprecompiledheaders.h"
 
 #if !defined LL_DARWIN
-    #error "Use only with Mac OS X"
+    #error "Use only with macOS"
 #endif
 
+#define LL_CARBON_CRASH_HANDLER 1
 
 #include "llwindowmacosx.h"
 #include "llappviewermacosx-objc.h"
@@ -48,7 +49,9 @@
 #include "llerrorcontrol.h"
 #include "llvoavatarself.h"         // for gAgentAvatarp->getFullname()
 #include <ApplicationServices/ApplicationServices.h>
-
+#ifdef LL_CARBON_CRASH_HANDLER
+#include <Carbon/Carbon.h>
+#endif
 #include <vector>
 #include <exception>
 #include <fstream>
@@ -58,10 +61,6 @@
 #include "lldiriterator.h"
 #include <signal.h>
 #include <CoreAudio/CoreAudio.h>    // for systemwide mute
-
-#include <CoreFoundation/CoreFoundation.h>
-#include <IOKit/IOKitLib.h>
-
 class LLMediaCtrl;      // for LLURLDispatcher
 
 namespace

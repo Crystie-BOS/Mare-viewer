@@ -41,7 +41,7 @@ class AOTimerCollection
         AOTimerCollection();
         ~AOTimerCollection();
 
-        virtual BOOL tick();
+        virtual bool tick();
 
         void enableInventoryTimer(bool enable);
         void enableSettingsTimer(bool enable);
@@ -69,7 +69,7 @@ class AOSitCancelTimer
         void oneShot();
         void stop();
 
-        virtual BOOL tick();
+        virtual bool tick();
 
     protected:
         S32 mTickCount;
@@ -107,7 +107,7 @@ class AOEngine
         const LLUUID& getAOFolder() const;
 
         // true doesn't mean success, it just means we went ahead with calling createNewCategory - use the callback for certainty
-        bool addSet(const std::string &name, BOOL reload = TRUE, inventory_func_type callback = no_op_inventory_func);
+        bool addSet(const std::string &name, bool reload = TRUE, inventory_func_type callback = no_op_inventory_func);
         bool removeSet(AOSet* set);
 
         bool addAnimation(const AOSet* set, AOSet::AOState* state, const LLInventoryItem* item, bool reload = true);

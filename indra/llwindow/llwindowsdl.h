@@ -52,51 +52,51 @@ public:
     void show() override;
     void hide() override;
     void close() override;
-    BOOL getVisible() override;
-    BOOL getMinimized() override;
-    BOOL getMaximized() override;
-    BOOL maximize() override;
+    bool getVisible() override;
+    bool getMinimized() override;
+    bool getMaximized() override;
+    bool maximize() override;
     void minimize() override;
     void restore() override;
-    /*virtual*/ BOOL getFullscreen();
-    BOOL getPosition(LLCoordScreen *position) override;
-    BOOL getSize(LLCoordScreen *size) override;
-    BOOL getSize(LLCoordWindow *size) override;
-    BOOL setPosition(LLCoordScreen position) override;
-    BOOL setSizeImpl(LLCoordScreen size) override;
-    BOOL setSizeImpl(LLCoordWindow size) override;
-    BOOL switchContext(BOOL fullscreen, const LLCoordScreen &size, BOOL enable_vsync, const LLCoordScreen * const posp = NULL) override;
+    /*virtual*/ bool getFullscreen();
+    bool getPosition(LLCoordScreen *position) override;
+    bool getSize(LLCoordScreen *size) override;
+    bool getSize(LLCoordWindow *size) override;
+    bool setPosition(LLCoordScreen position) override;
+    bool setSizeImpl(LLCoordScreen size) override;
+    bool setSizeImpl(LLCoordWindow size) override;
+    bool switchContext(bool fullscreen, const LLCoordScreen &size, bool enable_vsync, const LLCoordScreen * const posp = NULL) override;
     void* createSharedContext() override;
     void makeContextCurrent(void* context) override;
     void destroySharedContext(void* context) override;
     void toggleVSync(bool enable_vsync) override;
-    BOOL setCursorPosition(LLCoordWindow position) override;
-    BOOL getCursorPosition(LLCoordWindow *position) override;
+    bool setCursorPosition(LLCoordWindow position) override;
+    bool getCursorPosition(LLCoordWindow *position) override;
     void showCursor() override;
     void hideCursor() override;
     void showCursorFromMouseMove() override;
     void hideCursorUntilMouseMove() override;
-    BOOL isCursorHidden() override;
+    bool isCursorHidden() override;
     void updateCursor() override;
     void captureMouse() override;
     void releaseMouse() override;
-    void setMouseClipping( BOOL b ) override;
+    void setMouseClipping( bool b ) override;
     void setMinSize(U32 min_width, U32 min_height, bool enforce_immediately = true) override;
 
-    BOOL isClipboardTextAvailable() override;
-    BOOL pasteTextFromClipboard(LLWString &dst) override;
-    BOOL copyTextToClipboard(const LLWString & src) override;
+    bool isClipboardTextAvailable() override;
+    bool pasteTextFromClipboard(LLWString &dst) override;
+    bool copyTextToClipboard(const LLWString & src) override;
 
-    BOOL isPrimaryTextAvailable() override;
-    BOOL pasteTextFromPrimary(LLWString &dst) override;
-    BOOL copyTextToPrimary(const LLWString & src) override;
+    bool isPrimaryTextAvailable() override;
+    bool pasteTextFromPrimary(LLWString &dst) override;
+    bool copyTextToPrimary(const LLWString & src) override;
 
     void flashIcon(F32 seconds) override;
     F32 getGamma() override;
-    BOOL setGamma(const F32 gamma) override;
+    bool setGamma(const F32 gamma) override;
     U32 getFSAASamples() override;
     void setFSAASamples(const U32 fsaa_samples) override;
-    BOOL restoreGamma() override;
+    bool restoreGamma() override;
     ESwapMethod getSwapMethod() override { return mSwapMethod; }
     void processMiscNativeEvents() override;
     void gatherInput() override;
@@ -106,12 +106,12 @@ public:
     void delayInputProcessing() override {};
 
     // handy coordinate space conversion routines
-    BOOL convertCoords(LLCoordScreen from, LLCoordWindow *to) override;
-    BOOL convertCoords(LLCoordWindow from, LLCoordScreen *to) override;
-    BOOL convertCoords(LLCoordWindow from, LLCoordGL *to) override;
-    BOOL convertCoords(LLCoordGL from, LLCoordWindow *to) override;
-    BOOL convertCoords(LLCoordScreen from, LLCoordGL *to) override;
-    BOOL convertCoords(LLCoordGL from, LLCoordScreen *to) override;
+    bool convertCoords(LLCoordScreen from, LLCoordWindow *to) override;
+    bool convertCoords(LLCoordWindow from, LLCoordScreen *to) override;
+    bool convertCoords(LLCoordWindow from, LLCoordGL *to) override;
+    bool convertCoords(LLCoordGL from, LLCoordWindow *to) override;
+    bool convertCoords(LLCoordScreen from, LLCoordGL *to) override;
+    bool convertCoords(LLCoordGL from, LLCoordScreen *to) override;
 
     LLWindowResolution* getSupportedResolutions(S32 &num_resolutions) override;
     F32 getNativeAspectRatio() override;
@@ -121,7 +121,7 @@ public:
     void beforeDialog() override;
     void afterDialog() override;
 
-    BOOL dialogColorPicker(F32 *r, F32 *g, F32 *b) override;
+    bool dialogColorPicker(F32 *r, F32 *g, F32 *b) override;
 
     U32 getAvailableVRAMMegabytes() override;
 
@@ -156,11 +156,11 @@ public:
 protected:
     LLWindowSDL(LLWindowCallbacks* callbacks,
         const std::string& title, int x, int y, int width, int height, U32 flags,
-        BOOL fullscreen, BOOL clearBg, BOOL disable_vsync, BOOL use_gl,
-        BOOL ignore_pixel_depth, U32 fsaa_samples);
+        bool fullscreen, bool clearBg, bool disable_vsync, bool use_gl,
+        bool ignore_pixel_depth, U32 fsaa_samples);
     ~LLWindowSDL();
 
-    BOOL    isValid() override;
+    bool    isValid() override;
     LLSD getNativeKeyData() override;
 
     void    initCursors();
@@ -168,12 +168,12 @@ protected:
     void    moveWindow(const LLCoordScreen& position,const LLCoordScreen& size);
 
     // Changes display resolution. Returns true if successful
-    BOOL    setDisplayResolution(S32 width, S32 height, S32 bits, S32 refresh);
+    bool    setDisplayResolution(S32 width, S32 height, S32 bits, S32 refresh);
 
     // Go back to last fullscreen display resolution.
-    BOOL    setFullscreenResolution();
+    bool    setFullscreenResolution();
 
-    BOOL    shouldPostQuit() { return mPostQuit; }
+    bool    shouldPostQuit() { return mPostQuit; }
 
 protected:
     //
@@ -181,12 +181,12 @@ protected:
     //
 
     // create or re-create the GL context/window.  Called from the constructor and switchContext().
-    BOOL createContext(int x, int y, int width, int height, int bits, BOOL fullscreen, BOOL disable_vsync);
+    bool createContext(int x, int y, int width, int height, int bits, bool fullscreen, bool disable_vsync);
     void destroyContext();
     void setupFailure(const std::string& text, const std::string& caption, U32 type);
     void fixWindowSize(void);
-    U32 SDLCheckGrabbyKeys(SDLKey keysym, BOOL gain);
-    BOOL SDLReallyCaptureInput(BOOL capture);
+    U32 SDLCheckGrabbyKeys(SDLKey keysym, bool gain);
+    bool SDLReallyCaptureInput(bool capture);
 
     //
     // Platform specific variables
@@ -196,7 +196,7 @@ protected:
     SDL_Surface *   mWindow;
     std::string mWindowTitle;
     double      mOriginalAspectRatio;
-    BOOL        mNeedsResize;       // Constructor figured out the window is too big, it needs a resize.
+    bool        mNeedsResize;       // Constructor figured out the window is too big, it needs a resize.
     LLCoordScreen   mNeedsResizeSize;
     F32         mOverrideAspectRatio;
     F32     mGamma;
@@ -212,8 +212,8 @@ protected:
 
 private:
 #if LL_X11
-    void x11_set_urgent(BOOL urgent);
-    BOOL mFlashing;
+    void x11_set_urgent(bool urgent);
+    bool mFlashing;
     LLTimer mFlashTimer;
 #endif //LL_X11
 

@@ -65,8 +65,8 @@ static LLPanelInjector<LLPanelGroup> t_panel_group("panel_group_info_sidetray");
 
 LLPanelGroupTab::LLPanelGroupTab()
     : LLPanel(),
-      mAllowEdit(TRUE),
-      mHasModal(FALSE)
+      mAllowEdit(true),
+      mHasModal(false)
 {
     mGroupID = LLUUID::null;
 }
@@ -75,21 +75,21 @@ LLPanelGroupTab::~LLPanelGroupTab()
 {
 }
 
-BOOL LLPanelGroupTab::isVisibleByAgent(LLAgent* agentp)
+bool LLPanelGroupTab::isVisibleByAgent(LLAgent* agentp)
 {
     //default to being visible
-    return TRUE;
+    return true;
 }
 
-BOOL LLPanelGroupTab::postBuild()
+bool LLPanelGroupTab::postBuild()
 {
-    return TRUE;
+    return true;
 }
 
 LLPanelGroup::LLPanelGroup()
 :   LLPanel(),
     LLGroupMgrObserver( LLUUID() ),
-    mSkipRefresh(FALSE),
+    mSkipRefresh(false),
     mButtonJoin(NULL)
 {
     // Set up the factory callbacks.
@@ -101,10 +101,7 @@ LLPanelGroup::LLPanelGroup()
 LLPanelGroup::~LLPanelGroup()
 {
     LLGroupMgr::getInstance()->removeObserver(this);
-    if(LLVoiceClient::instanceExists())
-    {
-        LLVoiceClient::getInstance()->removeObserver(this);
-    }
+    LLVoiceClient::removeObserver(this);
 }
 
 void LLPanelGroup::onOpen(const LLSD& key)
@@ -157,7 +154,7 @@ void LLPanelGroup::onOpen(const LLSD& key)
 // [/SL:KB]
 }
 
-BOOL LLPanelGroup::postBuild()
+bool LLPanelGroup::postBuild()
 {
     mDefaultNeedsApplyMesg = getString("default_needs_apply_text");
     mWantApplyMesg = getString("want_apply_text");
@@ -222,11 +219,11 @@ BOOL LLPanelGroup::postBuild()
         mJoinText = panel_general->getChild<LLUICtrl>("join_cost_text");
     }
 
-    LLVoiceClient::getInstance()->addObserver(this);
+    LLVoiceClient::addObserver(this);
   //KKA-839 Get the call button set right
   childSetEnabled("btn_call", LLVoiceClient::getInstance()->canCall());
 
-    return TRUE;
+    return true;
 }
 
 void LLPanelGroup::reposButton(const std::string& name)
@@ -260,7 +257,7 @@ void LLPanelGroup::reposButtons()
     reposButton("btn_call");
 }
 
-void LLPanelGroup::reshape(S32 width, S32 height, BOOL called_from_parent )
+void LLPanelGroup::reshape(S32 width, S32 height, bool called_from_parent )
 {
     LLPanel::reshape(width, height, called_from_parent );
 
@@ -309,9 +306,9 @@ void LLPanelGroup::onBtnJoin()
     }
     else
     {
-        LL_DEBUGS() << "joining group: " << mID << LL_ENDL;
-        LLGroupActions::join(mID);
-    }
+    LL_DEBUGS() << "joining group: " << mID << LL_ENDL;
+    LLGroupActions::join(mID);
+}
 }
 
 void LLPanelGroup::changed(LLGroupChange gc)
@@ -322,7 +319,7 @@ void LLPanelGroup::changed(LLGroupChange gc)
 }
 
 // virtual
-void LLPanelGroup::onChange(EStatusType status, const std::string &channelURI, bool proximal)
+void LLPanelGroup::onChange(EStatusType status, const LLSD& channelInfo, bool proximal)
 {
     if(status == STATUS_JOINING || status == STATUS_LEFT_CHANNEL)
     {
@@ -539,7 +536,7 @@ bool LLPanelGroup::apply(LLPanelGroupTab* tab)
             }
         }
 
-        mSkipRefresh = TRUE;
+        mSkipRefresh = true;
         return true;
     }
 
@@ -592,7 +589,7 @@ void LLPanelGroup::refreshData()
 {
     if(mSkipRefresh)
     {
-        mSkipRefresh = FALSE;
+        mSkipRefresh = false;
         return;
     }
     LLGroupMgr::getInstance()->clearGroupData(getID());

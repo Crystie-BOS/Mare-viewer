@@ -112,23 +112,25 @@ void LLStatGraph::draw()
         mUpdateTimer.reset();
     }
 
-    gGL.color4fv(mBackgroundColor.get().mV);
-    gl_rect_2d(0, getRect().getHeight(), getRect().getWidth(), 0, TRUE);
+    LLColor4 color;
 
-    gGL.color4fv(mBorderColor.get().mV);
-    gl_rect_2d(0, getRect().getHeight(), getRect().getWidth(), 0, FALSE);
+    threshold_vec_t::iterator it = std::lower_bound(mThresholds.begin(), mThresholds.end(), Threshold(mValue / mMax, LLUIColor()));
 
-    LLColor4 color = mColor.get();
-
-    for (S32 i = mThresholds.size() - 1; i > -1; --i) {
-        if (mValue > mThresholds[i].mValue) {
-            color = mThresholds[i].mColor;
-            break;
-        }
+    if (it != mThresholds.begin())
+    {
+        it--;
     }
 
+    color = LLUIColorTable::instance().getColor( "MenuDefaultBgColor" );
     gGL.color4fv(color.mV);
-    gl_rect_2d(1, ll_round(frac*getRect().getHeight()), getRect().getWidth() - 1, 0, TRUE);
+    gl_rect_2d(0, getRect().getHeight(), getRect().getWidth(), 0, true);
+
+    gGL.color4fv(LLColor4::black.mV);
+    gl_rect_2d(0, getRect().getHeight(), getRect().getWidth(), 0, false);
+
+    color = it->mColor;
+    gGL.color4fv(color.mV);
+    gl_rect_2d(1, ll_round(frac*getRect().getHeight()), getRect().getWidth() - 1, 0, true);
 }
 
 void LLStatGraph::setMin(const F32 min)
@@ -167,16 +169,16 @@ void LLStatGraph::setClickedCallback(callback_t cb)
     mClickedCallback = boost::bind(cb);
 }
 
-BOOL LLStatGraph::handleMouseDown(S32 x, S32 y, MASK mask)
+bool LLStatGraph::handleMouseDown(S32 x, S32 y, MASK mask)
 {
-    BOOL handled = LLView::handleMouseDown(x, y, mask);
+    bool handled = LLView::handleMouseDown(x, y, mask);
 
     if (getSoundFlags() & MOUSE_DOWN) {
         make_ui_sound("UISndClick");
     }
 
     if (!handled && mClickedCallback) {
-        handled = TRUE;
+        handled = true;
     }
 
     if (handled) {
@@ -190,9 +192,9 @@ BOOL LLStatGraph::handleMouseDown(S32 x, S32 y, MASK mask)
     return handled;
 }
 
-BOOL LLStatGraph::handleMouseUp(S32 x, S32 y, MASK mask)
+bool LLStatGraph::handleMouseUp(S32 x, S32 y, MASK mask)
 {
-    BOOL handled = LLView::handleMouseUp(x, y, mask);
+    bool handled = LLView::handleMouseUp(x, y, mask);
 
     if (getSoundFlags() & MOUSE_UP) {
         make_ui_sound("UISndClickRelease");
@@ -214,23 +216,23 @@ BOOL LLStatGraph::handleMouseUp(S32 x, S32 y, MASK mask)
         //
         if (mClickedCallback && !handled) {
             mClickedCallback();
-            handled = TRUE;
+            handled = true;
         }
     }
 
     return handled;
 }
 
-BOOL LLStatGraph::handleHover(S32 x, S32 y, MASK mask)
+bool LLStatGraph::handleHover(S32 x, S32 y, MASK mask)
 {
-    BOOL handled = LLView::handleHover(x, y, mask);
+    bool handled = LLView::handleHover(x, y, mask);
 
     if (!handled && mClickedCallback) {
         //
         //  clickable statistics graphs change the cursor to a hand
         //
         LLUI::getInstance()->getWindow()->setCursor(UI_CURSOR_HAND);
-        handled = TRUE;
+        handled = true;
     }
 
     return handled;

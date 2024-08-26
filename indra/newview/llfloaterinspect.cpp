@@ -66,7 +66,7 @@
 
 LLFloaterInspect::LLFloaterInspect(const LLSD& key)
   : LLFloater(key),
-    mDirty(FALSE),
+    mDirty(false),
     mOwnerNameCacheConnection(),
     mCreatorNameCacheConnection(),
     mPopupMenu(NULL),
@@ -94,7 +94,7 @@ LLFloaterInspect::LLFloaterInspect(const LLSD& key)
     // </FS:Ansariel>
 }
 
-BOOL LLFloaterInspect::postBuild()
+bool LLFloaterInspect::postBuild()
 {
     mObjectList = getChild<LLScrollListCtrl>("object_list");
 //  childSetAction("button owner",onClickOwnerProfile, this);
@@ -125,7 +125,7 @@ BOOL LLFloaterInspect::postBuild()
 
     refresh();
 
-    return TRUE;
+    return true;
 }
 
 LLFloaterInspect::~LLFloaterInspect(void)
@@ -149,7 +149,7 @@ LLFloaterInspect::~LLFloaterInspect(void)
     }
     else
     {
-        LLFloaterReg::showInstance("build", LLSD(), TRUE);
+        LLFloaterReg::showInstance("build", LLSD(), true);
     }
 
     // <FS:Ansariel> FIRE-22292: Configurable columns
@@ -195,7 +195,7 @@ void LLFloaterInspect::onScrollListRightClicked(LLUICtrl* ctrl, S32 x, S32 y)
 
 void LLFloaterInspect::onOpen(const LLSD& key)
 {
-    BOOL forcesel = LLSelectMgr::getInstance()->setForceSelection(TRUE);
+    bool forcesel = LLSelectMgr::getInstance()->setForceSelection(true);
     LLToolMgr::getInstance()->setTransientTool(LLToolCompInspect::getInstance());
     LLSelectMgr::getInstance()->setForceSelection(forcesel);    // restore previouis value
     mObjectSelection = LLSelectMgr::getInstance()->getSelection();
@@ -702,7 +702,7 @@ void LLFloaterInspect::draw()
     if (mDirty)
     {
         refresh();
-        mDirty = FALSE;
+        mDirty = false;
     }
 
     LLFloater::draw();

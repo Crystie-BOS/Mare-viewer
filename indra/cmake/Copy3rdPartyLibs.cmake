@@ -84,7 +84,6 @@ if(WINDOWS)
         set(release_files ${release_files} BsSndRpt64.exe)
       endif(ADDRESS_SIZE EQUAL 32)
     endif (USE_BUGSPLAT)
-
     if (TARGET ll::fmodstudio)
         # fmodL is included for logging, only one should be picked by manifest
         # set(release_files ${release_files} fmodL.dll)
@@ -201,6 +200,10 @@ elseif(DARWIN)
         liburiparser.1.0.27.dylib
        )
 
+    if (TARGET ll::openal)
+      list(APPEND release_files libalut.dylib libopenal.dylib)
+    endif ()
+
     if (TARGET ll::fmodstudio)
       set(debug_files ${debug_files} libfmodL.dylib)
       set(release_files ${release_files} libfmod.dylib)
@@ -252,11 +255,10 @@ elseif(LINUX)
          #libgobject-2.0.so
                  )
      endif()
-
     if (TARGET ll::fmodstudio)
-      set(debug_files ${debug_files} "libfmodL.so")
+      # set(debug_files ${debug_files} "libfmodL.so")
       set(release_files ${release_files} "libfmod.so")
-    endif ()
+     endif()
 
 else(WINDOWS)
     message(STATUS "WARNING: unrecognized platform for staging 3rd party libs, skipping...")

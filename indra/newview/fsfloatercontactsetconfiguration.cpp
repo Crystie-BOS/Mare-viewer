@@ -52,7 +52,7 @@ FSFloaterContactSetConfiguration::FSFloaterContactSetConfiguration(const LLSD& t
     mContextConeFadeTime = gSavedSettings.getF32("ContextConeFadeTime");
 }
 
-BOOL FSFloaterContactSetConfiguration::postBuild()
+bool FSFloaterContactSetConfiguration::postBuild()
 {
     updateTitle();
 

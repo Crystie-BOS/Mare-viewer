@@ -66,7 +66,7 @@ public:
 
     virtual void clear();
 
-    virtual void setVisible(BOOL visible);
+    virtual void setVisible(bool visible);
 
     void setNameFilter(const std::string& filter);
     void setDirty(bool val = true, bool force_refresh = false);
@@ -93,10 +93,10 @@ public:
     bool getIconsVisible() const { return mShowIcons; }
     const std::string getIconParamName() const{return mIconParamName;}
     std::string getAvatarName(LLAvatarName av_name);
-    virtual BOOL handleRightMouseDown(S32 x, S32 y, MASK mask);
-    /*virtual*/ BOOL handleMouseDown( S32 x, S32 y, MASK mask );
-    /*virtual*/ BOOL handleMouseUp(S32 x, S32 y, MASK mask);
-    /*virtual*/ BOOL handleHover(S32 x, S32 y, MASK mask);
+    virtual bool handleRightMouseDown(S32 x, S32 y, MASK mask);
+    /*virtual*/ bool handleMouseDown( S32 x, S32 y, MASK mask );
+    /*virtual*/ bool handleMouseUp(S32 x, S32 y, MASK mask);
+    /*virtual*/ bool handleHover(S32 x, S32 y, MASK mask);
 
     // [Ansariel: Colorful radar]
     void setUseRangeColors(bool UseRangeColors);
@@ -123,7 +123,7 @@ public:
 protected:
     void refresh();
 
-    void addNewItem(const LLUUID& id, const std::string& name, BOOL is_online, EAddPosition pos = ADD_BOTTOM);
+    void addNewItem(const LLUUID& id, const std::string& name, bool is_online, EAddPosition pos = ADD_BOTTOM);
     void computeDifference(
         const uuid_vec_t& vnew,
         uuid_vec_t& vadded,

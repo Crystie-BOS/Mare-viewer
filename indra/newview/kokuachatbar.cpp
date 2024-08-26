@@ -50,11 +50,11 @@ KokuaChatBar::~KokuaChatBar()
     releaseFocus();
 }
 
-BOOL KokuaChatBar::postBuild()
+bool KokuaChatBar::postBuild()
 {
     mInputEditor = getChild<LLChatEntry>("kc_chat_editor");
-    mInputEditor->setCommitOnFocusLost( FALSE );
-    mInputEditor->setPassDelete(TRUE);
+    mInputEditor->setCommitOnFocusLost( false );
+    mInputEditor->setPassDelete(true);
     mInputEditor->setFont(LLViewerChat::getChatFont());
     mInputEditor->setAutoreplaceCallback(boost::bind(&LLAutoReplace::autoreplaceCallback, LLAutoReplace::getInstance(), _1, _2, _3, _4, _5));
     mInputEditor->setCommitCallback(boost::bind(&KokuaChatBar::onChatBoxCommit, this));
@@ -69,7 +69,7 @@ BOOL KokuaChatBar::postBuild()
 
     setTitle(LLTrans::getString("KokuaChatBar"));
 
-    return TRUE;
+    return true;
 }
 
 //added for KKA-990
@@ -98,7 +98,7 @@ void KokuaChatBar::reshapeChatLayoutPanel()
     // to a single line. If the floater is within the main area of the screen it will expand both top
     // and bottom and retain the centre point's y position. However, if near top or bottom the system
     // takes care of preventing ingress outside of visible areas or into the toolbox zone
-    reshape(getRect().getWidth(), mInputEditor->getRect().getHeight() + mInputEditorHeightPad, FALSE);
+    reshape(getRect().getWidth(), mInputEditor->getRect().getHeight() + mInputEditorHeightPad, false);
     if (mInputEditor->getText().size() == 0)
     {
         storeRectControl();
@@ -120,7 +120,7 @@ void KokuaChatBar::onChatFontChange(LLFontGL* fontp)
 
 void KokuaChatBar::onOpen(const LLSD& key)
 {
-    mInputEditor->setFocus(TRUE);
+    mInputEditor->setFocus(true);
 }
 
 void KokuaChatBar::onChatBoxKeystroke()
@@ -144,14 +144,14 @@ void KokuaChatBar::sendChat( EChatType type )
 
         if (gSavedSettings.getBOOL("KokuaCloseChatBarOnReturn"))
         {
-            mInputEditor->setFocus(FALSE);
+            mInputEditor->setFocus(false);
             closeFloater();
         }
         else if (gSavedSettings.getBOOL("CloseChatOnReturn"))
         {
             // If the user wants to stop chatting on hitting return, lose focus
             // and go out of chat mode.
-            mInputEditor->setFocus(FALSE);
+            mInputEditor->setFocus(false);
         }
     }
 }
@@ -169,21 +169,21 @@ void KokuaChatBar::onChatBoxFocusReceived()
 }
 
 // virtual
-BOOL KokuaChatBar::handleKeyHere( KEY key, MASK mask )
+bool KokuaChatBar::handleKeyHere( KEY key, MASK mask )
 {
-    BOOL handled = FALSE;
+    bool handled = false;
 
     if( KEY_RETURN == key && mask == MASK_CONTROL)
     {
         // shout
         sendChat(CHAT_TYPE_SHOUT);
-        handled = TRUE;
+        handled = true;
     }
     else if (KEY_RETURN == key && mask == MASK_SHIFT)
     {
         // whisper
         sendChat(CHAT_TYPE_WHISPER);
-        handled = TRUE;
+        handled = true;
     }
 
     return handled;
@@ -205,7 +205,7 @@ void KokuaChatBar::startChat(const char* line)
         }
 
         nearby_chat->mInputEditor->endOfDoc();
-        nearby_chat->mInputEditor->setFocus(TRUE);
+        nearby_chat->mInputEditor->setFocus(true);
     }
 }
 

@@ -52,21 +52,21 @@ protected:
     LLResizeBar(const LLResizeBar::Params& p);
     friend class LLUICtrlFactory;
 
-    /*virtual*/ BOOL postBuild();
+    /*virtual*/ bool postBuild();
 public:
 
     virtual void    draw();
-    virtual BOOL    handleHover(S32 x, S32 y, MASK mask);
-    virtual BOOL    handleMouseDown(S32 x, S32 y, MASK mask);
-    virtual BOOL    handleMouseUp(S32 x, S32 y, MASK mask);
-    virtual BOOL    handleDoubleClick(S32 x, S32 y, MASK mask);
+    virtual bool    handleHover(S32 x, S32 y, MASK mask);
+    virtual bool    handleMouseDown(S32 x, S32 y, MASK mask);
+    virtual bool    handleMouseUp(S32 x, S32 y, MASK mask);
+    virtual bool    handleDoubleClick(S32 x, S32 y, MASK mask);
 
     void            setResizeLimits( S32 min_size, S32 max_size ) { mMinSize = min_size; mMaxSize = max_size; }
-    void            setEnableSnapping(BOOL enable) { mSnappingEnabled = enable; }
-    void            setAllowDoubleClickSnapping(BOOL allow) { mAllowDoubleClickSnapping = allow; }
+    void            setEnableSnapping(bool enable) { mSnappingEnabled = enable; }
+    void            setAllowDoubleClickSnapping(bool allow) { mAllowDoubleClickSnapping = allow; }
     bool            canResize() { return getEnabled() && mMaxSize > mMinSize; }
     void            setResizeListener(boost::function<void(void*)> listener) {mResizeListener = listener;}
-    BOOL            isShowDragHandle() const { return mShowDragHandle; }
+    bool            isShowDragHandle() const { return mShowDragHandle; }
     void            setImagePanel(LLPanel * panelp);
     LLPanel *       getImagePanel() const;
 
@@ -79,9 +79,9 @@ private:
     S32                             mMinSize;
     S32                             mMaxSize;
     const Side                      mSide;
-    BOOL                            mSnappingEnabled;
-    BOOL                            mAllowDoubleClickSnapping;
-    BOOL                            mShowDragHandle;
+    bool                            mSnappingEnabled;
+    bool                            mAllowDoubleClickSnapping;
+    bool                            mShowDragHandle;
     LLView*                         mResizingView;
     boost::function<void(void*)>    mResizeListener;
     LLPointer<LLUIImage>            mDragHandleImage;

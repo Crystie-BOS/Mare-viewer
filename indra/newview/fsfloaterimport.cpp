@@ -125,7 +125,7 @@ FSFloaterImport::~FSFloaterImport()
     gSavedSettings.setBOOL("ShowNewInventory", mSavedSettingShowNewInventory);
 }
 
-BOOL FSFloaterImport::postBuild()
+bool FSFloaterImport::postBuild()
 {
     if (LLAgentBenefitsMgr::current().getTextureUploadCost() == 0
         || gAgent.getRegion()->getCentralBakeVersion() > 0)
@@ -893,7 +893,7 @@ bool FSFloaterImport::processPrimCreated(LLViewerObject* object)
         gMessageSystem->addUUIDFast(_PREHASH_AgentID, gAgent.getID());
         gMessageSystem->addUUIDFast(_PREHASH_SessionID, gAgent.getSessionID());
         gMessageSystem->nextBlockFast(_PREHASH_HeaderData);
-        gMessageSystem->addBOOLFast(_PREHASH_Override, (BOOL)FALSE);
+        gMessageSystem->addBOOLFast(_PREHASH_Override, false);
 
         if (prim.has("group_mask"))
         {
@@ -902,7 +902,7 @@ bool FSFloaterImport::processPrimCreated(LLViewerObject* object)
             gMessageSystem->nextBlockFast(_PREHASH_ObjectData);
             gMessageSystem->addU32Fast(_PREHASH_ObjectLocalID, object_local_id);
             gMessageSystem->addU8Fast(_PREHASH_Field, PERM_GROUP);
-            gMessageSystem->addBOOLFast(_PREHASH_Set, (BOOL)(group_mask & PERM_MODIFY) ? TRUE : FALSE);
+            gMessageSystem->addBOOLFast(_PREHASH_Set, (bool)(group_mask & PERM_MODIFY) ? true : false);
             gMessageSystem->addU32Fast(_PREHASH_Mask, PERM_MODIFY | PERM_MOVE | PERM_COPY);
         }
         if (prim.has("everyone_mask"))
@@ -912,12 +912,12 @@ bool FSFloaterImport::processPrimCreated(LLViewerObject* object)
             gMessageSystem->nextBlockFast(_PREHASH_ObjectData);
             gMessageSystem->addU32Fast(_PREHASH_ObjectLocalID, object_local_id);
             gMessageSystem->addU8Fast(_PREHASH_Field, PERM_EVERYONE);
-            gMessageSystem->addBOOLFast(_PREHASH_Set, (BOOL)(everyone_mask & PERM_MOVE) ? TRUE : FALSE);
+            gMessageSystem->addBOOLFast(_PREHASH_Set, (bool)(everyone_mask & PERM_MOVE) ? true : false);
             gMessageSystem->addU32Fast(_PREHASH_Mask, PERM_MOVE);
             gMessageSystem->nextBlockFast(_PREHASH_ObjectData);
             gMessageSystem->addU32Fast(_PREHASH_ObjectLocalID, object_local_id);
             gMessageSystem->addU8Fast(_PREHASH_Field, PERM_EVERYONE);
-            gMessageSystem->addBOOLFast(_PREHASH_Set, (BOOL)(everyone_mask & PERM_COPY) ? TRUE : FALSE);
+            gMessageSystem->addBOOLFast(_PREHASH_Set, (bool)(everyone_mask & PERM_COPY) ? true : false);
             gMessageSystem->addU32Fast(_PREHASH_Mask, PERM_COPY);
         }
         if (prim.has("next_owner_mask"))
@@ -927,17 +927,17 @@ bool FSFloaterImport::processPrimCreated(LLViewerObject* object)
             gMessageSystem->nextBlockFast(_PREHASH_ObjectData);
             gMessageSystem->addU32Fast(_PREHASH_ObjectLocalID, object_local_id);
             gMessageSystem->addU8Fast(_PREHASH_Field, PERM_NEXT_OWNER);
-            gMessageSystem->addBOOLFast(_PREHASH_Set, (BOOL)(next_owner_mask & PERM_MODIFY) ? TRUE : FALSE);
+            gMessageSystem->addBOOLFast(_PREHASH_Set, (bool)(next_owner_mask & PERM_MODIFY) ? true : false);
             gMessageSystem->addU32Fast(_PREHASH_Mask, PERM_MODIFY);
             gMessageSystem->nextBlockFast(_PREHASH_ObjectData);
             gMessageSystem->addU32Fast(_PREHASH_ObjectLocalID, object_local_id);
             gMessageSystem->addU8Fast(_PREHASH_Field, PERM_NEXT_OWNER);
-            gMessageSystem->addBOOLFast(_PREHASH_Set, (BOOL)(next_owner_mask & PERM_COPY) ? TRUE : FALSE);
+            gMessageSystem->addBOOLFast(_PREHASH_Set, (BOOL)(next_owner_mask & PERM_COPY) ? true : false);
             gMessageSystem->addU32Fast(_PREHASH_Mask, PERM_COPY);
             gMessageSystem->nextBlockFast(_PREHASH_ObjectData);
             gMessageSystem->addU32Fast(_PREHASH_ObjectLocalID, object_local_id);
             gMessageSystem->addU8Fast(_PREHASH_Field, PERM_NEXT_OWNER);
-            gMessageSystem->addBOOLFast(_PREHASH_Set, (BOOL)(next_owner_mask & PERM_TRANSFER) ? TRUE : FALSE);
+            gMessageSystem->addBOOLFast(_PREHASH_Set, (bool)(next_owner_mask & PERM_TRANSFER) ? true : false);
             gMessageSystem->addU32Fast(_PREHASH_Mask, PERM_TRANSFER);
         }
 
@@ -948,7 +948,7 @@ bool FSFloaterImport::processPrimCreated(LLViewerObject* object)
     if (prim.has("sale_info"))
     {
         LLSaleInfo sale_info;
-        BOOL has_perm_mask;
+        bool has_perm_mask;
         U32 perm_mask;
         sale_info.fromLLSD(prim["sale_info"], has_perm_mask, perm_mask);
         if (sale_info.isForSale())
