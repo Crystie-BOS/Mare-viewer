@@ -5992,17 +5992,6 @@ void LLVolumeGeometryManager::rebuildGeom(LLSpatialGroup* group)
                         emissive = true;
                     }
 
-//MK
-                    // Do not render surfaces with 0% alpha (unless we are in alpha debug mode or they glow)
-                    if (!emissive && !LLDrawPoolAlpha::sShowDebugAlpha && !gAgent.mRRInterface.sRestrainedLoveRenderInvisibleSurfaces)
-                    {
-                        if (te->getColor().mV[3] < 0.0001f)
-                        {
-                            continue;
-                        }
-                    }
-//mk
-
                     if (facep->isState(LLFace::TEXTURE_ANIM))
                     {
                         if (!vobj->mTexAnimMode)

@@ -1916,16 +1916,6 @@ name="Dummy Menu">
 ###             function="ToggleControl"
 ###             parameter="LimitSelectDistance" />
 ###        </menu_item_check>
-###        <menu_item_check
-###         label="Disable Camera Constraints"
-###         name="Disable Camera Distance">
-###            <menu_item_check.on_check
-###             function="CheckControl"
-###             parameter="DisableCameraConstraints" />
-###            <menu_item_check.on_click
-###             function="ToggleControl"
-###             parameter="DisableCameraConstraints" />
-###        </menu_item_check>
 ###
 ###        <menu_item_separator/>
 ###

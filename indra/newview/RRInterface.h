@@ -357,7 +357,6 @@ public:
     static bool sRestrainedLoveCommandLogging; // KKA-901 minimal always-on logging to aid in crash hunting, renamed and made switchable KKA-914
     static bool sRestrainedLoveLogging; // this controls the generation of LL_INFOS() output, previously controlled by RESTRAINEDLOVEDEBUG too
     static bool sRestrainedLoveHeadMouselookRenderRigged; // cached boolean
-    static bool sRestrainedLoveRenderInvisibleSurfaces; // cached boolean
     static bool sCanOoc; // when true, the user can bypass a sendchat restriction by surrounding with (( and ))
     static std::string sRecvimMessage; // message to replace an incoming IM, when under recvim
     static std::string sSendimMessage; // message to replace an outgoing IM, when under sendim

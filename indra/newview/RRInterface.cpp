@@ -123,7 +123,6 @@ bool RRInterface::sRestrainedLoveDebug = false; // Note: not used in this file; 
 bool RRInterface::sRestrainedLoveLogging = false; // Note: currently only used in this file
 bool RRInterface::sRestrainedLoveCommandLogging = false; // KKA-901/KKA-914 Make some logging full time to aid crash hunting. Currently only used in this file
 bool RRInterface::sRestrainedLoveHeadMouselookRenderRigged = false;
-bool RRInterface::sRestrainedLoveRenderInvisibleSurfaces = false;
 bool RRInterface::sCanOoc = true;
 std::string RRInterface::sRecvimMessage = "The Resident you messaged is prevented from reading your instant messages at the moment, please try again later.";
 std::string RRInterface::sSendimMessage = "*** IM blocked by sender's viewer";

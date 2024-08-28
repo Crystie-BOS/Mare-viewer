@@ -160,11 +160,6 @@ static bool handleRestrainedLoveHeadMouselookRenderRigged(const LLSD& newvalue)
     return true;
 }
 
-static bool handleRestrainedLoveRenderInvisibleSurfaces(const LLSD& newvalue)
-{
-    RRInterface::sRestrainedLoveRenderInvisibleSurfaces = newvalue.asBoolean();
-    return true;
-}
 //mk
 
 static bool handleRenderAvatarMouselookChanged(const LLSD& newvalue)
@@ -978,7 +973,6 @@ void settings_setup_listeners()
     setting_setup_signal_listener(gSavedSettings, "RenderDeferredShowInvisiprims",handleRenderDeferredShowInvisiprimsChanged);
     setting_setup_signal_listener(gSavedSettings, "RestrainedLoveCamDistNbGradients",handleRestrainedLoveCamDistNbGradientsChanged);
     setting_setup_signal_listener(gSavedSettings, "RestrainedLoveHeadMouselookRenderRigged",handleRestrainedLoveHeadMouselookRenderRigged);
-    setting_setup_signal_listener(gSavedSettings, "RestrainedLoveRenderInvisibleSurfaces",handleRestrainedLoveRenderInvisibleSurfaces);
 //mk
     setting_setup_signal_listener(gSavedSettings, "FirstPersonAvatarVisible", handleRenderAvatarMouselookChanged);
     setting_setup_signal_listener(gSavedSettings, "RenderFarClip", handleRenderFarClipChanged);
