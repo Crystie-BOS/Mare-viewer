@@ -79,8 +79,8 @@ LLPanelNearByMedia::LLPanelNearByMedia()
 :   mMediaList(NULL),
       mEnableAllCtrl(NULL),
       mDebugInfoVisible(false),
-      mParcelMediaItem(NULL)
-      mParcelAudioItem(NULL)
+      mParcelMediaItem(NULL),
+//    mParcelAudioItem(NULL),    // ## Zi: Media/Stream separation
       mMoreLessBtn(NULL)
 {
     /* ## Zi: Media/Stream separation
@@ -1335,11 +1335,17 @@ std::string LLPanelNearByMedia::getSelectedUrl()
 {
     std::string url;
     LLUUID selected_media_id = mMediaList->getValue().asUUID();
+/*
     if (selected_media_id == PARCEL_AUDIO_LIST_ITEM_UUID)
     {
         url = LLViewerMedia::getInstance()->getParcelAudioURL();
     }
     else if (selected_media_id == PARCEL_MEDIA_LIST_ITEM_UUID)
+    {
+        url = LLViewerParcelMedia::getInstance()->getURL();
+    }
+*/
+	if (selected_media_id == PARCEL_MEDIA_LIST_ITEM_UUID)
     {
         url = LLViewerParcelMedia::getInstance()->getURL();
     }

@@ -898,7 +898,7 @@ void AOEngine::cycle(eCycleMode cycleMode)
         {
             if (state->mCurrentAnimation == 0)
             {
-                state->mCurrentAnimation = state->mAnimations.size() - 1;
+                state->mCurrentAnimation = static_cast<U32>(state->mAnimations.size() - 1);
             }
             else
             {
@@ -1049,7 +1049,7 @@ bool AOEngine::addAnimation(const AOSet* set, AOSet::AOState* state, const LLInv
     anim.mAssetUUID = item->getAssetUUID();
     anim.mInventoryUUID = item->getUUID();
     anim.mName = item->getName();
-    anim.mSortOrder = state->mAnimations.size() + 1;
+    anim.mSortOrder = static_cast<S32>(state->mAnimations.size() + 1);
     state->mAnimations.push_back(anim);
 
     bool wasProtected = gSavedPerAccountSettings.getBOOL("LockAOFolders");
@@ -1092,7 +1092,7 @@ bool AOEngine::findForeignItems(const LLUUID& uuid) const
 
     if (items)
     {
-        for (S32 index = items->size() - 1; index >= 0; --index)
+        for (S32 index = static_cast<S32>(items->size() - 1); index >= 0; --index)
         {
             bool move = false;
 
@@ -1172,7 +1172,7 @@ bool AOEngine::removeAnimation(const AOSet* set, AOSet::AOState* state, S32 inde
         return false;
     }
 
-    S32 numOfAnimations = state->mAnimations.size();
+    S32 numOfAnimations = static_cast<S32>(state->mAnimations.size());
     if (numOfAnimations == 0)
     {
         return false;
@@ -1253,7 +1253,7 @@ bool AOEngine::removeAnimation(const AOSet* set, AOSet::AOState* state, S32 inde
 
 bool AOEngine::swapWithPrevious(AOSet::AOState* state, S32 index)
 {
-    S32 numOfAnimations = state->mAnimations.size();
+    S32 numOfAnimations = static_cast<S32>(state->mAnimations.size());
     if (numOfAnimations < 2 || index == 0)
     {
         return false;
@@ -1270,7 +1270,7 @@ bool AOEngine::swapWithPrevious(AOSet::AOState* state, S32 index)
 
 bool AOEngine::swapWithNext(AOSet::AOState* state, S32 index)
 {
-    S32 numOfAnimations = state->mAnimations.size();
+    S32 numOfAnimations = static_cast<S32>(state->mAnimations.size());
     if (numOfAnimations < 2 || index == (numOfAnimations - 1))
     {
         return false;
@@ -2134,7 +2134,7 @@ void AOEngine::parseNotecard(const char* buffer)
             LLNotificationsUtil::add("AOImportNoValidDelimiter", args);
             continue;
         }
-        U32 endTag = line.find("]");
+        U32 endTag = static_cast<U32>(line.find("]"));
 
         std::string stateName = line.substr(1, endTag - 1);
         LLStringUtil::trim(stateName);
@@ -2295,7 +2295,7 @@ void AOEngine::processImportStage3(const LLUUID &item_uuid)
         {
             LL_DEBUGS("AOEngine") << "state " << state->mName << " still has animations to link." << LL_ENDL;
 
-            for (S32 animationIndex = state->mAnimations.size() - 1; animationIndex >= 0; --animationIndex)
+            for (S32 animationIndex = static_cast<S32>(state->mAnimations.size() - 1); animationIndex >= 0; --animationIndex)
             {
                 LL_DEBUGS("AOEngine") << "linking animation " << state->mAnimations[animationIndex].mName << LL_ENDL;
 

@@ -859,11 +859,11 @@ void LLFloaterLocateQueue::processScriptRunningReply(LLMessageSystem* msg)
                 hfloater=compile_queue_floater_handles[object_id.asString()];
                 LLCheckedHandle<LLFloaterScriptQueue> floater(hfloater);
 
-                BOOL running;
+                bool running;
                 msg->getBOOLFast(_PREHASH_Script, _PREHASH_Running, running);
                 floater->setIsRunning(running);
 
-                BOOL mono;
+                bool mono;
                 msg->getBOOLFast(_PREHASH_Script, "Mono", mono);
                 floater->setIsMono(mono);
 

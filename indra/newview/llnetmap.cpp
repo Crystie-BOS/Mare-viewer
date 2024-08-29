@@ -1253,17 +1253,15 @@ bool LLNetMap::createImage(LLPointer<LLImageRaw>& rawimagep) const
         img_size <<= 1;
     }
 
-    if( mObjectImagep.isNull() ||
-        (mObjectImagep->getWidth() != img_size) ||
-        (mObjectImagep->getHeight() != img_size) )
-    {
-        mObjectRawImagep = new LLImageRaw(img_size, img_size, 4);
-        U8* data = mObjectRawImagep->getData();
+    if (rawimagep.isNull() || rawimagep->getWidth() != img_size || rawimagep->getHeight() != img_size) {
+        rawimagep = new LLImageRaw(img_size, img_size, 4);
+        U8 *data = rawimagep->getData();
+        if (data) {
         memset( data, 0, img_size * img_size * 4 );
-        mObjectImagep = LLViewerTextureManager::getLocalTexture( mObjectRawImagep.get(), false);
+        }
+        return true;
     }
-    setScale(mScale);
-    mUpdateNow = true;
+    return false;
 }
 
 bool LLNetMap::handleMouseDown(S32 x, S32 y, MASK mask)

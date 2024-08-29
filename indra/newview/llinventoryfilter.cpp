@@ -1932,7 +1932,7 @@ bool LLInventoryFilter::FilterOps::DateRange::validateBlock( bool   emit_errors 
 
 U32 LLInventoryFilter::getFilterSubStringCount() const
 {
-    return mFilterSubStrings.size();
+    return static_cast<U32>(mFilterSubStrings.size());
 }
 
 std::string::size_type LLInventoryFilter::getFilterSubStringPos(U32 index) const

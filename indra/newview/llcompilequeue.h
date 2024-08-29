@@ -92,7 +92,7 @@ protected:
 
     // this does the actual starting immediately for informational operations or
     // after confirmation for modifying/destructive operations
-    BOOL confirmedStart();
+    bool confirmedStart();
 
     bool onScriptQueueConfirmation(const LLSD& notification, const LLSD& response);
 

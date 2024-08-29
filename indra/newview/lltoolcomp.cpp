@@ -797,7 +797,7 @@ bool LLToolCompGun::handleRightMouseDown(S32 x, S32 y, MASK mask)
 
     // Returning true will suppress the context menu
     // NaCl - Rightclick-mousewheel zoom
-    if (!(gKeyboard->currentMask(TRUE) & MASK_ALT))
+    if (!(gKeyboard->currentMask(true) & MASK_ALT))
     {
         static LLCachedControl<LLVector3> _NACL_MLFovValues(gSavedSettings,"_NACL_MLFovValues");
         static LLCachedControl<F32> CameraAngle(gSavedSettings,"CameraAngle");
@@ -817,7 +817,7 @@ bool LLToolCompGun::handleRightMouseDown(S32 x, S32 y, MASK mask)
     // </FS:Ansariel>
 }
 // NaCl - Rightclick-mousewheel zoom
-BOOL LLToolCompGun::handleRightMouseUp(S32 x, S32 y, MASK mask)
+bool LLToolCompGun::handleRightMouseUp(S32 x, S32 y, MASK mask)
 {
     static LLCachedControl<LLVector3> _NACL_MLFovValues(gSavedSettings,"_NACL_MLFovValues");
     static LLCachedControl<F32> CameraAngle(gSavedSettings,"CameraAngle");
@@ -830,7 +830,7 @@ BOOL LLToolCompGun::handleRightMouseUp(S32 x, S32 y, MASK mask)
         gSavedSettings.setVector3("_NACL_MLFovValues",vTemp);
         gSavedSettings.setF32("CameraAngle",vTemp.mV[0]);
     }
-    return TRUE;
+    return true;
 }
 // NaCl End
 

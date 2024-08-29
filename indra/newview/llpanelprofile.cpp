@@ -1485,7 +1485,7 @@ void LLPanelProfileSecondLife::onCommitMenu(const LLSD& userdata)
     else if (item_name == "copy_user_uri")
     {
             std::string uri = LLSLURL("agent", agent_id, "about").getSLURLString();
-        LLClipboard::instance().copyToClipboard(utf8str_to_wstring(uri), 0, uri.size());
+        LLClipboard::instance().copyToClipboard(utf8str_to_wstring(uri), 0, static_cast<S32>(uri.size()));
     }
     else if (item_name == "agent_permissions")
     {

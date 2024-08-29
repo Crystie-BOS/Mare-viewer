@@ -200,7 +200,7 @@ bool KokuaFloaterBulkRename::nextObject()
     bool successful_start = false;
     do
     {
-        count = mObjectIDs.size();
+        count = static_cast<S32>(mObjectIDs.size());
         //LL_INFOS() << "Objects left to process = " << count << LL_ENDL;
         mCurrentObjectID.setNull();
         if(count > 0)
@@ -224,7 +224,7 @@ bool KokuaFloaterBulkRename::popNext()
 {
     // get the head element from the container, and attempt to get its inventory.
     bool rv = false;
-    S32 count = mObjectIDs.size();
+    S32 count = static_cast<S32>(mObjectIDs.size());
     if(mCurrentObjectID.isNull() && (count > 0))
     {
         mCurrentObjectID = mObjectIDs.at(0);

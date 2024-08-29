@@ -170,7 +170,7 @@ const LLUUID& AOSet::getAnimationForState(AOState* state) const
 {
     if (state)
     {
-        S32 numOfAnimations = state->mAnimations.size();
+        S32 numOfAnimations = static_cast<S32>(state->mAnimations.size());
         if (numOfAnimations)
         {
             if (state->mCycle)

@@ -300,7 +300,7 @@ public:
     }
 
 // [SL:KB] - Patch: UI-Notecards | Checked: 2010-09-12 (Catznip-2.1.2d) | Added: Catznip-2.1.2d
-    /*virtual*/ BOOL            handleRightMouseDown(S32 x, S32 y, MASK mask)
+    /*virtual*/ bool            handleRightMouseDown(S32 x, S32 y, MASK mask)
     {
         if (!mContextMenu)
         {
@@ -317,7 +317,7 @@ public:
         mEditor.localPointToScreen(x, y, &screen_x, &screen_y);
         mContextMenu->show(screen_x, screen_y);
 
-        return TRUE;
+        return true;
     }
 
     void onOpen()

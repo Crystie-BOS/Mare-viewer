@@ -379,7 +379,7 @@ void FSFloaterImport::processPrim(LLSD& prim)
         case LLAssetType::AT_BODYPART:
         {
             std::string asset(buffer.begin(), buffer.end());
-            S32 position = asset.rfind("textures");
+            S32 position = static_cast<S32>(asset.rfind("textures"));
             boost::regex pattern("[[:xdigit:]]{8}(-[[:xdigit:]]{4}){3}-[[:xdigit:]]{12}");
             boost::sregex_iterator m1(asset.begin() + position, asset.end(), pattern);
             boost::sregex_iterator m2;
@@ -411,7 +411,7 @@ void FSFloaterImport::processPrim(LLSD& prim)
             }
 
             S32 i;
-            S32 count = gesture->mSteps.size();
+            S32 count = static_cast<S32>(gesture->mSteps.size());
             for (i = 0; i < count; ++i)
             {
                 LLGestureStep* step = gesture->mSteps[i];
@@ -1253,8 +1253,8 @@ void FSFloaterImport::uploadAsset(LLUUID asset_id, LLUUID inventory_item)
         perms_prefix = "Wearables";
         std::string asset(asset_data.begin(), asset_data.end());
 
-        S32 position = asset.rfind("type");
-        S32 end = asset.find("\n", position);
+        S32 position = static_cast<S32>(asset.rfind("type"));
+        S32 end = static_cast<S32>(asset.find("\n", position));
         wearable_type = (LLWearableType::EType)boost::lexical_cast<S32>(asset.substr(position + 5, (end - (position + 5))));
 
         if (getChild<LLCheckBoxCtrl>("temp_asset")->get())
@@ -1263,7 +1263,7 @@ void FSFloaterImport::uploadAsset(LLUUID asset_id, LLUUID inventory_item)
             break;
         }
 
-        position = asset.rfind("textures");
+        position = static_cast<S32>(asset.rfind("textures"));
         boost::regex pattern("[[:xdigit:]]{8}(-[[:xdigit:]]{4}){3}-[[:xdigit:]]{12}");
         boost::sregex_iterator m1(asset.begin() + position, asset.end(), pattern);
         boost::sregex_iterator m2;
@@ -1399,7 +1399,7 @@ void FSFloaterImport::uploadAsset(LLUUID asset_id, LLUUID inventory_item)
             }
 
             S32 i;
-            S32 count = gesture->mSteps.size();
+            S32 count = static_cast<S32>(gesture->mSteps.size());
             bool replace = false;
             for (i = 0; i < count; ++i)
             {

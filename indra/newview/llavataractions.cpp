@@ -1067,7 +1067,7 @@ namespace action_give_inventory
 // static
 void LLAvatarActions::buildResidentsString(std::vector<LLAvatarName> avatar_names, std::string& residents_string, bool complete_name)
 {
-    int len = avatar_names.size();
+    U32 len = static_cast<U32>(avatar_names.size());
 //  llassert(s > 0);
 
     if (len != 1) {

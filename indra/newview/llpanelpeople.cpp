@@ -2269,7 +2269,7 @@ void LLPanelPeople::onContactSetsMenuItemClicked(const LLSD& userdata)
 
         LLSD payload, args;
         std::string set = mContactSetCombo->getValue().asString();
-        S32 selected_size = selected_uuids.size();
+        S32 selected_size = static_cast<S32>(selected_uuids.size());
         args["SET_NAME"] = set;
         args["TARGET"] = (selected_size > 1 ? llformat("%d", selected_size) : LLSLURL("agent", selected_uuids.front(), "about").getSLURLString());
         payload["contact_set"] = set;

@@ -59,7 +59,7 @@ NACLFloaterExploreSounds::~NACLFloaterExploreSounds()
 {
 }
 
-BOOL NACLFloaterExploreSounds::postBuild()
+bool NACLFloaterExploreSounds::postBuild()
 {
     getChild<LLButton>("play_locally_btn")->setClickedCallback(boost::bind(&NACLFloaterExploreSounds::handlePlayLocally, this));
     getChild<LLButton>("look_at_btn")->setClickedCallback(boost::bind(&NACLFloaterExploreSounds::handleLookAt, this));
@@ -77,7 +77,7 @@ BOOL NACLFloaterExploreSounds::postBuild()
     mObjectSounds = getChild<LLCheckBoxCtrl>("objects_chk");
     mPaused = getChild<LLCheckBoxCtrl>("pause_chk");
 
-    return TRUE;
+    return true;
 }
 
 void NACLFloaterExploreSounds::handleSelection()
@@ -142,7 +142,7 @@ public:
     }
 };
 
-BOOL NACLFloaterExploreSounds::tick()
+bool NACLFloaterExploreSounds::tick()
 {
     static const std::string str_playing =  getString("Playing");
     static const std::string str_not_playing = getString("NotPlaying");
@@ -311,7 +311,7 @@ BOOL NACLFloaterExploreSounds::tick()
     mHistoryScroller->selectMultiple(selected_ids);
     mHistoryScroller->setScrollPos(scroll_pos);
 
-    return FALSE;
+    return false;
 }
 
 void NACLFloaterExploreSounds::handlePlayLocally()

@@ -139,8 +139,8 @@ public:
     // inherited from LLKeyBindingToStringHandler
     virtual std::string getKeyBindingAsString(const std::string& mode, const std::string& control) const override;
 
-    BOOL startChosenChat(const char* line); // KKA-990 called from viewerwindow to avoid duplication of chat bar/conversation floater selection logic
-    BOOL chosenChatIsEmpty(); // KKA-990 added to check the chosen chat floater
+    bool startChosenChat(const char* line); // KKA-990 called from viewerwindow to avoid duplication of chat bar/conversation floater selection logic
+    bool chosenChatIsEmpty(); // KKA-990 added to check the chosen chat floater
 
 private:
     bool            scanKey(const std::vector<LLKeyboardBinding> &binding,

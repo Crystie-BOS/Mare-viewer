@@ -736,7 +736,7 @@ void FloaterAO::onClickTrash()
         return;
     }
 
-    for (S32 index = list.size() - 1; index != -1; --index)
+    for (S32 index = static_cast<S32>(list.size() - 1); index != -1; --index)
     {
         AOEngine::instance().removeAnimation(mSelectedSet, mSelectedState, mAnimationList->getItemIndex(list[index]));
     }

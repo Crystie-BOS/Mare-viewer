@@ -519,7 +519,7 @@ void LLAgent::init()
     mHttpPolicy = app_core_http.getPolicy(LLAppCoreHttp::AP_AGENT);
 
     std::string checkInterestSetting = gSavedSettings.getString("KokuaPersistInterestListMode");
-    if (checkInterestSetting == LLViewerRegion::IL_MODE_DEFAULT || checkInterestSetting == LLViewerRegion::IL_MODE_360)
+    if (checkInterestSetting == IL_MODE_DEFAULT || checkInterestSetting == IL_MODE_360)
     {
         LL_INFOS() << "Setting initial interest list mode to " << checkInterestSetting << LL_ENDL;
         mInterestListMode = checkInterestSetting;

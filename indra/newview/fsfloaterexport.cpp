@@ -95,14 +95,14 @@ void FSFloaterObjectExport::onIdle()
 
         if (mInventoryRequests.empty())
         {
-            mLastRequest = mAssetRequests.size();
+            mLastRequest = static_cast<S32>(mAssetRequests.size());
             mWaitTimer.start();
             mExportState = ASSET_DOWNLOAD;
         }
         else if (mLastRequest != mInventoryRequests.size())
         {
             mWaitTimer.start();
-            mLastRequest = mInventoryRequests.size();
+            mLastRequest = static_cast<S32>(mInventoryRequests.size());
             updateTitleProgress(INVENTORY_DOWNLOAD);
         }
         else if (mWaitTimer.getElapsedTimeF32() > MAX_INVENTORY_WAIT_TIME)
@@ -126,14 +126,14 @@ void FSFloaterObjectExport::onIdle()
 
         if (mAssetRequests.empty())
         {
-            mLastRequest = mRequestedTexture.size();
+            mLastRequest = static_cast<S32>(mRequestedTexture.size());
             mWaitTimer.start();
             mExportState = TEXTURE_DOWNLOAD;
         }
         else if (mLastRequest != mAssetRequests.size())
         {
             mWaitTimer.start();
-            mLastRequest = mAssetRequests.size();
+            mLastRequest = static_cast<S32>(mAssetRequests.size());
             updateTitleProgress(ASSET_DOWNLOAD);
         }
         else if (mWaitTimer.getElapsedTimeF32() > MAX_ASSET_WAIT_TIME)
@@ -177,7 +177,7 @@ void FSFloaterObjectExport::onIdle()
         else if (mLastRequest != mRequestedTexture.size())
         {
             mWaitTimer.start();
-            mLastRequest = mRequestedTexture.size();
+            mLastRequest = static_cast<S32>(mRequestedTexture.size());
             updateTitleProgress(TEXTURE_DOWNLOAD);
         }
         else if (mWaitTimer.getElapsedTimeF32() > MAX_TEXTURE_WAIT_TIME)
@@ -322,7 +322,7 @@ bool FSFloaterObjectExport::exportSelection()
     if (mExported && !mAborted)
     {
         mWaitTimer.start();
-        mLastRequest = mInventoryRequests.size();
+        mLastRequest = static_cast<S32>(mInventoryRequests.size());
         mExportState = INVENTORY_DOWNLOAD;
         gIdleCallbacks.addFunction(onIdle, this);
     }
@@ -846,7 +846,7 @@ void FSFloaterObjectExport::onLoadComplete(const LLUUID& asset_uuid, LLAssetType
     case LLAssetType::AT_BODYPART:
     {
         std::string asset(buffer.begin(), buffer.end());
-        S32 position = asset.rfind("textures");
+        S32 position = static_cast<S32>(asset.rfind("textures"));
         boost::regex pattern("[[:xdigit:]]{8}(-[[:xdigit:]]{4}){3}-[[:xdigit:]]{12}");
         boost::sregex_iterator m1(asset.begin() + position, asset.end(), pattern);
         boost::sregex_iterator m2;
@@ -879,7 +879,7 @@ void FSFloaterObjectExport::onLoadComplete(const LLUUID& asset_uuid, LLAssetType
         std::string name;
         std::string description;
         S32 i;
-        S32 count = gesture->mSteps.size();
+        S32 count = static_cast<S32>(gesture->mSteps.size());
         for (i = 0; i < count; ++i)
         {
             LLGestureStep* step = gesture->mSteps[i];
@@ -1147,7 +1147,7 @@ void FSFloaterObjectExport::addSelectedObjects()
             }
 
             updateTextureInfo();
-            mNumTextures = mTextures.size();
+            mNumTextures = static_cast<S32>(mTextures.size());
             mNumExportableTextures = getNumExportableTextures();
         }
         else

@@ -952,8 +952,8 @@ void LLWorldMapView::drawItems()
     static LLCachedControl<bool> mapShowTelehubs(gSavedSettings, "MapShowTelehubs");
     static LLCachedControl<bool> mapShowLandForSale(gSavedSettings, "MapShowLandForSale");
     static LLCachedControl<bool> mapShowEvents(gSavedSettings, "MapShowEvents");
-    bool show_mature = mature_enabled && gSavedSettings.getBOOL("ShowMatureEvents");
-    bool show_adult = adult_enabled && gSavedSettings.getBOOL("ShowAdultEvents");
+    static LLCachedControl<bool> showMatureEvents(gSavedSettings, "ShowMatureEvents");
+    static LLCachedControl<bool> showAdultEvents(gSavedSettings, "ShowAdultEvents");
     bool show_mature = mature_enabled && showMatureEvents;
     bool show_adult = adult_enabled && showAdultEvents;
 

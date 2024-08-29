@@ -1004,7 +1004,7 @@ LLUUID LLInventoryModel::findCategoryByName(std::string name)
         cats = get_ptr_in_map(mParentChildCategoryTree, root_id);
         if(cats)
         {
-            S32 count = cats->size();
+            S32 count = static_cast<S32>(cats->size());
             for(S32 i = 0; i < count; ++i)
             {
                 if(cats->at(i)->getName() == name)

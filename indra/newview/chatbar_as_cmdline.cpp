@@ -108,7 +108,7 @@ public:
             }
         }
     }
-    BOOL tick()
+    bool tick()
     {
         LLViewerInventoryItem* subj = instack.top();
         instack.pop();
@@ -154,7 +154,7 @@ public:
     ~ZdCleanup()
     {
     }
-    BOOL tick()
+    bool tick()
     {
         zdrop = NULL;
         return TRUE;
@@ -190,7 +190,7 @@ public:
             report_to_nearby_chat("Ztake deactivated.");
         }
     }
-    BOOL tick()
+    bool tick()
     {
         {
             LLMessageSystem *msg = gMessageSystem;
@@ -295,7 +295,7 @@ public:
     ~LOZtCleanup()
     {
     }
-    BOOL tick()
+    bool tick()
     {
         ztake->mRunning = TRUE;
         delete ztake;
@@ -323,7 +323,7 @@ public:
     {
         report_to_nearby_chat("Mtake deactivated.");
     }
-    BOOL tick()
+    bool tick()
     {
         {
             LLMessageSystem *msg = gMessageSystem;
@@ -339,17 +339,17 @@ public:
                     std::string primX = llformat("%f",(float)object->getScale().mV[VX]);
                     std::string primY = llformat("%f",(float)object->getScale().mV[VY]);
                     std::string primZ = llformat("%f",(float)object->getScale().mV[VZ]);
-                    zeroClearX = primX.find_last_not_of("0")+1;
+                    zeroClearX = static_cast<int>(primX.find_last_not_of("0")+1);
                     primX = primX.substr(0,zeroClearX);
-                    zeroClearY = primY.find_last_not_of("0")+1;
+                    zeroClearY = static_cast<int>(primY.find_last_not_of("0")+1);
                     primY = primY.substr(0,zeroClearY);
-                    zeroClearZ = primZ.find_last_not_of("0")+1;
+                    zeroClearZ = static_cast<int>(primZ.find_last_not_of("0")+1);
                     primZ = primZ.substr(0,zeroClearZ);
-                    zeroClearX = primX.find_last_not_of(".")+1;
+                    zeroClearX = static_cast<int>(primX.find_last_not_of(".")+1);
                     primX = primX.substr(0,zeroClearX);
-                    zeroClearY = primY.find_last_not_of(".")+1;
+                    zeroClearY = static_cast<int>(primY.find_last_not_of(".")+1);
                     primY = primY.substr(0,zeroClearY);
-                    zeroClearZ = primZ.find_last_not_of(".")+1;
+                    zeroClearZ = static_cast<int>(primZ.find_last_not_of(".")+1);
                     primZ = primZ.substr(0,zeroClearZ);
                     std::string name = llformat("%sx%sx%s",primX.c_str(),primY.c_str(),primZ.c_str());
                     msg->newMessageFast(_PREHASH_ObjectName);

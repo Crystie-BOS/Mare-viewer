@@ -41,7 +41,7 @@ QToolAlign::~QToolAlign()
 }
 
 
-BOOL QToolAlign::handleMouseDown(S32 x, S32 y, MASK mask)
+bool QToolAlign::handleMouseDown(S32 x, S32 y, MASK mask)
 {
     if (mHighlightedAxis != -1)
     {
@@ -52,7 +52,7 @@ BOOL QToolAlign::handleMouseDown(S32 x, S32 y, MASK mask)
         gViewerWindow->pickAsync(x, y, mask, pickCallback);
     }
 
-    return TRUE;
+    return true;
 }
 
 
@@ -114,7 +114,7 @@ void QToolAlign::handleDeselect()
 }
 
 
-BOOL QToolAlign::findSelectedManipulator(S32 x, S32 y)
+bool QToolAlign::findSelectedManipulator(S32 x, S32 y)
 {
     mHighlightedAxis = -1;
     mHighlightedDirection = 0;
@@ -174,25 +174,25 @@ BOOL QToolAlign::findSelectedManipulator(S32 x, S32 y)
             {
                 mHighlightedAxis = axis;
                 mHighlightedDirection = direction;
-                return TRUE;
+                return true;
             }
 
         }
     }
 
-    return FALSE;
+    return false;
 }
 
 
-BOOL QToolAlign::handleHover(S32 x, S32 y, MASK mask)
+bool QToolAlign::handleHover(S32 x, S32 y, MASK mask)
 {
     if (mask & MASK_SHIFT)
     {
-        mForce = FALSE;
+        mForce = false;
     }
     else
     {
-        mForce = TRUE;
+        mForce = true;
     }
 
     gViewerWindow->setCursor(UI_CURSOR_ARROW);
@@ -380,7 +380,7 @@ void QToolAlign::render()
 }
 
 // only works for our specialized (AABB, position centered) bboxes
-BOOL bbox_overlap(LLBBox bbox1, LLBBox bbox2)
+bool bbox_overlap(LLBBox bbox1, LLBBox bbox2)
 {
     const F32 FUDGE = 0.001f;  // because of SL precision/rounding
 
@@ -402,7 +402,7 @@ public:
     BBoxCompare(S32 axis, F32 direction, std::map<LLPointer<LLViewerObject>, LLBBox >& bboxes) :
         mAxis(axis), mDirection(direction), mBBoxes(bboxes) {}
 
-    BOOL operator() (LLViewerObject* object1, LLViewerObject* object2)
+    bool operator() (LLViewerObject* object1, LLViewerObject* object2)
     {
         LLVector3 corner1 = mBBoxes[object1].getCenterAgent() -
             mDirection * mBBoxes[object1].getExtentLocal()/2.0;
@@ -504,7 +504,7 @@ void QToolAlign::align()
             new_bbox.addPointLocal(-1.0 * this_bbox.getExtentLocal() / 2.0);
 
             // check to see if it overlaps the previously placed objects
-            BOOL overlap = FALSE;
+            bool overlap = false;
 
             LL_WARNS() << "i=" << i << " j=" << j << LL_ENDL;
 
@@ -515,7 +515,7 @@ void QToolAlign::align()
                     LLViewerObject* other_object = objects[k];
                     LLBBox other_bbox = new_bboxes[other_object];
 
-                    BOOL overlaps_this = bbox_overlap(other_bbox, new_bbox);
+                    bool overlaps_this = bbox_overlap(other_bbox, new_bbox);
 
                     if (overlaps_this)
                     {

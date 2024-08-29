@@ -179,14 +179,14 @@ bool LLToolPie::handleMouseDown(S32 x, S32 y, MASK mask)
     return handleLeftClickPick();
 }
 
-BOOL LLToolPie::handleMiddleMouseDown(S32 x, S32 y, MASK mask)
+bool LLToolPie::handleMiddleMouseDown(S32 x, S32 y, MASK mask)
 {
     LLPickInfo pick = gViewerWindow->pickImmediate(x, y, TRUE);
 
     return handleMediaClick(pick, 2);
 }
 
-BOOL LLToolPie::handleMiddleMouseUp(S32 x, S32 y, MASK mask)
+bool LLToolPie::handleMiddleMouseUp(S32 x, S32 y, MASK mask)
 {
     return LLViewerMediaFocus::getInstance()->handleMiddleMouse(x, y, mask, false);
 }
@@ -2300,12 +2300,12 @@ LLToolPie::~LLToolPie()
 // <FS:ND> FIRE-10276; handleTooltipObject can be called during name resolution (LLAvatarNameCache), then hover_object can lon gbe destroyed and the pointer invalid.
 // To circumvent this just pass the id and try to fetch the object from gObjectList.
 
-BOOL LLToolPie::handleTooltipObjectById( LLUUID hoverObjectId, std::string line, std::string tooltip_msg)
+bool LLToolPie::handleTooltipObjectById( LLUUID hoverObjectId, std::string line, std::string tooltip_msg)
 {
     LLViewerObject* pObject = gObjectList.findObject( hoverObjectId );
 
     if( !pObject )
-        return TRUE;
+        return true;
 
     return handleTooltipObject( pObject, line, tooltip_msg );
 }

@@ -1119,7 +1119,7 @@ bool LLViewerInput::startChosenChat(const char* line) // KKA-990 moved here from
             }
         }
     }
-    return FALSE;
+    return false;
 }
 
 // static

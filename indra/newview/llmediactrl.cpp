@@ -300,7 +300,7 @@ bool LLMediaCtrl::handleMouseDown( S32 x, S32 y, MASK mask )
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-BOOL LLMediaCtrl::handleMiddleMouseUp( S32 x, S32 y, MASK mask )
+bool LLMediaCtrl::handleMiddleMouseUp( S32 x, S32 y, MASK mask )
 {
     if (LLPanel::handleMiddleMouseUp(x, y, mask)) return TRUE;
     convertInputCoords(x, y);
@@ -317,7 +317,7 @@ BOOL LLMediaCtrl::handleMiddleMouseUp( S32 x, S32 y, MASK mask )
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-BOOL LLMediaCtrl::handleMiddleMouseDown( S32 x, S32 y, MASK mask )
+bool LLMediaCtrl::handleMiddleMouseDown( S32 x, S32 y, MASK mask )
 {
     if (LLPanel::handleMiddleMouseDown(x, y, mask)) return TRUE;
     convertInputCoords(x, y);

@@ -1499,7 +1499,7 @@ bool LLFloaterInventoryFinder::getCheckSinceLogoff()
 {
     return getChild<LLUICtrl>("check_since_logoff")->getValue();
 }
-BOOL LLFloaterInventoryFinder::getCheckTransferrable()
+bool LLFloaterInventoryFinder::getCheckTransferrable()
 {
     return getChild<LLUICtrl>("check_transferrable")->getValue();
 }
@@ -2352,7 +2352,7 @@ void LLPanelMainInventory::onFilterLinksChecked(const LLSD& userdata)
     }
 }
 
-BOOL LLPanelMainInventory::isFilterLinksChecked(const LLSD& userdata)
+bool LLPanelMainInventory::isFilterLinksChecked(const LLSD& userdata)
 {
     const std::string command_name = userdata.asString();
     if (command_name == "show_links")
@@ -2370,7 +2370,7 @@ BOOL LLPanelMainInventory::isFilterLinksChecked(const LLSD& userdata)
         return (getActivePanel()->getFilter().getFilterLinks() == LLInventoryFilter::FILTERLINK_EXCLUDE_LINKS);
     }
 
-    return FALSE;
+    return false;
 }
 // ## Zi: Filter Links Menu
 
@@ -2386,7 +2386,7 @@ LLInventoryFilter::EFilterSubstringTarget LLPanelMainInventory::getSearchTarget(
     return getActivePanel()->getFilterSubStringTarget();
 }
 
-BOOL LLPanelMainInventory::isSearchTargetChecked(const LLSD& userdata)
+bool LLPanelMainInventory::isSearchTargetChecked(const LLSD& userdata)
 {
     const std::string command_name = userdata.asString();
     if (command_name == "name")
@@ -2413,7 +2413,7 @@ BOOL LLPanelMainInventory::isSearchTargetChecked(const LLSD& userdata)
     {
         return (getSearchTarget()==LLInventoryFilter::SUBST_TARGET_ALL);
     }
-    return FALSE;
+    return false;
 }
 // ## Zi: Extended Inventory Search
 

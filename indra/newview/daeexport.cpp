@@ -125,14 +125,14 @@ ColladaExportFloater::~ColladaExportFloater()
     }
 }
 
-BOOL ColladaExportFloater::postBuild()
+bool ColladaExportFloater::postBuild()
 {
     mTitleProgress = getString("texture_progress");
     mTexturePanel = getChild<LLPanel>("textures_panel");
     childSetAction("export_btn", boost::bind(&ColladaExportFloater::onClickExport, this));
     LLSelectMgr::getInstance()->mUpdateSignal.connect(boost::bind(&ColladaExportFloater::updateSelection, this));
 
-    return TRUE;
+    return true;
 }
 
 void ColladaExportFloater::draw()
@@ -286,7 +286,7 @@ void ColladaExportFloater::addSelectedObjects()
             mObjectName = "";
         }
         mSaver.updateTextureInfo();
-        mNumTextures = mSaver.mTextures.size();
+        mNumTextures = static_cast<S32>(mSaver.mTextures.size());
         mNumExportableTextures = getNumExportableTextures();
     }
 }
