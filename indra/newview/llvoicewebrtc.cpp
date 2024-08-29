@@ -24,7 +24,7 @@
  * $/LicenseInfo$
  */
 #include <algorithm>
-#include <format>
+// #include <format> // not required and raises a needs C++20 warning
 #include "llvoicewebrtc.h"
 
 #include "llsdutil.h"
