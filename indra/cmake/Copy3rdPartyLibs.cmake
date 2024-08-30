@@ -7,7 +7,7 @@
 include(CMakeCopyIfDifferent)
 include(Linking)
 include(OPENAL)
-
+include(FMODSTUDIO)
 # When we copy our dependent libraries, we almost always want to copy them to
 # both the Release and the RelWithDebInfo staging directories. This has
 # resulted in duplicate (or worse, erroneous attempted duplicate)
@@ -74,6 +74,12 @@ if(WINDOWS)
         set(release_files ${release_files} BsSndRpt64.exe)
       endif(ADDRESS_SIZE EQUAL 32)
     endif (USE_BUGSPLAT)
+
+    if (TARGET ll::fmodstudio)
+        # fmodL is included for logging, only one should be picked by manifest
+        set(release_files ${release_files} fmodL.dll)
+        set(release_files ${release_files} fmod.dll)
+    endif ()
 
     if (TARGET ll::openal)
         list(APPEND release_files openal32.dll alut.dll)
@@ -170,6 +176,10 @@ elseif(DARWIN)
     set(release_files
         libndofdev.dylib
        )
+    if (TARGET ll::fmodstudio)
+      set(debug_files ${debug_files} libfmodL.dylib)
+      set(release_files ${release_files} libfmod.dylib)
+    endif ()
 
     if(LLCOMMON_LINK_SHARED)
         set(release_files ${release_files}
@@ -233,6 +243,10 @@ elseif(LINUX)
                 )
         endif()
      endif()
+    if (TARGET ll::fmodstudio)
+      set(debug_files ${debug_files} "libfmodL.so")
+      set(release_files ${release_files} "libfmod.so")
+    endif ()
 
 else(WINDOWS)
     message(STATUS "WARNING: unrecognized platform for staging 3rd party libs, skipping...")
