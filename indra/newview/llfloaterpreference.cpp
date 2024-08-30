@@ -700,10 +700,10 @@ void LLFloaterPreference::onDoNotDisturbResponseChanged()
 LLFloaterPreference::~LLFloaterPreference()
 {
     LLConversationLog::instance().removeObserver(this);
-    mComplexityChangedSignal.disconnect();
-    mComplexityModeChangedSignal.disconnect();
-    mLODFactorChangedSignal.disconnect();
-    mNumImpostorsChangedSignal.disconnect();
+    mComplexityChangedSignalAdvanced.disconnect();
+    mComplexityModeChangedSignalAdvanced.disconnect();
+    mLODFactorChangedSignalAdvanced.disconnect();
+    mNumImpostorsChangedSignalAdvanced.disconnect();
 }
 
 void LLFloaterPreference::draw()
@@ -1031,7 +1031,7 @@ void LLFloaterPreference::updateComplexityTextAdvanced()
 
 void LLFloaterPreference::updateObjectMeshDetailTextAdvanced()
 {
-    updateSliderText(getChild<LLSliderCtrl>("ObjectMeshDetail", true), getChild<LLTextBox>("ObjectMeshDetailText", true));
+    updateSliderTextAdvanced(getChild<LLSliderCtrl>("ObjectMeshDetail", true), getChild<LLTextBox>("ObjectMeshDetailText", true));
 }
 
 void LLFloaterPreference::onAvatarImpostorsEnable()
@@ -2105,6 +2105,16 @@ void LLFloaterPreference::updateMaxNonImpostorsAdvanced()
     gSavedSettings.setU32("RenderAvatarMaxNonImpostors", value);
     LLVOAvatar::updateImpostorRendering(value); // make it effective immediately
     setMaxNonImpostorsTextAdvanced(value, getChild<LLTextBox>("IndirectMaxNonImpostorsText"));
+}
+
+void LLFloaterPreference::updateIndirectMaxNonImpostorsAdvanced(const LLSD& newvalue)
+{
+    U32 value = newvalue.asInteger();
+    if ((value != 0) && (value != gSavedSettings.getU32("IndirectMaxNonImpostors")))
+    {
+        gSavedSettings.setU32("IndirectMaxNonImpostors", value);
+        setMaxNonImpostorsTextAdvanced(value, getChild<LLTextBox>("IndirectMaxNonImpostorsText"));
+    }
 }
 
 void LLFloaterPreference::setMaxNonImpostorsTextAdvanced(U32 value, LLTextBox* text_box)
@@ -3789,20 +3799,20 @@ bool LLFloaterPreference::postBuildAdvanced()
         {
             updateComplexityText();
         });
-    mComplexityModeChangedSignal = gSavedSettings.getControl("RenderAvatarComplexityMode")->getSignal()->connect(
+    mComplexityModeChangedSignalAdvanced = gSavedSettings.getControl("RenderAvatarComplexityMode")->getSignal()->connect(
         [this](LLControlVariable* control, const LLSD& new_val, const LLSD& old_val)
         {
-            updateComplexityMode(new_val);
+            updateComplexityModeAdvanced(new_val);
         });
-    mLODFactorChangedSignal = gSavedSettings.getControl("RenderVolumeLODFactor")->getCommitSignal()->connect(
+    mLODFactorChangedSignalAdvanced = gSavedSettings.getControl("RenderVolumeLODFactor")->getCommitSignal()->connect(
         [this](LLControlVariable* control, const LLSD& new_val, const LLSD& old_val)
         {
-            updateObjectMeshDetailText();
+            updateObjectMeshDetailTextAdvanced();
         });
-    mNumImpostorsChangedSignal = gSavedSettings.getControl("RenderAvatarMaxNonImpostors")->getSignal()->connect(
+    mNumImpostorsChangedSignalAdvanced = gSavedSettings.getControl("RenderAvatarMaxNonImpostors")->getSignal()->connect(
         [this](LLControlVariable* control, const LLSD& new_val, const LLSD& old_val)
         {
-            updateIndirectMaxNonImpostors(new_val);
+            updateIndirectMaxNonImpostorsAdvanced(new_val);
         });
     return true;
 
@@ -4240,7 +4250,7 @@ S32 copy_prefs_file(const std::string& from, const std::string& to)
     S32 read = 0;
     const S32 COPY_BUFFER_SIZE = 16384;
     U8 buffer[COPY_BUFFER_SIZE];
-    while(((read = fread(buffer, 1, sizeof(buffer), in)) > 0)
+    while(((read = static_cast<S32>( fread(buffer, 1, sizeof(buffer), in))) > 0)
           && (fwrite(buffer, 1, read, out) == (U32)read));      /* Flawfinder : ignore */
     if(ferror(in) || ferror(out)) rv = -2;
 

@@ -248,6 +248,9 @@ protected:
     boost::signals2::connection mComplexityModeChangedSignalAdvanced;
     boost::signals2::connection mLODFactorChangedSignalAdvanced;
     boost::signals2::connection mNumImpostorsChangedSignalAdvanced;
+private:
+     void updateMaxComplexityAdvanced();
+
 public:
 //End Advanced section
 
@@ -456,7 +459,7 @@ protected:
     void onClickBackupSettings();
     void onClickRestoreSettings();
 
-    void doSelect(BOOL all);                                                // calls applySelection for each list
+    void doSelect(bool all);                                                // calls applySelection for each list
     void applySelection(LLScrollListCtrl* control, bool all);               // selects or deselects all items in a scroll list
     void doBackupSettings(const LLSD& notification, const LLSD& response);  // callback for backup dialog
     void doRestoreSettings(const LLSD& notification, const LLSD& response); // callback for restore dialog

@@ -332,6 +332,7 @@ LLVivoxVoiceClient::LLVivoxVoiceClient() :
     mVoiceEnabled(false),
     mProcessChannels(false),
     mWriteInProgress(false),
+    mLipSyncEnabled(false),
 
     mVoiceFontsReceived(false),
     mVoiceFontsNew(false),
@@ -473,6 +474,7 @@ void LLVivoxVoiceClient::updateSettings()
     setRenderDevice(outputDevice);
     F32 mic_level = gSavedSettings.getF32("AudioLevelMic");
     setMicGain(mic_level);
+    setLipSyncEnabled(gSavedSettings.getBOOL("LipSyncEnabled"));
 }
 
 /////////////////////////////
@@ -5534,6 +5536,31 @@ void LLVivoxVoiceClient::setVoiceEnabled(bool enabled)
     else
     {
         LL_DEBUGS("Voice") << " no-op" << LL_ENDL;
+    }
+}
+
+bool LLVivoxVoiceClient::voiceEnabled()
+{
+    return gSavedSettings.getBOOL("EnableVoiceChat") &&
+          !gSavedSettings.getBOOL("CmdLineDisableVoice") &&
+          !gNonInteractive;
+}
+
+void LLVivoxVoiceClient::setLipSyncEnabled(bool enabled)
+{
+    mLipSyncEnabled = enabled;
+}
+
+bool LLVivoxVoiceClient::lipSyncEnabled()
+{
+
+    if ( mVoiceEnabled )
+    {
+        return mLipSyncEnabled;
+    }
+    else
+    {
+        return false;
     }
 }
 

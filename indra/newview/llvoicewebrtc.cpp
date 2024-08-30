@@ -359,7 +359,7 @@ void LLWebRTCVoiceClient::updateSettings()
     config.mNoiseSuppressionLevel = (llwebrtc::LLWebRTCDeviceInterface::AudioConfig::ENoiseSuppressionLevel) (U32)sNoiseSuppressionLevel;
 
     mWebRTCDeviceInterface->setAudioConfig(config);
-
+    setLipSyncEnabled(gSavedSettings.getBOOL("LipSyncEnabled"));
 }
 
 // Observers
@@ -1592,6 +1592,30 @@ void LLWebRTCVoiceClient::setVoiceEnabled(bool enabled)
     }
 }
 
+bool LLWebRTCVoiceClient::voiceEnabled()
+{
+    return gSavedSettings.getBOOL("EnableVoiceChat") &&
+          !gSavedSettings.getBOOL("CmdLineDisableVoice") &&
+          !gNonInteractive;
+}
+
+void LLWebRTCVoiceClient::setLipSyncEnabled(bool enabled)
+{
+    mLipSyncEnabled = enabled;
+}
+
+bool LLWebRTCVoiceClient::lipSyncEnabled()
+{
+
+    if ( mVoiceEnabled )
+    {
+        return mLipSyncEnabled;
+    }
+    else
+    {
+        return false;
+    }
+}
 
 /////////////////////////////
 // Accessors for data related to nearby speakers

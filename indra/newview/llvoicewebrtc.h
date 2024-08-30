@@ -183,6 +183,9 @@ public:
     //@{
     void setVoiceEnabled(bool enabled) override;
     void setMuteMic(bool muted) override;        // Set the mute state of the local mic.
+    bool voiceEnabled() override;
+    bool lipSyncEnabled() override;
+    void setLipSyncEnabled(bool enabled) override;
     //@}
 
     //////////////////////////
@@ -260,9 +263,12 @@ public:
     participantStatePtr_t addParticipantByID(const std::string& channelID, const LLUUID &id, const LLUUID& region);
     void removeParticipantByID(const std::string& channelID, const LLUUID &id, const LLUUID& region);
 
-  protected:
+    protected:
 
     typedef std::map<const LLUUID, participantStatePtr_t> participantUUIDMap;
+        
+    private:
+    bool        mLipSyncEnabled;
 
     class sessionState
     {

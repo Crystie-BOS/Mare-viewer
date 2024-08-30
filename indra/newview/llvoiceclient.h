@@ -251,7 +251,7 @@ public:
     virtual bool voiceEnabled()=0;
 #endif
     virtual void setVoiceEnabled(bool enabled)=0;
-    virtual void setLipSyncEnabled(BOOL enabled)=0;
+    virtual void setLipSyncEnabled(bool enabled)=0;
     virtual bool lipSyncEnabled()=0;
     virtual void setMuteMic(bool muted)=0;      // Set the mute state of the local mic.
     //@}
@@ -445,6 +445,7 @@ public:
     void setMicGain(F32 volume);
     void setUserVolume(const LLUUID& id, F32 volume); // set's volume for specified agent, from 0-1 (where .5 is nominal)
     bool voiceEnabled();
+    void setLipSyncEnabled(bool enabled);
     void setMuteMic(bool muted);        // Use this to mute the local mic (for when the client is minimized, etc), ignoring user PTT state.
     void setUserPTTState(bool ptt);
     bool getUserPTTState();
@@ -458,6 +459,7 @@ public:
 
     void updateMicMuteLogic();
 
+    bool lipSyncEnabled();
     boost::signals2::connection MicroChangedCallback(const micro_changed_signal_t::slot_type& cb ) { return mMicroChangedSignal.connect(cb); }
 
 

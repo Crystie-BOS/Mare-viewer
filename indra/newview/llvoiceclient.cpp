@@ -636,6 +636,17 @@ void LLVoiceClient::updateMicMuteLogic()
     LLVivoxVoiceClient::getInstance()->setMuteMic(new_mic_mute);
 }
 
+void LLVoiceClient::setLipSyncEnabled(bool enabled)
+{
+    LLWebRTCVoiceClient::getInstance()->setLipSyncEnabled(enabled);
+    LLVivoxVoiceClient::getInstance()->setLipSyncEnabled(enabled);
+}
+
+bool LLVoiceClient::lipSyncEnabled()
+{
+	return LLWebRTCVoiceClient::getInstance()->lipSyncEnabled() || LLVivoxVoiceClient::getInstance()->lipSyncEnabled();
+}
+
 void LLVoiceClient::setMuteMic(bool muted)
 {
     if (mMuteMic != muted)

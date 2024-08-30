@@ -192,7 +192,10 @@ public:
     /////////////////////////
     /// @name enable disable voice and features
     //@{
+    virtual bool voiceEnabled() override;
     void setVoiceEnabled(bool enabled) override;
+    virtual bool lipSyncEnabled() override;
+    virtual void setLipSyncEnabled(bool enabled) override;
     void setMuteMic(bool muted) override;       // Set the mute state of the local mic.
     //@}
 
@@ -818,6 +821,7 @@ private:
     bool        mWriteInProgress;
     std::string mWriteString;
     size_t      mWriteOffset;
+    bool        mLipSyncEnabled;
 
     typedef std::set<LLVoiceClientParticipantObserver*> observer_set_t;
     observer_set_t mParticipantObservers;
