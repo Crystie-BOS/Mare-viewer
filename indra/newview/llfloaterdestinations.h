@@ -39,8 +39,8 @@ private:
     ~LLFloaterDestinations();
     bool postBuild() override;
 //MK
-    virtual void onOpen(const LLSD& key);
-    virtual void draw();
+    virtual void onOpen(const LLSD& key) override;
+    virtual void draw() override;
 //mk
 };
 

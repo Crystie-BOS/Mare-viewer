@@ -42,7 +42,7 @@ private:
 
     LLMediaCtrl* mAvatarPicker;
 //MK
-    /*virtual*/ void draw();
+    /*virtual*/ void draw() override;
 //mk
 };
 
