@@ -245,7 +245,7 @@ void PieMenu::hide()
     LLView::setVisible(FALSE);
 }
 
-void PieMenu::setVisible(BOOL visible)
+void PieMenu::setVisible(bool visible)
 {
     // hide the menu if needed
     if (!visible)

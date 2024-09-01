@@ -4258,7 +4258,7 @@ void LLPanelPreferenceCrashReports::apply()
     gCrashSettings.setBOOL("CrashSubmitName", pSendName->get());
 }
 
-void LLPanelPreferenceCrashReports::cancel()
+void LLPanelPreferenceCrashReports::cancel(const std::vector<std::string> settings_to_skip)
 {
 }
 // [/SL:KB]

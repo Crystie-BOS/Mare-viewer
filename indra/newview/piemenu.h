@@ -58,7 +58,7 @@ class PieMenu : public LLMenuGL
 
     PieMenu(const LLMenuGL::Params& p);
 
-        /*virtual*/ void setVisible(BOOL visible);
+        /*virtual*/ void setVisible(bool visible);
 
         // adding and removing "child" slices to the pie
         /*virtual*/ bool addChild(LLView* child,S32 tab_group=0);
