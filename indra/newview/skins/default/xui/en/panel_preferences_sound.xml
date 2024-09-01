@@ -687,9 +687,10 @@
    width="200"/>
   <text
    layout="topleft"
+   follows="left|top"
    height="15"
-   left="260"
-   top_pad="-12"
+   left="30"
+   top_pad="10"
    width="100"
    name="noise_suppression_label">
     Noise Suppression
@@ -730,8 +731,8 @@
    is_toggle="true"
    label="Voice Input/Output devices"
    layout="topleft"
-   left="20"
-   top_pad="0"
+   left="28"
+   top_pad="10"
    name="device_settings_btn"
    width="200">
   </button>
