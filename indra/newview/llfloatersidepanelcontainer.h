@@ -49,31 +49,26 @@ public:
     LLFloaterSidePanelContainer(const LLSD& key, const Params& params = getDefaultParams());
     ~LLFloaterSidePanelContainer();
 
-    /*virtual*/ void onOpen(const LLSD& key);
+    bool postBuild() override;
 
-    /*virtual*/ void closeFloater(bool app_quitting = false);
+    void onOpen(const LLSD& key) override;
+
+    void closeFloater(bool app_quitting = false) override;
+
+    void onClickCloseBtn(bool app_qutting) override;
 
     void cleanup() { destroy(); }
 
-    LLPanel* openChildPanel(const std::string& panel_name, const LLSD& params);
+    LLPanel* openChildPanel(std::string_view panel_name, const LLSD& params);
 
     static LLFloater* getTopmostInventoryFloater();
 
-    static void showPanel(const std::string& floater_name, const LLSD& key);
+    static void showPanel(std::string_view floater_name, const LLSD& key);
 
-    static void showPanel(const std::string& floater_name, const std::string& panel_name, const LLSD& key);
+    static void showPanel(std::string_view floater_name, std::string_view panel_name, const LLSD& key);
 
-// [SL:KB] - Patch: UI-SidePanelInstance | Checked: Catznip-3.4
-    static LLPanel* findPanel(const std::string& floater_name, const std::string& panel_name = sMainPanelName);
-
-    template <typename T>
-    static T* findPanel(const std::string& floater_name, const std::string& panel_name = sMainPanelName)
-    {
-        return dynamic_cast<T*>(findPanel(floater_name, panel_name));
-    }
-// [/SL:KB]
-
-    static LLPanel* getPanel(const std::string& floater_name, const std::string& panel_name = sMainPanelName);
+    static LLPanel* getPanel(std::string_view floater_name, std::string_view panel_name = sMainPanelName);
+    static LLPanel* findPanel(std::string_view floater_name, std::string_view panel_name = sMainPanelName);
 
     /**
      * Gets the panel of given type T (doesn't show it or do anything else with it).
@@ -83,7 +78,12 @@ public:
      * @returns a pointer to the panel of given type T.
      */
     template <typename T>
-    static T* getPanel(const std::string& floater_name, const std::string& panel_name = sMainPanelName)
+    static T* findPanel(std::string_view floater_name, std::string_view panel_name = sMainPanelName)
+    {
+        return dynamic_cast<T*>(findPanel(floater_name, panel_name));
+    }
+    template <typename T>
+    static T* getPanel(std::string_view floater_name, std::string_view panel_name = sMainPanelName)
     {
         T* panel = dynamic_cast<T*>(getPanel(floater_name, panel_name));
         if (!panel)
@@ -92,6 +92,11 @@ public:
         }
         return panel;
     }
+
+protected:
+    void onCloseMsgCallback(const LLSD& notification, const LLSD& response);
+
+    LLPanel* mMainPanel = nullptr;
 };
 
 #endif // LL_LLFLOATERSIDEPANELCONTAINER_H

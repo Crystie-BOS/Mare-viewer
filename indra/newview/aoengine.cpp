@@ -489,7 +489,7 @@ void AOEngine::enable(bool enable)
 
 void AOEngine::setStateCycleTimer(const AOSet::AOState* state)
 {
-    F32 timeout = state->mCycleTime;
+    F32 timeout = static_cast<F32>(state->mCycleTime);
     LL_DEBUGS("AOEngine") << "Setting cycle timeout for state " << state->mName << " of " << timeout << LL_ENDL;
     if (timeout > 0.0f)
     {
@@ -1693,7 +1693,7 @@ bool AOEngine::renameSet(AOSet* set, const std::string& name)
 void AOEngine::saveState(const AOSet::AOState* state)
 {
     std::string stateParams = state->mName;
-    F32 time = state->mCycleTime;
+    F32 time = static_cast<F32>(state->mCycleTime);
     if (time > 0.0f)
     {
         std::ostringstream timeStr;
@@ -1906,7 +1906,7 @@ void AOEngine::setRandomize(AOSet::AOState* state, bool randomize)
 
 void AOEngine::setCycleTime(AOSet::AOState* state, F32 time)
 {
-    state->mCycleTime = time;
+    state->mCycleTime = static_cast<S32>(time);
     state->mDirty = true;
 }
 

@@ -167,7 +167,6 @@ private:
     LLButton*           mMuteBtn;
     LLButton*           mMoreLessBtn;
 
-    bool                mAllMediaDisabled;
     bool                mDebugInfoVisible;
 //  bool                mParcelAudioAutoStart;  // ## Zi: Media/Stream separation
     std::string         mEmptyNameString;

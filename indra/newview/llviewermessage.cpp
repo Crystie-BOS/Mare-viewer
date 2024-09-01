@@ -4029,7 +4029,7 @@ void process_time_synch(LLMessageSystem *mesgsys, void **user_data)
 
     LLWorld::getInstance()->setSpaceTimeUSec(space_time_usec);
 
-    LL_DEBUGS("WindlightSync") << "Sun phase: " << phase << " rad = " << fmodf(phase / F_TWO_PI + 0.25, 1.f) * 24.f << " h" << LL_ENDL;
+    LL_DEBUGS("WindlightSync") << "Sun phase: " << phase << " rad = " << fmodf(phase / F_TWO_PI + 0.25f, 1.f) * 24.f << " h" << LL_ENDL;
 
     /* LAPRAS
         We decode these parts of the message but ignore them
@@ -4048,7 +4048,7 @@ void process_sound_trigger(LLMessageSystem *msg, void **)
     }
 
     U64     region_handle = 0;
-    F32     gain = 0;
+    F32     gain = 0.f;
     LLUUID  sound_id;
     LLUUID  owner_id;
     LLUUID  object_id;
@@ -4270,8 +4270,8 @@ void process_sim_stats(LLMessageSystem *msg, void **user_data)
     }
 
     // CA: It can happen that number of agents isn't an integer. When that happens, round up.
-    ca_performance_status_now[LL_SIM_STAT_NUMAGENTMAIN] = llceil(ca_performance_status_now[LL_SIM_STAT_NUMAGENTMAIN]);
-    ca_performance_status_now[LL_SIM_STAT_NUMAGENTCHILD] = llceil(ca_performance_status_now[LL_SIM_STAT_NUMAGENTCHILD]);
+    ca_performance_status_now[LL_SIM_STAT_NUMAGENTMAIN] = (F32)llceil(ca_performance_status_now[LL_SIM_STAT_NUMAGENTMAIN]);
+    ca_performance_status_now[LL_SIM_STAT_NUMAGENTCHILD] = (F32)llceil(ca_performance_status_now[LL_SIM_STAT_NUMAGENTCHILD]);
 
     // don't start doing comparisons until we've got a valid set of previous stats
     if (ca_previous_stats_valid)

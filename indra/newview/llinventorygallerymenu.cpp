@@ -978,7 +978,7 @@ void LLInventoryGalleryContextMenu::updateMenuItemsVisibility(LLContextMenu* men
             {
                 LLViewerInventoryCategory* cat = gInventory.getCategory(selected_id);
                 if (cat
-                    && !LLFolderType::lookupIsProtectedType(cat->getPreferredType(),selected_id)
+                    && !LLFolderType::lookupIsProtectedType(cat->getPreferredType(), selected_id)
                     && gInventory.isObjectDescendentOf(selected_id, gInventory.getRootFolderID()))
                 {
                     can_list = true;

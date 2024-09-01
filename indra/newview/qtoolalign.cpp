@@ -159,7 +159,7 @@ bool QToolAlign::findSelectedManipulator(S32 x, S32 y)
         for (F32 direction = -1.0; direction <= 1.0; direction += 2.0)
         {
             LLVector3 axis_vector = LLVector3(0,0,0);
-            axis_vector.mV[axis] = direction * bbox_scale.mV[axis] / 2.0;
+            axis_vector.mV[axis] = static_cast<F32>(direction * bbox_scale.mV[axis] / 2.0);
 
             LLVector4 manipulator_center =  LLVector4(axis_vector);
 
@@ -338,7 +338,7 @@ void QToolAlign::renderManipulators()
             for (S32 i = 0; i < arrows; i++)
             {
                 LLVector3 axis_vector = LLVector3(0,0,0);
-                axis_vector.mV[axis] = direction * (bbox_scale.mV[axis] / 2.0 + i * (size/3.0));
+                axis_vector.mV[axis] = static_cast<F32>( direction * (bbox_scale.mV[axis] / 2.0 + i * (size/3.0)));
 
                 LLVector3 manipulator_center =  bbox_center + axis_vector;
 
@@ -351,7 +351,6 @@ void QToolAlign::renderManipulators()
                 manipulator_bbox.addPointLocal(LLVector3(-1, -1, -0.75) * size * 0.5);
                 manipulator_bbox.addPointLocal(LLVector3(1, 1, 0.75) * size * 0.5);
 
-                gGL.color4fv(color.mV);
                 gGL.color4fv(color.mV);
 
                 render_cone_bbox(manipulator_bbox);

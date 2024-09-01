@@ -138,6 +138,8 @@ private:
     bool            mUpdateObjectImage;
     bool            mUpdateParcelImage;
 
+private:
+    bool            mUpdateNow;
     LLUIColor       mBackgroundColor;
 
     F32             mScale;                 // Size of a region in pixels

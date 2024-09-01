@@ -135,20 +135,22 @@ void LLFloaterIMNearbyChatToastPanel::addMessage(LLSD& notification)
 
     std::string color_name = notification["text_color"].asString();
 
-    LLColor4 textColor = LLUIColorTable::instance().getColor(color_name);
+    LLColor4 lgg_textColor = LLUIColorTable::instance().getColor(color_name);
 
     //color based on contact sets prefs
     if (chat_type == CHAT_TYPE_IM || chat_type == CHAT_TYPE_IM_GROUP)
     {
-        textColor = LGGContactSets::getInstance()->colorize(mFromID, textColor, LGG_CS_IM);
+        lgg_textColor = LGGContactSets::getInstance()->colorize(mFromID, lgg_textColor, LGG_CS_IM);
     }
     else
     {
-        textColor = LGGContactSets::getInstance()->colorize(mFromID, textColor, LGG_CS_CHAT);
+        lgg_textColor = LGGContactSets::getInstance()->colorize(mFromID, lgg_textColor, LGG_CS_CHAT);
     }
-    LGGContactSets::getInstance()->hasFriendColorThatShouldShow(mFromID, LGG_CS_CHAT, textColor);
+    LGGContactSets::getInstance()->hasFriendColorThatShouldShow(mFromID, LGG_CS_CHAT, lgg_textColor);
+	
+	LLUIColor textColor = static_cast<LLUIColor>(lgg_textColor);
 
-    textColor.mV[VALPHA] =notification["color_alpha"].asReal();
+    F32 textAlpha = (F32)notification["color_alpha"].asReal();
 
     S32 font_size = notification["font_size"].asInteger();
 
@@ -165,6 +167,7 @@ void LLFloaterIMNearbyChatToastPanel::addMessage(LLSD& notification)
     {
         LLStyle::Params style_params;
         style_params.color(textColor);
+        style_params.alpha(textAlpha);
         std::string font_name = LLFontGL::nameFromFont(messageFont);
         std::string font_style_size = LLFontGL::sizeFromFont(messageFont);
         style_params.font.name(font_name);
@@ -204,20 +207,22 @@ void LLFloaterIMNearbyChatToastPanel::init(LLSD& notification)
 
     std::string color_name = notification["text_color"].asString();
 
-    LLColor4 textColor = LLUIColorTable::instance().getColor(color_name);
+    LLColor4 lgg_textColor = LLUIColorTable::instance().getColor(color_name);
 
     //color based on contact sets prefs
     if (chat_type == CHAT_TYPE_IM || chat_type == CHAT_TYPE_IM_GROUP)
     {
-        textColor = LGGContactSets::getInstance()->colorize(mFromID, textColor, LGG_CS_IM);
+        lgg_textColor = LGGContactSets::getInstance()->colorize(mFromID, lgg_textColor, LGG_CS_IM);
     }
     else
     {
-        textColor = LGGContactSets::getInstance()->colorize(mFromID, textColor, LGG_CS_CHAT);
+        lgg_textColor = LGGContactSets::getInstance()->colorize(mFromID, lgg_textColor, LGG_CS_CHAT);
     }
-    LGGContactSets::getInstance()->hasFriendColorThatShouldShow(mFromID, LGG_CS_CHAT, textColor);
+    LGGContactSets::getInstance()->hasFriendColorThatShouldShow(mFromID, LGG_CS_CHAT, lgg_textColor);
 
-    textColor.mV[VALPHA] =notification["color_alpha"].asReal();
+    F32 textAlpha = (F32)notification["color_alpha"].asReal();
+
+    LLUIColor textColor = (LLUIColor)lgg_textColor;
 
     S32 font_size = notification["font_size"].asInteger();
 
@@ -248,14 +253,9 @@ void LLFloaterIMNearbyChatToastPanel::init(LLSD& notification)
         if (mSourceType == CHAT_SOURCE_AGENT || mSourceType == CHAT_SOURCE_OBJECT)
         {
             LLStyle::Params style_params_name;
-
-            LLColor4 user_name_color = LLUIColorTable::instance().getColor("HTMLLinkColor");
-            style_params_name.color(user_name_color);
-
-            std::string font_name = LLFontGL::nameFromFont(messageFont);
-            std::string font_style_size = LLFontGL::sizeFromFont(messageFont);
-            style_params_name.font.name(font_name);
-            style_params_name.font.size(font_style_size);
+            style_params_name.color = LLUIColorTable::instance().getColor("HTMLLinkColor");
+            style_params_name.font.name = LLFontGL::nameFromFont(messageFont);
+            style_params_name.font.size = LLFontGL::sizeFromFont(messageFont);
 
             style_params_name.link_href = notification["sender_slurl"].asString();
             style_params_name.is_link = true;
@@ -300,6 +300,7 @@ void LLFloaterIMNearbyChatToastPanel::init(LLSD& notification)
     {
         LLStyle::Params style_params;
         style_params.color(textColor);
+        style_params.alpha(textAlpha);
         std::string font_name = LLFontGL::nameFromFont(messageFont);
         std::string font_style_size = LLFontGL::sizeFromFont(messageFont);
         style_params.font.name(font_name);

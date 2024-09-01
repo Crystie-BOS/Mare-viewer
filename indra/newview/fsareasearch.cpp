@@ -767,7 +767,7 @@ void FSAreaSearch::matchObject(FSObjectProperties& details, LLViewerObject* obje
 
     if (mFilterDistance)
     {
-        S32 distance = dist_vec(mPanelList->getAgentLastPosition(), objectp->getPositionGlobal());// used mAgentLastPosition instead of gAgent->getPositionGlobal for performace
+        S32 distance = (S32)dist_vec(mPanelList->getAgentLastPosition(), objectp->getPositionGlobal());// used mAgentLastPosition instead of gAgent->getPositionGlobal for performace
         if (!(distance >= mFilterDistanceMin && distance <= mFilterDistanceMax))
         {
             return;
@@ -1702,15 +1702,15 @@ bool FSPanelAreaSearchList::onContextMenuItemClick(const LLSD& userdata)
                     if (camera_aspect < 1.0f || invert)
                     {
                         angle_of_view = llmax(0.1f, LLViewerCamera::getInstance()->getView() * LLViewerCamera::getInstance()->getAspect());
-                        distance = width * 0.5 * 1.1 / tanf(angle_of_view * 0.5f);
+                        distance = (F32)(width * 0.5 * 1.1 / tanf(angle_of_view * 0.5f));
                     }
                     else
                     {
                         angle_of_view = llmax(0.1f, LLViewerCamera::getInstance()->getView());
-                        distance = height * 0.5 * 1.1 / tanf(angle_of_view * 0.5f);
+                        distance = (F32)(height * 0.5 * 1.1 / tanf(angle_of_view * 0.5f));
                     }
 
-                    distance += depth * 0.5;
+                    distance += (F32)(depth * 0.5);
 
 
                     // Verify that the bounding box isn't inside the near clip.  Using OBB-plane intersection to check if the
@@ -1721,7 +1721,7 @@ bool FSPanelAreaSearchList::onContextMenuItemClick(const LLSD& userdata)
                     LLVector3d axis_y = LLVector3d(0, 1, 0) * bbox.getRotation();
                     LLVector3d axis_z = LLVector3d(0, 0, 1) * bbox.getRotation();
                     //Normal of nearclip plane is camera_dir.
-                    F32 min_near_clip_dist = bbox_extents.mdV[0] * (camera_dir * axis_x) + bbox_extents.mdV[1] * (camera_dir * axis_y) + bbox_extents.mdV[2] * (camera_dir * axis_z); // http://www.gamasutra.com/view/feature/131790/simple_intersection_tests_for_games.php?page=7
+                    F32 min_near_clip_dist = (F32)(bbox_extents.mdV[0] * (camera_dir * axis_x) + bbox_extents.mdV[1] * (camera_dir * axis_y) + bbox_extents.mdV[2] * (camera_dir * axis_z)); // http://www.gamasutra.com/view/feature/131790/simple_intersection_tests_for_games.php?page=7
                     F32 camera_to_near_clip_dist(LLViewerCamera::getInstance()->getNear());
                     F32 min_camera_dist(min_near_clip_dist + camera_to_near_clip_dist);
                     if (distance < min_camera_dist)

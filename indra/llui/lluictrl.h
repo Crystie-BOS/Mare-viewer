@@ -230,7 +230,7 @@ public:
     // selected radio button, etc.).  Defaults to no-op.
     virtual void    clear();
 
-    virtual void    setColor(const LLColor4& color);
+    virtual void    setColor(const LLUIColor& color);
 
     // Ansariel: Changed to virtual. We might want to change the transparency ourself!
     virtual F32     getCurrentTransparency();
@@ -242,7 +242,7 @@ public:
     bool    focusPrevItem(bool text_entry_only);
 
     // ## Zi: Made this virtual to be able to override it, so we can fix the IM focus issue
-    virtual bool    focusFirstItem(bool prefer_text_fields = false, bool focus_flash = true );
+    bool    focusFirstItem(bool prefer_text_fields = false, bool focus_flash = true );
 
     // Non Virtuals
     LLHandle<LLUICtrl> getHandle() const { return getDerivedHandle<LLUICtrl>(); }
@@ -354,7 +354,7 @@ private:
 // Build time optimization, generate once in .cpp file
 #ifndef LLUICTRL_CPP
 extern template class LLUICtrl* LLView::getChild<class LLUICtrl>(
-    const std::string& name, bool recurse) const;
+    std::string_view name, bool recurse) const;
 #endif
 
 #endif  // LL_LLUICTRL_H

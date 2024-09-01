@@ -689,6 +689,7 @@ void LLConversationViewParticipant::draw()
     static LLUIColor sFlashBgColor = LLUIColorTable::instance().getColor("MenuItemFlashBgColor", DEFAULT_WHITE);
     static LLUIColor sFocusOutlineColor = LLUIColorTable::instance().getColor("InventoryFocusOutlineColor", DEFAULT_WHITE);
     static LLUIColor sMouseOverColor = LLUIColorTable::instance().getColor("InventoryMouseOverColor", DEFAULT_WHITE);
+    static LLUIColor sFriendColor = LLUIColorTable::instance().getColor("ConversationFriendColor");
         static LLCachedControl<bool> colorFriends(gSavedSettings, "KokuaColorFriendNamesInConversationsFloater");
         static LLCachedControl<bool> colorFriendsAsNameTag(gSavedSettings, "KokuaColorFriendNamesInConversationsFloaterAsNameTags");
 
@@ -700,13 +701,15 @@ void LLConversationViewParticipant::draw()
     F32 y = (F32)getRect().getHeight() - font->getLineHeight() - (F32)mTextPad;
     F32 text_left = (F32)getLabelXPos();
 
-    LLColor4 color;
+    LLUIColor* color;
+	// LGGContacts really needs converting to use LLUIColor too, but that's a task for another time
+	LLColor4 lgg_color = sFriendColor; //KKA-848 start with LL default
 
     LLLocalSpeakerMgr *speakerMgr = LLLocalSpeakerMgr::getInstance();
 
     if (speakerMgr && speakerMgr->isSpeakerToBeRemoved(mUUID))
     {
-        color = sFgDisabledColor;
+        color = &sFgDisabledColor;
     }
     else
     {
@@ -715,19 +718,19 @@ void LLConversationViewParticipant::draw()
         {
             if (colorFriendsAsNameTag)
             {
-                color = LLUIColorTable::instance().getColor("ConversationFriendColor"); //KKA-848 start with LL default
-                color = LGGContactSets::getInstance()->colorize(mUUID, color, LGG_CS_TAG);
-                LGGContactSets::getInstance()->hasFriendColorThatShouldShow(mUUID, LGG_CS_TAG, color);
-                LLNetMap::getAvatarMarkColor(mUUID, color);
+                LGGContactSets::getInstance()->colorize(mUUID, lgg_color, LGG_CS_TAG);
+                LGGContactSets::getInstance()->hasFriendColorThatShouldShow(mUUID, LGG_CS_TAG, lgg_color);
+                LLNetMap::getAvatarMarkColor(mUUID, lgg_color);
+				color = (LLUIColor*)&lgg_color;
             }
             else
             {
-                color = LLUIColorTable::instance().getColor("ConversationFriendColor");
+                color = &sFriendColor;
             }
         }
         else
         {
-            color = mIsSelected ? sHighlightFgColor : sFgColor;
+            color = mIsSelected ? &sHighlightFgColor : &sFgColor;
         }
     }
 
@@ -738,7 +741,7 @@ void LLConversationViewParticipant::draw()
     }
 
     drawHighlight(show_context, mIsSelected, sHighlightBgColor, sFlashBgColor, sFocusOutlineColor, sMouseOverColor);
-    drawLabel(font, text_left, y, color, right_x);
+    drawLabel(font, text_left, y, color->get(), right_x);
 
     LLView::draw();
 }

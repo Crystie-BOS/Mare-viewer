@@ -33,6 +33,8 @@
 
 class LLAvatarName;
 class LLBlockList;
+class LLMenuButton;
+class LLButton;
 
 //class LLPanelBlockedList : public LLPanel
 //{

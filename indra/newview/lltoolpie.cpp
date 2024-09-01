@@ -1318,7 +1318,7 @@ bool LLToolPie::handleTooltipObject( LLViewerObject* hover_object, std::string l
                     if (hover_object->getRegion() && gAgent.getRegion() &&
                         hover_object->getRegion()->getRegionID() == gAgent.getRegion()->getRegionID())
                     {
-                        S32 link_cost = LLSelectMgr::getInstance()->getHoverObjects()->getSelectedLinksetCost();
+                        S32 link_cost = (S32)LLSelectMgr::getInstance()->getHoverObjects()->getSelectedLinksetCost();
                         if (link_cost > 0)
                         {
                             args.clear();
@@ -1635,11 +1635,8 @@ void LLToolPie::handleDeselect()
 
 LLTool* LLToolPie::getOverrideTool(MASK mask)
 {
-    // <FS:Ansariel> Use faster LLCachedControls for frequently visited locations
-    //if (gSavedSettings.getBOOL("EnableGrab"))
-    static LLCachedControl<bool> enableGrab(gSavedSettings, "EnableGrab", true);
-    if (enableGrab)
-    // </FS:Ansariel>
+    static LLCachedControl<bool> enable_grab(gSavedSettings, "EnableGrab");
+    if (enable_grab)
     {
         if (mask == DEFAULT_GRAB_MASK)
         {

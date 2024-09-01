@@ -448,6 +448,7 @@ protected:
     LLButton*           mPipetteBtn;
     LLButton*           mSelectBtn;
     LLButton*           mCancelBtn;
+    LLView*             mPreviewWidget = nullptr;
     LLButton*           mTransBtn;
 
 private:

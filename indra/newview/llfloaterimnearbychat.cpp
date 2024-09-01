@@ -537,7 +537,7 @@ void LLFloaterIMNearbyChat::onChatBoxKeystrokeWithText(LLChatEntry* lmInputEdito
                 lmInputEditor->setText(utf8_trigger + rest_of_match); // keep original capitalization for user-entered part
                 // Select to end of line, starting from the character
                 // after the last one the user typed.
-                lmInputEditor->selectByCursorPosition(static_cast<S32>(utf8_out_str.size()-rest_of_match.size()),static_cast<S32>(utf8_out_str.size()));
+                mInputEditor->selectByCursorPosition(static_cast<S32>(utf8_out_str.size() - rest_of_match.size()), static_cast<S32>(utf8_out_str.size()));
             }
 
         }

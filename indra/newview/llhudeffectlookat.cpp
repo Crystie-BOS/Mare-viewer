@@ -37,6 +37,7 @@
 #include "llvoavatar.h"
 #include "lldrawable.h"
 #include "llviewerobjectlist.h"
+#include "llviewercontrol.h"
 #include "llrendersphere.h"
 #include "llselectmgr.h"
 #include "llglheaders.h"
@@ -46,7 +47,7 @@
 #include "llavatarnamecache.h"
 #include "llxmltree.h"
 #include "llviewercontrol.h"
-bool LLHUDEffectLookAt::sDebugLookAt = FALSE;
+bool LLHUDEffectLookAt::sDebugLookAt = false;
 
 // packet layout
 const S32 SOURCE_AVATAR = 0;
@@ -574,7 +575,7 @@ void LLHUDEffectLookAt::render()
             std::string name = nameBuffer.mDisplayName;
 
             gViewerWindow->setup3DRender();
-            hud_render_utf8text(name, position, *fontp, LLFontGL::NORMAL, LLFontGL::NO_SHADOW, -0.5*fontp->getWidthF32(name), 3.0, color, FALSE);
+            hud_render_utf8text(name, position, *fontp, LLFontGL::NORMAL, LLFontGL::NO_SHADOW, (F32)(-0.5*fontp->getWidthF32(name)), 3.0, color, FALSE);
 
             glPopMatrix();
         }
@@ -646,8 +647,16 @@ void LLHUDEffectLookAt::update()
     {
         if (calcTargetPosition())
         {
+            static LLCachedControl<bool> disable_look_at(gSavedSettings, "DisableLookAtAnimation", true);
             LLMotion* head_motion = ((LLVOAvatar*)(LLViewerObject*)mSourceObject)->findMotion(ANIM_AGENT_HEAD_ROT);
-            if (!head_motion || head_motion->isStopped())
+            if (disable_look_at())
+            {
+                if (head_motion)
+                {
+                    ((LLVOAvatar*)(LLViewerObject*)mSourceObject)->stopMotion(ANIM_AGENT_HEAD_ROT);
+                }
+            }
+            else if (!head_motion || head_motion->isStopped())
             {
                 ((LLVOAvatar*)(LLViewerObject*)mSourceObject)->startMotion(ANIM_AGENT_HEAD_ROT);
             }
@@ -745,7 +754,15 @@ bool LLHUDEffectLookAt::calcTargetPosition()
     if (!mTargetPos.isFinite())
         return false;
 
-    source_avatar->setAnimationData("LookAtPoint", (void *)&mTargetPos);
+    static LLCachedControl<bool> disable_look_at(gSavedSettings, "DisableLookAtAnimation", true);
+    if (disable_look_at())
+    {
+        source_avatar->removeAnimationData("LookAtPoint");
+    }
+    else
+    {
+        source_avatar->setAnimationData("LookAtPoint", (void*)&mTargetPos);
+    }
 
     return true;
 }

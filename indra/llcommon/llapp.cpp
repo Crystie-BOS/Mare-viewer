@@ -87,7 +87,7 @@ bool LLApp::sDisableCrashlogger = false;
 
 // Local flag for whether or not to do logging in signal handlers.
 //static
-bool LLApp::sLogInSignal = false;
+bool LLApp::sLogInSignal = true;
 
 // static
 // Keeps track of application status
@@ -314,7 +314,6 @@ void LLApp::stepFrame()
     LLEventTimer::updateClass();
     mRunner.run();
 }
-
 void LLApp::setupErrorHandling(bool second_instance)
 {
     // Error handling is done by starting up an error handling thread, which just sleeps and
@@ -370,6 +369,9 @@ static std::map<LLApp::EAppStatus, const char*> statusDesc
 // static
 void LLApp::setStatus(EAppStatus status)
 {
+    auto status_it = statusDesc.find(status);
+    std::string status_text = status_it != statusDesc.end() ? std::string(status_it->second) : std::to_string(status);
+    LL_INFOS() << "status: " << status_text << LL_ENDL;
     // notify everyone waiting on sStatus any time its value changes
     sStatus.set_all(status);
 
@@ -378,18 +380,7 @@ void LLApp::setStatus(EAppStatus status)
     if (! LLEventPumps::wasDeleted())
     {
         // notify interested parties of status change
-        LLSD statsd;
-        auto found = statusDesc.find(status);
-        if (found != statusDesc.end())
-        {
-            statsd = found->second;
-        }
-        else
-        {
-            // unknown status? at least report value
-            statsd = LLSD::Integer(status);
-        }
-        LLEventPumps::instance().obtain("LLApp").post(llsd::map("status", statsd));
+        LLEventPumps::instance().obtain("LLApp").post(llsd::map("status", status_text));
     }
 }
 
@@ -482,6 +473,33 @@ int LLApp::getPid()
 #else
     return getpid();
 #endif
+}
+
+// static
+void LLApp::notifyOutOfDiskSpace()
+{
+    static const U32Seconds min_interval = U32Seconds(60);
+    static U32Seconds min_time_to_send = U32Seconds(0);
+    U32Seconds now = LLTimer::getTotalTime();
+    if (now < min_time_to_send)
+        return;
+
+    min_time_to_send = now + min_interval;
+
+    if (LLApp* app = instance())
+    {
+        app->sendOutOfDiskSpaceNotification();
+    }
+    else
+    {
+        LL_WARNS() << "No app instance" << LL_ENDL;
+    }
+}
+
+// virtual
+void LLApp::sendOutOfDiskSpaceNotification()
+{
+    LL_WARNS() << "Should never be called" << LL_ENDL; // Should be overridden
 }
 
 #ifndef LL_WINDOWS
@@ -651,6 +669,7 @@ void default_unix_signal_handler(int signum, siginfo_t *info, void *)
             {
                 LL_WARNS() << "Signal handler - Handling fatal signal!" << LL_ENDL;
             }
+
             if (LLApp::isError())
             {
                 // Received second fatal signal while handling first, just die right now
@@ -688,15 +707,14 @@ void default_unix_signal_handler(int signum, siginfo_t *info, void *)
             clear_signals();
             raise(signum);
             return;
-        } else {
-            if (LLApp::sLogInSignal)
-            {
-                LL_INFOS() << "Signal handler - Unhandled signal " << signum << ", ignoring!" << LL_ENDL;
-            }
+        }
+
+        if (LLApp::sLogInSignal)
+        {
+            LL_INFOS() << "Signal handler - Unhandled signal " << signum << ", ignoring!" << LL_ENDL;
         }
     }
 }
-
 bool unix_post_minidump_callback(const char *dump_dir,
                       const char *minidump_id,
                       void *context, bool succeeded)

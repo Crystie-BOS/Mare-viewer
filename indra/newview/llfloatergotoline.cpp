@@ -107,11 +107,11 @@ void LLFloaterGotoLine::handleBtnGoto()
         row = getChild<LLUICtrl>("goto_line")->getValue().asInteger();
         if (row >= 0)
         {
-            if (mEditorCore && mEditorCore->mCurrentEditor)
-            {
-                mEditorCore->mCurrentEditor->deselect();
-                mEditorCore->mCurrentEditor->setCursor(row, column);
-                mEditorCore->mCurrentEditor->setFocus(true);
+                if (mEditorCore && mEditorCore->mEditor)
+                {
+            mEditorCore->mEditor->deselect();
+            mEditorCore->mEditor->setCursor(row, column);
+            mEditorCore->mEditor->setFocus(true);
             }
 
         }

@@ -1453,7 +1453,7 @@ static std::string add_save_texture_filter_to_gtkchooser(GtkWindow *picker)
     return caption;
 }
 
-BOOL LLFilePicker::getMultipleOpenFilesModeless(ELoadFilter filter,
+bool LLFilePicker::getMultipleOpenFilesModeless(ELoadFilter filter,
                                                 void (*callback)(bool, std::vector<std::string> &, void*),
                                                 void *userdata )
 {
@@ -1464,6 +1464,7 @@ BOOL LLFilePicker::getMultipleOpenFilesModeless(ELoadFilter filter,
 bool LLFilePicker::getSaveFile( ESaveFilter filter, const std::string& filename, bool blocking )
 {
     bool rtn = false;
+
 
     // if local file browsing is turned off, return without opening dialog
     if (!check_local_file_access_enabled())
@@ -1671,7 +1672,7 @@ bool LLFilePicker::getOpenFile( ELoadFilter filter, bool blocking )
     return rtn;
 }
 
-BOOL LLFilePicker::getOpenFileModeless(ELoadFilter filter,
+bool LLFilePicker::getOpenFileModeless(ELoadFilter filter,
                                        void (*callback)(bool, std::vector<std::string> &, void*),
                                        void *userdata)
 {
@@ -1679,9 +1680,11 @@ BOOL LLFilePicker::getOpenFileModeless(ELoadFilter filter,
     return FALSE;
 }
 
+
 bool LLFilePicker::getMultipleOpenFiles( ELoadFilter filter, bool blocking)
 {
     bool rtn = false;
+
 
     // if local file browsing is turned off, return without opening dialog
     if (!check_local_file_access_enabled())

@@ -201,6 +201,8 @@ private:
     bool            mScriptRemoved;
     bool            mSaveDialogShown;
     LLUUID          mAssetID;
+    LLTextBox*      mLineCol = nullptr;
+    LLButton*       mSaveBtn = nullptr;
     LLScriptEditor*     mCurrentEditor;
 
     LLScriptEdContainer* mContainer; // parent view

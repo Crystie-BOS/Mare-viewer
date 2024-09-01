@@ -86,7 +86,6 @@
      sort_ascending="true" 
      width="495" />
 	 <button
-	 enabled_control="FirstSelectedDisabledPopups"
      follows="top|left"
      height="23"
      image_overlay="Arrow_Up"
@@ -100,7 +99,6 @@
          function="Pref.ClickEnablePopup" />
     </button>
     <button
-	 enabled_control="FirstSelectedEnabledPopups"
 	 follows="top|left"
      height="23"
      image_overlay="Arrow_Down"

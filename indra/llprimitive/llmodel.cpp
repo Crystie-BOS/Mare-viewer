@@ -1490,7 +1490,7 @@ void LLMeshSkinInfo::fromLLSD(LLSD& skin)
             {
                 for (U32 k = 0; k < 4; k++)
                 {
-                    mat.mMatrix[j][k] = skin["inverse_bind_matrix"][i][j*4+k].asReal();
+                    mat.mMatrix[j][k] = (F32)skin["inverse_bind_matrix"][i][j*4+k].asReal();
                 }
             }
 
@@ -1513,7 +1513,7 @@ void LLMeshSkinInfo::fromLLSD(LLSD& skin)
         {
             for (U32 k = 0; k < 4; k++)
             {
-                mat.mMatrix[j][k] = skin["bind_shape_matrix"][j*4+k].asReal();
+                mat.mMatrix[j][k] = (F32)skin["bind_shape_matrix"][j*4+k].asReal();
             }
         }
         mBindShapeMatrix.loadu(mat);
@@ -1528,7 +1528,7 @@ void LLMeshSkinInfo::fromLLSD(LLSD& skin)
             {
                 for (U32 k = 0; k < 4; k++)
                 {
-                    mat.mMatrix[j][k] = skin["alt_inverse_bind_matrix"][i][j*4+k].asReal();
+                    mat.mMatrix[j][k] = (F32)skin["alt_inverse_bind_matrix"][i][j*4+k].asReal();
                 }
             }
 
@@ -1538,7 +1538,7 @@ void LLMeshSkinInfo::fromLLSD(LLSD& skin)
 
     if (skin.has("pelvis_offset"))
     {
-        mPelvisOffset = skin["pelvis_offset"].asReal();
+        mPelvisOffset = (F32)skin["pelvis_offset"].asReal();
     }
 
     if (skin.has("lock_scale_if_joint_position"))
@@ -1621,7 +1621,7 @@ void LLMeshSkinInfo::updateHash()
 
     for (size_t i = 0, count = mInvBindMatrix.size() * 16; i < count; ++i)
     {
-        S32 t = llround(src[i] * 10000.f);
+        S32 t = ll_round(src[i] * 10000.f);
         hash.update((const void*)&t, sizeof(S32));
     }
     //hash.update((const void*)mInvBindMatrix.data(), sizeof(LLMatrix4a) * mInvBindMatrix.size());

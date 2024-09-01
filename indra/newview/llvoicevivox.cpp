@@ -332,7 +332,6 @@ LLVivoxVoiceClient::LLVivoxVoiceClient() :
     mVoiceEnabled(false),
     mProcessChannels(false),
     mWriteInProgress(false),
-    mLipSyncEnabled(false),
 
     mVoiceFontsReceived(false),
     mVoiceFontsNew(false),
@@ -474,7 +473,6 @@ void LLVivoxVoiceClient::updateSettings()
     setRenderDevice(outputDevice);
     F32 mic_level = gSavedSettings.getF32("AudioLevelMic");
     setMicGain(mic_level);
-    setLipSyncEnabled(gSavedSettings.getBOOL("LipSyncEnabled"));
 }
 
 /////////////////////////////
@@ -1316,7 +1314,7 @@ bool LLVivoxVoiceClient::establishVoiceConnection()
             {
                 if (result.has("retry") && ++retries <= CONNECT_RETRY_MAX && !sShuttingDown)
                 {
-                    F32 timeout = LLSD::Real(result["retry"]);
+                    F32 timeout = (F32)LLSD::Real(result["retry"]);
                     timeout *= retries;
                     LL_INFOS("Voice") << "Retry connection to voice service in " << timeout << " seconds" << LL_ENDL;
                     llcoro::suspendUntilTimeout(timeout);

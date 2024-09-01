@@ -581,7 +581,7 @@ private:
     class LLViewBorder* mBorder;
     LLHandle<LLContextMenu> mPopupMenuHandle;
 
-    LLView          *mCommentTextView;
+    LLTextBox*      mCommentText = nullptr;
 
     LLWString       mSearchString;
     LLFrameTimer    mSearchTimer;

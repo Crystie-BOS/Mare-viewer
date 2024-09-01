@@ -35,6 +35,7 @@
 #include "lluuid.h"
 #include "llviewertexture.h"
 #include "llgl.h"
+#include "lluicolor.h"
 
 class LLViewerRegion;
 class LLVector3;
@@ -128,6 +129,14 @@ private:
 
     std::vector<Edge> mEdges;
     static update_signal_t* sUpdateSignal;
+
+    static bool sColorSetInitialized;
+    static LLUIColor sAvailColor;
+    static LLUIColor sOwnedColor;
+    static LLUIColor sGroupColor;
+    static LLUIColor sSelfColor;
+    static LLUIColor sForSaleColor;
+    static LLUIColor sAuctionColor;
 };
 
 #endif

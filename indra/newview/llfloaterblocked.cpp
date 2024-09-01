@@ -181,7 +181,7 @@ void LLPanelBlockList::selectEntry(const LLMute& muteEntry)
         const LLSD& sdValue = (*itItem)->getValue();
         if ( (muteEntry.mID == sdValue["id"].asUUID()) && ((muteEntry.mName.empty()) ||(muteEntry.mName == sdValue["name"].asString())) )
         {
-            S32 idxItem = itItem - muteItems.begin();
+            S32 idxItem = static_cast<S32>(itItem - muteItems.begin());
             if (idxItem != m_pBlockList->getFirstSelectedIndex())
             {
                 m_pBlockList->deselectAllItems();

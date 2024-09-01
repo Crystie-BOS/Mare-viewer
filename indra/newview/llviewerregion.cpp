@@ -82,7 +82,6 @@
 #include "llcoros.h"
 #include "lleventcoro.h"
 #include "llcorehttputil.h"
-#include "llcallstack.h"
 #include "llsettingsdaycycle.h"
 
 #include <boost/regex.hpp>
@@ -1272,8 +1271,12 @@ U32 LLViewerRegion::getNumOfVisibleGroups() const
     return mImpl ? static_cast<U32>(mImpl->mVisibleGroups.size()) : 0;
 }
 
-void LLViewerRegion::updateReflectionProbes()
+void LLViewerRegion::updateReflectionProbes(bool full_update)
 {
+    if (!full_update && mReflectionMaps.empty())
+    {
+        return;
+    }
     LL_PROFILE_ZONE_SCOPED_CATEGORY_DISPLAY;
     const F32 probe_spacing = 32.f;
     const F32 probe_radius = sqrtf((probe_spacing * 0.5f) * (probe_spacing * 0.5f) * 3.f);
@@ -1281,7 +1284,7 @@ void LLViewerRegion::updateReflectionProbes()
 
     F32 start = probe_spacing * 0.5f;
 
-    U32 grid_width = REGION_WIDTH_METERS / probe_spacing;
+    U32 grid_width = (U32)(REGION_WIDTH_METERS / probe_spacing);
 
     mReflectionMaps.resize(grid_width * grid_width);
 
@@ -2198,7 +2201,7 @@ const LLViewerRegion::tex_matrix_t& LLViewerRegion::getWorldMapTiles() const
     {
         U32 gridX ,gridY;
         grid_from_region_handle(mHandle, &gridX, &gridY);
-        U32 totalX(getWidth() / REGION_WIDTH_U32);
+        U32 totalX((U32)getWidth() / REGION_WIDTH_U32);
         if (!totalX) ++totalX; // If this region is too small, still get an image.
         /* TODO: Nonsquare regions?
         U32 totalY(getLength()/REGION_WIDTH_U32);
@@ -2746,7 +2749,6 @@ LLViewerRegion::eCacheUpdateResult LLViewerRegion::cacheFullUpdate(LLDataPackerB
         if (entry->getCRC() == crc)
         {
             LL_DEBUGS("AnimatedObjects") << " got dupe for local_id " << local_id << LL_ENDL;
-            dumpStack("AnimatedObjectsStack");
 
             // Record a hit
             entry->recordDupe();
@@ -2755,7 +2757,6 @@ LLViewerRegion::eCacheUpdateResult LLViewerRegion::cacheFullUpdate(LLDataPackerB
         else //CRC changed
         {
             LL_DEBUGS("AnimatedObjects") << " got update for local_id " << local_id << LL_ENDL;
-            dumpStack("AnimatedObjectsStack");
 
             // Update the cache entry
             entry->updateEntry(crc, dp);
@@ -2773,7 +2774,6 @@ LLViewerRegion::eCacheUpdateResult LLViewerRegion::cacheFullUpdate(LLDataPackerB
     else
     {
         LL_DEBUGS("AnimatedObjects") << " got first notification for local_id " << local_id << LL_ENDL;
-        dumpStack("AnimatedObjectsStack");
 
         // we haven't seen this object before
         // Create new entry and add to map
@@ -3185,16 +3185,24 @@ void LLViewerRegion::unpackRegionHandshake()
             compp->setParamsReady();
         }
 
-        LLPBRTerrainFeatures::queueQuery(*this, [](LLUUID region_id, bool success, const LLModifyRegion& composition_changes)
+        std::string cap = getCapability("ModifyRegion"); // needed for queueQuery
+        if (cap.empty())
         {
-            if (!success) { return; }
-            LLViewerRegion* region = LLWorld::getInstance()->getRegionFromID(region_id);
-            if (!region) { return; }
-            LLVLComposition* compp = region->getComposition();
-            if (!compp) { return; }
-            compp->apply(composition_changes);
-            LLFloaterRegionInfo::sRefreshFromRegion(region);
-        });
+            LLFloaterRegionInfo::sRefreshFromRegion(this);
+        }
+        else
+        {
+            LLPBRTerrainFeatures::queueQuery(*this, [](LLUUID region_id, bool success, const LLModifyRegion& composition_changes)
+            {
+                if (!success) { return; }
+                LLViewerRegion* region = LLWorld::getInstance()->getRegionFromID(region_id);
+                if (!region) { return; }
+                LLVLComposition* compp = region->getComposition();
+                if (!compp) { return; }
+                compp->apply(composition_changes);
+                LLFloaterRegionInfo::sRefreshFromRegion(region);
+            });
+        }
     }
 
 
@@ -3312,6 +3320,7 @@ void LLViewerRegionImpl::buildCapabilityNames(LLSD& capabilityNames)
     capabilityNames.append("VoiceSignalingRequest");
     capabilityNames.append("ReadOfflineMsgs"); // Requires to respond reliably: AcceptFriendship, AcceptGroupInvite, DeclineFriendship, DeclineGroupInvite
     capabilityNames.append("RegionObjects");
+    capabilityNames.append("RegionSchedule");
     capabilityNames.append("RemoteParcelRequest");
     capabilityNames.append("RenderMaterials");
     capabilityNames.append("RequestTextureDownload");
@@ -3783,7 +3792,7 @@ void LLViewerRegion::resetMaterialsCapThrottle()
     if (   mSimulatorFeatures.has("RenderMaterialsCapability")
         && mSimulatorFeatures["RenderMaterialsCapability"].isReal() )
     {
-        requests_per_sec = mSimulatorFeatures["RenderMaterialsCapability"].asReal();
+        requests_per_sec = (F32)mSimulatorFeatures["RenderMaterialsCapability"].asReal();
         if ( requests_per_sec == 0.0f )
         {
             requests_per_sec = 1.0f;

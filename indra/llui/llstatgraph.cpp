@@ -81,15 +81,15 @@ void LLStatGraph::draw()
         {
           // KKA-821 Annoyingly this arrived as a SampleAccumulator, but the existing code casts it to a CountAccumulator
           // However, we need it back as a SampleAccumulator for getLastValue to work
-            mValue = recording.getLastValue(*(LLTrace::StatType<LLTrace::SampleAccumulator> *)mNewStatFloatp);
+            mValue = (F32)recording.getLastValue(*(LLTrace::StatType<LLTrace::SampleAccumulator> *)mNewStatFloatp);
         }
         else if (mPerSec)
         {
-            mValue = recording.getPerSec(*mNewStatFloatp);
+            mValue = (F32)recording.getPerSec(*mNewStatFloatp);
         }
         else
         {
-            mValue = recording.getSum(*mNewStatFloatp);
+            mValue = (F32)recording.getSum(*mNewStatFloatp);
         }
     }
 
@@ -98,7 +98,7 @@ void LLStatGraph::draw()
     frac = llmin(1.f, frac);
     if (mInvertBar) // KKA-821 add inverting so that a minimum value gives a full bar (for situations when minimum should grab attention with a full bar, like zero sim spare time)
     {
-      frac = 1.0 - frac;
+      frac = static_cast<F32>(1.0 - frac);
     }
 
     if (mUpdateTimer.getElapsedTimeF32() > 0.5f)
@@ -112,8 +112,6 @@ void LLStatGraph::draw()
         mUpdateTimer.reset();
     }
 
-    LLColor4 color;
-
     threshold_vec_t::iterator it = std::lower_bound(mThresholds.begin(), mThresholds.end(), Threshold(mValue / mMax, LLUIColor()));
 
     if (it != mThresholds.begin())
@@ -121,15 +119,14 @@ void LLStatGraph::draw()
         it--;
     }
 
-    color = LLUIColorTable::instance().getColor( "MenuDefaultBgColor" );
-    gGL.color4fv(color.mV);
+    static LLUIColor default_color = LLUIColorTable::instance().getColor( "MenuDefaultBgColor" );
+    gGL.color4fv(default_color.get().mV);
     gl_rect_2d(0, getRect().getHeight(), getRect().getWidth(), 0, true);
 
     gGL.color4fv(LLColor4::black.mV);
     gl_rect_2d(0, getRect().getHeight(), getRect().getWidth(), 0, false);
 
-    color = it->mColor;
-    gGL.color4fv(color.mV);
+    gGL.color4fv(it->mColor().mV);
     gl_rect_2d(1, ll_round(frac*getRect().getHeight()), getRect().getWidth() - 1, 0, true);
 }
 

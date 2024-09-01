@@ -106,6 +106,7 @@ LLNetMap::LLNetMap (const Params & p)
     mPopupWorldPos(0.f, 0.f, 0.f),
     mMouseDown(0, 0),
     mPanning(false),
+    mUpdateNow(false),
     mUpdateObjectImage(false),
     mUpdateParcelImage(false),
     mObjectImageCenterGlobal( gAgentCamera.getCameraPositionGlobal() ),
@@ -334,16 +335,17 @@ void LLNetMap::draw()
 
             if (use_world_map_textures) {
                 const LLViewerRegion::tex_matrix_t& tiles(regionp->getWorldMapTiles());
-                for (S32 i(0), scaled_width(regionp->getWidth() / region_width), square_width(scaled_width * scaled_width);
-                    i < square_width; ++i)
+				S32 scaled_width = (S32)(regionp->getWidth() / region_width);
+				S32 square_width = (S32)(scaled_width * scaled_width);
+                for (S32 i(0); i < square_width; ++i)
                 {
-                    const F32 y(i / scaled_width);
-                    const F32 x(i - y * scaled_width);
+                    const F32 y((F32)(i / scaled_width));
+                    const F32 x((F32)(i - y * scaled_width));
                     const F32 local_left(left + x * mScale);
                     const F32 local_right(local_left + mScale);
                     const F32 local_bottom(bottom + y * mScale);
                     const F32 local_top(local_bottom + mScale);
-                    LLViewerTexture* pRegionImage = tiles[x * scaled_width + y];
+                    LLViewerTexture* pRegionImage = tiles[(U64)(x * scaled_width + y)];
                     if (pRegionImage && pRegionImage->hasGLTexture())
                     {
                         gGL.getTexUnit(0)->bind(pRegionImage);
@@ -370,8 +372,6 @@ void LLNetMap::draw()
                 }
             }
 
-            if (fRenderTerrain)
-            {
                 // Draw using texture.
                 gGL.getTexUnit(0)->bind(regionp->getLand().getSTexture());
                 // <FS:Ansariel> Remove QUADS rendering mode
@@ -404,45 +404,7 @@ void LLNetMap::draw()
                 gGL.end();
                 // </FS:Ansariel>
 
-                // Draw water
                 gGL.flush();
-                {
-                    if (regionp->getLand().getWaterTexture())
-                    {
-                        gGL.getTexUnit(0)->bind(regionp->getLand().getWaterTexture());
-                        // <FS:Ansariel> Remove QUADS rendering mode
-                        //gGL.begin(LLRender::QUADS);
-                        //  gGL.texCoord2f(0.f, 1.f);
-                        //  gGL.vertex2f(left, top);
-                        //  gGL.texCoord2f(0.f, 0.f);
-                        //  gGL.vertex2f(left, bottom);
-                        //  gGL.texCoord2f(1.f, 0.f);
-                        //  gGL.vertex2f(right, bottom);
-                        //  gGL.texCoord2f(1.f, 1.f);
-                        //  gGL.vertex2f(right, top);
-                        //gGL.end();
-                        gGL.begin(LLRender::TRIANGLES);
-                        {
-                            gGL.texCoord2f(0.f, 1.f);
-                            gGL.vertex2f(left, top);
-                            gGL.texCoord2f(0.f, 0.f);
-                            gGL.vertex2f(left, bottom);
-                            gGL.texCoord2f(1.f, 0.f);
-                            gGL.vertex2f(right, bottom);
-
-                            gGL.texCoord2f(0.f, 1.f);
-                            gGL.vertex2f(left, top);
-                            gGL.texCoord2f(1.f, 0.f);
-                            gGL.vertex2f(right, bottom);
-                            gGL.texCoord2f(1.f, 1.f);
-                            gGL.vertex2f(right, top);
-                        }
-                        gGL.end();
-                        // </FS:Ansariel>
-                    }
-                }
-                gGL.flush();
-            }
         }
 
         //
@@ -672,7 +634,7 @@ void LLNetMap::draw()
             if (local_mouse)
             {
                 F32 dist_to_cursor_squared = dist_vec_squared(LLVector2(pos_map.mV[VX], pos_map.mV[VY]),
-                                                LLVector2(local_mouse_x,local_mouse_y));
+                                                LLVector2((F32)local_mouse_x, (F32)local_mouse_y));
 
                 if (dist_to_cursor_squared < min_pick_dist_squared)
                 {
@@ -720,11 +682,10 @@ void LLNetMap::draw()
                       dot_width,
                       self_tag_color);  // <FS:CR> FIRE-1061
 
-            F32 dist_to_cursor_squared = dist_vec_squared(
-                LLVector2(pos_map.mV[VX], pos_map.mV[VY]),
-                LLVector2(local_mouse_x,local_mouse_y)
-            );
-            if(dist_to_cursor_squared < min_pick_dist_squared && dist_to_cursor_squared < closest_dist_squared) {
+            F32 dist_to_cursor_squared = dist_vec_squared(LLVector2(pos_map.mV[VX], pos_map.mV[VY]),
+                                          LLVector2((F32)local_mouse_x, (F32)local_mouse_y));
+            if(dist_to_cursor_squared < min_pick_dist_squared && dist_to_cursor_squared < closest_dist_squared)
+            {
                 mClosestAgentToCursor = gAgent.getID();
                 mClosestAgentPosition = pos_global;
             }
@@ -948,7 +909,7 @@ LLVector3d LLNetMap::viewPosToGlobal( S32 x, S32 y )
 bool LLNetMap::handleScrollWheel(S32 x, S32 y, S32 clicks)
 {
     // note that clicks are reversed from what you'd think: i.e. > 0  means zoom out, < 0 means zoom in
-    F32 new_scale = mScale * pow(MAP_SCALE_ZOOM_FACTOR, -clicks);
+    F32 new_scale = mScale * (F32)pow(MAP_SCALE_ZOOM_FACTOR, -clicks);
     F32 old_scale = mScale;
 
     setScale(new_scale);
@@ -958,8 +919,8 @@ bool LLNetMap::handleScrollWheel(S32 x, S32 y, S32 clicks)
     {
         // Adjust pan to center the zoom on the mouse pointer
         LLVector2 zoom_offset;
-        zoom_offset.mV[VX] = x - getRect().getWidth() / 2;
-        zoom_offset.mV[VY] = y - getRect().getHeight() / 2;
+        zoom_offset.mV[VX] = (F32)(x - getRect().getWidth() / 2);
+        zoom_offset.mV[VY] = (F32)(y - getRect().getHeight() / 2);
         mCurPan -= zoom_offset * mScale / old_scale - zoom_offset;
     }
 
@@ -1256,8 +1217,9 @@ bool LLNetMap::createImage(LLPointer<LLImageRaw>& rawimagep) const
     if (rawimagep.isNull() || rawimagep->getWidth() != img_size || rawimagep->getHeight() != img_size) {
         rawimagep = new LLImageRaw(img_size, img_size, 4);
         U8 *data = rawimagep->getData();
+
         if (data) {
-        memset( data, 0, img_size * img_size * 4 );
+            memset(data, 0, img_size * img_size * 4);
         }
         return true;
     }
@@ -1405,8 +1367,8 @@ void LLNetMap::renderPropertyLinesForRegion(const LLViewerRegion* region)
     const S32 imgHeight = (S32)mParcelImagep->getHeight();
 
     const LLVector3 originLocal(region->getOriginGlobal() - mParcelImageCenterGlobal);
-    const S32 originX = llround(originLocal.mV[VX] * mObjectMapTPM + imgWidth / 2);
-    const S32 originY = llround(originLocal.mV[VY] * mObjectMapTPM + imgHeight / 2);
+    const S32 originX = (S32)(llround(originLocal.mV[VX] * mObjectMapTPM + imgWidth / 2));
+    const S32 originY = (S32)(llround(originLocal.mV[VY] * mObjectMapTPM + imgHeight / 2));
 
     U32* pTextureData = (U32*)mParcelRawImagep->getData();
 
@@ -1422,7 +1384,7 @@ void LLNetMap::renderPropertyLinesForRegion(const LLViewerRegion* region)
     //  draw the north and east region borders
     //
     const F32 real_width(region->getWidth());
-    const S32 borderY = originY + llround(real_width * mObjectMapTPM);
+    const S32 borderY = (S32)(originY + llround(real_width * mObjectMapTPM));
     if (borderY >= 0 && borderY < imgHeight) {
         S32 curX = llclamp(originX, 0, imgWidth), endX = llclamp(originX + (S32)llround(real_width * mObjectMapTPM), 0, imgWidth - 1);
         for (; curX <= endX; curX++) {
@@ -1430,7 +1392,7 @@ void LLNetMap::renderPropertyLinesForRegion(const LLViewerRegion* region)
         }
     }
 
-    const S32 borderX = originX + llround(real_width * mObjectMapTPM);
+    const S32 borderX = (S32)(originX + llround(real_width * mObjectMapTPM));
     if (borderX >= 0 && borderX < imgWidth) {
         S32 curY = llclamp(originY, 0, imgHeight), endY = llclamp(originY + (S32)lround(real_width * mObjectMapTPM), 0, imgHeight - 1);
         for (; curY <= endY; curY++) {
@@ -1442,7 +1404,7 @@ void LLNetMap::renderPropertyLinesForRegion(const LLViewerRegion* region)
     //  render parcel lines
     //
     static const F32 GRID_STEP = PARCEL_GRID_STEP_METERS;
-    static const S32 GRIDS_PER_EDGE = real_width / GRID_STEP;
+    static const S32 GRIDS_PER_EDGE = (S32)(real_width / GRID_STEP);
 
     const U8 *ownerp = region->getParcelOverlay()->getOwnership();
     const U8 *collisionp = (region->getHandle() == LLViewerParcelMgr::instance().getCollisionRegionHandle()) ? LLViewerParcelMgr::instance().getCollisionBitmap() : NULL;
@@ -1474,8 +1436,8 @@ void LLNetMap::renderPropertyLinesForRegion(const LLViewerRegion* region)
                 continue;
             }
 
-            const S32 posX = originX + llround(col * GRID_STEP * mObjectMapTPM);
-            const S32 posY = originY + llround(row * GRID_STEP * mObjectMapTPM);
+            const S32 posX = (S32)(originX + llround(col * GRID_STEP * mObjectMapTPM));
+            const S32 posY = (S32)(originY + llround(row * GRID_STEP * mObjectMapTPM));
 
             if ((for_sale_parcels && (detected_auction || detected_for_sale)) ||
                 (land_owners && (detected_owned || detected_group || detected_self || detected_for_sale || detected_auction)) ||

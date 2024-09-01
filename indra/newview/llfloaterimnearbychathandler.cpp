@@ -155,7 +155,6 @@ protected:
     toast_list_t m_toast_pool;
 
     bool    mStopProcessing;
-    bool    mChannelRect;
 
     // <FS:Ansariel> Zi Ree's customizable nearby chat toast width
     void            reshapePanel(LLFloaterIMNearbyChatToastPanel* panel);
@@ -303,8 +302,8 @@ bool    LLFloaterIMNearbyChatScreenChannel::createPoolToast()
 
     LLToast::Params p;
     p.panel = panel;
-    p.lifetime_secs = gSavedSettings.getS32("NearbyToastLifeTime");
-    p.fading_time_secs = gSavedSettings.getS32("NearbyToastFadingTime");
+    p.lifetime_secs = (F32)gSavedSettings.getS32("NearbyToastLifeTime");
+    p.fading_time_secs = (F32)gSavedSettings.getS32("NearbyToastFadingTime");
 
     LLToast* toast = new LLFloaterIMNearbyChatToast(p, this);
 
@@ -329,7 +328,7 @@ void LLFloaterIMNearbyChatScreenChannel::addChat(LLSD& chat)
 
     if (mFloaterSnapRegion == NULL)
     {
-        mFloaterSnapRegion = gViewerWindow->getRootView()->getChildView("floater_snap_region");
+        mFloaterSnapRegion = gViewerWindow->getFloaterSnapRegion();
     }
     LLRect channel_rect;
     mFloaterSnapRegion->localRectToOtherView(mFloaterSnapRegion->getLocalRect(), &channel_rect, gFloaterView);
@@ -425,7 +424,7 @@ void LLFloaterIMNearbyChatScreenChannel::arrangeToasts()
 
     if (mFloaterSnapRegion == NULL)
     {
-        mFloaterSnapRegion = gViewerWindow->getRootView()->getChildView("floater_snap_region");
+        mFloaterSnapRegion = gViewerWindow->getFloaterSnapRegion();
     }
 
     if (!getParent())
@@ -585,14 +584,13 @@ void LLFloaterIMNearbyChatHandler::processChat(const LLChat& chat_msg,
 
         if (gSavedSettings.getS32("ShowScriptErrorsLocation") == 1)// show error in window //("ScriptErrorsAsChat"))
         {
-
-            LLColor4 txt_color;
-
-            LLViewerChat::getChatColor(chat_msg,txt_color);
+            LLUIColor txt_color;
+            F32 alpha = 1.f;
+            LLViewerChat::getChatColor(chat_msg, txt_color, alpha);
 
             LLFloaterScriptDebug::addScriptLine(chat_msg.mText,
                                                 chat_msg.mFromName,
-                                                txt_color,
+                                                txt_color % alpha,
                                                 chat_msg.mFromID);
             return;
         }
@@ -704,11 +702,19 @@ void LLFloaterIMNearbyChatHandler::processChat(const LLChat& chat_msg,
             }
         }
 
+        if (chat_msg.mSourceType == CHAT_SOURCE_OBJECT)
+        {
+            user_preferences = gSavedSettings.getString("NotificationObjectIMOptions");
+        }
+        else
+        {
+            user_preferences = gSavedSettings.getString("NotificationNearbyChatOptions");
+        }
+
         //Will show toast when chat preference is set
         //KKA-623 Change this so that instead of the option for nearby chat controlling everything, the object setting controls the objects and stop
         //the behaviour where no-popup for an object becomes a popup anyway as a chat item
         //KKA-878 Add an alwaystoast option to override the intelligent show logic (which differs a bit from the same in llimview)
-//        if((CHAT_SOURCE_OBJECT != chat_msg.mSourceType && gSavedSettings.getString("NotificationNearbyChatOptions") == "toast") || !nearby_chat->isMessagePaneExpanded() || (CHAT_SOURCE_OBJECT == chat_msg.mSourceType && gSavedSettings.getString("NotificationObjectIMOptions") == "toast"))
         if (user_preferences == "toast" || user_preferences=="alwaystoast" || !nearby_chat->isMessagePaneExpanded())
         {
             // Add a nearby chat toast.

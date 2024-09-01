@@ -389,8 +389,10 @@ void notify_of_message(const LLSD& msg, bool is_dnd_msg)
 //              || !session_floater->isMessagePaneExpanded())
     if ("alwaystoast" == user_preferences || (("toast" == user_preferences) &&
         (ON_TOP_AND_ITEM_IS_SELECTED != conversations_floater_status) &&
-        (!session_floater->isTornOff() || !LLFloater::isVisible(session_floater)))
-                || !session_floater->isMessagePaneExpanded())
+        (!session_floater->isTornOff()
+         || session_floater->isMinimized()
+         || !LLFloater::isVisible(session_floater)))
+         || !session_floater->isMessagePaneExpanded())
 
     {
         //Show IM toasts (upper right toasts)
@@ -4369,7 +4371,7 @@ public:
                 false, // is_announced
                 false, // keyword_alert_performed
                 false, // is_region_message
-                timestamp);
+                (U32)timestamp);
 
             if (LLMuteList::getInstance()->isMuted(from_id, name, LLMute::flagTextChat))
             {

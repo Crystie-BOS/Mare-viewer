@@ -87,8 +87,6 @@
 
 #include "llenvironment.h"
 
-#include <boost/shared_ptr.hpp>
-
 void copy_slurl_to_clipboard_callback_inv(const std::string& slurl);
 
 typedef std::pair<LLUUID, LLUUID> two_uuids_t;
@@ -1213,6 +1211,7 @@ void LLInvFVBridge::addMarketplaceContextMenuOptions(U32 flags,
             || (U32)depth > (max_depth + 1))
         {
             disabled_items.push_back(std::string("New Folder"));
+            disabled_items.push_back(std::string("New Listing Folder"));
         }
     }
 
@@ -4077,7 +4076,7 @@ void LLFolderBridge::perform_pasteFromClipboard()
 
         const bool move_is_into_current_outfit = (mUUID == current_outfit_id);
         const bool move_is_into_my_outfits = (mUUID == my_outifts_id) || model->isObjectDescendentOf(mUUID, my_outifts_id);
-        const bool move_is_into_outfit = /*move_is_into_my_outfits ||*/ (getCategory() && getCategory()->getPreferredType()==LLFolderType::FT_OUTFIT); // <FS:Ansariel> Unable to copy&paste into outfits anymore
+        const bool move_is_into_outfit = move_is_into_my_outfits || (getCategory() && getCategory()->getPreferredType()==LLFolderType::FT_OUTFIT);
         const bool move_is_into_marketplacelistings = model->isObjectDescendentOf(mUUID, marketplacelistings_id);
         const bool move_is_into_favorites = (mUUID == favorites_id);
         const bool move_is_into_lost_and_found = model->isObjectDescendentOf(mUUID, lost_and_found_id);
@@ -4490,6 +4489,7 @@ void LLFolderBridge::buildContextMenuOptions(U32 flags, menuentry_vec_t&   items
         if (LLMarketplaceData::instance().isUpdating(mUUID))
         {
             disabled_items.push_back(std::string("New Folder"));
+            disabled_items.push_back(std::string("New Listing Folder"));
             disabled_items.push_back(std::string("Rename"));
             disabled_items.push_back(std::string("Cut"));
             disabled_items.push_back(std::string("Copy"));
@@ -4500,6 +4500,7 @@ void LLFolderBridge::buildContextMenuOptions(U32 flags, menuentry_vec_t&   items
     if (getPreferredType() == LLFolderType::FT_MARKETPLACE_STOCK)
     {
         disabled_items.push_back(std::string("New Folder"));
+        disabled_items.push_back(std::string("New Listing Folder"));
         disabled_items.push_back(std::string("New Script"));
         disabled_items.push_back(std::string("New Note"));
         disabled_items.push_back(std::string("New Gesture"));
@@ -4511,6 +4512,7 @@ void LLFolderBridge::buildContextMenuOptions(U32 flags, menuentry_vec_t&   items
     if (marketplace_listings_id == mUUID)
     {
         disabled_items.push_back(std::string("New Folder"));
+        disabled_items.push_back(std::string("New Listing Folder"));
         disabled_items.push_back(std::string("Rename"));
         disabled_items.push_back(std::string("Cut"));
         disabled_items.push_back(std::string("Delete"));

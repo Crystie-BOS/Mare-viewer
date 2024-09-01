@@ -298,6 +298,41 @@
          name="2"
          value="2"/>
     </combo_box>
+
+    <text
+      type="string"
+      length="1"
+      follows="left|top"
+      height="16"
+      layout="topleft"
+      left="30"
+      top_delta="42"
+      width="128"
+      name="AvatarComplexityModeLabel"
+      text_readonly_color="LabelDisabledColor">
+        Avatar display:
+    </text>
+    <combo_box
+     control_name="RenderAvatarComplexityMode"
+     height="23"
+     layout="topleft"
+     left_delta="130"
+     top_delta="-4"
+     name="AvatarComplexityMode"
+     width="150">
+        <combo_box.item
+         label="Limit by complexity"
+         name="0"
+         value="0"/>
+        <combo_box.item
+         label="Always show friends"
+         name="1"
+         value="1"/>
+        <combo_box.item
+         label="Only show friends"
+         name="2"
+         value="2"/>
+    </combo_box>
   <check_box
     control_name="RenderGeometryOverloadProtection"
     initial_value="true"
@@ -326,7 +361,7 @@
     max_val="101"
     name="IndirectMaxComplexity"
     show_text="false"
-    top_delta="18"
+    top_delta="40"
     width="300">
     <slider.commit_callback
       function="Pref.UpdateIndirectMaxComplexity"

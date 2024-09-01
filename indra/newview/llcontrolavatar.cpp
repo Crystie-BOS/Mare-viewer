@@ -99,6 +99,10 @@ LLVOAvatar *LLControlAvatar::getAttachedAvatar()
 
 void LLControlAvatar::getNewConstraintFixups(LLVector3& new_pos_fixup, F32& new_scale_fixup) const
 {
+    static LLCachedControl<F32> anim_max_legal_offset(gSavedSettings, "AnimatedObjectsMaxLegalOffset", MAX_LEGAL_OFFSET);
+    F32 max_legal_offset = llmax(anim_max_legal_offset(), 0.f);
+    static LLCachedControl<F32> anim_max_legal_size(gSavedSettings, "AnimatedObjectsMaxLegalSize", MAX_LEGAL_SIZE);
+    F32 max_legal_size = llmax(anim_max_legal_size(), 1.f);
     new_pos_fixup = LLVector3();
     new_scale_fixup = 1.0f;
     LLVector3 vol_pos = mRootVolp->getRenderPosition();
@@ -405,7 +409,8 @@ bool LLControlAvatar::updateCharacter(LLAgent &agent)
 //virtual
 void LLControlAvatar::updateDebugText()
 {
-    if (gSavedSettings.getBOOL("DebugAnimatedObjects"))
+    static LLCachedControl<bool> debug_animated_objects(gSavedSettings, "DebugAnimatedObjects");
+    if (debug_animated_objects)
     {
         S32 total_linkset_count = 0;
         if (mRootVolp)
@@ -692,14 +697,14 @@ bool LLControlAvatar::isImpostor()
     return LLVOAvatar::isImpostor();
 }
 
-//static
+// static
 void LLControlAvatar::onRegionChanged()
 {
-    std::vector<LLCharacter*>::iterator it = LLCharacter::sInstances.begin();
-    for ( ; it != LLCharacter::sInstances.end(); ++it)
+    for (LLCharacter* character : LLCharacter::sInstances)
     {
-        LLControlAvatar* cav = dynamic_cast<LLControlAvatar*>(*it);
-        if (!cav) continue;
-        cav->mRegionChanged = true;
+        if (LLControlAvatar* cav = dynamic_cast<LLControlAvatar*>(character))
+        {
+            cav->mRegionChanged = true;
+        }
     }
 }

@@ -367,7 +367,7 @@ void LLStatusBar::refresh()
     }
 
     if (fps_stats_visible) {
-        F32 fps = LLTrace::get_frame_recording().getPeriodMeanPerSec(LLStatViewer::FPS, 200);
+        F32 fps = (F32)LLTrace::get_frame_recording().getPeriodMeanPerSec(LLStatViewer::FPS, 200);
 
         if (fps >= 100.f) {
             mFPSText->setValue(llformat("%.0f", fps));

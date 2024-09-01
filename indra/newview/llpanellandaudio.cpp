@@ -209,7 +209,7 @@ void LLPanelLandAudio::refresh()
         }
         // </FS:Testy>
 
-        BOOL can_change_av_sounds = LLViewerParcelMgr::isParcelModifiableByAgent(parcel, GP_LAND_OPTIONS) && parcel->getHaveNewParcelLimitData();
+        bool can_change_av_sounds = LLViewerParcelMgr::isParcelModifiableByAgent(parcel, GP_LAND_OPTIONS) && parcel->getHaveNewParcelLimitData();
         mCheckAVSoundAny->set(parcel->getAllowAnyAVSounds());
         mCheckAVSoundAny->setEnabled(can_change_av_sounds);
 

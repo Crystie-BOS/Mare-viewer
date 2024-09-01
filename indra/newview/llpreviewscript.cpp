@@ -438,7 +438,7 @@ void LLLiveLSLEditor::experienceChanged()
     if(mScriptEd->getAssociatedExperience() != mExperiences->getSelectedValue().asUUID())
     {
         mScriptEd->enableSave(getIsModifiable());
-        //getChildView("Save_btn")->setEnabled(true);
+        //mSaveBtn->setEnabled(true);
         mScriptEd->setAssociatedExperience(mExperiences->getSelectedValue().asUUID());
         updateExperiencePanel();
     }
@@ -484,6 +484,7 @@ void LLLiveLSLEditor::onToggleExperience( LLUICtrl *ui, void* userdata )
 
 bool LLScriptEdCore::postBuild()
 {
+    mLineCol = getChild<LLTextBox>("line_col");
     mErrorList = getChild<LLScrollListCtrl>("lsl errors");
 
     mFunctions = getChild<LLComboBox>("Insert...");
@@ -494,7 +495,8 @@ bool LLScriptEdCore::postBuild()
 
     mCurrentEditor = mEditor;
     childSetCommitCallback("lsl errors", &LLScriptEdCore::onErrorList, this);
-    childSetAction("Save_btn", boost::bind(&LLScriptEdCore::doSave,this,false));
+    mSaveBtn = getChild<LLButton>("Save_btn");
+    mSaveBtn->setCommitCallback(boost::bind(&LLScriptEdCore::doSave, this, false));
     childSetAction("Edit_btn", boost::bind(&LLScriptEdCore::openInExternalEditor, this));
 
     initMenu();
@@ -718,7 +720,7 @@ bool LLScriptEdCore::hasChanged()
 void LLScriptEdCore::draw()
 {
     bool script_changed = hasChanged();
-    getChildView("Save_btn")->setEnabled(script_changed && !mScriptRemoved);
+    mSaveBtn->setEnabled(script_changed && !mScriptRemoved);
 
     if( mEditor->hasFocus() )
     {
@@ -730,11 +732,11 @@ void LLScriptEdCore::draw()
         args["[LINE]"] = llformat ("%d", line);
         args["[COLUMN]"] = llformat ("%d", column);
         cursor_pos = LLTrans::getString("CursorPos", args);
-        getChild<LLUICtrl>("line_col")->setValue(cursor_pos);
+        mLineCol->setValue(cursor_pos);
     }
     else
     {
-        getChild<LLUICtrl>("line_col")->setValue(LLStringUtil::null);
+        mLineCol->setValue(LLStringUtil::null);
     }
 
     updateDynamicHelp();
@@ -2396,23 +2398,6 @@ void LLLiveLSLEditor::draw()
         {
             runningCheckbox->setLabel(getString("script_running"));
             runningCheckbox->setEnabled(!mIsSaving);
-
-            if(object->permAnyOwner())
-            {
-                runningCheckbox->setLabel(getString("script_running"));
-                runningCheckbox->setEnabled(!mIsSaving);
-            }
-            else
-            {
-                runningCheckbox->setLabel(getString("public_objects_can_not_run"));
-                runningCheckbox->setEnabled(FALSE);
-                // *FIX: Set it to false so that the ui is correct for
-                // a box that is released to public. It could be
-                // incorrect after a release/claim cycle, but will be
-                // correct after clicking on it.
-                runningCheckbox->set(FALSE);
-                mMonoCheckbox->set(FALSE);
-            }
         }
         else
         {

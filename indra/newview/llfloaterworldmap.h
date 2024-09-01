@@ -34,11 +34,9 @@
 
 #include "llfloater.h"
 #include "llmapimagetype.h"
-#include "lltracker.h"
-#include "llslurl.h"
-
-// <FS:Ansariel> Parcel details on map
 #include "llremoteparcelrequest.h"
+#include "llslurl.h"
+#include "lltracker.h"
 
 class LLCtrlListInterface;
 class LLFriendObserver;
@@ -48,23 +46,26 @@ class LLItemInfo;
 class LLLineEditor;
 class LLTabContainer;
 class LLWorldMapView;
+class LLButton;
+class LLCheckBoxCtrl;
+class LLSliderCtrl;
+class LLSpinCtrl;
+class LLSearchEditor;
 
-// <FS:Ansariel> Parcel details on map
-class FSWorldMapParcelInfoObserver : public LLRemoteParcelInfoObserver
+class LLWorldMapParcelInfoObserver : public LLRemoteParcelInfoObserver
 {
 public:
-    FSWorldMapParcelInfoObserver(const LLVector3d& pos_global);
-    ~FSWorldMapParcelInfoObserver();
+    LLWorldMapParcelInfoObserver(const LLVector3d& pos_global);
+    ~LLWorldMapParcelInfoObserver();
 
-    void    processParcelInfo(const LLParcelData& parcel_data);
-    void    setParcelID(const LLUUID& parcel_id);
-    void    setErrorStatus(S32 status, const std::string& reason);
+    void processParcelInfo(const LLParcelData& parcel_data);
+    void setParcelID(const LLUUID& parcel_id);
+    void setErrorStatus(S32 status, const std::string& reason);
 
 protected:
     LLVector3d  mPosGlobal;
     LLUUID      mParcelID;
 };
-// </FS:Ansariel> Parcel details on map
 
 class LLFloaterWorldMap : public LLFloater
 {
@@ -134,8 +135,7 @@ public:
     //Slapp instigated avatar tracking
     void            avatarTrackFromSlapp( const LLUUID& id );
 
-    // <FS:Ansariel> Parcel details on map
-    void            processParcelInfo(const LLParcelData& parcel_data, const LLVector3d& pos_global);
+    void            processParcelInfo(const LLParcelData& parcel_data, const LLVector3d& pos_global) const;
 
 protected:
     void            onGoHome();
@@ -165,7 +165,6 @@ protected:
     void            buildLandmarkIDLists();
     void            flyToLandmark();
     void            teleportToLandmark();
-    void            setLandmarkVisited();
 
     void            buildAvatarIDList();
     void            flyToAvatar();
@@ -179,13 +178,6 @@ protected:
 
     void            onTeleportFinished();
 
-    // <FS:Ansariel> Parcel details on map
-    void            requestParcelInfo(const LLVector3d& pos_global);
-    LLVector3d      mRequestedGlobalPos;
-    bool            mShowParcelInfo;
-    FSWorldMapParcelInfoObserver* mParcelInfoObserver;
-    // </FS:Ansariel> Parcel details on map
-
 private:
     LLWorldMapView* mMapView; // Panel displaying the map
 
@@ -195,8 +187,13 @@ private:
     // enable/disable teleport destination coordinates
     void enableTeleportCoordsDisplay( bool enabled );
 
-    std::vector<LLUUID> mLandmarkAssetIDList;
-    std::vector<LLUUID> mLandmarkItemIDList;
+    void            requestParcelInfo(const LLVector3d& pos_global, const LLVector3d& region_origin);
+    LLVector3d      mRequestedGlobalPos;
+    bool            mShowParcelInfo;
+    LLWorldMapParcelInfoObserver* mParcelInfoObserver;
+
+    uuid_vec_t      mLandmarkAssetIDList;
+    uuid_vec_t      mLandmarkItemIDList;
 
     static const LLUUID sHomeID;
 
@@ -224,6 +221,29 @@ private:
     LLCtrlListInterface *   mListFriendCombo;
     LLCtrlListInterface *   mListLandmarkCombo;
     LLCtrlListInterface *   mListSearchResults;
+
+    LLButton*               mTeleportButton = nullptr;
+    LLButton*               mShowDestinationButton = nullptr;
+    LLButton*               mCopySlurlButton = nullptr;
+    LLButton*               mGoHomeButton = nullptr;
+
+    LLCheckBoxCtrl*         mPeopleCheck = nullptr;
+    LLCheckBoxCtrl*         mInfohubCheck = nullptr;
+    LLCheckBoxCtrl*         mLandSaleCheck = nullptr;
+    LLCheckBoxCtrl*         mEventsCheck = nullptr;
+    LLCheckBoxCtrl*         mEventsMatureCheck = nullptr;
+    LLCheckBoxCtrl*         mEventsAdultCheck = nullptr;
+
+    LLUICtrl*               mAvatarIcon = nullptr;
+    LLUICtrl*               mLandmarkIcon = nullptr;
+    LLUICtrl*               mLocationIcon = nullptr;
+
+    LLSearchEditor*         mLocationEditor = nullptr;
+    LLUICtrl*               mTeleportCoordSpinX = nullptr;
+    LLUICtrl*               mTeleportCoordSpinY = nullptr;
+    LLUICtrl*               mTeleportCoordSpinZ = nullptr;
+
+    LLSliderCtrl*           mZoomSlider = nullptr;
 
     boost::signals2::connection mTeleportFinishConnection;
 };

@@ -41,6 +41,7 @@
 #include "llwebrtc.h"
 // WebRTC Includes
 #ifdef WEBRTC_WIN
+#pragma warning(push)
 #pragma warning(disable : 4996) // ignore 'deprecated.'  We don't use the functions marked
                                 // deprecated in the webrtc headers, but msvc complains anyway.
                                 // Clang doesn't, and that's generally what webrtc uses.
@@ -433,5 +434,9 @@ class LLWebRTCPeerConnectionImpl : public LLWebRTCPeerConnectionInterface,
 };
 
 }
+
+#if WEBRTC_WIN
+#pragma warning(pop)
+#endif
 
 #endif // LLWEBRTC_IMPL_H

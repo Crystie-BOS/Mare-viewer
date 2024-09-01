@@ -450,7 +450,7 @@ bool LLToolCamera::handleHover(S32 x, S32 y, MASK mask)
                     }
                     else
                     {
-                        gAgentCamera.cameraZoomIn( pow( IN_FACTOR, dy * camera_mouse_speed_multiplier));
+                        gAgentCamera.cameraZoomIn((F32)pow( IN_FACTOR, dy ) );
                     }
                 }
 
@@ -487,11 +487,11 @@ bool LLToolCamera::handleRightMouseDown(S32 x, S32 y, MASK mask)
     {
         agent_push_forward(KEYSTATE_DOWN);
         right_hold_mouse_walk = true;
-        return TRUE;
+        return true;
     }
     else
     {
-        return FALSE;
+        return false;
     }
 }
 
@@ -501,11 +501,11 @@ bool LLToolCamera::handleRightMouseUp(S32 x, S32 y, MASK mask)
     {
         agent_push_forward(KEYSTATE_UP);
         right_hold_mouse_walk = false;
-        return TRUE;
+        return true;
     }
     else
     {
-        return FALSE;
+        return false;
     }
 }
 //</FS:JL>

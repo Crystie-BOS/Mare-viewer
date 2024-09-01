@@ -50,8 +50,6 @@
 #include <map>
 #include <set>
 
-#include "llcontrol.h" // <FS:Ansariel> Optional legacy name cache expiration
-
 // Time-to-live for a temp cache entry.
 const F64 TEMP_CACHE_ENTRY_LIFETIME = 60.0;
 // Maximum time an unrefreshed cache entry is allowed.

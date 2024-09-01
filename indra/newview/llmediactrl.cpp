@@ -312,14 +312,14 @@ bool LLMediaCtrl::handleMiddleMouseUp( S32 x, S32 y, MASK mask )
 
     gFocusMgr.setMouseCapture( NULL );
 
-    return TRUE;
+    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 //
 bool LLMediaCtrl::handleMiddleMouseDown( S32 x, S32 y, MASK mask )
 {
-    if (LLPanel::handleMiddleMouseDown(x, y, mask)) return TRUE;
+    if (LLPanel::handleMiddleMouseDown(x, y, mask)) return true;
     convertInputCoords(x, y);
 
     if (mMediaSource)
@@ -329,14 +329,11 @@ bool LLMediaCtrl::handleMiddleMouseDown( S32 x, S32 y, MASK mask )
 
     if (mTakeFocusOnClick)
     {
-        setFocus( TRUE );
+        setFocus( true );
     }
 
-    return TRUE;
+    return true;
 }
-
-////////////////////////////////////////////////////////////////////////////////
-//
 bool LLMediaCtrl::handleRightMouseUp( S32 x, S32 y, MASK mask )
 {
     if (LLPanel::handleRightMouseUp(x, y, mask)) return true;

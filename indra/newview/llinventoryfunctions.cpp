@@ -833,7 +833,7 @@ bool get_is_category_removable(const LLInventoryModel* model, const LLUUID& id)
             && gSavedPerAccountSettings.getBOOL("LockWearableFavoritesFolders"))
     )
     {
-        return FALSE;
+        return false;
     }
     // ## Zi: Animation Overrider
 
@@ -945,7 +945,7 @@ bool get_is_category_renameable(const LLInventoryModel* model, const LLUUID& id)
             && gSavedPerAccountSettings.getBOOL("LockWearableFavoritesFolders"))
     )
     {
-        return FALSE;
+        return false;
     }
     // ## Zi: Animation Overrider
 
@@ -3705,11 +3705,11 @@ void LLInventoryAction::onItemsRemovalConfirmation(const LLSD& notification, con
                                                               {
                                                                   for (const LLUUID& id : item_deletion_list)
                                                                   {
-                                                                      remove_inventory_item(id, NULL);
+                                                                      gInventory.removeItem(id);
                                                                   }
                                                                   for (const LLUUID& id : cat_deletion_list)
                                                                   {
-                                                                      remove_inventory_category(id, NULL);
+                                                                      gInventory.removeCategory(id);
                                                                   }
                                                               });
         }

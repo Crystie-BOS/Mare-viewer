@@ -297,7 +297,9 @@ void LLPanelNearByMedia::onVisibilityChange(bool new_visibility)
 /*  ## Zi: Media/Stream separation
 bool LLPanelNearByMedia::getParcelAudioAutoStart()
 {
+
     return mParcelAudioAutoStart;
+
 }
 ## Zi: Media/Stream separation
 */
