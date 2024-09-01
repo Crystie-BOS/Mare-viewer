@@ -440,7 +440,7 @@ public:
 
     /*virtual*/ bool postBuild();
     /*virtual*/ void apply();
-    /*virtual*/ void cancel();
+    /*virtual*/ void cancel(const std::vector<std::string> settings_to_skip = {});
 
     void refresh();
 
