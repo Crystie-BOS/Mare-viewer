@@ -619,7 +619,6 @@ bool idle_startup()
                 RRInterface::sRestrainedLoveLogging = gSavedSettings.getBOOL("RestrainedLoveLogging");
                 RRInterface::sRestrainedLoveCommandLogging = gSavedSettings.getBOOL("RestrainedLoveCommandLogging"); // KKA-914 (making previous KKA-901 logging optional and default off)
                 RRInterface::sRestrainedLoveHeadMouselookRenderRigged = gSavedSettings.getBOOL("RestrainedLoveHeadMouselookRenderRigged");
-                RRInterface::sRestrainedLoveRenderInvisibleSurfaces = gSavedSettings.getBOOL("RestrainedLoveRenderInvisibleSurfaces");
             #if RLV_ALWAYS_ON
                 RRInterface::sCanOoc = FALSE;
             #else
