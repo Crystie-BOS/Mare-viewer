@@ -71,7 +71,7 @@ public:
     LLOutfitListBase();
     virtual ~LLOutfitListBase();
 
-    /*virtual*/ BOOL postBuild();
+    /*virtual*/ bool postBuild();
     /*virtual*/ void onOpen(const LLSD& info);
 
     void refreshList(const LLUUID& category_id);
@@ -227,7 +227,7 @@ public:
         Params() : cat_id("cat_id") {}
     };
 
-    virtual BOOL handleToolTip(S32 x, S32 y, MASK mask);
+    virtual bool handleToolTip(S32 x, S32 y, MASK mask);
 
  protected:
     LLOutfitAccordionCtrlTab(const LLOutfitAccordionCtrlTab::Params &p)
@@ -254,7 +254,7 @@ public:
     LLOutfitsList();
     virtual ~LLOutfitsList();
 
-    /*virtual*/ BOOL postBuild();
+    /*virtual*/ bool postBuild();
 
     /*virtual*/ void onOpen(const LLSD& info);
 
@@ -291,7 +291,7 @@ public:
     */
     void onExpandAllFolders();
 
-    /*virtual*/ bool getHasExpandableFolders() { return TRUE; }
+    /*virtual*/ bool getHasExpandableFolders() { return true; }
 
 protected:
     LLOutfitListGearMenuBase* createGearMenu();

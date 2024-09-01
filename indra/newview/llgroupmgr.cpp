@@ -65,31 +65,7 @@
 #include "llcorehttputil.h"
 #include "lluiusage.h"
 
-#if (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__ ) >= 40800
-   #pragma GCC diagnostic push
-   #pragma GCC diagnostic ignored "-Wuninitialized"
-   #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
-
-
-#if LL_MSVC
-#pragma warning(push)
-// disable boost::lexical_cast warning
-#pragma warning (disable:4702)
-#endif
-
 #include <boost/lexical_cast.hpp>
-
-#if LL_MSVC
-#pragma warning(pop)   // Restore all warnings to the previous state
-#endif
-
-#if (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__ ) >= 40800
-   #pragma GCC diagnostic pop
-///No idea of the scope of   #pragma GCC diagnostic ignored"-Wuninitialized"
-///or    #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-///but using push and pop in case a problem occurs later.
-#endif
 
 const U32 MAX_CACHED_GROUPS = 20;
 
@@ -116,7 +92,7 @@ LLGroupMemberData::LLGroupMemberData(const LLUUID& id,
                                         U64 agent_powers,
                                         const std::string& title,
                                         const std::string& online_status,
-                                        BOOL is_owner) :
+                                        bool is_owner) :
     mID(id),
     mContribution(contribution),
     mAgentPowers(agent_powers),
@@ -160,7 +136,7 @@ LLGroupRoleData::LLGroupRoleData(const LLUUID& role_id,
                                 const S32 member_count) :
     mRoleID(role_id),
     mMemberCount(member_count),
-    mMembersNeedsSort(FALSE)
+    mMembersNeedsSort(false)
 {
     mRoleData.mRoleName = role_name;
     mRoleData.mRoleTitle = role_title;
@@ -175,7 +151,7 @@ LLGroupRoleData::LLGroupRoleData(const LLUUID& role_id,
     mRoleID(role_id),
     mRoleData(role_data),
     mMemberCount(member_count),
-    mMembersNeedsSort(FALSE)
+    mMembersNeedsSort(false)
 {
 
 }
@@ -185,20 +161,20 @@ LLGroupRoleData::~LLGroupRoleData()
 }
 
 S32 LLGroupRoleData::getMembersInRole(uuid_vec_t members,
-                                      BOOL needs_sort)
+                                      bool needs_sort)
 {
     if (mRoleID.isNull())
     {
         // This is the everyone role, just return the size of members,
         // because everyone is in the everyone role.
-        return members.size();
+        return static_cast<S32>(members.size());
     }
 
     // Sort the members list, if needed.
     if (mMembersNeedsSort)
     {
         std::sort(mMemberIDs.begin(), mMemberIDs.end());
-        mMembersNeedsSort = FALSE;
+        mMembersNeedsSort = false;
     }
     if (needs_sort)
     {
@@ -207,18 +183,18 @@ S32 LLGroupRoleData::getMembersInRole(uuid_vec_t members,
     }
 
     // Return the number of members in the intersection.
-    S32 max_size = llmin( members.size(), mMemberIDs.size() );
+    auto max_size = llmin( members.size(), mMemberIDs.size() );
     uuid_vec_t in_role( max_size );
     uuid_vec_t::iterator in_role_end;
     in_role_end = std::set_intersection(mMemberIDs.begin(), mMemberIDs.end(),
                                     members.begin(), members.end(),
                                     in_role.begin());
-    return in_role_end - in_role.begin();
+    return (S32)(in_role_end - in_role.begin());
 }
 
 void LLGroupRoleData::addMember(const LLUUID& member)
 {
-    mMembersNeedsSort = TRUE;
+    mMembersNeedsSort = true;
     mMemberIDs.push_back(member);
 }
 
@@ -228,7 +204,7 @@ bool LLGroupRoleData::removeMember(const LLUUID& member)
 
     if (it != mMemberIDs.end())
     {
-        mMembersNeedsSort = TRUE;
+        mMembersNeedsSort = true;
         mMemberIDs.erase(it);
         return true;
     }
@@ -238,7 +214,7 @@ bool LLGroupRoleData::removeMember(const LLUUID& member)
 
 void LLGroupRoleData::clearMembers()
 {
-    mMembersNeedsSort = FALSE;
+    mMembersNeedsSort = false;
     mMemberIDs.clear();
 }
 
@@ -249,13 +225,13 @@ void LLGroupRoleData::clearMembers()
 
 LLGroupMgrGroupData::LLGroupMgrGroupData(const LLUUID& id) :
     mID(id),
-    mShowInList(TRUE),
-    mOpenEnrollment(FALSE),
+    mShowInList(true),
+    mOpenEnrollment(false),
     mMembershipFee(0),
-    mAllowPublish(FALSE),
-    mListInProfile(FALSE),
-    mMaturePublish(FALSE),
-    mChanged(FALSE),
+    mAllowPublish(false),
+    mListInProfile(false),
+    mMaturePublish(false),
+    mChanged(false),
     mMemberCount(0),
     mRoleCount(0),
     mReceivedRoleMemberPairs(0),
@@ -275,7 +251,7 @@ void LLGroupMgrGroupData::setAccessed()
     mAccessTime = (F32)LLFrameTimer::getTotalSeconds();
 }
 
-BOOL LLGroupMgrGroupData::getRoleData(const LLUUID& role_id, LLRoleData& role_data)
+bool LLGroupMgrGroupData::getRoleData(const LLUUID& role_id, LLRoleData& role_data)
 {
     role_data_map_t::const_iterator it;
 
@@ -283,10 +259,10 @@ BOOL LLGroupMgrGroupData::getRoleData(const LLUUID& role_id, LLRoleData& role_da
     it = mRoleChanges.find(role_id);
     if (it != mRoleChanges.end())
     {
-        if ((*it).second.mChangeType == RC_DELETE) return FALSE;
+        if ((*it).second.mChangeType == RC_DELETE) return false;
 
         role_data = (*it).second;
-        return TRUE;
+        return true;
     }
 
     // Ok, no changes, hasn't been deleted, isn't a new role, just find the role.
@@ -294,11 +270,11 @@ BOOL LLGroupMgrGroupData::getRoleData(const LLUUID& role_id, LLRoleData& role_da
     if (rit != mRoles.end())
     {
         role_data = (*rit).second->getRoleData();
-        return TRUE;
+        return true;
     }
 
     // This role must not exist.
-    return FALSE;
+    return false;
 }
 
 
@@ -360,7 +336,7 @@ void LLGroupMgrGroupData::setRoleData(const LLUUID& role_id, LLRoleData role_dat
     }
 }
 
-BOOL LLGroupMgrGroupData::pendingRoleChanges()
+bool LLGroupMgrGroupData::pendingRoleChanges()
 {
     return (!mRoleChanges.empty());
 }
@@ -540,7 +516,7 @@ bool LLGroupMgrGroupData::changeRoleMember(const LLUUID& role_id,
 
         //TODO move this into addrole function
         //see if they added someone to the owner role and update isOwner
-        gmd->mIsOwner = (role_id == mOwnerRole) ? TRUE : gmd->mIsOwner;
+        gmd->mIsOwner = (role_id == mOwnerRole) ? true : gmd->mIsOwner;
     }
     else if (RMC_REMOVE == rmc)
     {
@@ -549,7 +525,7 @@ bool LLGroupMgrGroupData::changeRoleMember(const LLUUID& role_id,
         gmd->removeRole(role_id);
 
         //see if they removed someone from the owner role and update isOwner
-        gmd->mIsOwner = (role_id == mOwnerRole) ? FALSE : gmd->mIsOwner;
+        gmd->mIsOwner = (role_id == mOwnerRole) ? false : gmd->mIsOwner;
     }
 
     lluuid_pair role_member;
@@ -591,7 +567,7 @@ bool LLGroupMgrGroupData::changeRoleMember(const LLUUID& role_id,
 
     recalcAgentPowers(member_id);
 
-    mChanged = TRUE;
+    mChanged = true;
     return true;
 }
 
@@ -829,7 +805,7 @@ void LLGroupMgrGroupData::banMemberById(const LLUUID& participant_uuid)
 
     mPendingBanRequest = false;
 
-    LLGroupMemberData* member_data = (*mi).second;
+    LLGroupMemberData* member_data = mi->second;
     if (member_data && member_data->isInRole(mOwnerRole))
     {
         return; // can't ban group owner
@@ -855,8 +831,7 @@ void LLGroupMgrGroupData::banMemberById(const LLUUID& participant_uuid)
 // LLGroupMgr
 //
 
-LLGroupMgr::LLGroupMgr():
-    mMemberRequestInFlight(false)
+LLGroupMgr::LLGroupMgr()
 {
 }
 
@@ -1005,11 +980,11 @@ void LLGroupMgr::processGroupMembersReply(LLMessageSystem* msg, void** data)
     LLGroupMgrGroupData* group_datap = LLGroupMgr::getInstance()->getGroupData(group_id);
     if (!group_datap || (group_datap->mMemberRequestID != request_id))
     {
-        LL_WARNS() << "processGroupMembersReply: Received incorrect (stale?) group or request id" << LL_ENDL;
+        LL_WARNS() << "Received incorrect (stale?) group or request id" << LL_ENDL;
         return;
     }
 
-    msg->getS32(_PREHASH_GroupData, "MemberCount", group_datap->mMemberCount );
+    msg->getS32Fast(_PREHASH_GroupData, _PREHASH_MemberCount, group_datap->mMemberCount);
 
     if (group_datap->mMemberCount > 0)
     {
@@ -1017,19 +992,19 @@ void LLGroupMgr::processGroupMembersReply(LLMessageSystem* msg, void** data)
         std::string online_status;
         std::string title;
         U64 agent_powers = 0;
-        BOOL is_owner = FALSE;
+        bool is_owner = false;
 
         S32 num_members = msg->getNumberOfBlocksFast(_PREHASH_MemberData);
         for (S32 i = 0; i < num_members; i++)
         {
             LLUUID member_id;
 
-            msg->getUUIDFast(_PREHASH_MemberData, _PREHASH_AgentID, member_id, i );
-            msg->getS32(_PREHASH_MemberData, _PREHASH_Contribution, contribution, i);
-            msg->getU64(_PREHASH_MemberData, "AgentPowers", agent_powers, i);
+            msg->getUUIDFast(_PREHASH_MemberData, _PREHASH_AgentID, member_id, i);
+            msg->getS32Fast(_PREHASH_MemberData, _PREHASH_Contribution, contribution, i);
+            msg->getU64Fast(_PREHASH_MemberData, _PREHASH_AgentPowers, agent_powers, i);
             msg->getStringFast(_PREHASH_MemberData, _PREHASH_OnlineStatus, online_status, i);
-            msg->getString(_PREHASH_MemberData, "Title", title, i);
-            msg->getBOOL(_PREHASH_MemberData,"IsOwner",is_owner,i);
+            msg->getStringFast(_PREHASH_MemberData, _PREHASH_Title, title, i);
+            msg->getBOOLFast(_PREHASH_MemberData, _PREHASH_IsOwner, is_owner, i);
 
             if (member_id.notNull())
             {
@@ -1074,7 +1049,7 @@ void LLGroupMgr::processGroupMembersReply(LLMessageSystem* msg, void** data)
 
     group_datap->mMemberVersion.generate();
 
-    if (group_datap->mMembers.size() ==  (U32)group_datap->mMemberCount)
+    if (group_datap->mMembers.size() == (U32)group_datap->mMemberCount)
     {
         group_datap->mMemberDataComplete = true;
         group_datap->mMemberRequestID.setNull();
@@ -1086,7 +1061,7 @@ void LLGroupMgr::processGroupMembersReply(LLMessageSystem* msg, void** data)
         }
     }
 
-    group_datap->mChanged = TRUE;
+    group_datap->mChanged = true;
     LLGroupMgr::getInstance()->notifyObservers(GC_MEMBER_DATA);
 }
 
@@ -1112,7 +1087,7 @@ void LLGroupMgr::processGroupPropertiesReply(LLMessageSystem* msg, void** data)
     LLUUID group_id;
     std::string name;
     std::string charter;
-    BOOL    show_in_list = FALSE;
+    bool    show_in_list = false;
     LLUUID  founder_id;
     U64     powers_mask = GP_NO_POWERS;
     S32     money = 0;
@@ -1120,11 +1095,11 @@ void LLGroupMgr::processGroupPropertiesReply(LLMessageSystem* msg, void** data)
     LLUUID  insignia_id;
     LLUUID  owner_role;
     U32     membership_fee = 0;
-    BOOL    open_enrollment = FALSE;
+    bool    open_enrollment = false;
     S32     num_group_members = 0;
     S32     num_group_roles = 0;
-    BOOL    allow_publish = FALSE;
-    BOOL    mature = FALSE;
+    bool    allow_publish = false;
+    bool    mature = false;
 
     msg->getUUIDFast(_PREHASH_GroupData, _PREHASH_GroupID, group_id );
     msg->getUUIDFast(_PREHASH_GroupData, _PREHASH_FounderID, founder_id);
@@ -1159,7 +1134,7 @@ void LLGroupMgr::processGroupPropertiesReply(LLMessageSystem* msg, void** data)
     group_datap->mRoleCount = num_group_roles + 1; // Add the everyone role.
 
     group_datap->mGroupPropertiesDataComplete = true;
-    group_datap->mChanged = TRUE;
+    group_datap->mChanged = true;
 
     properties_request_map_t::iterator request = LLGroupMgr::getInstance()->mPropRequests.find(group_id);
     if (request != LLGroupMgr::getInstance()->mPropRequests.end())
@@ -1256,7 +1231,7 @@ void LLGroupMgr::processGroupRoleDataReply(LLMessageSystem* msg, void** data)
         }
     }
 
-    group_datap->mChanged = TRUE;
+    group_datap->mChanged = true;
     LLGroupMgr::getInstance()->notifyObservers(GC_ROLE_DATA);
 }
 
@@ -1366,7 +1341,7 @@ void LLGroupMgr::processGroupRoleMembersReply(LLMessageSystem* msg, void** data)
         group_datap->mRoleMembersRequestID.setNull();
     }
 
-    group_datap->mChanged = TRUE;
+    group_datap->mChanged = true;
     LLGroupMgr::getInstance()->notifyObservers(GC_ROLE_MEMBER_DATA);
 
     if (group_datap->mPendingBanRequest)
@@ -1416,7 +1391,7 @@ void LLGroupMgr::processGroupTitlesReply(LLMessageSystem* msg, void** data)
         }
     }
 
-    group_datap->mChanged = TRUE;
+    group_datap->mChanged = true;
     LLGroupMgr::getInstance()->notifyObservers(GC_TITLES);
 }
 
@@ -1426,7 +1401,7 @@ void LLGroupMgr::processEjectGroupMemberReply(LLMessageSystem* msg, void ** data
     LL_DEBUGS("GrpMgr") << "processEjectGroupMemberReply" << LL_ENDL;
     LLUUID group_id;
     msg->getUUIDFast(_PREHASH_GroupData, _PREHASH_GroupID, group_id);
-    BOOL success;
+    bool success;
     msg->getBOOLFast(_PREHASH_EjectData, _PREHASH_Success, success);
 
     // If we had a failure, the group panel needs to be updated.
@@ -1441,7 +1416,7 @@ void LLGroupMgr::processJoinGroupReply(LLMessageSystem* msg, void ** data)
 {
     LL_DEBUGS("GrpMgr") << "processJoinGroupReply" << LL_ENDL;
     LLUUID group_id;
-    BOOL success;
+    bool success;
     msg->getUUIDFast(_PREHASH_GroupData, _PREHASH_GroupID, group_id);
     msg->getBOOLFast(_PREHASH_GroupData, _PREHASH_Success, success);
 
@@ -1461,7 +1436,7 @@ void LLGroupMgr::processLeaveGroupReply(LLMessageSystem* msg, void ** data)
 {
     LL_DEBUGS("GrpMgr") << "processLeaveGroupReply" << LL_ENDL;
     LLUUID group_id;
-    BOOL success;
+    bool success;
     msg->getUUIDFast(_PREHASH_GroupData, _PREHASH_GroupID, group_id);
     msg->getBOOLFast(_PREHASH_GroupData, _PREHASH_Success, success);
 
@@ -1480,7 +1455,7 @@ void LLGroupMgr::processLeaveGroupReply(LLMessageSystem* msg, void ** data)
 void LLGroupMgr::processCreateGroupReply(LLMessageSystem* msg, void ** data)
 {
     LLUUID group_id;
-    BOOL success;
+    bool success;
     std::string message;
 
     msg->getUUIDFast(_PREHASH_ReplyData, _PREHASH_GroupID, group_id );
@@ -1497,8 +1472,8 @@ void LLGroupMgr::processCreateGroupReply(LLMessageSystem* msg, void ** data)
         // This is so when we go to modify the group we will be able to do so.
         // This isn't actually too bad because real data will come down in 2 or 3 miliseconds and replace this.
         LLGroupData gd;
-        gd.mAcceptNotices = TRUE;
-        gd.mListInProfile = TRUE;
+        gd.mAcceptNotices = true;
+        gd.mListInProfile = true;
         gd.mContribution = 0;
         gd.mID = group_id;
         gd.mName = "new group";
@@ -1583,7 +1558,7 @@ void LLGroupMgr::notifyObservers(LLGroupChange gc)
             {
                 oi->second->changed(gc);
             }
-            gi->second->mChanged = FALSE;
+            gi->second->mChanged = false;
 
 
             // notify LLParticularGroupObserver
@@ -1606,7 +1581,7 @@ void LLGroupMgr::addGroup(LLGroupMgrGroupData* group_datap)
     {
         // LRU: Remove the oldest un-observed group from cache until group size is small enough
 
-        F32 oldest_access = LLFrameTimer::getTotalSeconds();
+        F32 oldest_access = (F32)LLFrameTimer::getTotalSeconds();
         group_map_t::iterator oldest_gi = mGroups.end();
 
         for (group_map_t::iterator gi = mGroups.begin(); gi != mGroups.end(); ++gi )
@@ -1715,14 +1690,13 @@ void LLGroupMgr::sendGroupRoleMembersRequest(const LLUUID& group_id)
     if (group_datap->mRoleMembersRequestID.isNull())
     {
         // Don't send the request if we don't have all the member or role data
-        if (!group_datap->isMemberDataComplete()
-            || !group_datap->isRoleDataComplete())
+        if (!group_datap->isMemberDataComplete() || !group_datap->isRoleDataComplete())
         {
             // *TODO: KLW FIXME: Should we start a member or role data request?
             LL_INFOS("GrpMgr") << " Pending: " << (group_datap->mPendingRoleMemberRequest ? "Y" : "N")
-                << " MemberDataComplete: " << (group_datap->mMemberDataComplete ? "Y" : "N")
-                << " RoleDataComplete: " << (group_datap->mRoleDataComplete ? "Y" : "N") << LL_ENDL;
-            group_datap->mPendingRoleMemberRequest = TRUE;
+                << ", MemberDataComplete: " << (group_datap->mMemberDataComplete ? "Y" : "N")
+                << ", RoleDataComplete: " << (group_datap->mRoleDataComplete ? "Y" : "N") << LL_ENDL;
+            group_datap->mPendingRoleMemberRequest = true;
             return;
         }
 
@@ -1781,11 +1755,11 @@ void LLGroupMgr::sendGroupTitleUpdate(const LLUUID& group_id, const LLUUID& titl
     {
         if (iter->mRoleID == title_role_id)
         {
-            iter->mSelected = TRUE;
+            iter->mSelected = true;
         }
         else if (iter->mSelected)
         {
-            iter->mSelected = FALSE;
+            iter->mSelected = false;
         }
     }
 }
@@ -1796,9 +1770,9 @@ void LLGroupMgr::sendCreateGroupRequest(const std::string& name,
                                         U8 show_in_list,
                                         const LLUUID& insignia,
                                         S32 membership_fee,
-                                        BOOL open_enrollment,
-                                        BOOL allow_publish,
-                                        BOOL mature_publish)
+                                        bool open_enrollment,
+                                        bool allow_publish,
+                                        bool mature_publish)
 {
     LLMessageSystem* msg = gMessageSystem;
     msg->newMessage("CreateGroupRequest");
@@ -1844,7 +1818,7 @@ void LLGroupMgr::sendUpdateGroupInfo(const LLUUID& group_id)
     gAgent.sendReliableMessage();
 
     // Not expecting a response, so let anyone else watching know the data has changed.
-    group_datap->mChanged = TRUE;
+    group_datap->mChanged = true;
     notifyObservers(GC_PROPERTIES);
 }
 
@@ -1890,7 +1864,7 @@ void LLGroupMgr::sendGroupRoleMemberChanges(const LLUUID& group_id)
     group_datap->mRoleMemberChanges.clear();
 
     // Not expecting a response, so let anyone else watching know the data has changed.
-    group_datap->mChanged = TRUE;
+    group_datap->mChanged = true;
     notifyObservers(GC_ROLE_MEMBER_DATA);
 }
 
@@ -2021,14 +1995,14 @@ void LLGroupMgr::sendGroupMemberEjects(const LLUUID& group_id,
     group_datap->mMemberVersion.generate();
 }
 
-void LLGroupMgr::getGroupBanRequestCoro(std::string url, LLUUID groupId)
+void LLGroupMgr::getGroupBanRequestCoro(std::string url, LLUUID group_id)
 {
     LLCore::HttpRequest::policy_t httpPolicy(LLCore::HttpRequest::DEFAULT_POLICY_ID);
     LLCoreHttpUtil::HttpCoroutineAdapter::ptr_t
         httpAdapter(new LLCoreHttpUtil::HttpCoroutineAdapter("groupMembersRequest", httpPolicy));
     LLCore::HttpRequest::ptr_t httpRequest(new LLCore::HttpRequest);
 
-    std::string finalUrl = url + "?group_id=" + groupId.asString();
+    std::string finalUrl = url + "?group_id=" + group_id.asString();
 
     LLSD result = httpAdapter->getAndSuspend(httpRequest, finalUrl);
 
@@ -2049,8 +2023,8 @@ void LLGroupMgr::getGroupBanRequestCoro(std::string url, LLUUID groupId)
     }
 }
 
-void LLGroupMgr::postGroupBanRequestCoro(std::string url, LLUUID groupId,
-    U32 action, uuid_vec_t banList, bool update)
+void LLGroupMgr::postGroupBanRequestCoro(std::string url, LLUUID group_id,
+    U32 action, uuid_vec_t ban_list, bool update)
 {
     LLCore::HttpRequest::policy_t httpPolicy(LLCore::HttpRequest::DEFAULT_POLICY_ID);
     LLCoreHttpUtil::HttpCoroutineAdapter::ptr_t
@@ -2063,20 +2037,16 @@ void LLGroupMgr::postGroupBanRequestCoro(std::string url, LLUUID groupId,
 
     httpHeaders->append(HTTP_OUT_HEADER_CONTENT_TYPE, HTTP_CONTENT_LLSD_XML);
 
-
-    std::string finalUrl = url + "?group_id=" + groupId.asString();
+    std::string finalUrl = url + "?group_id=" + group_id.asString();
 
     LLSD postData = LLSD::emptyMap();
     postData["ban_action"] = (LLSD::Integer)action;
     // Add our list of potential banned residents to the list
     postData["ban_ids"] = LLSD::emptyArray();
-    LLSD banEntry;
 
-    uuid_vec_t::const_iterator it = banList.begin();
-    for (; it != banList.end(); ++it)
+    for (const LLUUID& ban_id : ban_list)
     {
-        banEntry = (*it);
-        postData["ban_ids"].append(banEntry);
+        postData["ban_ids"].append(ban_id);
     }
 
     LL_WARNS() << "post: " << ll_pretty_print_sd(postData) << LL_ENDL;
@@ -2101,7 +2071,7 @@ void LLGroupMgr::postGroupBanRequestCoro(std::string url, LLUUID groupId,
 
     if (update)
     {
-        getGroupBanRequestCoro(url, groupId);
+        getGroupBanRequestCoro(url, group_id);
     }
 }
 
@@ -2184,41 +2154,62 @@ void LLGroupMgr::processGroupBanRequest(const LLSD& content)
         gdatap->createBanEntry(ban_id, ban_data);
     }
 
-    gdatap->mChanged = TRUE;
+    gdatap->mChanged = true;
     LLGroupMgr::getInstance()->notifyObservers(GC_BANLIST);
 }
 
-void LLGroupMgr::groupMembersRequestCoro(std::string url, LLUUID groupId)
+void LLGroupMgr::groupMembersRequestCoro(std::string url, LLUUID group_id, U32 page_size, U32 page_start, U32 sort_column, bool sort_descending)
 {
+    LL_INFOS("GrpMgr") << "group_id: '" << group_id << "'"
+        << ", page_size: " << page_size << ", page_start: " << page_start
+        << ", sort_column: " << sort_column << ", sort_descending: " << sort_descending << LL_ENDL;
     LLCore::HttpRequest::policy_t httpPolicy(LLCore::HttpRequest::DEFAULT_POLICY_ID);
     LLCoreHttpUtil::HttpCoroutineAdapter::ptr_t
         httpAdapter(new LLCoreHttpUtil::HttpCoroutineAdapter("groupMembersRequest", httpPolicy));
     LLCore::HttpRequest::ptr_t httpRequest(new LLCore::HttpRequest);
-    LLCore::HttpOptions::ptr_t httpOpts = LLCore::HttpOptions::ptr_t(new LLCore::HttpOptions);
+    LLCore::HttpOptions::ptr_t httpOpts(new LLCore::HttpOptions);
+
+    LLSD postData = LLSD::emptyMap();
+    postData["group_id"] = group_id;
+
+    if (page_size)
+    {
+        postData["page_size"] = LLSD::Integer(page_size);
+        if (page_start)
+        {
+            postData["page_start"] = LLSD::Integer(page_start);
+        }
+    }
+
+    if (sort_column)
+    {
+        postData["sort_column"] = LLSD::Integer(sort_column);
+        if (sort_descending)
+        {
+            postData["sort_descending"] = 1;
+        }
+    }
 
     mMemberRequestInFlight = true;
 
-    LLSD postData = LLSD::emptyMap();
-    postData["group_id"] = groupId;
+    LLSD response = httpAdapter->postAndSuspend(httpRequest, url, postData, httpOpts);
 
-    LLSD result = httpAdapter->postAndSuspend(httpRequest, url, postData, httpOpts);
+    mMemberRequestInFlight = false;
 
-    LLSD httpResults = result[LLCoreHttpUtil::HttpCoroutineAdapter::HTTP_RESULTS];
+    LLSD httpResults = response.get(LLCoreHttpUtil::HttpCoroutineAdapter::HTTP_RESULTS);
     LLCore::HttpStatus status = LLCoreHttpUtil::HttpCoroutineAdapter::getStatusFromLLSD(httpResults);
 
     if (!status)
     {
         LL_WARNS("GrpMgr") << "Error receiving group member data " << LL_ENDL;
-        mMemberRequestInFlight = false;
         return;
     }
 
-    result.erase(LLCoreHttpUtil::HttpCoroutineAdapter::HTTP_RESULTS);
-    LLGroupMgr::processCapGroupMembersRequest(result);
-    mMemberRequestInFlight = false;
+    response.erase(LLCoreHttpUtil::HttpCoroutineAdapter::HTTP_RESULTS);
+    processCapGroupMembersResponse(response, url, page_size, page_start, sort_column, sort_descending);
 }
 
-void LLGroupMgr::sendCapGroupMembersRequest(const LLUUID& group_id)
+void LLGroupMgr::sendCapGroupMembersRequest(const LLUUID& group_id, U32 page_size, U32 page_start, const std::string& sort_column_name, bool sort_descending)
 {
     static U32 lastGroupMemberRequestFrame = 0;
     // KKA-1018 If we're called with null, don't bother calling the server - this resolves the first group fetch failing issue
@@ -2229,19 +2220,23 @@ void LLGroupMgr::sendCapGroupMembersRequest(const LLUUID& group_id)
 
     // Have we requested the information already this frame?
     // Todo: make this per group, we can invite to one group and simultaneously be checking another one
-    if ((lastGroupMemberRequestFrame == gFrameCount) || (mMemberRequestInFlight))
+    if ((lastGroupMemberRequestFrame == gFrameCount) || mMemberRequestInFlight)
         return;
+
+    LL_INFOS("GrpMgr") << "group_id: '" << group_id << "'"
+        << ", page_size: " << page_size << ", page_start: " << page_start
+        << ", sort_column_name: '" << sort_column_name << "', sort_descending: " << sort_descending << LL_ENDL;
 
     LLViewerRegion* currentRegion = gAgent.getRegion();
     // Thank you FS:Ansariel!
-    if(!currentRegion)
+    if (!currentRegion)
     {
         LL_WARNS("GrpMgr") << "Agent does not have a current region. Uh-oh!" << LL_ENDL;
         return;
     }
 
     // Check to make sure we have our capabilities
-    if(!currentRegion->capabilitiesReceived())
+    if (!currentRegion->capabilitiesReceived())
     {
         LL_WARNS("GrpMgr") << " Capabilities not received!" << LL_ENDL;
         return;
@@ -2251,9 +2246,9 @@ void LLGroupMgr::sendCapGroupMembersRequest(const LLUUID& group_id)
     std::string cap_url =  currentRegion->getCapability("GroupMemberData");
 
     // Thank you FS:Ansariel!
-    if(cap_url.empty())
+    if (cap_url.empty())
     {
-        LL_INFOS("GrpMgr") << "Region has no GroupMemberData capability.  Falling back to UDP fetch." << LL_ENDL;
+        LL_INFOS("GrpMgr") << "Region has no GroupMemberData capability. Falling back to UDP fetch." << LL_ENDL;
         sendGroupMembersRequest(group_id);
         return;
     }
@@ -2263,119 +2258,138 @@ void LLGroupMgr::sendCapGroupMembersRequest(const LLUUID& group_id)
 
     lastGroupMemberRequestFrame = gFrameCount;
 
-    LLCoros::instance().launch("LLGroupMgr::groupMembersRequestCoro",
-        boost::bind(&LLGroupMgr::groupMembersRequestCoro, this, cap_url, group_id));
+    U32 sort_column = 0; // No sorting by default
+    if (!sort_column_name.empty())
+    {
+        static const std::vector<std::string> column_names = { "name", "donated", "online", "title" };
+        auto it = std::find(column_names.begin(), column_names.end(), sort_column_name);
+        if (it == column_names.end())
+        {
+            LL_WARNS("GrpMgr") << "Invalid column name: '" << sort_column_name << "'" << LL_ENDL;
+        }
+        else
+        {
+            // Use offset (1) because 0 means "no sorting"
+            sort_column = 1 + (U32)std::distance(column_names.begin(), it);
+        }
+    }
+
+    LLCoros::instance().launch("LLGroupMgr::groupMembersRequestCoro", [&]()
+        {
+            groupMembersRequestCoro(cap_url, group_id, page_size, page_start, sort_column, sort_descending);
+        });
 }
 
-
-void LLGroupMgr::processCapGroupMembersRequest(const LLSD& content)
+void LLGroupMgr::processCapGroupMembersResponse(const LLSD& response, const std::string& url, U32 page_size, U32 page_start, U32 sort_column, bool sort_descending)
 {
+    LLUUID group_id = response["group_id"].asUUID();
+    LL_INFOS("GrpMgr") << "group_id: '" << group_id << "'"
+        << ", page_size: " << page_size << ", page_start: " << page_start
+        << ", sort_column: " << sort_column << ", sort_descending: " << sort_descending << LL_ENDL;
+
     // Did we get anything in content?
-    if(!content.size())
+    if (!response.size())
     {
-        LL_DEBUGS("GrpMgr") << "No group member data received." << LL_ENDL;
+        LL_INFOS("GrpMgr") << "No group member data received." << LL_ENDL;
         return;
     }
 
-    LLUUID group_id = content["group_id"].asUUID();
-
     LLGroupMgrGroupData* group_datap = getGroupData(group_id);
-    if(!group_datap)
+    if (!group_datap)
     {
         LL_WARNS("GrpMgr") << "Received incorrect, possibly stale, group or request id" << LL_ENDL;
         return;
     }
 
-    // If we have no members, there's no reason to do anything else
-    S32 num_members = content["member_count"];
-    if (num_members < 1)
-    {
-        LL_INFOS("GrpMgr") << "Received empty group members list for group id: " << group_id.asString() << LL_ENDL;
-        // Set mMemberDataComplete for correct handling of empty responses. See MAINT-5237
-        group_datap->mMemberDataComplete = true;
-        group_datap->mChanged = TRUE;
-        LLGroupMgr::getInstance()->notifyObservers(GC_MEMBER_DATA);
-        return;
-    }
+    LLSD members = response["members"];
+    LLSD titles = response["titles"];
+    LLSD defaults = response["defaults"];
 
-    group_datap->mMemberCount = num_members;
-
-    LLSD    member_list = content["members"];
-    LLSD    titles      = content["titles"];
-    LLSD    defaults    = content["defaults"];
-
-    std::string online_status;
-    std::string title;
-    S32         contribution;
-    U64         member_powers;
-    // If this is changed to a bool, make sure to change the LLGroupMemberData constructor
-    BOOL        is_owner;
+    size_t members_before = group_datap->mMembers.size();
+    size_t members_loaded = members.size();
 
     // Compute this once, rather than every time.
-    U64 default_powers  = llstrtou64(defaults["default_powers"].asString().c_str(), NULL, 16);
+    std::string default_title = titles.size() ? titles[0].asString() : LLStringUtil::null;
+    U64 default_powers = llstrtou64(defaults["default_powers"].asString().c_str(), NULL, 16);
 
-    LLSD::map_const_iterator member_iter_start  = member_list.beginMap();
-    LLSD::map_const_iterator member_iter_end    = member_list.endMap();
-    for( ; member_iter_start != member_iter_end; ++member_iter_start)
+    auto members_end = members.endMap();
+    for (auto it = members.beginMap(); it != members_end; ++it)
     {
         // Reset defaults
-        online_status   = "unknown";
-        title           = titles[0].asString();
-        contribution    = 0;
-        member_powers   = default_powers;
-        is_owner        = false;
+        std::string online_status = "unknown";
+        std::string title = default_title;
+        U64 member_powers = default_powers;
+        S32 donated_square_meters = 0;
+        bool is_owner = false;
 
-        const LLUUID member_id(member_iter_start->first);
-        LLSD member_info = member_iter_start->second;
+        const LLUUID member_id(it->first);
+        LLSD member_info = it->second;
 
-        if(member_info.has("last_login"))
+        if (member_info.has("last_login"))
         {
             online_status = member_info["last_login"].asString();
-            if(online_status == "Online")
-                online_status = LLTrans::getString("group_member_status_online");
-            else
-                formatDateString(online_status);
-        }
-
-        if(member_info.has("title"))
-            title = titles[member_info["title"].asInteger()].asString();
-
-        if(member_info.has("powers"))
-            member_powers = llstrtou64(member_info["powers"].asString().c_str(), NULL, 16);
-
-        if(member_info.has("donated_square_meters"))
-            contribution = member_info["donated_square_meters"];
-
-        if(member_info.has("owner"))
-            is_owner = true;
-
-        LLGroupMemberData* data = new LLGroupMemberData(member_id,
-            contribution,
-            member_powers,
-            title,
-            online_status,
-            is_owner);
-
-        LLGroupMemberData* member_old = group_datap->mMembers[member_id];
-        if (member_old && group_datap->mRoleMemberDataComplete)
-        {
-            LLGroupMemberData::role_list_t::iterator rit = member_old->roleBegin();
-            LLGroupMemberData::role_list_t::iterator end = member_old->roleEnd();
-
-            for ( ; rit != end; ++rit)
+            if (online_status == "Online")
             {
-                data->addRole((*rit).first,(*rit).second);
+                online_status = LLTrans::getString("group_member_status_online");
+            }
+            else
+            {
+                formatDateString(online_status);
             }
         }
-        else
+
+        if (member_info.has("title"))
         {
-            group_datap->mRoleMemberDataComplete = false;
+            title = titles[member_info["title"].asInteger()].asString();
+        }
+
+        if (member_info.has("powers"))
+        {
+            member_powers = llstrtou64(member_info["powers"].asString().c_str(), NULL, 16);
+        }
+
+        if (member_info.has("donated_square_meters"))
+        {
+            donated_square_meters = member_info["donated_square_meters"];
+        }
+
+        if (member_info.has("owner"))
+        {
+            is_owner = true;
+        }
+
+        LLGroupMemberData* data = new LLGroupMemberData(member_id,
+            donated_square_meters, member_powers, title, online_status, is_owner);
+
+        if (group_datap->mRoleMemberDataComplete)
+        {
+            if (LLGroupMemberData* member_old = group_datap->mMembers[member_id])
+            {
+                auto role_end = member_old->roleEnd();
+                for (auto role_it = member_old->roleBegin(); role_it != role_end; ++role_it)
+                {
+                    data->addRole(role_it->first, role_it->second);
+                }
+            }
+            else
+            {
+                group_datap->mRoleMemberDataComplete = false;
+            }
         }
 
         group_datap->mMembers[member_id] = data;
     }
 
+    U32 member_count = (U32)group_datap->mMembers.size();
+
+    group_datap->mMemberCount = (S32)member_count;
+    group_datap->mMemberDataComplete = true;
+    group_datap->mMemberRequestID.setNull();
     group_datap->mMemberVersion.generate();
+
+    LL_INFOS("GrpMgr") << "members before: " << members_before
+        << ", members loaded: " << members_loaded
+        << ", members now: " << member_count << LL_ENDL;
 
     // Technically, we have this data, but to prevent completely overhauling
     // this entire system (it would be nice, but I don't have the time),
@@ -2384,12 +2398,19 @@ void LLGroupMgr::processCapGroupMembersRequest(const LLSD& content)
     //
     // TODO:
     // Refactor to reduce multiple calls for data we already have.
-    if(group_datap->mTitles.size() < 1)
+    if (group_datap->mTitles.size() < 1)
+    {
         sendGroupTitlesRequest(group_id);
+    }
 
+    if (page_size && members_loaded >= page_size && member_count > members_before)
+    {
+        LLCoros::instance().launch("LLGroupMgr::groupMembersRequestCoro", [&]()
+            {
+                groupMembersRequestCoro(url, group_id, page_size, page_start, sort_column, sort_descending);
+            });
+    }
 
-    group_datap->mMemberDataComplete = true;
-    group_datap->mMemberRequestID.setNull();
     // Make the role-member data request
     if (group_datap->mPendingRoleMemberRequest || !group_datap->mRoleMemberDataComplete)
     {
@@ -2397,11 +2418,9 @@ void LLGroupMgr::processCapGroupMembersRequest(const LLSD& content)
         sendGroupRoleMembersRequest(group_id);
     }
 
-    group_datap->mChanged = TRUE;
+    group_datap->mChanged = true;
     notifyObservers(GC_MEMBER_DATA);
-
 }
-
 
 void LLGroupMgr::sendGroupRoleChanges(const LLUUID& group_id)
 {
@@ -2413,7 +2432,7 @@ void LLGroupMgr::sendGroupRoleChanges(const LLUUID& group_id)
         group_datap->sendRoleChanges();
 
         // Not expecting a response, so let anyone else watching know the data has changed.
-        group_datap->mChanged = TRUE;
+        group_datap->mChanged = true;
         notifyObservers(GC_ROLE_DATA);
     }
 }
@@ -2421,9 +2440,11 @@ void LLGroupMgr::sendGroupRoleChanges(const LLUUID& group_id)
 void LLGroupMgr::cancelGroupRoleChanges(const LLUUID& group_id)
 {
     LL_DEBUGS("GrpMgr") << "LLGroupMgr::cancelGroupRoleChanges" << LL_ENDL;
-    LLGroupMgrGroupData* group_datap = getGroupData(group_id);
 
-    if (group_datap) group_datap->cancelRoleChanges();
+    if (LLGroupMgrGroupData* group_datap = getGroupData(group_id))
+    {
+        group_datap->cancelRoleChanges();
+    }
 }
 
 //static
@@ -2431,7 +2452,7 @@ bool LLGroupMgr::parseRoleActions(const std::string& xml_filename)
 {
     LLXMLNodePtr root;
 
-    BOOL success = LLUICtrlFactory::getLayeredXMLNode(xml_filename, root);
+    bool success = LLUICtrlFactory::getLayeredXMLNode(xml_filename, root);
 
     if (!success || !root || !root->hasName( "role_actions" ))
     {
@@ -2545,5 +2566,3 @@ void LLGroupMgr::debugClearAllGroups(void*)
     LLGroupMgr::getInstance()->clearGroups();
     LLGroupMgr::parseRoleActions("role_actions.xml");
 }
-
-

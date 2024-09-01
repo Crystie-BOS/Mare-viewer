@@ -125,7 +125,7 @@ FSFloaterImport::~FSFloaterImport()
     gSavedSettings.setBOOL("ShowNewInventory", mSavedSettingShowNewInventory);
 }
 
-BOOL FSFloaterImport::postBuild()
+bool FSFloaterImport::postBuild()
 {
     if (LLAgentBenefitsMgr::current().getTextureUploadCost() == 0
         || gAgent.getRegion()->getCentralBakeVersion() > 0)
@@ -379,7 +379,7 @@ void FSFloaterImport::processPrim(LLSD& prim)
         case LLAssetType::AT_BODYPART:
         {
             std::string asset(buffer.begin(), buffer.end());
-            S32 position = asset.rfind("textures");
+            S32 position = static_cast<S32>(asset.rfind("textures"));
             boost::regex pattern("[[:xdigit:]]{8}(-[[:xdigit:]]{4}){3}-[[:xdigit:]]{12}");
             boost::sregex_iterator m1(asset.begin() + position, asset.end(), pattern);
             boost::sregex_iterator m2;
@@ -411,7 +411,7 @@ void FSFloaterImport::processPrim(LLSD& prim)
             }
 
             S32 i;
-            S32 count = gesture->mSteps.size();
+            S32 count = static_cast<S32>(gesture->mSteps.size());
             for (i = 0; i < count; ++i)
             {
                 LLGestureStep* step = gesture->mSteps[i];
@@ -893,7 +893,7 @@ bool FSFloaterImport::processPrimCreated(LLViewerObject* object)
         gMessageSystem->addUUIDFast(_PREHASH_AgentID, gAgent.getID());
         gMessageSystem->addUUIDFast(_PREHASH_SessionID, gAgent.getSessionID());
         gMessageSystem->nextBlockFast(_PREHASH_HeaderData);
-        gMessageSystem->addBOOLFast(_PREHASH_Override, (BOOL)FALSE);
+        gMessageSystem->addBOOLFast(_PREHASH_Override, false);
 
         if (prim.has("group_mask"))
         {
@@ -902,7 +902,7 @@ bool FSFloaterImport::processPrimCreated(LLViewerObject* object)
             gMessageSystem->nextBlockFast(_PREHASH_ObjectData);
             gMessageSystem->addU32Fast(_PREHASH_ObjectLocalID, object_local_id);
             gMessageSystem->addU8Fast(_PREHASH_Field, PERM_GROUP);
-            gMessageSystem->addBOOLFast(_PREHASH_Set, (BOOL)(group_mask & PERM_MODIFY) ? TRUE : FALSE);
+            gMessageSystem->addBOOLFast(_PREHASH_Set, (bool)(group_mask & PERM_MODIFY) ? true : false);
             gMessageSystem->addU32Fast(_PREHASH_Mask, PERM_MODIFY | PERM_MOVE | PERM_COPY);
         }
         if (prim.has("everyone_mask"))
@@ -912,12 +912,12 @@ bool FSFloaterImport::processPrimCreated(LLViewerObject* object)
             gMessageSystem->nextBlockFast(_PREHASH_ObjectData);
             gMessageSystem->addU32Fast(_PREHASH_ObjectLocalID, object_local_id);
             gMessageSystem->addU8Fast(_PREHASH_Field, PERM_EVERYONE);
-            gMessageSystem->addBOOLFast(_PREHASH_Set, (BOOL)(everyone_mask & PERM_MOVE) ? TRUE : FALSE);
+            gMessageSystem->addBOOLFast(_PREHASH_Set, (bool)(everyone_mask & PERM_MOVE) ? true : false);
             gMessageSystem->addU32Fast(_PREHASH_Mask, PERM_MOVE);
             gMessageSystem->nextBlockFast(_PREHASH_ObjectData);
             gMessageSystem->addU32Fast(_PREHASH_ObjectLocalID, object_local_id);
             gMessageSystem->addU8Fast(_PREHASH_Field, PERM_EVERYONE);
-            gMessageSystem->addBOOLFast(_PREHASH_Set, (BOOL)(everyone_mask & PERM_COPY) ? TRUE : FALSE);
+            gMessageSystem->addBOOLFast(_PREHASH_Set, (bool)(everyone_mask & PERM_COPY) ? true : false);
             gMessageSystem->addU32Fast(_PREHASH_Mask, PERM_COPY);
         }
         if (prim.has("next_owner_mask"))
@@ -927,17 +927,17 @@ bool FSFloaterImport::processPrimCreated(LLViewerObject* object)
             gMessageSystem->nextBlockFast(_PREHASH_ObjectData);
             gMessageSystem->addU32Fast(_PREHASH_ObjectLocalID, object_local_id);
             gMessageSystem->addU8Fast(_PREHASH_Field, PERM_NEXT_OWNER);
-            gMessageSystem->addBOOLFast(_PREHASH_Set, (BOOL)(next_owner_mask & PERM_MODIFY) ? TRUE : FALSE);
+            gMessageSystem->addBOOLFast(_PREHASH_Set, (bool)(next_owner_mask & PERM_MODIFY) ? true : false);
             gMessageSystem->addU32Fast(_PREHASH_Mask, PERM_MODIFY);
             gMessageSystem->nextBlockFast(_PREHASH_ObjectData);
             gMessageSystem->addU32Fast(_PREHASH_ObjectLocalID, object_local_id);
             gMessageSystem->addU8Fast(_PREHASH_Field, PERM_NEXT_OWNER);
-            gMessageSystem->addBOOLFast(_PREHASH_Set, (BOOL)(next_owner_mask & PERM_COPY) ? TRUE : FALSE);
+            gMessageSystem->addBOOLFast(_PREHASH_Set, (BOOL)(next_owner_mask & PERM_COPY) ? true : false);
             gMessageSystem->addU32Fast(_PREHASH_Mask, PERM_COPY);
             gMessageSystem->nextBlockFast(_PREHASH_ObjectData);
             gMessageSystem->addU32Fast(_PREHASH_ObjectLocalID, object_local_id);
             gMessageSystem->addU8Fast(_PREHASH_Field, PERM_NEXT_OWNER);
-            gMessageSystem->addBOOLFast(_PREHASH_Set, (BOOL)(next_owner_mask & PERM_TRANSFER) ? TRUE : FALSE);
+            gMessageSystem->addBOOLFast(_PREHASH_Set, (bool)(next_owner_mask & PERM_TRANSFER) ? true : false);
             gMessageSystem->addU32Fast(_PREHASH_Mask, PERM_TRANSFER);
         }
 
@@ -948,7 +948,7 @@ bool FSFloaterImport::processPrimCreated(LLViewerObject* object)
     if (prim.has("sale_info"))
     {
         LLSaleInfo sale_info;
-        BOOL has_perm_mask;
+        bool has_perm_mask;
         U32 perm_mask;
         sale_info.fromLLSD(prim["sale_info"], has_perm_mask, perm_mask);
         if (sale_info.isForSale())
@@ -1253,8 +1253,8 @@ void FSFloaterImport::uploadAsset(LLUUID asset_id, LLUUID inventory_item)
         perms_prefix = "Wearables";
         std::string asset(asset_data.begin(), asset_data.end());
 
-        S32 position = asset.rfind("type");
-        S32 end = asset.find("\n", position);
+        S32 position = static_cast<S32>(asset.rfind("type"));
+        S32 end = static_cast<S32>(asset.find("\n", position));
         wearable_type = (LLWearableType::EType)boost::lexical_cast<S32>(asset.substr(position + 5, (end - (position + 5))));
 
         if (getChild<LLCheckBoxCtrl>("temp_asset")->get())
@@ -1263,7 +1263,7 @@ void FSFloaterImport::uploadAsset(LLUUID asset_id, LLUUID inventory_item)
             break;
         }
 
-        position = asset.rfind("textures");
+        position = static_cast<S32>(asset.rfind("textures"));
         boost::regex pattern("[[:xdigit:]]{8}(-[[:xdigit:]]{4}){3}-[[:xdigit:]]{12}");
         boost::sregex_iterator m1(asset.begin() + position, asset.end(), pattern);
         boost::sregex_iterator m2;
@@ -1399,7 +1399,7 @@ void FSFloaterImport::uploadAsset(LLUUID asset_id, LLUUID inventory_item)
             }
 
             S32 i;
-            S32 count = gesture->mSteps.size();
+            S32 count = static_cast<S32>(gesture->mSteps.size());
             bool replace = false;
             for (i = 0; i < count; ++i)
             {
@@ -2058,7 +2058,7 @@ void uploadCoroutine( LLCoreHttpUtil::HttpCoroutineAdapter::ptr_t &a_httpAdapter
                         LL_INFOS() << "inventory_item_flags " << inventory_item_flags << LL_ENDL;
                     }
                 }
-                S32 creation_date_now = time_corrected();
+                S32 creation_date_now = (S32)time_corrected();
 
                 LLPointer<LLViewerInventoryItem> item = new LLViewerInventoryItem( postContentResult[ "new_inventory_item" ].asUUID(), item_folder_id, new_perms, postContentResult[ "new_asset" ].asUUID(),
                                                                                     asset_type, inventory_type, item_name, item_description, LLSaleInfo::DEFAULT, inventory_item_flags, creation_date_now );

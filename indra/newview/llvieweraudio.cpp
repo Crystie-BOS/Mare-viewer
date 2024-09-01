@@ -76,7 +76,7 @@ LLViewerAudio::~LLViewerAudio()
 
 void LLViewerAudio::registerIdleListener()
 {
-    if(mIdleListnerActive==false)
+    if (!mIdleListnerActive)
     {
         mIdleListnerActive = true;
         doOnIdleRepeating(boost::bind(boost::bind(&LLViewerAudio::onIdleUpdate, this)));
@@ -382,9 +382,9 @@ void init_audio()
 
 // load up our initial set of sounds we'll want so they're in memory and ready to be played
 
-    BOOL mute_audio = gSavedSettings.getBOOL("MuteAudio");
+    bool mute_audio = gSavedSettings.getBOOL("MuteAudio");
 
-    if (!mute_audio && FALSE == gSavedSettings.getBOOL("NoPreload"))
+    if (!mute_audio && false == gSavedSettings.getBOOL("NoPreload"))
     {
         gAudiop->preloadSound(LLUUID(gSavedSettings.getString("UISndAlert")));
         gAudiop->preloadSound(LLUUID(gSavedSettings.getString("UISndBadKeystroke")));
@@ -438,10 +438,10 @@ void init_audio()
 void audio_update_volume(bool force_update)
 {
     F32 master_volume = gSavedSettings.getF32("AudioLevelMaster");
-    BOOL mute_audio = gSavedSettings.getBOOL("MuteAudio");
+    bool mute_audio = gSavedSettings.getBOOL("MuteAudio");
 
     LLProgressView* progress = gViewerWindow->getProgressView();
-    BOOL progress_view_visible = FALSE;
+    bool progress_view_visible = false;
 
     if (progress)
     {
@@ -450,7 +450,7 @@ void audio_update_volume(bool force_update)
 
     if (!gViewerWindow->getActive() && gSavedSettings.getBOOL("MuteWhenMinimized"))
     {
-        mute_audio = TRUE;
+        mute_audio = true;
     }
     F32 mute_volume = mute_audio ? 0.0f : 1.0f;
 
@@ -527,7 +527,7 @@ void audio_update_volume(bool force_update)
         static LLCachedControl<F32> audioLevelMusic(gSavedSettings, "AudioLevelMusic", 0.5f);
         static LLCachedControl<bool> muteMusic(gSavedSettings, "MuteMusic", false);
         F32 music_volume = (F32)audioLevelMusic;
-        BOOL music_muted = (BOOL)muteMusic;
+        bool music_muted = (bool)muteMusic;
         // </FS:Ansariel>
         F32 fade_volume = LLViewerAudio::getInstance()->getFadeVolume();
 
@@ -543,7 +543,7 @@ void audio_update_volume(bool force_update)
     static LLCachedControl<F32> audioLevelMedia(gSavedSettings, "AudioLevelMedia", 0.5f);
     static LLCachedControl<bool> muteMedia(gSavedSettings, "MuteMedia", false);
     F32 media_volume = (F32)audioLevelMedia;
-    BOOL media_muted = (BOOL)muteMedia;
+    bool media_muted = (BOOL)muteMedia;
     // </FS:Ansariel>
     media_volume = mute_volume * master_volume * media_volume;
     LLViewerMedia::getInstance()->setVolume( media_muted ? 0.0f : media_volume );
@@ -560,7 +560,7 @@ void audio_update_volume(bool force_update)
         // <FS:Ansariel> Use faster LLCachedControls for frequently visited locations
         //BOOL voice_mute = gSavedSettings.getBOOL("MuteVoice");
         static LLCachedControl<bool> muteVoice(gSavedSettings, "MuteVoice", false);
-        BOOL voice_mute = (BOOL)muteVoice;
+        bool voice_mute = (bool)muteVoice;
         // </FS:Ansariel>
         LLVoiceClient *voice_inst = LLVoiceClient::getInstance();
         voice_inst->setVoiceVolume(voice_mute ? 0.f : voice_volume);
@@ -641,18 +641,13 @@ void audio_update_wind(bool force_update)
         // don't use the setter setMaxWindGain() because we don't
         // want to screw up the fade-in on startup by setting actual source gain
         // outside the fade-in.
-        // <FS:Ansariel> Use faster LLCachedControls for frequently visited locations
-        //F32 master_volume  = gSavedSettings.getBOOL("MuteAudio") ? 0.f : gSavedSettings.getF32("AudioLevelMaster");
-        //F32 ambient_volume = gSavedSettings.getBOOL("MuteAmbient") ? 0.f : gSavedSettings.getF32("AudioLevelAmbient");
+        static LLCachedControl<bool> mute_audio(gSavedSettings, "MuteAudio");
+        static LLCachedControl<bool> mute_ambient(gSavedSettings, "MuteAmbient");
+        static LLCachedControl<F32> level_master(gSavedSettings, "AudioLevelMaster");
+        static LLCachedControl<F32> level_ambient(gSavedSettings, "AudioLevelAmbient");
 
-        static LLCachedControl<bool> muteAudio(gSavedSettings, "MuteAudio", false);
-        static LLCachedControl<bool> muteAmbient(gSavedSettings, "MuteAmbient", false);
-        static LLCachedControl<F32> audioLevelMaster(gSavedSettings, "AudioLevelMaster", 1.0f);
-        static LLCachedControl<F32> audioLevelAmbient(gSavedSettings, "AudioLevelAmbient", 0.5f);
-
-        F32 master_volume  = muteAudio ? 0.f : (F32)audioLevelMaster;
-        F32 ambient_volume = muteAmbient ? 0.f : (F32)audioLevelAmbient;
-        // </FS:Ansariel>
+        F32 master_volume  = mute_audio() ? 0.f : level_master();
+        F32 ambient_volume = mute_ambient() ? 0.f : level_ambient();
         F32 max_wind_volume = master_volume * ambient_volume;
 
         const F32 WIND_SOUND_TRANSITION_TIME = 2.f;

@@ -57,7 +57,7 @@ class KokuaRLVFloaterSupport
 public:
     KokuaRLVFloaterSupport() {}
     ~KokuaRLVFloaterSupport() {}
-    static BOOL addNameToLocalCache(LLUUID &obj_id, std::string &from_name);
+    static bool addNameToLocalCache(LLUUID &obj_id, std::string &from_name);
     static std::string getNameFromUUID(const LLUUID& idObj, bool fIncludeAttachPt);
     static std::string getModifierText(F32 value, F32 ceiling);
     static void commandNotify(LLUUID& object_uuid, std::string& command);
@@ -76,8 +76,8 @@ class KokuaFloaterRLVDebug : public LLMultiFloater
 public:
     KokuaFloaterRLVDebug(const LLSD& key);
     ~KokuaFloaterRLVDebug();
-    BOOL postBuild();
-    void setVisible(BOOL visible);
+    bool postBuild();
+    void setVisible(bool visible);
     void show(const LLUUID& object_id);
     static KokuaFloaterRLVDebug* getBase();
     /*virtual*/ void closeFloater(bool app_quitting = false);
@@ -97,7 +97,7 @@ public:
 
     void addLine(const std::string &utf8mesg, const std::string &user_name, const LLColor4& color);
     void updateName(const std::string &user_name, const LLUUID &id);
-    virtual BOOL postBuild();
+    virtual bool postBuild();
 
 protected:
     LLTextEditor* mHistoryEditor;
@@ -113,7 +113,7 @@ class KokuaFloaterRLVConsole : public LLFloater
 public:
     KokuaFloaterRLVConsole(const LLSD& sdKey);
     ~KokuaFloaterRLVConsole() override;
-    BOOL postBuild() override;
+    bool postBuild() override;
     void onClose(bool fQuitting) override;
     static KokuaFloaterRLVConsole* getBase();
     void addCommandReply(const std::string& strReply);
@@ -134,7 +134,7 @@ class KokuaFloaterRLVStatus : public LLFloater
 public:
     KokuaFloaterRLVStatus(const LLSD& sdKey);
     ~KokuaFloaterRLVStatus();
-    BOOL postBuild();
+    bool postBuild();
     static KokuaFloaterRLVStatus* getBase();
     void refreshRLVStatus();
     static void callRefreshRLVStatus();
@@ -160,7 +160,7 @@ class KokuaFloaterRLVWorn : public LLFloater
 public:
     KokuaFloaterRLVWorn(const LLSD& sdKey);
     ~KokuaFloaterRLVWorn();
-    BOOL postBuild();
+    bool postBuild();
     static KokuaFloaterRLVWorn* getBase();
     void refreshWornStatus();
     static void callRefreshWornStatus();

@@ -34,6 +34,8 @@
 #include "llpluginmessageclasses.h"
 #include "llsdserialize.h"
 #include "stringize.h"
+#include "threadpool.h"
+#include "workqueue.h"
 
 #include "llapr.h"
 #include "llrand.h"
@@ -47,7 +49,7 @@ LLPluginProcessParentOwner::~LLPluginProcessParentOwner()
 bool LLPluginProcessParent::sUseReadThread = false;
 apr_pollset_t *LLPluginProcessParent::sPollSet = NULL;
 bool LLPluginProcessParent::sPollsetNeedsRebuild = false;
-LLMutex *LLPluginProcessParent::sInstancesMutex;
+LLCoros::Mutex *LLPluginProcessParent::sInstancesMutex;
 LLPluginProcessParent::mapInstances_t LLPluginProcessParent::sInstances;
 LLThread *LLPluginProcessParent::sReadThread = NULL;
 
@@ -81,33 +83,12 @@ protected:
 
 };
 
-
-class LLPluginProcessCreationThread : public LLThread
-{
-public:
-    LLPluginProcessCreationThread(LLPluginProcessParent *parent) :
-        LLThread("LLPluginProcessCreationThread", gAPRPoolp),
-        pParent(parent)
-    {
-    }
-protected:
-    // Inherited from LLThread, should run once
-    /*virtual*/ void run(void)
-    {
-        pParent->createPluginProcess();
-    }
-private:
-    LLPluginProcessParent *pParent;
-
-};
-
 LLPluginProcessParent::LLPluginProcessParent(LLPluginProcessParentOwner *owner):
-    mIncomingQueueMutex(),
-    pProcessCreationThread(NULL)
+    mIncomingQueueMutex()
 {
     if(!sInstancesMutex)
     {
-        sInstancesMutex = new LLMutex();
+        sInstancesMutex = new LLCoros::Mutex();
     }
 
     mOwner = owner;
@@ -132,18 +113,6 @@ LLPluginProcessParent::LLPluginProcessParent(LLPluginProcessParentOwner *owner):
 LLPluginProcessParent::~LLPluginProcessParent()
 {
     LL_DEBUGS("Plugin") << "destructor" << LL_ENDL;
-    if (pProcessCreationThread)
-    {
-        if (!pProcessCreationThread->isStopped())
-        {
-            // Shouldn't happen at this stage
-            LL_WARNS("Plugin") << "Shutting down active pProcessCreationThread" << LL_ENDL;
-            pProcessCreationThread->shutdown();
-            ms_sleep(20);
-        }
-        delete pProcessCreationThread;
-        pProcessCreationThread = NULL;
-    }
 
     // Destroy any remaining shared memory regions
     sharedMemoryRegionsType::iterator iter;
@@ -177,7 +146,7 @@ LLPluginProcessParent::ptr_t LLPluginProcessParent::create(LLPluginProcessParent
 
     // Don't add to the global list until fully constructed.
     {
-        LLMutexLock lock(sInstancesMutex);
+        LLCoros::LockType lock(*sInstancesMutex);
         sInstances.insert(mapInstances_t::value_type(that.get(), that));
     }
 
@@ -187,7 +156,7 @@ LLPluginProcessParent::ptr_t LLPluginProcessParent::create(LLPluginProcessParent
 /*static*/
 void LLPluginProcessParent::shutdown()
 {
-    LLMutexLock lock(sInstancesMutex);
+    LLCoros::LockType lock(*sInstancesMutex);
 
     mapInstances_t::iterator it;
     for (it = sInstances.begin(); it != sInstances.end(); ++it)
@@ -245,7 +214,7 @@ bool LLPluginProcessParent::pollTick()
         {
             // this grabs a copy of the smart pointer to ourselves to ensure that we do not
             // get destroyed until after this method returns.
-            LLMutexLock lock(sInstancesMutex);
+            LLCoros::LockType lock(*sInstancesMutex);
             mapInstances_t::iterator it = sInstances.find(this);
             if (it != sInstances.end())
                 that = (*it).second;
@@ -264,7 +233,7 @@ void LLPluginProcessParent::removeFromProcessing()
     // Remove from the global list before beginning destruction.
     {
         // Make sure to get the global mutex _first_ here, to avoid a possible deadlock against LLPluginProcessParent::poll()
-        LLMutexLock lock(sInstancesMutex);
+        LLCoros::LockType lock(*sInstancesMutex);
         {
             LLMutexLock lock2(&mIncomingQueueMutex);
             sInstances.erase(this);
@@ -360,35 +329,6 @@ bool LLPluginProcessParent::accept()
     }
 
     return result;
-}
-
-bool LLPluginProcessParent::createPluginProcess()
-{
-    if (!mProcess)
-    {
-        // Only argument to the launcher is the port number we're listening on
-        mProcessParams.args.add(stringize(mBoundPort));
-        mProcess = LLProcess::create(mProcessParams);
-        return mProcess != NULL;
-    }
-
-    return false;
-}
-
-void LLPluginProcessParent::clearProcessCreationThread()
-{
-    if (pProcessCreationThread)
-    {
-        if (!pProcessCreationThread->isStopped())
-        {
-            pProcessCreationThread->shutdown();
-        }
-        else
-        {
-            delete pProcessCreationThread;
-            pProcessCreationThread = NULL;
-        }
-    }
 }
 
 void LLPluginProcessParent::idle(void)
@@ -565,29 +505,71 @@ void LLPluginProcessParent::idle(void)
 
             case STATE_LISTENING:
                 {
+                    // Only argument to the launcher is the port number we're listening on
+                    mProcessParams.args.add(stringize(mBoundPort));
+
                     // Launch the plugin process.
-                    if (mDebug && !pProcessCreationThread)
+                    if (mDebug && !mProcess)
                     {
-                        createPluginProcess();
-                        if (!mProcess)
+                        if (!(mProcess = LLProcess::create(mProcessParams)))
                         {
                             errorState();
                         }
                     }
-                    else if (pProcessCreationThread == NULL)
+                    else if (!mProcess && !mProcessCreationRequested)
                     {
-                        // exe plugin process allocation can be hindered by a number
-                        // of factors, don't hold whole viewer because of it, use thread
-                        pProcessCreationThread = new LLPluginProcessCreationThread(this);
-                        pProcessCreationThread->start();
-                    }
-                    else if (!mProcess && pProcessCreationThread->isStopped())
-                    {
-                        delete pProcessCreationThread;
-                        pProcessCreationThread = NULL;
-                        errorState();
-                    }
+                        mProcessCreationRequested = true;
+                        LL::WorkQueue::ptr_t main_queue = LL::WorkQueue::getInstance("mainloop");
+                        // *NOTE: main_queue->postTo casts this refcounted smart pointer to a weak
+                        // pointer
+                        LL::WorkQueue::ptr_t general_queue = LL::WorkQueue::getInstance("General");
+                        llassert_always(main_queue);
+                        llassert_always(general_queue);
 
+                        auto process_params = mProcessParams;
+
+                        bool posted = main_queue->postTo(
+                            general_queue,
+                            [process_params]() // Work done on general queue
+                            {
+                                return LLProcess::create(process_params);
+                            },
+                            [this](LLProcessPtr new_process) // Callback to main thread
+                                mutable {
+                                ptr_t that;
+                                {
+                                    // this grabs a copy of the smart pointer to ourselves to ensure that we do not
+                                    // get destroyed until after this method returns.
+                                    LLCoros::LockType lock(*sInstancesMutex);
+                                    mapInstances_t::iterator it = sInstances.find(this);
+                                    if (it != sInstances.end())
+                                        that = (*it).second;
+                                }
+
+                                if (that)
+                                {
+                                    if (new_process)
+                                    {
+                                        that->mProcess = new_process;
+                                    }
+                                    else
+                                    {
+                                        that->mProcessCreationRequested = false;
+                                        that->errorState();
+                                    }
+                                }
+
+                            });
+                        if (!posted)
+                        {
+                            LL_WARNS("Plugin") << "Failed to dispath process creation to threadpool" << LL_ENDL;
+                            if (!(mProcess = LLProcess::create(mProcessParams)))
+                            {
+                                mProcessCreationRequested = false;
+                                errorState();
+                            }
+                        }
+                    }
 
                     if (mProcess)
                     {
@@ -618,15 +600,6 @@ void LLPluginProcessParent::idle(void)
                         // This will allow us to time out if the process never starts.
                         mHeartbeat.start();
                         mHeartbeat.setTimerExpirySec(mPluginLaunchTimeout);
-
-                        // pProcessCreationThread should have stopped by this point,
-                        // but check just in case it paused on statistics sync
-                        if (pProcessCreationThread && pProcessCreationThread->isStopped())
-                        {
-                            delete pProcessCreationThread;
-                            pProcessCreationThread = NULL;
-                        }
-
                         setState(STATE_LAUNCHED);
                     }
                 }
@@ -729,7 +702,6 @@ void LLPluginProcessParent::idle(void)
                 killSockets();
                 setState(STATE_DONE);
                 dirtyPollSet();
-                clearProcessCreationThread();
                 break;
 
             case STATE_DONE:
@@ -867,7 +839,7 @@ void LLPluginProcessParent::updatePollset()
         return;
     }
 
-    LLMutexLock lock(sInstancesMutex);
+    LLCoros::LockType lock(*sInstancesMutex);
 
     if(sPollSet)
     {
@@ -990,7 +962,7 @@ void LLPluginProcessParent::poll(F64 timeout)
                 mapInstances_t::iterator it;
 
                 {
-                    LLMutexLock lock(sInstancesMutex);
+                    LLCoros::LockType lock(*sInstancesMutex);
                     it = sInstances.find(thatId);
                     if (it != sInstances.end())
                         that = (*it).second;

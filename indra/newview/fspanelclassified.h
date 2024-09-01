@@ -49,7 +49,7 @@ public:
     FSPublishClassifiedFloater(const LLSD& key);
     virtual ~FSPublishClassifiedFloater();
 
-    /*virtual*/ BOOL postBuild();
+    /*virtual*/ bool postBuild();
 
     void setPrice(S32 price);
     S32 getPrice();
@@ -73,7 +73,7 @@ public:
 
     void updateData();
 
-    /*virtual*/ BOOL postBuild();
+    /*virtual*/ bool postBuild();
 
     /*virtual*/ void processProperties(void* data, EAvatarProcessorType type);
 
@@ -140,7 +140,7 @@ public:
 
     void setEditClassifiedCallback(const commit_callback_t& cb);
 
-    /*virtual*/ void reshape(S32 width, S32 height, BOOL called_from_parent = TRUE);
+    /*virtual*/ void reshape(S32 width, S32 height, bool called_from_parent = TRUE);
 
     /*virtual*/ void draw();
 
@@ -209,7 +209,7 @@ public:
 
     virtual ~FSPanelClassifiedEdit();
 
-    /*virtual*/ BOOL postBuild();
+    /*virtual*/ bool postBuild();
 
     void fillIn(const LLSD& key);
 
@@ -217,7 +217,7 @@ public:
 
     /*virtual*/ void processProperties(void* data, EAvatarProcessorType type);
 
-    /*virtual*/ BOOL isDirty() const;
+    /*virtual*/ bool isDirty() const;
 
     /*virtual*/ void resetDirty();
 

@@ -56,8 +56,8 @@
 #include "llviewerobject.h"
 #include "llviewerobjectlist.h"
 #include "llviewertexteditor.h"
-#include "llvoavatarself.h"
 #include "llwearabledata.h"
+#include "llvoavatarself.h"
 
 #include "RRInterface.h"
 
@@ -90,24 +90,24 @@ std::string KokuaRLVFloaterSupport::getModifierText(F32 value, F32 ceiling)
     return llformat("%.1f",value);
 }
 
-BOOL KokuaRLVFloaterSupport::addNameToLocalCache(LLUUID &obj_id, std::string &from_name)
+bool KokuaRLVFloaterSupport::addNameToLocalCache(LLUUID &obj_id, std::string &from_name)
 {
-    // returns TRUE if name exists in viewer's cache
+    // returns true if name exists in viewer's cache
 
     // is it currently in object cache?
     LLViewerObject* pobject = gObjectList.findObject(obj_id);
 
     // is it currently in local cache?
     std::map<LLUUID, std::string>::iterator iter = mKnownIDs.find(obj_id);
-    BOOL incache = !(iter == mKnownIDs.end());
+    bool incache = !(iter == mKnownIDs.end());
 
     // is it an attachment or an avatar? if neither (eg standalone object or locally made UUID) keep it in this cache
-    BOOL canberesolved = FALSE;
+    bool canberesolved = false;
     if (pobject && incache)
     {
         if ((pobject->isAvatar()))
         {
-            canberesolved = TRUE;
+            canberesolved = true;
         }
         else
         {
@@ -120,13 +120,13 @@ BOOL KokuaRLVFloaterSupport::addNameToLocalCache(LLUUID &obj_id, std::string &fr
             }
             if (pItem)
             {
-                canberesolved = TRUE;
+                canberesolved = true;
             }
         }
         if (canberesolved)
         {
             mKnownIDs.erase(iter);
-            incache = FALSE;
+            incache = false;
         }
     }
 
@@ -242,7 +242,7 @@ void KokuaRLVFloaterSupport::checkForRefreshNeeded(LLUUID& object_uuid, std::str
 
     if (command.find(",") != -1) {
         std::deque<std::string> list_of_commands = gAgent.mRRInterface.parse(command, ",");
-        for (unsigned int i = 0; i<list_of_commands.size(); ++i)
+        for (S32 i = 0; i < static_cast<S32>(list_of_commands.size()); ++i)
         {
             checkForRefreshNeeded(object_uuid, list_of_commands.at(i),refresh_status,refresh_worn);
             //if we know that we need to refresh both, break out early
@@ -258,12 +258,12 @@ void KokuaRLVFloaterSupport::checkForRefreshNeeded(LLUUID& object_uuid, std::str
     }
     else
     {
-        int ind = command.find("=");
+        S32 ind = static_cast<S32>(command.find("="));
         if (ind != -1)
         {
             param = command.substr(ind + 1);
             behav = command.substr(0, ind);
-            ind = behav.find(":");
+            ind = static_cast<S32>(behav.find(":"));
             if (ind != -1)
             {
                 option = behav.substr(ind + 1);
@@ -340,9 +340,9 @@ KokuaFloaterRLVDebug::KokuaFloaterRLVDebug(const LLSD& key)
 {
     // avoid resizing of the window to match
     // the initial size of the tabbed-childs, whenever a tab is opened or closed
-    mAutoResize = FALSE;
+    mAutoResize = false;
     // enabled autofocus blocks controling focus via  LLFloaterReg::showInstance
-    setAutoFocus(FALSE);
+    setAutoFocus(false);
 }
 
 KokuaFloaterRLVDebug::~KokuaFloaterRLVDebug()
@@ -354,26 +354,26 @@ void KokuaFloaterRLVDebug::show(const LLUUID& object_id)
     addOutputWindow(object_id);
 }
 
-BOOL KokuaFloaterRLVDebug::postBuild()
+bool KokuaFloaterRLVDebug::postBuild()
 {
     LLMultiFloater::postBuild();
 
     if (mTabContainer)
     {
-        return TRUE;
+        return true;
     }
 
-    return FALSE;
+    return false;
 }
 
-void KokuaFloaterRLVDebug::setVisible(BOOL visible)
+void KokuaFloaterRLVDebug::setVisible(bool visible)
 {
     if(visible)
     {
         KokuaFloaterRLVDebugOutput* floater_output = LLFloaterReg::findTypedInstance<KokuaFloaterRLVDebugOutput>("rlv_debug_output", LLUUID::null);
         if (floater_output == NULL)
         {
-            floater_output = dynamic_cast<KokuaFloaterRLVDebugOutput*>(LLFloaterReg::showInstance("rlv_debug_output", LLUUID::null, FALSE));
+            floater_output = dynamic_cast<KokuaFloaterRLVDebugOutput*>(LLFloaterReg::showInstance("rlv_debug_output", LLUUID::null, false));
             if (floater_output)
             {
                 addFloater(floater_output, false);
@@ -406,7 +406,7 @@ LLFloater* KokuaFloaterRLVDebug::addOutputWindow(const LLUUID &object_id)
 
     LLFloater::setFloaterHost(host);
     // prevent stealing focus
-    floaterp = LLFloaterReg::showInstance("rlv_debug_output", object_id, FALSE);
+    floaterp = LLFloaterReg::showInstance("rlv_debug_output", object_id, false);
     LLFloater::setFloaterHost(NULL);
 
     return floaterp;
@@ -435,7 +435,7 @@ void KokuaFloaterRLVDebug::addRLVLine(const std::string &utf8mesg, const LLColor
     if (option_ignore_queries)
     {
         // supress any command with "=number"
-        int ind = utf8mesg.find("=");
+        S32 ind = static_cast<S32>(utf8mesg.find("="));
         if (ind != -1) {
             S32 channel = 0; // must be initialised - convertToS32 will not modify if conversion fails
             std::string param = utf8mesg.substr(ind + 1);
@@ -490,7 +490,7 @@ void KokuaFloaterRLVDebug::refreshRLVDebug(LLUUID& source_id)
     KokuaFloaterRLVDebugOutput* floaterp = LLFloaterReg::getTypedInstance<KokuaFloaterRLVDebugOutput>("rlv_debug_output", source_id);
     if (floaterp)
     {
-        floaterp->updateName(KokuaRLVFloaterSupport::getNameFromUUID(source_id, TRUE), source_id);
+        floaterp->updateName(KokuaRLVFloaterSupport::getNameFromUUID(source_id, true), source_id);
     }
 }
 
@@ -509,14 +509,14 @@ KokuaFloaterRLVDebugOutput::KokuaFloaterRLVDebugOutput(const LLSD& object_id)
     mObjectID(object_id.asUUID())
 {
     // enabled autofocus blocks controling focus via  LLFloaterReg::showInstance
-    setAutoFocus(FALSE);
+    setAutoFocus(false);
 }
 
-BOOL KokuaFloaterRLVDebugOutput::postBuild()
+bool KokuaFloaterRLVDebugOutput::postBuild()
 {
     LLFloater::postBuild();
     mHistoryEditor = getChild<LLViewerTextEditor>("rlv_debug_output");
-    return TRUE;
+    return true;
 }
 
 KokuaFloaterRLVDebugOutput::~KokuaFloaterRLVDebugOutput()
@@ -527,8 +527,8 @@ void KokuaFloaterRLVDebugOutput::addLine(const std::string &utf8mesg, const std:
 {
     if (mObjectID.isNull())
     {
-        setCanTearOff(FALSE);
-        setCanClose(FALSE);
+        setCanTearOff(false);
+        setCanClose(false);
     }
     else
     {
@@ -544,8 +544,8 @@ void KokuaFloaterRLVDebugOutput::updateName(const std::string &user_name, const 
 {
     if (mObjectID.isNull())
     {
-        setCanTearOff(FALSE);
-        setCanClose(FALSE);
+        setCanTearOff(false);
+        setCanClose(false);
     }
     else
     {
@@ -553,14 +553,14 @@ void KokuaFloaterRLVDebugOutput::updateName(const std::string &user_name, const 
         setShortTitle(user_name);
 
         //we don't put the uuid into the actual text, so no need to replace there
-        //mHistoryEditor->replaceTextAll(id.asString(), user_name, FALSE);
+        //mHistoryEditor->replaceTextAll(id.asString(), user_name, false);
 
         //and update the main window too
         KokuaFloaterRLVDebugOutput* floaterp = LLFloaterReg::getTypedInstance<KokuaFloaterRLVDebugOutput>("rlv_debug_output", LLUUID::null);
         if (floaterp)
         {
-             floaterp->mHistoryEditor->replaceTextAll(id.asString(), user_name, TRUE);
-             floaterp->mHistoryEditor->setReadOnly(TRUE);
+             floaterp->mHistoryEditor->replaceTextAll(id.asString(), user_name, true);
+             floaterp->mHistoryEditor->setReadOnly(true);
         }
     }
 }
@@ -578,7 +578,7 @@ KokuaFloaterRLVConsole::~KokuaFloaterRLVConsole()
 {
 }
 
-BOOL KokuaFloaterRLVConsole::postBuild()
+bool KokuaFloaterRLVConsole::postBuild()
 {
     LLLineEditor* pInputEdit = getChild<LLLineEditor>("rlv_console_input");
     pInputEdit->setEnableLineHistory(true);
@@ -589,7 +589,7 @@ BOOL KokuaFloaterRLVConsole::postBuild()
     m_pOutputText = getChild<LLTextEditor>("rlv_console_output");
     m_pOutputText->appendText(sRLVprompt, false);
 
-    return TRUE;
+    return true;
 }
 
 void KokuaFloaterRLVConsole::onClose(bool fQuitting)
@@ -626,7 +626,7 @@ void KokuaFloaterRLVConsole::onInput(LLUICtrl* pCtrl, const LLSD& sdParam)
         strInput.erase(0, 1);
         LLStringUtil::toLower(strInput);
 
-        BOOL result = gAgent.mRRInterface.handleCommand(gAgent.getID(), strInput);
+        bool result = gAgent.mRRInterface.handleCommand(gAgent.getID(), strInput);
 
         // only put feedback in the window if the command was rejected (output from =channel commands will arrive by another route)
 
@@ -654,12 +654,12 @@ KokuaFloaterRLVStatus::~KokuaFloaterRLVStatus()
 {
 }
 
-BOOL KokuaFloaterRLVStatus::postBuild()
+bool KokuaFloaterRLVStatus::postBuild()
 {
     getChild<LLUICtrl>("copy_btn")->setCommitCallback(boost::bind(&KokuaFloaterRLVStatus::onBtnCopyToClipboard, this));
     mPauseUpdating = getChild<LLCheckBoxCtrl>( "pause_updating");
     mPauseUpdating->setCommitCallback(boost::bind(&KokuaFloaterRLVStatus::onCommitPauseUpdating, this));
-    return TRUE;
+    return true;
 }
 
 void KokuaFloaterRLVStatus::onOpen(const LLSD& key)
@@ -670,7 +670,7 @@ void KokuaFloaterRLVStatus::onOpen(const LLSD& key)
 void KokuaFloaterRLVStatus::onBtnCopyToClipboard()
 {
     LLWString res = utf8str_to_wstring(gAgent.mRRInterface.getRlvRestrictions());
-    LLClipboard::instance().copyToClipboard(res, 0, res.length());
+    LLClipboard::instance().copyToClipboard(res, 0, static_cast<S32>(res.length()));
 }
 
 void KokuaFloaterRLVStatus::onCommitPauseUpdating()
@@ -740,8 +740,8 @@ void KokuaFloaterRLVStatus::refreshRLVStatus()
     {
 
         std::string option;
-        BOOL is_exception = FALSE;
-        //BOOL option_is_uuid = FALSE;
+        bool is_exception = false;
+        //bool option_is_uuid = false;
         std::string behav = it->second;
         LLStringUtil::toLower(behav);
 
@@ -757,9 +757,9 @@ void KokuaFloaterRLVStatus::refreshRLVStatus()
             || behav.find("edit:") == 0
             || behav.find("touchworld:") == 0
             || behav.find("shownames:") == 0
-            || behav.find("shownametags:") == 0) is_exception = TRUE;
+            || behav.find("shownametags:") == 0) is_exception = true;
 
-        int ind = behav.find(":");
+        S32 ind = static_cast<S32>(behav.find(":"));
         if (ind != -1) {
             option = behav.substr(ind + 1);
             behav = behav.substr(0, ind);
@@ -771,7 +771,7 @@ void KokuaFloaterRLVStatus::refreshRLVStatus()
 
         LLUUID idOption;
 
-        if (option != "" && (idOption.set(option, FALSE)) && (idOption.notNull()))
+        if (option != "" && (idOption.set(option, false)) && (idOption.notNull()))
         {
             LLAvatarName avName;
             //KKA-823 add exception for camtextures/setcam_textures - a texture uuid isn't going to resolve to a name
@@ -969,7 +969,7 @@ void KokuaFloaterRLVStatus::refreshRLVStatus()
                 str << label_mode << "distextend";
                 sdModifierColumns[0]["value"] = str.str();
                 sdModifierColumns[1]["value"] = "";
-                sdModifierColumns[2]["value"] = KokuaRLVFloaterSupport::getModifierText((int)sphere_effect->getDistExtend(), EXTREMUM);
+                sdModifierColumns[2]["value"] = KokuaRLVFloaterSupport::getModifierText(static_cast<F32>(sphere_effect->getDistExtend()), EXTREMUM);
                 pModifierList->addElement(sdModifierRow, ADD_BOTTOM);
                 str.str(std::string());
 
@@ -977,7 +977,7 @@ void KokuaFloaterRLVStatus::refreshRLVStatus()
                 str << label_mode << "origin";
                 sdModifierColumns[0]["value"] = str.str();
                 sdModifierColumns[1]["value"] = "";
-                sdModifierColumns[2]["value"] = KokuaRLVFloaterSupport::getModifierText((int)sphere_effect->getOrigin(), EXTREMUM);
+                sdModifierColumns[2]["value"] = KokuaRLVFloaterSupport::getModifierText(static_cast<F32>(sphere_effect->getOrigin()), EXTREMUM);
                 pModifierList->addElement(sdModifierRow, ADD_BOTTOM);
                 str.str(std::string());
 
@@ -1034,10 +1034,10 @@ KokuaFloaterRLVWorn::~KokuaFloaterRLVWorn()
     gInventory.removeObserver(mInventoryObserver);
 }
 
-BOOL KokuaFloaterRLVWorn::postBuild()
+bool KokuaFloaterRLVWorn::postBuild()
 {
     getChild<LLUICtrl>("refresh_btn")->setCommitCallback(boost::bind(&KokuaFloaterRLVWorn::onBtnRefresh, this));
-    return TRUE;
+    return true;
 }
 
 void KokuaFloaterRLVWorn::onOpen(const LLSD& key)
@@ -1177,7 +1177,7 @@ void KokuaFloaterRLVWorn::refreshWornStatus()
             || behav.find("attach") != -1
             || behav.find("detach") != -1))
         {
-            int ind = behav.find(":");
+            S32 ind = static_cast<S32>(behav.find(":"));
             if (ind != -1)
             {
                 option = behav.substr(ind + 1);
@@ -1195,12 +1195,12 @@ void KokuaFloaterRLVWorn::refreshWornStatus()
     // panel 4 iterates through the clothing layers reporting worn items and the attach/detach status
     // for that clothing layer
 
-    int ind_wt = 0;
+    S32 ind_wt = 0;
     while (ind_wt < LLWearableType::WT_COUNT)
     {
         // do this as a while to make the early exit more readable, unfortunately getWearableCount
         // isn't public although it exists
-        int ind_layers = 0;
+        S32 ind_layers = 0;
         while (ind_layers < LLWearableData::MAX_CLOTHING_LAYERS)
         {
             LLViewerInventoryItem* vi_item = gInventory.getItem(gAgentWearables.getWearableItemID((LLWearableType::EType)ind_wt, ind_layers));
@@ -1210,7 +1210,7 @@ void KokuaFloaterRLVWorn::refreshWornStatus()
                 // even if it's empty we want to give it a row in the floater
                 sdWearColumns[0]["value"] = gAgent.mRRInterface.getOutfitLayerAsString((LLWearableType::EType)ind_wt);
                 sdWearColumns[1]["value"] = "(empty)";
-                BOOL can_wear = gAgent.mRRInterface.canWear((LLWearableType::EType)ind_wt, false);
+                bool can_wear = gAgent.mRRInterface.canWear((LLWearableType::EType)ind_wt, false);
                 if (can_wear)
                 {
                     sdWearColumns[2]["value"] = "unlocked";
@@ -1221,7 +1221,7 @@ void KokuaFloaterRLVWorn::refreshWornStatus()
                 }
                 // we don't need to think about unwearing from the must-be-one-or-more spots at this point
                 // since it's empty (which it shouldn't remain as) right now
-                BOOL can_unwear = gAgent.mRRInterface.canUnwear((LLWearableType::EType)ind_wt);
+                bool can_unwear = gAgent.mRRInterface.canUnwear((LLWearableType::EType)ind_wt);
                 if (can_unwear)
                 {
                     sdWearColumns[3]["value"] = "unlocked";
@@ -1241,7 +1241,7 @@ void KokuaFloaterRLVWorn::refreshWornStatus()
                     sdWearColumns[0]["value"] = gAgent.mRRInterface.getOutfitLayerAsString((LLWearableType::EType)ind_wt);
                     sdWearColumns[1]["value"] = vi_item->getName();
 
-                    BOOL can_wear = gAgent.mRRInterface.canWear((LLWearableType::EType)ind_wt, false);
+                    bool can_wear = gAgent.mRRInterface.canWear((LLWearableType::EType)ind_wt, false);
                     // ideally this would return false if LLWearableData::MAX_CLOTHING_LAYERS is reached, but we won't try to
                     // allow for that here
                     if (can_wear)
@@ -1254,7 +1254,7 @@ void KokuaFloaterRLVWorn::refreshWornStatus()
                     }
                     // this time we check detach for the item itself, not the attach point
                     // however we also need to add a warning if it's one of the must-be-there points
-                    BOOL can_unwear = gAgent.mRRInterface.canUnwear(vi_item);
+                    bool can_unwear = gAgent.mRRInterface.canUnwear(vi_item);
                     if (can_unwear)
                     {
                         LLViewerWearable* vw_item = gAgentWearables.getViewerWearable((LLWearableType::EType)ind_wt, ind_layers);

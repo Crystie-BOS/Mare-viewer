@@ -50,7 +50,7 @@ public:
     /*virtual*/ void markDead();
     /*virtual*/ void setSourceObject(LLViewerObject* objectp);
 
-    BOOL setPointAt(EPointAtType target_type, LLViewerObject *object, LLVector3 position);
+    bool setPointAt(EPointAtType target_type, LLViewerObject *object, LLVector3 position);
     void clearPointAtTarget();
 
     EPointAtType getPointAtType() { return mTargetType; }
@@ -69,7 +69,8 @@ protected:
     void setTargetPosGlobal(const LLVector3d &target_pos_global);
     bool calcTargetPosition();
     void update();
-
+public:
+    static bool sDebugPointAt;
 private:
     EPointAtType                mTargetType;
     LLVector3d                  mTargetOffsetGlobal;

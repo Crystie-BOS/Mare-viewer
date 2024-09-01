@@ -110,7 +110,7 @@ public:
             }
         }
     }
-    BOOL tick()
+    bool tick()
     {
         LLViewerInventoryItem* subj = instack.top();
         instack.pop();
@@ -156,7 +156,7 @@ public:
     ~ZdCleanup()
     {
     }
-    BOOL tick()
+    bool tick()
     {
         zdrop = NULL;
         return TRUE;
@@ -192,7 +192,7 @@ public:
             report_to_nearby_chat("Ztake deactivated.");
         }
     }
-    BOOL tick()
+    bool tick()
     {
         {
             LLMessageSystem *msg = gMessageSystem;
@@ -297,7 +297,7 @@ public:
     ~LOZtCleanup()
     {
     }
-    BOOL tick()
+    bool tick()
     {
         ztake->mRunning = TRUE;
         delete ztake;
@@ -325,7 +325,7 @@ public:
     {
         report_to_nearby_chat("Mtake deactivated.");
     }
-    BOOL tick()
+    bool tick()
     {
         {
             LLMessageSystem *msg = gMessageSystem;
@@ -341,17 +341,17 @@ public:
                     std::string primX = llformat("%f",(float)object->getScale().mV[VX]);
                     std::string primY = llformat("%f",(float)object->getScale().mV[VY]);
                     std::string primZ = llformat("%f",(float)object->getScale().mV[VZ]);
-                    zeroClearX = primX.find_last_not_of("0")+1;
+                    zeroClearX = static_cast<int>(primX.find_last_not_of("0")+1);
                     primX = primX.substr(0,zeroClearX);
-                    zeroClearY = primY.find_last_not_of("0")+1;
+                    zeroClearY = static_cast<int>(primY.find_last_not_of("0")+1);
                     primY = primY.substr(0,zeroClearY);
-                    zeroClearZ = primZ.find_last_not_of("0")+1;
+                    zeroClearZ = static_cast<int>(primZ.find_last_not_of("0")+1);
                     primZ = primZ.substr(0,zeroClearZ);
-                    zeroClearX = primX.find_last_not_of(".")+1;
+                    zeroClearX = static_cast<int>(primX.find_last_not_of(".")+1);
                     primX = primX.substr(0,zeroClearX);
-                    zeroClearY = primY.find_last_not_of(".")+1;
+                    zeroClearY = static_cast<int>(primY.find_last_not_of(".")+1);
                     primY = primY.substr(0,zeroClearY);
-                    zeroClearZ = primZ.find_last_not_of(".")+1;
+                    zeroClearZ = static_cast<int>(primZ.find_last_not_of(".")+1);
                     primZ = primZ.substr(0,zeroClearZ);
                     std::string name = llformat("%sx%sx%s",primX.c_str(),primY.c_str(),primZ.c_str());
                     msg->newMessageFast(_PREHASH_ObjectName);
@@ -481,7 +481,7 @@ bool cmd_line_chat(std::string revised_text, EChatType type, bool from_gesture)
                     gSavedSettings.setBOOL("FSRenderFarClipStepping", TRUE);
                     return false;
                 }
-                int drawDist;
+                F32 drawDist;
                 if (i >> drawDist)
                 {
                     gSavedSettings.setF32("RenderFarClip", drawDist);
@@ -709,9 +709,9 @@ bool cmd_line_chat(std::string revised_text, EChatType type, bool from_gesture)
                 if (revised_text.length() > command.length() + 1) //Typing this command with no argument was causing a crash. -Madgeek
                 {
                     LLVector3d agentPos = gAgent.getPositionGlobal();
-                    S32 agent_x = llround( (F32)fmod( agentPos.mdV[VX], (F64)REGION_WIDTH_METERS ) );
-                    S32 agent_y = llround( (F32)fmod( agentPos.mdV[VY], (F64)REGION_WIDTH_METERS ) );
-                    S32 agent_z = llround( (F32)agentPos.mdV[VZ] );
+                    S32 agent_x = (S32)llround( (F32)fmod( agentPos.mdV[VX], (F64)REGION_WIDTH_METERS ) );
+                    S32 agent_y = (S32)llround( (F32)fmod( agentPos.mdV[VY], (F64)REGION_WIDTH_METERS ) );
+                    S32 agent_z = (S32)llround( (F32)agentPos.mdV[VZ] );
                     std::string region_name = LLWeb::escapeURL(revised_text.substr(command.length()+1));
                     std::string url;
                     if(!sFSCmdLineMapToKeepPos)

@@ -81,15 +81,15 @@ void LLStatGraph::draw()
         {
           // KKA-821 Annoyingly this arrived as a SampleAccumulator, but the existing code casts it to a CountAccumulator
           // However, we need it back as a SampleAccumulator for getLastValue to work
-            mValue = recording.getLastValue(*(LLTrace::StatType<LLTrace::SampleAccumulator> *)mNewStatFloatp);
+            mValue = (F32)recording.getLastValue(*(LLTrace::StatType<LLTrace::SampleAccumulator> *)mNewStatFloatp);
         }
         else if (mPerSec)
         {
-            mValue = recording.getPerSec(*mNewStatFloatp);
+            mValue = (F32)recording.getPerSec(*mNewStatFloatp);
         }
         else
         {
-            mValue = recording.getSum(*mNewStatFloatp);
+            mValue = (F32)recording.getSum(*mNewStatFloatp);
         }
     }
 
@@ -98,7 +98,7 @@ void LLStatGraph::draw()
     frac = llmin(1.f, frac);
     if (mInvertBar) // KKA-821 add inverting so that a minimum value gives a full bar (for situations when minimum should grab attention with a full bar, like zero sim spare time)
     {
-      frac = 1.0 - frac;
+      frac = static_cast<F32>(1.0 - frac);
     }
 
     if (mUpdateTimer.getElapsedTimeF32() > 0.5f)
@@ -112,23 +112,22 @@ void LLStatGraph::draw()
         mUpdateTimer.reset();
     }
 
-    gGL.color4fv(mBackgroundColor.get().mV);
-    gl_rect_2d(0, getRect().getHeight(), getRect().getWidth(), 0, TRUE);
+    threshold_vec_t::iterator it = std::lower_bound(mThresholds.begin(), mThresholds.end(), Threshold(mValue / mMax, LLUIColor()));
 
-    gGL.color4fv(mBorderColor.get().mV);
-    gl_rect_2d(0, getRect().getHeight(), getRect().getWidth(), 0, FALSE);
-
-    LLColor4 color = mColor.get();
-
-    for (S32 i = mThresholds.size() - 1; i > -1; --i) {
-        if (mValue > mThresholds[i].mValue) {
-            color = mThresholds[i].mColor;
-            break;
-        }
+    if (it != mThresholds.begin())
+    {
+        it--;
     }
 
-    gGL.color4fv(color.mV);
-    gl_rect_2d(1, ll_round(frac*getRect().getHeight()), getRect().getWidth() - 1, 0, TRUE);
+    static LLUIColor default_color = LLUIColorTable::instance().getColor( "MenuDefaultBgColor" );
+    gGL.color4fv(default_color.get().mV);
+    gl_rect_2d(0, getRect().getHeight(), getRect().getWidth(), 0, true);
+
+    gGL.color4fv(LLColor4::black.mV);
+    gl_rect_2d(0, getRect().getHeight(), getRect().getWidth(), 0, false);
+
+    gGL.color4fv(it->mColor().mV);
+    gl_rect_2d(1, ll_round(frac*getRect().getHeight()), getRect().getWidth() - 1, 0, true);
 }
 
 void LLStatGraph::setMin(const F32 min)
@@ -167,16 +166,16 @@ void LLStatGraph::setClickedCallback(callback_t cb)
     mClickedCallback = boost::bind(cb);
 }
 
-BOOL LLStatGraph::handleMouseDown(S32 x, S32 y, MASK mask)
+bool LLStatGraph::handleMouseDown(S32 x, S32 y, MASK mask)
 {
-    BOOL handled = LLView::handleMouseDown(x, y, mask);
+    bool handled = LLView::handleMouseDown(x, y, mask);
 
     if (getSoundFlags() & MOUSE_DOWN) {
         make_ui_sound("UISndClick");
     }
 
     if (!handled && mClickedCallback) {
-        handled = TRUE;
+        handled = true;
     }
 
     if (handled) {
@@ -190,9 +189,9 @@ BOOL LLStatGraph::handleMouseDown(S32 x, S32 y, MASK mask)
     return handled;
 }
 
-BOOL LLStatGraph::handleMouseUp(S32 x, S32 y, MASK mask)
+bool LLStatGraph::handleMouseUp(S32 x, S32 y, MASK mask)
 {
-    BOOL handled = LLView::handleMouseUp(x, y, mask);
+    bool handled = LLView::handleMouseUp(x, y, mask);
 
     if (getSoundFlags() & MOUSE_UP) {
         make_ui_sound("UISndClickRelease");
@@ -214,23 +213,23 @@ BOOL LLStatGraph::handleMouseUp(S32 x, S32 y, MASK mask)
         //
         if (mClickedCallback && !handled) {
             mClickedCallback();
-            handled = TRUE;
+            handled = true;
         }
     }
 
     return handled;
 }
 
-BOOL LLStatGraph::handleHover(S32 x, S32 y, MASK mask)
+bool LLStatGraph::handleHover(S32 x, S32 y, MASK mask)
 {
-    BOOL handled = LLView::handleHover(x, y, mask);
+    bool handled = LLView::handleHover(x, y, mask);
 
     if (!handled && mClickedCallback) {
         //
         //  clickable statistics graphs change the cursor to a hand
         //
         LLUI::getInstance()->getWindow()->setCursor(UI_CURSOR_HAND);
-        handled = TRUE;
+        handled = true;
     }
 
     return handled;

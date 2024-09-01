@@ -39,12 +39,9 @@
 		<menu_item_check label="Chat nei dintorni..." name="Nearby Chat"/>
 		<menu_item_check label="Parla" name="Speak"/>
 		<menu_item_check label="Registro conversazioni..." name="Conversation Log..."/>
-		<menu label="Manipolazione voce" name="VoiceMorphing">
-			<menu_item_check label="Nessuna manipolazione voce" name="NoVoiceMorphing"/>
-			<menu_item_check label="Anteprima..." name="Preview"/>
-			<menu_item_call label="Abbonati..." name="Subscribe"/>
-			<menu_item_call label="Vantaggio Premium..." name="PremiumPerk"/>
-		</menu>
+		<menu_item_call label="Facebook..." name="Facebook"/>
+		<menu_item_call label="Twitter..." name="Twitter"/>
+		<menu_item_call label="Flickr..." name="Flickr"/>
 		<menu_item_check label="Gesture..." name="Gestures"/>
 		<menu_item_check label="Amici" name="My Friends"/>
 		<menu_item_check label="Gruppi" name="My Groups"/>
@@ -86,8 +83,6 @@
 			<menu_item_call label="Illuminazione personale..." name="adjustment_tool"/>
 			<menu_item_check label="Ferma nuvole" name="pause_clouds"/>
 		</menu>
-		<menu_item_call label="Lista Suoni" name="Sound Explorer"/>
-     	<menu_item_call label="Asset Blacklist" name="asset_blacklist"/>
 	</menu>
 	<menu label="Costruisci" name="BuildTools">
 		<menu_item_check label="Costruisci" name="Show Build Tools"/>
@@ -144,7 +139,8 @@
 			<menu_item_check label="Posiziona nella griglia" name="Snap to Grid"/>
 			<menu_item_call label="Posiziona coordinate XY dell'oggetto sulla griglia" name="Snap Object XY to Grid"/>
 			<menu_item_call label="Usa la selezione per la griglia" name="Use Selection for Grid"/>
-			<menu_item_call label="Opzioni della griglia" name="Grid Options"/>
+			<menu_item_call label="Opzioni della griglia..." name="Grid Options"/>
+			<menu_item_call label="Imposta diritti predefiniti..." name="Set default permissions"/>
 		</menu>
 		<menu label="Carica sul server" name="Upload">
 			<menu_item_call label="Immagine ([COST] L$)..." name="Upload Image"/>
@@ -285,6 +281,7 @@
 			<menu_item_check label="Info livello dettaglio" name="LOD Info"/>
 			<menu_item_check label="Conteggio triangolo" name="Triangle Count"/>
 			<menu_item_check label="Crea coda" name="Build Queue"/>
+			<menu_item_check label="Particelle" name="Particles"/>
 			<menu_item_check label="Giunti" name="Joints"/>
 			<menu_item_check label="Vettori vento" name="Wind Vectors"/>
 			<menu_item_check label="Scolpisci" name="Sculpt"/>

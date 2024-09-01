@@ -75,8 +75,9 @@
 // Bugsplat (http://bugsplat.com) crash reporting tool
 #ifdef LL_BUGSPLAT
 #include "BugSplat.h"
-#include "json/reader.h"                 // JsonCpp
+#include "boost/json.hpp"                 // Boost.Json
 #include "llagent.h"                // for agent location
+#include "llstartup.h"
 #include "llviewerregion.h"
 #include "llvoavatarself.h"         // for agent name
 namespace Kokua
@@ -159,8 +160,7 @@ namespace
             // We don't have an email address for any user. Hijack this
             // metadata field for the platform identifier.
             sBugSplatSender->setDefaultUserEmail(
-                WCSTR(STRINGIZE(LLOSInfo::instance().getOSStringSimple() << " ("
-                                << ADDRESS_SIZE << "-bit)")));
+                WCSTR(LLOSInfo::instance().getOSStringSimple()));
 
             if (gAgentAvatarp)
             {
@@ -187,6 +187,8 @@ namespace
 
             // LL_ERRS message, when there is one
             sBugSplatSender->setDefaultUserDescription(WCSTR(LLError::getFatalMessage()));
+            // App state
+            sBugSplatSender->setAttribute(WCSTR(L"AppState"), WCSTR(LLStartUp::getStartupStateString()));
 
             if (gAgent.getRegion())
             {
@@ -230,19 +232,6 @@ LONG WINAPI catchallCrashHandler(EXCEPTION_POINTERS * /*ExceptionInfo*/)
     return 0;
 }
 
-// *FIX:Mani - This hack is to fix a linker issue with libndofdev.lib
-// The lib was compiled under VS2005 - in VS2003 we need to remap assert
-#ifdef LL_DEBUG
-#ifdef LL_MSVC7
-extern "C" {
-    void _wassert(const wchar_t * _Message, const wchar_t *_File, unsigned _Line)
-    {
-        LL_ERRS() << _Message << LL_ENDL;
-    }
-}
-#endif
-#endif
-
 const std::string LLAppViewerWin32::sWindowClass = "Second Life";
 
 /*
@@ -273,7 +262,7 @@ bool create_app_mutex()
     LPCWSTR unique_mutex_name = L"SecondLifeAppMutex";
     HANDLE hMutex;
     hMutex = CreateMutex(NULL, TRUE, unique_mutex_name);
-    if(GetLastError() == ERROR_ALREADY_EXISTS)
+    if (GetLastError() == ERROR_ALREADY_EXISTS)
     {
         result = false;
     }
@@ -497,7 +486,7 @@ int APIENTRY WINMAIN(HINSTANCE hInstance,
     gDebugInfo["FoundOtherInstanceAtStartup"] = LLSD::Boolean(found_other_instance);
 
     bool ok = viewer_app_ptr->init();
-    if(!ok)
+    if (!ok)
     {
         LL_WARNS() << "Application init failed." << LL_ENDL;
         return -1;
@@ -564,7 +553,7 @@ int APIENTRY WINMAIN(HINSTANCE hInstance,
         }
 #endif
 
-        gGLActive = TRUE;
+        gGLActive = true;
 
         viewer_app_ptr->cleanup();
 
@@ -807,90 +796,86 @@ bool LLAppViewerWin32::init()
         LLFile::remove(log_file, ENOENT);
     }
 
-    std::string build_data_fname(
-        gDirUtilp->getExpandedFilename(LL_PATH_EXECUTABLE, "build_data.json"));
-    // Use llifstream instead of std::ifstream because LL_PATH_EXECUTABLE
-    // could contain non-ASCII characters, which std::ifstream doesn't handle.
-    llifstream inf(build_data_fname.c_str());
-    if (! inf.is_open())
+    // Win7 is no longer supported
+    bool is_win_7_or_below = LLOSInfo::getInstance()->mMajorVer <= 6 && LLOSInfo::getInstance()->mMajorVer <= 1;
+
+    if (!is_win_7_or_below)
     {
-        LL_WARNS("BUGSPLAT") << "Can't initialize BugSplat, can't read '" << build_data_fname
-                   << "'" << LL_ENDL;
-    }
-    else
-    {
-        Json::Reader reader;
-        Json::Value build_data;
-        if (! reader.parse(inf, build_data, false)) // don't collect comments
+        std::string build_data_fname(
+            gDirUtilp->getExpandedFilename(LL_PATH_EXECUTABLE, "build_data.json"));
+        // Use llifstream instead of std::ifstream because LL_PATH_EXECUTABLE
+        // could contain non-ASCII characters, which std::ifstream doesn't handle.
+        llifstream inf(build_data_fname.c_str());
+        if (!inf.is_open())
         {
-            // gah, the typo is baked into Json::Reader API
-            LL_WARNS("BUGSPLAT") << "Can't initialize BugSplat, can't parse '" << build_data_fname
-                       << "': " << reader.getFormatedErrorMessages() << LL_ENDL;
+            LL_WARNS("BUGSPLAT") << "Can't initialize BugSplat, can't read '" << build_data_fname
+                << "'" << LL_ENDL;
         }
         else
         {
-            Json::Value BugSplat_DB = build_data["BugSplat DB"];
-            if (! BugSplat_DB)
+            boost::system::error_code ec;
+            boost::json::value build_data = boost::json::parse(inf, ec);
+            if(ec.failed())
             {
-                LL_WARNS("BUGSPLAT") << "Can't initialize BugSplat, no 'BugSplat DB' entry in '"
-                           << build_data_fname << "'" << LL_ENDL;
+                // gah, the typo is baked into Json::Reader API
+                LL_WARNS("BUGSPLAT") << "Can't initialize BugSplat, can't parse '" << build_data_fname
+                    << "': " << ec.what() << LL_ENDL;
             }
             else
             {
-                // Got BugSplat_DB, onward!
-                std::wstring version_string(WSTRINGIZE(LL_VIEWER_VERSION_MAJOR << '.' <<
-                                                       LL_VIEWER_VERSION_MINOR << '.' <<
-                                                       LL_VIEWER_VERSION_PATCH << '.' <<
-                                                       LL_VIEWER_VERSION_BUILD));
-
-                DWORD dwFlags = dwAsk | // allow for prompting
-                                MDSF_PREVENTHIJACKING; // disallow swiping Exception filter
-
-                                bool needs_log_file = false;
-                if (!isSecondInstance())
+                if (!build_data.is_object() || !build_data.as_object().contains("BugSplat DB"))
                 {
-                    // Startup only!
-                    LL_INFOS("BUGSPLAT") << "Engaged BugSplat logging to bugsplat.log";
-                    needs_log_file = true;
-                    dwFlags |= MDSF_LOGFILE | MDSF_LOG_VERBOSE;
+                    LL_WARNS("BUGSPLAT") << "Can't initialize BugSplat, no 'BugSplat DB' entry in '"
+                        << build_data_fname << "'" << LL_ENDL;
+                }
+                else
+                {
+                    boost::json::value BugSplat_DB = build_data.at("BugSplat DB");
+
+                    // Got BugSplat_DB, onward!
+                    std::wstring version_string(WSTRINGIZE(LL_VIEWER_VERSION_MAJOR << '.' <<
+                        LL_VIEWER_VERSION_MINOR << '.' <<
+                        LL_VIEWER_VERSION_PATCH << '.' <<
+                        LL_VIEWER_VERSION_BUILD));
+
+                    DWORD dwFlags = MDSF_NONINTERACTIVE | // automatically submit report without prompting
+                        MDSF_PREVENTHIJACKING; // disallow swiping Exception filter
+
+                    bool needs_log_file = !isSecondInstance();
+                    LL_DEBUGS("BUGSPLAT");
+                    if (needs_log_file)
+                    {
+                        // Startup only!
+                        LL_INFOS("BUGSPLAT") << "Engaged BugSplat logging to bugsplat.log" << LL_ENDL;
+                        dwFlags |= MDSF_LOGFILE | MDSF_LOG_VERBOSE;
+                    }
                     LL_ENDL;
-                }
 
-                // have to convert normal wide strings to strings of __wchar_t
+                    // have to convert normal wide strings to strings of __wchar_t
+                    sBugSplatSender = new MiniDmpSender(
+                        WCSTR(boost::json::value_to<std::string>(BugSplat_DB)),
+                        WCSTR(LL_TO_WSTRING(LL_VIEWER_CHANNEL)),
+                        WCSTR(version_string),
+                        nullptr,              // szAppIdentifier -- set later
+                        dwFlags);
+                    sBugSplatSender->setCallback(bugsplatSendLog);
 
-                // <FS:ND> Set up Bugsplat to ask or always send
+                    LL_DEBUGS("BUGSPLAT");
+                    if (needs_log_file)
+                    {
+                        // Log file will be created in %TEMP%, but it will be moved into logs folder in case of crash
+                        std::string log_file = gDirUtilp->getExpandedFilename(LL_PATH_LOGS, "bugsplat.log");
+                        sBugSplatSender->setLogFilePath(WCSTR(log_file));
+                    }
+                    LL_ENDL;
 
-                // sBugSplatSender = new MiniDmpSender(
-                //  WCSTR(BugSplat_DB.asString()),
-                //  WCSTR(LL_TO_WSTRING(LL_VIEWER_CHANNEL)),
-                //  WCSTR(version_string),
-                //  nullptr,              // szAppIdentifier -- set later
-                //  MDSF_NONINTERACTIVE | // automatically submit report without prompting
-                //  MDSF_PREVENTHIJACKING); // disallow swiping Exception filter
-
-                sBugSplatSender = new MiniDmpSender(
-                    WCSTR(BugSplat_DB.asString()),
-                    WCSTR(LL_TO_WSTRING(LL_VIEWER_CHANNEL)),
-                    WCSTR(version_string),
-                    nullptr,              // szAppIdentifier -- set later
-                    dwFlags);
-                sBugSplatSender->setCallback(bugsplatSendLog);
-
-
-                if (needs_log_file)
-                {
-                    // Log file will be created in %TEMP%, but it will be moved into logs folder in case of crash
-                    std::string log_file = gDirUtilp->getExpandedFilename(LL_PATH_LOGS, "bugsplat.log");
-                    sBugSplatSender->setLogFilePath(WCSTR(log_file));
-                }
-
-                // engage stringize() overload that converts from wstring
-                LL_INFOS("BUGSPLAT") << "Engaged BugSplat(" << LL_TO_STRING(LL_VIEWER_CHANNEL)
-                           << ' ' << stringize(version_string) << ')' << LL_ENDL;
-            } // got BugSplat_DB
-        } // parsed build_data.json
-    } // opened build_data.json
-
+                    // engage stringize() overload that converts from wstring
+                    LL_INFOS("BUGSPLAT") << "Engaged BugSplat(" << LL_TO_STRING(LL_VIEWER_CHANNEL)
+                        << ' ' << stringize(version_string) << ')' << LL_ENDL;
+                } // got BugSplat_DB
+            } // parsed build_data.json
+        } // opened build_data.json
+    } // !is_win_7_or_below
 #endif // LL_BUGSPLAT
 #endif // LL_SEND_CRASH_REPORTS
 
@@ -959,19 +944,18 @@ bool LLAppViewerWin32::initHardwareTest()
     // Do driver verification and initialization based on DirectX
     // hardware polling and driver versions
     //
-    if (/*TRUE == gSavedSettings.getBOOL("ProbeHardwareOnStartup") &&*/ FALSE == gSavedSettings.getBOOL("NoHardwareProbe")) // <FS:Ansariel> FIRE-20378 / FIRE-20382: Breaks memory detection an 4K monitor workaround
+    if (true == gSavedSettings.getBOOL("ProbeHardwareOnStartup") && false == gSavedSettings.getBOOL("NoHardwareProbe"))
     {
         // per DEV-11631 - disable hardware probing for everything
         // but vram.
-        BOOL vram_only = TRUE;
+        bool vram_only = true;
 
         LLSplashScreen::update(LLTrans::getString("StartupDetectingHardware"));
 
         LL_DEBUGS("AppInit") << "Attempting to poll DirectX for hardware info" << LL_ENDL;
         gDXHardware.setWriteDebugFunc(write_debug_dx);
         // <FS:Ansariel> FIRE-15891: Add option to disable WMI check in case of problems
-        //BOOL probe_ok = gDXHardware.getInfo(vram_only);
-        BOOL probe_ok = gDXHardware.getInfo(vram_only, gSavedSettings.getBOOL("FSDisableWMIProbing"));
+        bool probe_ok = gDXHardware.getInfo(vram_only, gSavedSettings.getBOOL("FSDisableWMIProbing"));
         // </FS:Ansariel>
 
         if (!probe_ok
@@ -993,12 +977,12 @@ bool LLAppViewerWin32::initHardwareTest()
                 LLWeb::loadURLExternal("http://secondlife.com/support/", false);
                 return false;
             }
-            gWarningSettings.setBOOL("AboutDirectX9", FALSE);
+            gWarningSettings.setBOOL("AboutDirectX9", false);
         }
         LL_DEBUGS("AppInit") << "Done polling DirectX for hardware info" << LL_ENDL;
 
         // Only probe once after installation
-        gSavedSettings.setBOOL("ProbeHardwareOnStartup", FALSE);
+        gSavedSettings.setBOOL("ProbeHardwareOnStartup", false);
 
         // Disable so debugger can work
         std::string splash_msg;
@@ -1087,7 +1071,7 @@ bool LLAppViewerWin32::sendURLToOtherInstance(const std::string& url)
         COPYDATASTRUCT cds;
         const S32 SLURL_MESSAGE_TYPE = 0;
         cds.dwData = SLURL_MESSAGE_TYPE;
-        cds.cbData = url.length() + 1;
+        cds.cbData = static_cast<DWORD>(url.length()) + 1;
         cds.lpData = (void*)url.c_str();
 
         LRESULT msg_result = SendMessage(other_window, WM_COPYDATA, NULL, (LPARAM)&cds);

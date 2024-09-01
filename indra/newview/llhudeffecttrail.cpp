@@ -42,7 +42,7 @@
 #include "llvoavatar.h"
 #include "llworld.h"
 
-LLHUDEffectSpiral::LLHUDEffectSpiral(const U8 type) : LLHUDEffect(type), mbInit(FALSE)
+LLHUDEffectSpiral::LLHUDEffectSpiral(const U8 type) : LLHUDEffect(type), mbInit(false)
 {
     mKillTime = 10.f;
     mVMag = 1.f;
@@ -175,7 +175,7 @@ void LLHUDEffectSpiral::triggerLocal()
 
     mKillTime = mTimer.getElapsedTimeF32() + mDuration;
 
-    BOOL show_beam = gSavedSettings.getBOOL("ShowSelectionBeam");
+    bool show_beam = gSavedSettings.getBOOL("ShowSelectionBeam");
 
     LLColor4 color;
     color.setVec(mColor);
@@ -255,7 +255,7 @@ void LLHUDEffectSpiral::triggerLocal()
         }
     }
 
-    mbInit = TRUE;
+    mbInit = true;
 }
 
 void LLHUDEffectSpiral::setTargetObject(LLViewerObject *objp)

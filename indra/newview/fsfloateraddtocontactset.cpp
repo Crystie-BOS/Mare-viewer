@@ -64,7 +64,7 @@ FSFloaterAddToContactSet::~FSFloaterAddToContactSet()
     }
 }
 
-BOOL FSFloaterAddToContactSet::postBuild()
+bool FSFloaterAddToContactSet::postBuild()
 {
     if (mHasMultipleAgents)
     {

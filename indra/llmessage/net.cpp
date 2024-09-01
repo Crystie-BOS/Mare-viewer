@@ -77,7 +77,7 @@ const char* LOOPBACK_ADDRESS_STRING = "127.0.0.1";
 const char* BROADCAST_ADDRESS_STRING = "255.255.255.255";
 
 #if LL_DARWIN
-    // Mac OS X returns an error when trying to set these to 400000.  Smaller values succeed.
+    // macOS returns an error when trying to set these to 400000.  Smaller values succeed.
     // System (default) values can be found by sysctl kern.ipc.maxsockbuf which is the combined value
     // of the send and receive buffer. Numbers below is 256kB per buffer for a total of
     // 262144 * 2 * 8 = 4194304 bit. Default on most newer systems is 6291456, so the setting is conservative.
@@ -341,8 +341,8 @@ S32 receive_packet(int hSocket, char * receiveBuffer)
     return nRet;
 }
 
-// Returns TRUE on success.
-BOOL send_packet(int hSocket, const char *sendBuffer, int size, U32 recipient, int nPort)
+// Returns true on success.
+bool send_packet(int hSocket, const char *sendBuffer, int size, U32 recipient, int nPort)
 {
     //  Sends a packet to the address set in initNet
     //
@@ -367,7 +367,7 @@ BOOL send_packet(int hSocket, const char *sendBuffer, int size, U32 recipient, i
                 // assume it is.  JNC 2002.01.18
                 if (WSAECONNRESET == WSAGetLastError())
                 {
-                    return TRUE;
+                    return true;
                 }
                 LL_INFOS() << "sendto() failed to " << u32_to_ip_string(recipient) << ":" << nPort
                     << ", Error " << last_error << LL_ENDL;
@@ -601,11 +601,11 @@ int receive_packet(int hSocket, char * receiveBuffer)
     return nRet;
 }
 
-BOOL send_packet(int hSocket, const char * sendBuffer, int size, U32 recipient, int nPort)
+bool send_packet(int hSocket, const char * sendBuffer, int size, U32 recipient, int nPort)
 {
     int     ret;
-    BOOL    success;
-    BOOL    resend;
+    bool    success;
+    bool    resend;
     S32     send_attempts = 0;
 
     stDstAddr.sin_addr.s_addr = recipient;
@@ -619,34 +619,34 @@ BOOL send_packet(int hSocket, const char * sendBuffer, int size, U32 recipient, 
         if (ret >= 0)
         {
             // successful send
-            success = TRUE;
-            resend = FALSE;
+            success = true;
+            resend = false;
         }
         else
         {
             // send failed, check to see if we should resend
-            success = FALSE;
+            success = false;
 
             if (errno == EAGAIN)
             {
                 // say nothing, just repeat send
                 LL_INFOS() << "sendto() reported buffer full, resending (attempt " << send_attempts << ")" << LL_ENDL;
                 LL_INFOS() << inet_ntoa(stDstAddr.sin_addr) << ":" << nPort << LL_ENDL;
-                resend = TRUE;
+                resend = true;
             }
             else if (errno == ECONNREFUSED)
             {
                 // response to ICMP connection refused message on earlier send
                 LL_INFOS() << "sendto() reported connection refused, resending (attempt " << send_attempts << ")" << LL_ENDL;
                 LL_INFOS() << inet_ntoa(stDstAddr.sin_addr) << ":" << nPort << LL_ENDL;
-                resend = TRUE;
+                resend = true;
             }
             else
             {
                 // some other error
                 LL_INFOS() << "sendto() failed: " << errno << ", " << strerror(errno) << LL_ENDL;
                 LL_INFOS() << inet_ntoa(stDstAddr.sin_addr) << ":" << nPort << LL_ENDL;
-                resend = FALSE;
+                resend = false;
             }
         }
     }
@@ -655,7 +655,7 @@ BOOL send_packet(int hSocket, const char * sendBuffer, int size, U32 recipient, 
     if (send_attempts >= 3)
     {
         LL_INFOS() << "sendPacket() bailed out of send!" << LL_ENDL;
-        return FALSE;
+        return false;
     }
 
     return success;

@@ -289,7 +289,7 @@ void FSFloaterSearch::onClose(bool app_quitting)
     }
 }
 
-BOOL FSFloaterSearch::postBuild()
+bool FSFloaterSearch::postBuild()
 {
     childSetAction("people_profile_btn", boost::bind(&FSFloaterSearch::onBtnPeopleProfile, this));
     childSetAction("people_message_btn", boost::bind(&FSFloaterSearch::onBtnPeopleIM, this));
@@ -793,7 +793,7 @@ FSPanelSearchPeople::~FSPanelSearchPeople()
     }
 }
 
-BOOL FSPanelSearchPeople::postBuild()
+bool FSPanelSearchPeople::postBuild()
 {
     mSearchComboBox =   findChild<LLSearchComboBox>("people_edit");
     mSearchResults =    findChild<FSScrollListCtrl>("search_results_people");
@@ -1133,7 +1133,7 @@ FSPanelSearchGroups::~FSPanelSearchGroups()
 {
 }
 
-BOOL FSPanelSearchGroups::postBuild()
+bool FSPanelSearchGroups::postBuild()
 {
     mSearchComboBox =   findChild<LLSearchComboBox>("groups_edit");
     mSearchResults =    findChild<LLScrollListCtrl>("search_results_groups");
@@ -1442,7 +1442,7 @@ FSPanelSearchPlaces::~FSPanelSearchPlaces()
 {
 }
 
-BOOL FSPanelSearchPlaces::postBuild()
+bool FSPanelSearchPlaces::postBuild()
 {
     mSearchComboBox =   findChild<LLSearchComboBox>("places_edit");
     mSearchResults =    findChild<LLScrollListCtrl>("search_results_places");
@@ -1628,8 +1628,8 @@ void FSPanelSearchPlaces::processSearchReply(LLMessageSystem* msg, void**)
     LLUUID      query_id;
     LLUUID      parcel_id;
     std::string name;
-    BOOL        for_sale;
-    BOOL        auction;
+    bool        for_sale;
+    bool        auction;
     F32         dwell;
 
     msg->getUUID("AgentData", "AgentID", agent_id);
@@ -1795,7 +1795,7 @@ FSPanelSearchLand::~FSPanelSearchLand()
 {
 }
 
-BOOL FSPanelSearchLand::postBuild()
+bool FSPanelSearchLand::postBuild()
 {
     mSearchResults  = getChild<LLScrollListCtrl>("search_results_land");
     mPriceEditor    = findChild<LLLineEditor>("price_edit");
@@ -2009,8 +2009,8 @@ void FSPanelSearchLand::processSearchReply(LLMessageSystem* msg, void**)
     std::string name;
     std::string land_sku;
     std::string land_type;
-    BOOL        auction;
-    BOOL        for_sale;
+    bool        auction;
+    bool        for_sale;
     S32         price;
     S32         area;
 
@@ -2194,7 +2194,7 @@ FSPanelSearchClassifieds::~FSPanelSearchClassifieds()
 {
 }
 
-BOOL FSPanelSearchClassifieds::postBuild()
+bool FSPanelSearchClassifieds::postBuild()
 {
     mSearchComboBox = findChild<LLSearchComboBox>("classifieds_edit");
     mSearchResults = getChild<LLScrollListCtrl>("search_results_classifieds");
@@ -2255,7 +2255,7 @@ void FSPanelSearchClassifieds::find()
         return;
     }
     U32 category = mClassifiedsCategory->getValue().asInteger();
-    BOOL auto_renew = FALSE;
+    bool auto_renew = FALSE;
     U32 flags = pack_classified_flags_request(auto_renew, inc_pg, inc_mature, inc_adult);
 
     mResultsReceived = 0;
@@ -2510,7 +2510,7 @@ FSPanelSearchEvents::~FSPanelSearchEvents()
 {
 }
 
-BOOL FSPanelSearchEvents::postBuild()
+bool FSPanelSearchEvents::postBuild()
 {
     mSearchComboBox = findChild<LLSearchComboBox>("events_edit");
     mSearchResults = getChild<LLScrollListCtrl>("search_results_events");
@@ -2975,7 +2975,7 @@ FSPanelSearchWeb::FSPanelSearchWeb() : FSSearchPanelBase()
 //  }
 }
 
-BOOL FSPanelSearchWeb::postBuild()
+bool FSPanelSearchWeb::postBuild()
 {
     mWebBrowser = getChild<LLMediaCtrl>("search_browser");
     return TRUE;
@@ -3060,7 +3060,8 @@ void FSPanelSearchWeb::loadURL(const SearchQuery &p)
     // add the maturity and category variables to the new Second Life search URL
 //  if (LLGridManager::getInstance()->isInSecondLife())
 //  {
-        url = gSavedSettings.getString("SearchURL") + "&maturity=" + maturity + "&" + mCategoryPaths[p.category].asString();
+//        url = gSavedSettings.getString("SearchURL") + "&maturity=" + maturity + "&" + mCategoryPaths[p.category].asString();
+        url = gSavedSettings.getString("SearchURL") + "&maturity=" + maturity;
 //  }
 //  // for OpenSim, do the same as in earlier versions
 //  else

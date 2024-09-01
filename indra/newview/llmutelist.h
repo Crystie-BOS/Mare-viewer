@@ -89,31 +89,31 @@ public:
     void removeObserver(LLMuteListObserver* observer);
 
     // Add either a normal or a BY_NAME mute, for any or all properties.
-    BOOL add(const LLMute& mute, U32 flags = 0);
+    bool add(const LLMute& mute, U32 flags = 0);
 
     // Remove both normal and legacy mutes, for any or all properties.
-    BOOL remove(const LLMute& mute, U32 flags = 0);
-    BOOL autoRemove(const LLUUID& agent_id, const EAutoReason reason);
+    bool remove(const LLMute& mute, U32 flags = 0);
+    bool autoRemove(const LLUUID& agent_id, const EAutoReason reason);
 
     // Name is required to test against legacy text-only mutes.
-    BOOL isMuted(const LLUUID& id, const std::string& name = LLStringUtil::null, U32 flags = 0) const;
+    bool isMuted(const LLUUID& id, const std::string& name = LLStringUtil::null, U32 flags = 0) const;
 
     // Workaround for username-based mute search, a lot of string conversions so use cautiously
     // Expects lower case username
-    BOOL isMuted(const std::string& username, U32 flags = 0) const;
+    bool isMuted(const std::string& username, U32 flags = 0) const;
 
 //MK
     // Search in the mute list for any name that is contained in the message "s"
     // Workaround for username-based mute search, a lot of string conversions so use cautiously
-    BOOL containsMutedName(const std::string& s, U32 flags = 0) const;
+    bool containsMutedName(const std::string& s, U32 flags = 0) const;
 //mk
 
     // Alternate (convenience) form for places we don't need to pass the name, but do need flags
-    BOOL isMuted(const LLUUID& id, U32 flags) const { return isMuted(id, LLStringUtil::null, flags); };
+    bool isMuted(const LLUUID& id, U32 flags) const { return isMuted(id, LLStringUtil::null, flags); };
 
     static bool isLinden(const std::string& name);
 
-    BOOL isLoaded() const { return mIsLoaded; }
+    bool isLoaded() const { return mIsLoaded; }
 
     std::vector<LLMute> getMutes() const;
 
@@ -124,8 +124,8 @@ public:
     void cache(const LLUUID& agent_id);
 
 private:
-    BOOL loadFromFile(const std::string& filename);
-    BOOL saveToFile(const std::string& filename);
+    bool loadFromFile(const std::string& filename);
+    bool saveToFile(const std::string& filename);
 
     void setLoaded();
     void notifyObservers();
@@ -173,7 +173,7 @@ private:
     typedef std::set<LLMuteListObserver*> observer_set_t;
     observer_set_t mObservers;
 
-    BOOL mIsLoaded;
+    bool mIsLoaded;
 
     friend class LLDispatchEmptyMuteList;
 };

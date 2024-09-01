@@ -58,8 +58,8 @@
 // [/SL:KB]
 
 
-BOOL gBreak = false;
-BOOL gSent = false;
+bool gBreak = false;
+bool gSent = false;
 
 int LLCrashLogger::ssl_mutex_count = 0;
 LLCoreInt::HttpMutex ** LLCrashLogger::ssl_mutex_list = NULL;
@@ -142,7 +142,7 @@ std::string getStartupStateFromLog(std::string& sllog)
     std::string startup_state = "STATE_FIRST";
     std::string startup_token = "Startup state changing from ";
 
-    int index = sllog.rfind(startup_token);
+    auto index = sllog.rfind(startup_token);
     if (index < 0 || index + startup_token.length() > sllog.length()) {
         return startup_state;
     }
@@ -198,7 +198,7 @@ bool LLCrashLogger::readMinidump(std::string minidump_path)
     size_t length=0;
 
     llifstream minidump_stream(minidump_path.c_str(), std::ios_base::in | std::ios_base::binary);
-    if(minidump_stream.is_open())
+    if (minidump_stream.is_open())
     {
         minidump_stream.seekg(0, std::ios::end);
         length = (size_t)minidump_stream.tellg();
@@ -218,7 +218,7 @@ bool LLCrashLogger::readMinidump(std::string minidump_path)
         LL_WARNS("CRASHREPORT") << "failed to open minidump "<<minidump_path<<LL_ENDL;
     }
 
-    return (length>0?true:false);
+    return length > 0;
 }
 
 void LLCrashLogger::gatherFiles()

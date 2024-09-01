@@ -45,11 +45,10 @@
 #include "llcorehttputil.h"
 #include "llexception.h"
 #include "stringize.h"
+#include "workqueue.h"
 
 #include <map>
 #include <set>
-
-#include "llcontrol.h" // <FS:Ansariel> Optional legacy name cache expiration
 
 // Time-to-live for a temp cache entry.
 const F64 TEMP_CACHE_ENTRY_LIFETIME = 60.0;
@@ -180,19 +179,26 @@ void LLAvatarNameCache::requestAvatarNameCache_(std::string url, std::vector<LLU
 
         if (LLAvatarNameCache::instanceExists())
         {
-            if (!success)
-            {   // on any sort of failure add dummy records for any agent IDs
-                // in this request that we do not have cached already
-                std::vector<LLUUID>::const_iterator it = agentIds.begin();
-                for (; it != agentIds.end(); ++it)
-                {
-                    const LLUUID& agent_id = *it;
-                    LLAvatarNameCache::getInstance()->handleAgentError(agent_id);
-                }
-                return;
-            }
+            // dispatch handler execution back to mainloop
+            auto workqueue = LL::WorkQueue::getInstance("mainloop");
 
-            LLAvatarNameCache::getInstance()->handleAvNameCacheSuccess(results, httpResults);
+            if (workqueue)
+            {
+                workqueue->post([=]()
+                    {
+                        if (!success)
+                        {   // on any sort of failure add dummy records for any agent IDs
+                            // in this request that we do not have cached already
+                            for (const auto& agent_id : agentIds)
+                            {
+                                LLAvatarNameCache::getInstance()->handleAgentError(agent_id);
+                            }
+                            return;
+                        }
+
+                        LLAvatarNameCache::getInstance()->handleAvNameCacheSuccess(results, httpResults);
+                    });
+            }
         }
     }
     catch (const LLCoros::Stop&)
@@ -255,7 +261,7 @@ void LLAvatarNameCache::handleAvNameCacheSuccess(const LLSD &data, const LLSD &h
 
     // Same logic as error response case
     const LLSD& unresolved_agents = data["bad_ids"];
-    S32  num_unresolved = unresolved_agents.size();
+    auto num_unresolved = unresolved_agents.size();
     if (num_unresolved > 0)
     {
         LL_WARNS("AvNameCache") << "LLAvatarNameResponder::result " << num_unresolved << " unresolved ids; "

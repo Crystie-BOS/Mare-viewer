@@ -16,9 +16,9 @@ class NACLFloaterExploreSounds
 {
 public:
     NACLFloaterExploreSounds(const LLSD& key);
-    BOOL postBuild();
+    bool postBuild();
 
-    BOOL tick();
+    bool tick();
 
     LLSoundHistoryItem getItem(const LLUUID& itemID);
     void requestNameCallback(LLMessageSystem* msg);     // KKA-796 object name query callback

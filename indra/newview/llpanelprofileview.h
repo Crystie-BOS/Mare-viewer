@@ -58,17 +58,17 @@ public:
 
     /*virtual*/ void onOpen(const LLSD& key);
 
-    /*virtual*/ BOOL postBuild();
+    /*virtual*/ bool postBuild();
 
-    BOOL handleDragAndDrop(S32 x, S32 y, MASK mask,
-                           BOOL drop, EDragAndDropType cargo_type,
+    bool handleDragAndDrop(S32 x, S32 y, MASK mask,
+                           bool drop, EDragAndDropType cargo_type,
                            void *cargo_data, EAcceptance *accept,
                            std::string& tooltip_msg)
     {
         LLToolDragAndDrop::handleGiveDragAndDrop(getAvatarId(), gAgent.getSessionID(), drop,
                  cargo_type, cargo_data, accept);
 
-        return TRUE;
+        return true;
     }
 
 

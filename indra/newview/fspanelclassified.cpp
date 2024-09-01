@@ -134,7 +134,7 @@ FSPanelClassifiedInfo* FSPanelClassifiedInfo::create()
     return panel;
 }
 
-BOOL FSPanelClassifiedInfo::postBuild()
+bool FSPanelClassifiedInfo::postBuild()
 {
     childSetAction("back_btn", boost::bind(&FSPanelClassifiedInfo::onExit, this));
     childSetAction("show_on_map_btn", boost::bind(&FSPanelClassifiedInfo::onMapClick, this));
@@ -162,7 +162,7 @@ void FSPanelClassifiedInfo::setEditClassifiedCallback(const commit_callback_t& c
     getChild<LLButton>("edit_btn")->setClickedCallback(cb);
 }
 
-void FSPanelClassifiedInfo::reshape(S32 width, S32 height, BOOL called_from_parent /* = TRUE */)
+void FSPanelClassifiedInfo::reshape(S32 width, S32 height, bool called_from_parent /* = TRUE */)
 {
     LLPanel::reshape(width, height, called_from_parent);
 
@@ -496,8 +496,8 @@ void FSPanelClassifiedInfo::stretchSnapshot()
     // Lets increase texture height to force texture look as expected.
     rc.mBottom -= BTN_HEIGHT_SMALL;
 
-    F32 t_width = texture->getFullWidth();
-    F32 t_height = texture->getFullHeight();
+    F32 t_width = (F32)texture->getFullWidth();
+    F32 t_height = (F32)texture->getFullHeight();
 
     F32 ratio = llmin<F32>( (rc.getWidth() / t_width), (rc.getHeight() / t_height) );
 
@@ -613,7 +613,7 @@ FSPanelClassifiedEdit* FSPanelClassifiedEdit::create()
     return panel;
 }
 
-BOOL FSPanelClassifiedEdit::postBuild()
+bool FSPanelClassifiedEdit::postBuild()
 {
     FSPanelClassifiedInfo::postBuild();
 
@@ -780,14 +780,14 @@ void FSPanelClassifiedEdit::processProperties(void* data, EAvatarProcessorType t
     }
 }
 
-BOOL FSPanelClassifiedEdit::isDirty() const
+bool FSPanelClassifiedEdit::isDirty() const
 {
     if(mIsNew)
     {
         return TRUE;
     }
 
-    BOOL dirty = false;
+    bool dirty = false;
 
     dirty |= FSPanelClassifiedInfo::isDirty();
     dirty |= getChild<LLUICtrl>("classified_snapshot")->isDirty();
@@ -1151,7 +1151,7 @@ FSPublishClassifiedFloater::~FSPublishClassifiedFloater()
 {
 }
 
-BOOL FSPublishClassifiedFloater::postBuild()
+bool FSPublishClassifiedFloater::postBuild()
 {
     LLFloater::postBuild();
 

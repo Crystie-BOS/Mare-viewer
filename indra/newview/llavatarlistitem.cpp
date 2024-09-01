@@ -127,7 +127,7 @@ LLAvatarListItem::~LLAvatarListItem()
     }
 }
 
-BOOL  LLAvatarListItem::postBuild()
+bool LLAvatarListItem::postBuild()
 {
     mAvatarIcon = getChild<LLAvatarIconCtrl>("avatar_icon");
     mAvatarName = getChild<LLTextBox>("avatar_name");
@@ -180,10 +180,10 @@ BOOL  LLAvatarListItem::postBuild()
         sStaticInitialized = true;
     }
 
-    return TRUE;
+    return true;
 }
 
-void LLAvatarListItem::handleVisibilityChange ( BOOL new_visibility )
+void LLAvatarListItem::handleVisibilityChange ( bool new_visibility )
 {
     //Adjust positions of icons (info button etc) when
     //speaking indicator visibility was changed/toggled while panel was closed (not visible)
@@ -373,7 +373,7 @@ void LLAvatarListItem::setShowProfileBtn(bool show)
 void LLAvatarListItem::showSpeakingIndicator(bool visible)
 {
     // Already done? Then do nothing.
-    if (mSpeakingIndicator->getVisible() == (BOOL)visible)
+    if (mSpeakingIndicator->getVisible() == (bool)visible)
         return;
 // Disabled to not contradict with SpeakingIndicatorManager functionality. EXT-3976
 // probably this method should be totally removed.
@@ -493,7 +493,7 @@ void LLAvatarListItem::setFirstSeen(time_t seentime)
 void LLAvatarListItem::setAvatarIconVisible(bool visible)
 {
     // Already done? Then do nothing.
-    if (mAvatarIcon->getVisible() == (BOOL)visible)
+    if (mAvatarIcon->getVisible() == (bool)visible)
     {
         return;
     }
@@ -552,17 +552,17 @@ void LLAvatarListItem::onProfileBtnClick()
     LLAvatarActions::showProfile(mAvatarId);
 }
 
-BOOL LLAvatarListItem::handleDoubleClick(S32 x, S32 y, MASK mask)
+bool LLAvatarListItem::handleDoubleClick(S32 x, S32 y, MASK mask)
 {
     if(mInfoBtn->getRect().pointInRect(x, y))
     {
         onInfoBtnClick();
-        return TRUE;
+        return true;
     }
     if(mProfileBtn->getRect().pointInRect(x, y))
     {
         onProfileBtnClick();
-        return TRUE;
+        return true;
     }
     return LLPanel::handleDoubleClick(x, y, mask);
 }
@@ -625,7 +625,7 @@ void LLAvatarListItem::processProperties(void* data, EAvatarProcessorType type)
         && type == APT_PROPERTIES)
     {
         LLAvatarData* avatar_data = static_cast<LLAvatarData*>(data);
-        mAvatarAge = ((LLDate::now().secondsSinceEpoch()  - (avatar_data->born_on).secondsSinceEpoch()) / 86400);
+        mAvatarAge = static_cast<S32>(((LLDate::now().secondsSinceEpoch() - (avatar_data->born_on).secondsSinceEpoch()) / 86400));
         mAvatarAgeDisplay->setValue(mAvatarAge);
 
         if (mShowPaymentStatus)

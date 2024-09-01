@@ -41,6 +41,7 @@
 
 class LLViewerTextEditor;
 class LLButton;
+class LLLineEditor;
 // [SL:KB] - Patch: UI-FloaterSearchReplace | Checked: 2010-11-05 (Catznip-2.3.0a) | Added: Catznip-2.3.0a
 class LLTextEditor;
 // [/SL:KB]
@@ -59,14 +60,14 @@ public:
 // [SL:KB] - Patch: UI-FloaterSearchReplace | Checked: 2010-11-05 (Catznip-2.3.0a) | Added: Catznip-2.3.0a
     virtual bool hasAccelerators() const override;
 // [/SL:KB]
-    BOOL handleKeyHere(KEY key, MASK mask) override;
-    void setEnabled( BOOL enabled ) override;
+    bool handleKeyHere(KEY key, MASK mask) override;
+    void setEnabled(bool enabled) override;
 
     // llfloater
-    BOOL canClose() override;
+    bool canClose() override;
 
     // llpanel
-    BOOL postBuild() override;
+    bool postBuild() override;
 
     // reach into the text editor, and grab the drag item
     const LLInventoryItem* getDragItem();
@@ -102,12 +103,6 @@ protected:
                                LLAssetType::EType type,
                                void* user_data, S32 status, LLExtStat ext_status);
 
-    static void onClickSave(void* data);
-
-    static void onClickDelete(void* data);
-
-    static void onClickEdit(void* data);
-
     static void onSaveComplete(const LLUUID& asset_uuid,
                                void* user_data,
                                S32 status, LLExtStat ext_status);
@@ -125,14 +120,18 @@ protected:
     std::string getTmpFileName();
 
 protected:
-    LLViewerTextEditor* mEditor;
-    LLButton* mSaveBtn;
+    LLViewerTextEditor* mEditor = nullptr;
+    LLLineEditor* mDescEditor = nullptr;
+    LLButton* mSaveBtn = nullptr;
+    LLButton* mEditBtn = nullptr;
+    LLButton* mDeleteBtn = nullptr;
+    LLUICtrl* mLockBtn = nullptr;
 
     LLUUID mAssetID;
 
     LLUUID mObjectID;
 
-    LLLiveLSLFile* mLiveFile;
+    LLLiveLSLFile* mLiveFile = nullptr;
 };
 
 

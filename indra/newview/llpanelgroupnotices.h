@@ -68,7 +68,7 @@ public:
 
     //
     // LLView functionality
-    virtual BOOL handleDragAndDrop(S32 x, S32 y, MASK mask, BOOL drop,
+    virtual bool handleDragAndDrop(S32 x, S32 y, MASK mask, bool drop,
                                    EDragAndDropType cargo_type,
                                    void* cargo_data,
                                    EAcceptance* accept,
@@ -92,8 +92,8 @@ public:
     //virtual bool apply(std::string& mesg);
     //virtual void update();
 
-    virtual BOOL postBuild();
-    virtual BOOL isVisibleByAgent(LLAgent* agentp);
+    virtual bool postBuild();
+    virtual bool isVisibleByAgent(LLAgent* agentp);
 
 // [SL:KB] - Patch: Notification-GroupCreateNotice | Checked: 2012-02-16 (Catznip-3.2)
 //  /*virtual*/ S32 notifyParent(const LLSD& sdInfo);

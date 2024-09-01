@@ -64,9 +64,9 @@ class PieMenu : public LLMenuGL
         /*virtual*/ bool addChild(LLView* child,S32 tab_group=0);
         /*virtual*/ void removeChild(LLView* child);
 
-        /*virtual*/ BOOL handleHover(S32 x,S32 y,MASK mask);
-        /*virtual*/ BOOL handleMouseUp(S32 x,S32 y,MASK mask);
-        /*virtual*/ BOOL handleRightMouseUp(S32 x,S32 y,MASK mask);
+        /*virtual*/ bool handleHover(S32 x,S32 y,MASK mask);
+        /*virtual*/ bool handleMouseUp(S32 x,S32 y,MASK mask);
+        /*virtual*/ bool handleRightMouseUp(S32 x,S32 y,MASK mask);
 
         // does all the hard work of bringing the menu on the screen
         void draw();
@@ -83,7 +83,7 @@ class PieMenu : public LLMenuGL
         slice_list_t* mSlices;
 
         // appends a sub pie menu to the current pie
-        BOOL appendContextSubMenu(PieMenu* menu);
+        bool appendContextSubMenu(PieMenu* menu);
 
         // we never rearrange our menu
         void needsArrange() {};
@@ -94,7 +94,7 @@ class PieMenu : public LLMenuGL
 
     protected:
         // general mouse button handling
-        BOOL handleMouseButtonUp(S32 x,S32 y,MASK mask);
+        bool handleMouseButtonUp(S32 x,S32 y,MASK mask);
         // font used for the menu
         const LLFontGL* mFont;
         // currently highlighted item, must be tested if it's a slice or submenu

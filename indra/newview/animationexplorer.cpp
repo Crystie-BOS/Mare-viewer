@@ -143,7 +143,7 @@ void AnimationExplorer::startMotion(const LLUUID& motionID)
     }
 }
 
-BOOL AnimationExplorer::postBuild()
+bool AnimationExplorer::postBuild()
 {
     mAnimationScrollList = getChild<LLScrollListCtrl>("animation_list");
     mStopButton = getChild<LLButton>("stop_btn");
@@ -175,7 +175,7 @@ BOOL AnimationExplorer::postBuild()
     // request list of recent animations
     update();
 
-    return TRUE;
+    return true;
 }
 
 void AnimationExplorer::onSelectAnimation()
@@ -474,7 +474,7 @@ void AnimationExplorer::requestNameCallback(LLMessageSystem* msg)
 }
 
 // Copied from llfloaterbvhpreview.cpp
-BOOL AnimationExplorer::handleMouseDown(S32 x, S32 y, MASK mask)
+bool AnimationExplorer::handleMouseDown(S32 x, S32 y, MASK mask)
 {
     if (mPreviewCtrl && mPreviewCtrl->getRect().pointInRect(x, y))
     {
@@ -483,14 +483,14 @@ BOOL AnimationExplorer::handleMouseDown(S32 x, S32 y, MASK mask)
         gViewerWindow->hideCursor();
         mLastMouseX = x;
         mLastMouseY = y;
-        return TRUE;
+        return true;
     }
 
     return LLFloater::handleMouseDown(x, y, mask);
 }
 
 // Copied from llfloaterbvhpreview.cpp
-BOOL AnimationExplorer::handleMouseUp(S32 x, S32 y, MASK mask)
+bool AnimationExplorer::handleMouseUp(S32 x, S32 y, MASK mask)
 {
     gFocusMgr.setMouseCapture(FALSE);
     gViewerWindow->showCursor();
@@ -498,7 +498,7 @@ BOOL AnimationExplorer::handleMouseUp(S32 x, S32 y, MASK mask)
 }
 
 // (Almost) Copied from llfloaterbvhpreview.cpp
-BOOL AnimationExplorer::handleHover(S32 x, S32 y, MASK mask)
+bool AnimationExplorer::handleHover(S32 x, S32 y, MASK mask)
 {
     if (!mPreviewCtrl || !mAnimationPreview || !mPreviewCtrl->getRect().pointInRect(x, y))
     {
@@ -541,17 +541,17 @@ BOOL AnimationExplorer::handleHover(S32 x, S32 y, MASK mask)
     {
         gViewerWindow->setCursor(UI_CURSOR_TOOLZOOMIN);
     }
-    return TRUE;
+    return true;
 }
 
 // (Almost) Copied from llfloaterbvhpreview.cpp
-BOOL AnimationExplorer::handleScrollWheel(S32 x, S32 y, S32 clicks)
+bool AnimationExplorer::handleScrollWheel(S32 x, S32 y, S32 clicks)
 {
     if (mPreviewCtrl && mPreviewCtrl->getRect().pointInRect(x, y))
     {
         mAnimationPreview->zoom((F32)clicks * -0.2f);
         mAnimationPreview->requestUpdate();
-        return TRUE;
+        return true;
     }
     return LLFloater::handleScrollWheel(x, y, clicks);
 }

@@ -2949,7 +2949,7 @@
     <key>Value</key>
     <integer>0</integer>
   </map>
-    <key>AutoAcceptNewInventory</key>
+  <key>AutoAcceptNewInventory</key>
     <map>
       <key>Comment</key>
       <string>Automatically accept new notecards/textures/landmarks</string>
@@ -3212,6 +3212,18 @@
       <string>String</string>
       <key>Value</key>
       <string>http://lecs-viewer-web-components.s3.amazonaws.com/v3.0/[GRID_LOWERCASE]/avatars.html</string>
+    </map>
+    <!--AvatarBakedTextureUploadTimeout is in use by QA-->
+    <key>AvatarBakedTextureUploadTimeout</key>
+    <map>
+        <key>Comment</key>
+        <string>Specifes the maximum time in seconds to wait before sending your baked textures for avatar appearance.  Set to 0 to disable and wait until all baked textures are at highest resolution.</string>
+        <key>Persist</key>
+        <integer>1</integer>
+        <key>Type</key>
+        <string>U32</string>
+        <key>Value</key>
+        <integer>60</integer>
     </map>
     <key>AvatarPhysics</key>
     <map>
@@ -3735,6 +3747,17 @@
       <string>Boolean</string>
       <key>Value</key>
       <integer>0</integer>
+    </map>
+    <key>BulkUpload2KTextures</key>
+    <map>
+        <key>Comment</key>
+        <string>Bulk upload scales textures to 2K if true, to 1K if false</string>
+        <key>Persist</key>
+        <integer>1</integer>
+        <key>Type</key>
+        <string>Boolean</string>
+        <key>Value</key>
+        <integer>1</integer>
     </map>
     <key>EnableButtonFlashing</key>
     <map>
@@ -4587,6 +4610,28 @@
     <string>F32</string>
     <key>Value</key>
     <real>64.0</real>
+  </map>
+  <key>AvatarExtentRefreshPeriodBatch</key>
+  <map>
+    <key>Comment</key>
+    <string>how many frames do we spread over by default when refreshing extents (default is 4)</string>
+    <key>Persist</key>
+    <integer>1</integer>
+    <key>Type</key>
+    <string>S32</string>
+    <key>Value</key>
+    <integer>4</integer>
+  </map>
+  <key>AvatarExtentRefreshMaxPerBatch</key>
+  <map>
+    <key>Comment</key>
+    <string>how many avatars do we want to handle in total per batch (default is 5)</string>
+    <key>Persist</key>
+    <integer>1</integer>
+    <key>Type</key>
+    <string>S32</string>
+    <key>Value</key>
+    <integer>5</integer>
   </map>
   <key>DebugAvatarAppearanceMessage</key>
   <map>
@@ -10309,17 +10354,6 @@
         <key>Value</key>
             <integer>1</integer>
         </map>
-  <key>AlwaysRenderFriends</key>
-    <map>
-      <key>Comment</key>
-      <string>Always render friends regardless of max complexity</string>
-      <key>Persist</key>
-      <integer>1</integer>
-      <key>Type</key>
-      <string>Boolean</string>
-      <key>Value</key>
-      <integer>0</integer>
-    </map>
   <key>RenderAvatarCloth</key>
     <map>
       <key>Comment</key>
@@ -10330,6 +10364,17 @@
       <string>Boolean</string>
       <key>Value</key>
       <integer>0</integer>
+    </map>
+    <key>RenderCanUseGLTFPBROpaqueShaders</key>
+    <map>
+        <key>Comment</key>
+        <string>Hardware has support for GLTF scene shaders</string>
+        <key>Persist</key>
+        <integer>0</integer>
+        <key>Type</key>
+        <string>Boolean</string>
+        <key>Value</key>
+        <integer>1</integer>
     </map>
   <key>RenderClass1MemoryBandwidth</key>
   <map>
@@ -10485,7 +10530,7 @@
    <key>RenderHiDPI</key>
   <map>
     <key>Comment</key>
-    <string>Enable support for HiDPI displays, like Retina (MacOS X ONLY, requires restart)</string>
+    <string>Enable support for HiDPI displays, like Retina (macOS ONLY, requires restart)</string>
     <key>Persist</key>
     <integer>1</integer>
     <key>Type</key>
@@ -10942,13 +10987,35 @@
   <key>RenderMaxVRAMBudget</key>
   <map>
     <key>Comment</key>
-    <string>Maximum amount of texture memory to budget for (in MB), or 0 for autodetect.  Requires restart.</string>
+    <string>Maximum amount of texture memory to budget for (in MB), or 0 for autodetect.</string>
     <key>Persist</key>
     <integer>1</integer>
     <key>Type</key>
     <string>U32</string>
     <key>Value</key>
     <integer>0</integer>
+  </map>
+  <key>RenderMinFreeMainMemoryThreshold</key>
+  <map>
+    <key>Comment</key>
+    <string>Minimum of available physical memory in MB before textures get scaled down</string>
+    <key>Persist</key>
+    <integer>0</integer>
+    <key>Type</key>
+    <string>U32</string>
+    <key>Value</key>
+    <integer>512</integer>
+  </map>
+  <key>RenderLowMemMinDiscardIncrement</key>
+  <map>
+    <key>Comment</key>
+    <string>Minimum increment of discard level if system memory gets low</string>
+    <key>Persist</key>
+    <integer>1</integer>
+    <key>Type</key>
+    <string>F32</string>
+    <key>Value</key>
+    <real>0.1</real>
   </map>
   <key>RenderMaxTextureIndex</key>
   <map>
@@ -10972,6 +11039,17 @@
     <key>Value</key>
     <integer>2048</integer>
   </map>
+    <key>RenderDownScaleMethod</key>
+    <map>
+        <key>Comment</key>
+        <string>Method to use to downscale images.  0 - FBO, 1 - PBO</string>
+        <key>Persist</key>
+        <integer>1</integer>
+        <key>Type</key>
+        <string>U32</string>
+        <key>Value</key>
+        <integer>1</integer>
+    </map>
     <key>RenderDebugTextureBind</key>
     <map>
       <key>Comment</key>
@@ -12060,6 +12138,17 @@
       <key>Value</key>
       <integer>1</integer>
     </map>
+    <key>NameTagDebugAVRezState</key>
+    <map>
+        <key>Comment</key>
+        <string>Show Avatar Rez state in name tag</string>
+        <key>Persist</key>
+        <integer>0</integer>
+        <key>Type</key>
+        <string>Boolean</string>
+        <key>Value</key>
+        <integer>0</integer>
+    </map>
     <key>RenderInitError</key>
     <map>
       <key>Comment</key>
@@ -12597,20 +12686,9 @@
     <key>RenderTerrainPBREnabled</key>
     <map>
       <key>Comment</key>
-      <string>EXPERIMENTAL: Enable PBR Terrain features.</string>
+      <string>Enable PBR Terrain features.</string>
       <key>Persist</key>
       <integer>1</integer>
-      <key>Type</key>
-      <string>Boolean</string>
-      <key>Value</key>
-      <integer>0</integer>
-    </map>
-    <key>RenderTerrainPBRForce</key>
-    <map>
-      <key>Comment</key>
-      <string>Force-load PBR terrain if enabled</string>
-      <key>Persist</key>
-      <integer>0</integer>
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
@@ -12659,6 +12737,17 @@
       <string>F32</string>
       <key>Value</key>
       <real>8.0</real>
+    </map>
+    <key>RenderTerrainPBRTransformsEnabled</key>
+    <map>
+      <key>Comment</key>
+      <string>EXPERIMENTAL: Enable PBR Terrain texture transforms.</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
     </map>
     <key>RenderTerrainPBRNormalsEnabled</key>
     <map>
@@ -12776,16 +12865,27 @@
       <key>Backup</key>
       <integer>0</integer>
     </map>
-    <key>RenderUseImpostors</key>
+    <key>RenderAvatarFriendsOnly</key>
     <map>
-      <key>Comment</key>
-    <string>OBSOLETE and UNUSED. See RenderAvatarMaxNonImpostors and RenderAvatarMaxComplexity.</string>
-      <key>Persist</key>
-    <integer>0</integer>
-      <key>Type</key>
-      <string>Boolean</string>
-      <key>Value</key>
-    <integer>0</integer>
+        <key>Comment</key>
+        <string>When enabled hides all avatars that aren't friends. Does not affect inworld control avatars (animeshes), nor self.</string>
+        <key>Persist</key>
+        <integer>0</integer>
+        <key>Type</key>
+        <string>Boolean</string>
+        <key>Value</key>
+        <real>0</real>
+    </map>
+    <key>RenderAvatarComplexityMode</key>
+    <map>
+        <key>Comment</key>
+        <string>0 - complexity limit applies to everyone, 1 - always show friends, 2 - only show friends</string>
+        <key>Persist</key>
+        <integer>1</integer>
+        <key>Type</key>
+        <string>S32</string>
+        <key>Value</key>
+        <real>0</real>
     </map>
   <key>RenderAvatarMaxNonImpostors</key>
   <map>
@@ -14865,6 +14965,19 @@
       <key>Backup</key>
       <integer>0</integer>
     </map>
+    <key>TextureBiasUnimportantFactor</key>
+    <map>
+      <key>Comment</key>
+      <string>When biasing textures to lower resolution due to lack of vram, the importance threshold below which is considered unimportant and getting an extra bias.</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>0.25</real>
+      <key>Backup</key>
+      <integer>0</integer>
+    </map>
     <key>TextureDecodeDisabled</key>
     <map>
       <key>Comment</key>
@@ -15012,6 +15125,28 @@
       <string>String</string>
       <key>Value</key>
       <string />
+    </map>
+    <key>TextureScaleMinAreaFactor</key>
+    <map>
+        <key>Comment</key>
+        <string>Limits how texture scale affects area calculation.</string>
+        <key>Persist</key>
+        <integer>1</integer>
+        <key>Type</key>
+        <string>F32</string>
+        <key>Value</key>
+        <real>0.04</real>
+    </map>
+    <key>TextureScaleMaxAreaFactor</key>
+    <map>
+        <key>Comment</key>
+        <string>Limits how texture scale affects area calculation.</string>
+        <key>Persist</key>
+        <integer>1</integer>
+        <key>Type</key>
+        <string>F32</string>
+        <key>Value</key>
+        <real>25.0</real>
     </map>
     <key>ThreadPoolSizes</key>
     <map>
@@ -16274,6 +16409,17 @@
       <key>Value</key>
       <integer>1</integer>
     </map>
+    <key>Use24HourClock</key>
+    <map>
+        <key>Comment</key>
+        <string>12 vs 24. At the moment only for region restart schedule floater</string>
+        <key>Persist</key>
+        <integer>0</integer>
+        <key>Type</key>
+        <string>Boolean</string>
+        <key>Value</key>
+        <integer>0</integer>
+    </map>
     <key>EnvironmentPersistAcrossLogin</key>
     <map>
       <key>Comment</key>
@@ -16333,7 +16479,7 @@
     <key>Persist</key>
     <integer>1</integer>
     <key>Type</key>
-    <string>S32</string>
+    <string>U32</string>
     <key>Value</key>
     <integer>8</integer>
   </map>
@@ -16941,8 +17087,39 @@
       <string>U32</string>
       <key>Value</key>
       <integer>44125</integer>
-      <key>Backup</key>
-      <integer>0</integer>
+    </map>
+    <key>VoiceEchoCancellation</key>
+    <map>
+      <key>Comment</key>
+      <string>Voice Echo Cancellation</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
+    <key>VoiceAutomaticGainControl</key>
+    <map>
+      <key>Comment</key>
+      <string>Voice Automatic Gain Control</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
+    <key>VoiceNoiseSuppressionLevel</key>
+    <map>
+      <key>Comment</key>
+      <string>Voice Noise Suppression Level</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>U32</string>
+      <key>Value</key>
+      <integer>4</integer>
     </map>
     <key>WarningsAsChat</key>
     <map>
@@ -16958,13 +17135,13 @@
     <key>VoiceServerType</key>
     <map>
       <key>Comment</key>
-      <string>The type of voice server to connect to.</string>
+      <string>The type of voice server to use for group, conference, and p2p calls.</string>
       <key>Persist</key>
       <integer>0</integer>
       <key>Type</key>
       <string>String</string>
       <key>Value</key>
-      <string>vivox</string>
+      <string/>
     </map>
     <key>WLSkyDetail</key>
     <map>
@@ -17879,6 +18056,17 @@
       <key>Value</key>
       <integer>0</integer>
     </map>
+    <key>DisableLookAtAnimation</key>
+    <map>
+        <key>Comment</key>
+        <string>Avatar follows cursor with avatars eyes, when disabled, avatar will look forward</string>
+        <key>Persist</key>
+        <integer>0</integer>
+        <key>Type</key>
+        <string>Boolean</string>
+        <key>Value</key>
+        <integer>0</integer>
+    </map>
      <key>WebProfileFloaterRect</key>
     <map>
       <key>Comment</key>
@@ -18398,6 +18586,259 @@
       <string>String</string>
       <key>Value</key>
       <string>00000000-0000-0000-0000-000000000000</string>
+    </map>
+    <key>LocalTerrainTransform1ScaleU</key>
+    <map>
+      <key>Comment</key>
+      <string>KHR texture transform component if LocalTerrainAsset1 is set</string>
+      <key>Persist</key>
+      <integer>0</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>1.0</real>
+    </map>
+    <key>LocalTerrainTransform1ScaleV</key>
+    <map>
+      <key>Comment</key>
+      <string>KHR texture transform component if LocalTerrainAsset1 is set</string>
+      <key>Persist</key>
+      <integer>0</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>1.0</real>
+    </map>
+    <key>LocalTerrainTransform1Rotation</key>
+    <map>
+      <key>Comment</key>
+      <string>KHR texture transform component if LocalTerrainAsset1 is set</string>
+      <key>Persist</key>
+      <integer>0</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>0.0</real>
+    </map>
+    <key>LocalTerrainTransform1OffsetU</key>
+    <map>
+      <key>Comment</key>
+      <string>KHR texture transform component if LocalTerrainAsset1 is set</string>
+      <key>Persist</key>
+      <integer>0</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>0.0</real>
+    </map>
+    <key>LocalTerrainTransform1OffsetV</key>
+    <map>
+      <key>Comment</key>
+      <string>KHR texture transform component if LocalTerrainAsset1 is set</string>
+      <key>Persist</key>
+      <integer>0</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>0.0</real>
+    </map>
+    <key>LocalTerrainTransform2ScaleU</key>
+    <map>
+      <key>Comment</key>
+      <string>KHR texture transform component if LocalTerrainAsset2 is set</string>
+      <key>Persist</key>
+      <integer>0</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>1.0</real>
+    </map>
+    <key>LocalTerrainTransform2ScaleV</key>
+    <map>
+      <key>Comment</key>
+      <string>KHR texture transform component if LocalTerrainAsset2 is set</string>
+      <key>Persist</key>
+      <integer>0</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>1.0</real>
+    </map>
+    <key>LocalTerrainTransform2Rotation</key>
+    <map>
+      <key>Comment</key>
+      <string>KHR texture transform component if LocalTerrainAsset2 is set</string>
+      <key>Persist</key>
+      <integer>0</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>0.0</real>
+    </map>
+    <key>LocalTerrainTransform2OffsetU</key>
+    <map>
+      <key>Comment</key>
+      <string>KHR texture transform component if LocalTerrainAsset2 is set</string>
+      <key>Persist</key>
+      <integer>0</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>0.0</real>
+    </map>
+    <key>LocalTerrainTransform2OffsetV</key>
+    <map>
+      <key>Comment</key>
+      <string>KHR texture transform component if LocalTerrainAsset2 is set</string>
+      <key>Persist</key>
+      <integer>0</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>0.0</real>
+    </map>
+    <key>LocalTerrainTransform3ScaleU</key>
+    <map>
+      <key>Comment</key>
+      <string>KHR texture transform component if LocalTerrainAsset3 is set</string>
+      <key>Persist</key>
+      <integer>0</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>1.0</real>
+    </map>
+    <key>LocalTerrainTransform3ScaleV</key>
+    <map>
+      <key>Comment</key>
+      <string>KHR texture transform component if LocalTerrainAsset3 is set</string>
+      <key>Persist</key>
+      <integer>0</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>1.0</real>
+    </map>
+    <key>LocalTerrainTransform3Rotation</key>
+    <map>
+      <key>Comment</key>
+      <string>KHR texture transform component if LocalTerrainAsset3 is set</string>
+      <key>Persist</key>
+      <integer>0</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>0.0</real>
+    </map>
+    <key>LocalTerrainTransform3OffsetU</key>
+    <map>
+      <key>Comment</key>
+      <string>KHR texture transform component if LocalTerrainAsset3 is set</string>
+      <key>Persist</key>
+      <integer>0</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>0.0</real>
+    </map>
+    <key>LocalTerrainTransform3OffsetV</key>
+    <map>
+      <key>Comment</key>
+      <string>KHR texture transform component if LocalTerrainAsset3 is set</string>
+      <key>Persist</key>
+      <integer>0</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>0.0</real>
+    </map>
+    <key>LocalTerrainTransform4ScaleU</key>
+    <map>
+      <key>Comment</key>
+      <string>KHR texture transform component if LocalTerrainAsset4 is set</string>
+      <key>Persist</key>
+      <integer>0</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>1.0</real>
+    </map>
+    <key>LocalTerrainTransform4ScaleV</key>
+    <map>
+      <key>Comment</key>
+      <string>KHR texture transform component if LocalTerrainAsset4 is set</string>
+      <key>Persist</key>
+      <integer>0</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>1.0</real>
+    </map>
+    <key>LocalTerrainTransform4Rotation</key>
+    <map>
+      <key>Comment</key>
+      <string>KHR texture transform component if LocalTerrainAsset4 is set</string>
+      <key>Persist</key>
+      <integer>0</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>0.0</real>
+    </map>
+    <key>LocalTerrainTransform4OffsetU</key>
+    <map>
+      <key>Comment</key>
+      <string>KHR texture transform component if LocalTerrainAsset4 is set</string>
+      <key>Persist</key>
+      <integer>0</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>0.0</real>
+    </map>
+    <key>LocalTerrainTransform4OffsetV</key>
+    <map>
+      <key>Comment</key>
+      <string>KHR texture transform component if LocalTerrainAsset4 is set</string>
+      <key>Persist</key>
+      <integer>0</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>0.0</real>
+    </map>
+    <key>LocalTerrainPaintEnabled</key>
+    <map>
+      <key>Comment</key>
+      <string>Enables local paintmap if LocalTerrainAsset1, etc are set</string>
+      <key>Persist</key>
+      <integer>0</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>TerrainPaintBitDepth</key>
+    <map>
+      <key>Comment</key>
+      <string>Bit depth for future terrain paint map operations. Min: 1. Max: 8. Takes effect when the paint map is created or modified. Modifications to an existing paintmap of different bit depth will have lower precision.</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>U32</string>
+      <key>Value</key>
+      <integer>5</integer>
+    </map>
+    <key>TerrainPaintResolution</key>
+    <map>
+      <key>Comment</key>
+      <string>Resolution of the terrain paint map in pixels. Rounded to a power of two. Min: 16. Max: RenderMaxTextureResolution. Takes effect when the paint map is created.</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>U32</string>
+      <key>Value</key>
+      <integer>2048</integer>
     </map>
 	<key>PathfindingRetrieveNeighboringRegion</key>
     <map>
@@ -20236,6 +20677,17 @@
     <key>Value</key>
     <integer>0</integer>
   </map>
+  <key>ColorSettingsHideDefault</key>
+  <map>
+    <key>Comment</key>
+    <string>Show non-default settings only in Color Settings list</string>
+    <key>Persist</key>
+    <integer>0</integer>
+    <key>Type</key>
+    <string>Boolean</string>
+    <key>Value</key>
+    <integer>0</integer>
+  </map>
   <key>DebugSettingsHideDefault</key>
   <map>
     <key>Comment</key>
@@ -20280,6 +20732,17 @@
   <key>Value</key>
   <integer>0</integer>
 </map>
+  <key>GLTFEnabled</key>
+  <map>
+    <key>Comment</key>
+    <string>Enable GLTF support.  Set to true by simulator if the simulator you are connected to supports GLTF Asset upload.  WARNING: Manually setting this to true will enable buttons that can drain your L$ balance by implicitly uploading textures without asking.</string>
+    <key>Persist</key>
+    <integer>0</integer>
+    <key>Type</key>
+    <string>Boolean</string>
+    <key>Value</key>
+    <integer>0</integer>
+  </map>
   <key>StatsReportMaxDuration</key>
   <map>
     <key>Comment</key>
@@ -20306,6 +20769,39 @@
   <map>
     <key>Comment</key>
     <string>In viewer stats data file, skip saving entry if there is no data</string>
+    <key>Persist</key>
+    <integer>0</integer>
+    <key>Type</key>
+    <string>Boolean</string>
+    <key>Value</key>
+    <integer>0</integer>
+  </map>
+<key>MultiModeDoubleClickFolder</key>
+<map>
+  <key>Comment</key>
+  <string>Sets the action for Double-click on folder in multi-folder view (0 - expands and collapses folder, 1 - opens a new window, 2 – stays in current floater but switches to SFV)</string>
+  <key>Persist</key>
+  <integer>1</integer>
+  <key>Type</key>
+  <string>U32</string>
+  <key>Value</key>
+  <integer>0</integer>
+</map>
+<key>SingleModeDoubleClickOpenWindow</key>
+<map>
+  <key>Comment</key>
+  <string>Sets the action for Double-click on folder in single-folder view (0 - stays in current window, 1 - opens a new window)</string>
+  <key>Persist</key>
+  <integer>1</integer>
+  <key>Type</key>
+  <string>Boolean</string>
+  <key>Value</key>
+  <integer>0</integer>
+</map>
+  <key>GLTFEnabled</key>
+  <map>
+    <key>Comment</key>
+    <string>Enable GLTF support.  Set to true by simulator if the simulator you are connected to supports GLTF Asset upload.  WARNING: Manually setting this to true will enable buttons that can drain your L$ balance by implicitly uploading textures without asking.</string>
     <key>Persist</key>
     <integer>0</integer>
     <key>Type</key>

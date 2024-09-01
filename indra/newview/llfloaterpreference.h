@@ -82,9 +82,9 @@ public:
     ~LLFloaterPreference();
 
     void apply();
-    void cancel();
+    void cancel(const std::vector<std::string> settings_to_skip = {});
     /*virtual*/ void draw();
-    /*virtual*/ BOOL postBuild();
+    /*virtual*/ bool postBuild();
     /*virtual*/ void onOpen(const LLSD& key);
     /*virtual*/ void onClose(bool app_quitting);
     /*virtual*/ void changed();
@@ -189,7 +189,6 @@ public:
     void onClickLogPath();
     void changeLogPath(const std::vector<std::string>& filenames, std::string proposed_name);
     bool moveTranscriptsAndLog();
-    void enableHistory();
     void setPersonalInfo(const std::string& visibility);
     void refreshEnabledState();
     void onCommitWindowedMode();
@@ -201,10 +200,8 @@ public:
 
     void refreshUI();
 
-    void onCommitMediaEnabled();
-    void onCommitMusicEnabled();
-    void applyResolution();
     void onChangeMaturity();
+    void onChangeComplexityMode(const LLSD& newvalue);
     void onChangeModelFolder();
     void onChangePBRFolder();
     void onChangeTextureFolder();
@@ -226,22 +223,35 @@ public:
     void buildPopupLists();
     static void refreshSkin(void* data);
     void selectPanel(const LLSD& name);
-    void saveCameraPreset(std::string& preset);
     void saveGraphicsPreset(std::string& preset);
 
 //These were in LLFloaterPreferenceGraphicsAdvanced, all have Advanced appended to their names
-    /*virtual*/ BOOL postBuildAdvanced();
+    /*virtual*/ bool postBuildAdvanced();
     void disableUnavailableSettingsAdvanced();
     void refreshEnabledGraphicsAdvanced();
     void refreshEnabledStateAdvanced();
     void updateSliderTextAdvanced(LLSliderCtrl* ctrl, LLTextBox* text_box);
     void updateMaxNonImpostorsAdvanced();
+    void updateIndirectMaxNonImpostorsAdvanced(const LLSD& newvalue);
     void setMaxNonImpostorsTextAdvanced(U32 value, LLTextBox* text_box);
     void setMaxComplexityTextAdvanced(U32 value, LLTextBox* text_box);
+    void updateComplexityModeAdvanced(const LLSD& newvalue);
+    void updateComplexityTextAdvanced();
+    void updateObjectMeshDetailTextAdvanced();
     void refreshAdvanced();
     // callback for when client modifies a render option
     void onRenderOptionEnableAdvanced();
   void onAdvancedAtmosphericsEnableAdvanced();
+protected:
+
+    boost::signals2::connection mComplexityChangedSignalAdvanced;
+    boost::signals2::connection mComplexityModeChangedSignalAdvanced;
+    boost::signals2::connection mLODFactorChangedSignalAdvanced;
+    boost::signals2::connection mNumImpostorsChangedSignalAdvanced;
+private:
+     void updateMaxComplexityAdvanced();
+
+public:
 //End Advanced section
 
     void setRecommendedSettings();
@@ -271,7 +281,12 @@ private:
     std::string mSavedGraphicsPreset;
     LOG_CLASS(LLFloaterPreference);
 
-    LLSearchEditor *mFilterEdit;
+    LLSearchEditor* mFilterEdit = nullptr;
+    LLScrollListCtrl* mEnabledPopups = nullptr;
+    LLScrollListCtrl* mDisabledPopups = nullptr;
+    LLButton*       mDeleteTranscriptsBtn = nullptr;
+    LLButton*       mEnablePopupBtn = nullptr;
+    LLButton*       mDisablePopupBtn = nullptr;
     std::unique_ptr< ll::prefs::SearchData > mSearchData;
     bool mSearchDataDirty;
 
@@ -288,12 +303,12 @@ class LLPanelPreference : public LLPanel
 {
 public:
     LLPanelPreference();
-    /*virtual*/ BOOL postBuild();
+    /*virtual*/ bool postBuild();
 
     virtual ~LLPanelPreference();
 
     virtual void apply();
-    virtual void cancel();
+    virtual void cancel(const std::vector<std::string> settings_to_skip = {});
     void setControlFalse(const LLSD& user_data);
     virtual void setHardwareDefaults();
 
@@ -334,15 +349,13 @@ private:
 class LLPanelPreferenceGraphics : public LLPanelPreference
 {
 public:
-    BOOL postBuild();
+    bool postBuild();
     void draw();
-    void cancel();
+    void cancel(const std::vector<std::string> settings_to_skip = {});
     void saveSettings();
     void resetDirtyChilds();
     void setHardwareDefaults();
     void setPresetText();
-
-    static const std::string getPresetsPath();
 
 protected:
     bool hasDirtyChilds();
@@ -359,10 +372,10 @@ public:
     LLPanelPreferenceControls();
     virtual ~LLPanelPreferenceControls();
 
-    BOOL postBuild();
+    bool postBuild();
 
     void apply();
-    void cancel();
+    void cancel(const std::vector<std::string> settings_to_skip = {});
     void saveSettings();
     void resetDirtyChilds();
 
@@ -425,7 +438,7 @@ class LLPanelPreferenceCrashReports : public LLPanelPreference
 public:
     LLPanelPreferenceCrashReports();
 
-    /*virtual*/ BOOL postBuild();
+    /*virtual*/ bool postBuild();
     /*virtual*/ void apply();
     /*virtual*/ void cancel();
 
@@ -440,7 +453,7 @@ class FSPanelPreferenceBackup : public LLPanelPreference
 {
 public:
     FSPanelPreferenceBackup();
-    /*virtual*/ BOOL postBuild();
+    /*virtual*/ bool postBuild();
 
 protected:
     // <FS:Zi> Backup settings
@@ -451,8 +464,8 @@ protected:
     void onClickBackupSettings();
     void onClickRestoreSettings();
 
-    void doSelect(BOOL all);                                                // calls applySelection for each list
-    void applySelection(LLScrollListCtrl* control, BOOL all);               // selects or deselects all items in a scroll list
+    void doSelect(bool all);                                                // calls applySelection for each list
+    void applySelection(LLScrollListCtrl* control, bool all);               // selects or deselects all items in a scroll list
     void doBackupSettings(const LLSD& notification, const LLSD& response);  // callback for backup dialog
     void doRestoreSettings(const LLSD& notification, const LLSD& response); // callback for restore dialog
     void onQuitConfirmed(const LLSD& notification, const LLSD& response);   // callback for finished restore dialog
@@ -468,7 +481,7 @@ public:
     FSPanelPreferenceSounds();
     virtual ~FSPanelPreferenceSounds();
 
-    BOOL postBuild();
+    bool postBuild();
 
 private:
     LLPanel*    mOutputDevicePanel;
@@ -494,7 +507,7 @@ public:
     void cancel();
 
 protected:
-    BOOL postBuild();
+    bool postBuild();
     void onOpen(const LLSD& key);
     void onClose(bool app_quitting);
     void saveSettings();

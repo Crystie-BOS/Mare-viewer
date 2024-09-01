@@ -73,7 +73,7 @@ LLPanelBlockList::~LLPanelBlockList()
 }
 
 // virtual
-BOOL LLPanelBlockList::postBuild()
+bool LLPanelBlockList::postBuild()
 {
     setVisibleCallback(boost::bind(&LLPanelBlockList::removePicker, this));
 
@@ -181,7 +181,7 @@ void LLPanelBlockList::selectEntry(const LLMute& muteEntry)
         const LLSD& sdValue = (*itItem)->getValue();
         if ( (muteEntry.mID == sdValue["id"].asUUID()) && ((muteEntry.mName.empty()) ||(muteEntry.mName == sdValue["name"].asString())) )
         {
-            S32 idxItem = itItem - muteItems.begin();
+            S32 idxItem = static_cast<S32>(itItem - muteItems.begin());
             if (idxItem != m_pBlockList->getFirstSelectedIndex())
             {
                 m_pBlockList->deselectAllItems();
@@ -361,7 +361,7 @@ LLPanelDerenderList::~LLPanelDerenderList()
     m_DerenderChangeConn.disconnect();
 }
 
-BOOL LLPanelDerenderList::postBuild()
+bool LLPanelDerenderList::postBuild()
 {
     m_pDerenderList = findChild<LLScrollListCtrl>("derender_list");
     m_pDerenderList->setCommitCallback(boost::bind(&LLPanelDerenderList::onSelectionChange, this));
@@ -528,7 +528,7 @@ LLPanelAvatarRendering::~LLPanelAvatarRendering()
 }
 
 // virtual
-BOOL LLPanelAvatarRendering::postBuild()
+bool LLPanelAvatarRendering::postBuild()
 {
     setVisibleCallback(boost::bind(&LLPanelAvatarRendering::removePicker, this));
 
@@ -740,7 +740,7 @@ LLFloaterBlocked::~LLFloaterBlocked()
 {
 }
 
-BOOL LLFloaterBlocked::postBuild()
+bool LLFloaterBlocked::postBuild()
 {
     m_pFilterEditor = findChild<LLFilterEditor>("blocked_filter");
     m_pFilterEditor->setCommitCallback(boost::bind(&LLFloaterBlocked::onFilterEdit, this, _2));

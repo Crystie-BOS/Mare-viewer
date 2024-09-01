@@ -74,7 +74,7 @@ void KokuaRLVExtras::initialise()
     static bool fInitialized = false;
     if (!fInitialized)
     {
-        KokuaRLVExtras::getInstance()->mLaunchTimestamp = LLDate::now().secondsSinceEpoch();
+        KokuaRLVExtras::getInstance()->mLaunchTimestamp = (U32)LLDate::now().secondsSinceEpoch();
         // Load the default string values
         std::vector<std::string> files = gDirUtilp->findSkinnedFilenames(LLDir::XUI, KOKUA_RLV_NAMES_FILE, LLDir::ALL_SKINS);
         m_StringMapPath = (!files.empty()) ? files.front() : LLStringUtil::null;
@@ -107,7 +107,7 @@ void KokuaRLVExtras::loadFromFile(const std::string& strFilePath)
     if (sdFileData.has("anonyms"))
     {
         const LLSD& sdAnonyms = sdFileData["anonyms"];
-        U32 initialStamp = LLDate::now().secondsSinceEpoch();
+        U32 initialStamp = (U32)LLDate::now().secondsSinceEpoch();
         for (LLSD::array_const_iterator itAnonym = sdAnonyms.beginArray(); itAnonym != sdAnonyms.endArray(); ++itAnonym)
         {
             struct embedded_anonym_t new_anon;
@@ -154,7 +154,7 @@ std::string KokuaRLVExtras::kokuaGetDummyName (std::string name)
     if (matched != mAnonEntries.end())
     {
         // LL_INFOS() << "matched " << name << " to " << (matched->second).mOriginalName << " as " << matched->first<< LL_ENDL;
-        (matched->second).mLastReferenced = LLDate::now().secondsSinceEpoch();
+        (matched->second).mLastReferenced = (U32)LLDate::now().secondsSinceEpoch();
         return matched->first;
     }
 
@@ -170,7 +170,7 @@ std::string KokuaRLVExtras::kokuaGetDummyName (std::string name)
         anonym_map_t::iterator nthitem = mAnonEntries.begin();
         U32 nthcount = 0;
 
-        for (int idx = 0, cnt = name.length(); idx < cnt; idx++)
+        for (int idx = 0, cnt = (int)name.length(); idx < cnt; idx++)
         {
             nHash += pszName[idx];
         }
@@ -189,13 +189,13 @@ std::string KokuaRLVExtras::kokuaGetDummyName (std::string name)
 
         // LL_INFOS() << "Overflow situation, chose hash item " << nHash << LL_ENDL;
 
-        (nthitem->second).mLastReferenced = LLDate::now().secondsSinceEpoch();
+        (nthitem->second).mLastReferenced = (U32)LLDate::now().secondsSinceEpoch();
         (nthitem->second).mOriginalName = name;
         return nthitem->first;
     }
 
     // LL_INFOS() << "Not found, reusing " << oldest->first << " occupied by " << (oldest->second).mOriginalName << LL_ENDL;
-    (oldest->second).mLastReferenced = LLDate::now().secondsSinceEpoch();
+    (oldest->second).mLastReferenced = (U32)LLDate::now().secondsSinceEpoch();
     (oldest->second).mOriginalName = name;
     return oldest->first;
 }

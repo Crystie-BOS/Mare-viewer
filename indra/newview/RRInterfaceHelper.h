@@ -33,7 +33,7 @@ class RRHelper
 public:
     RRHelper ();
     ~RRHelper ();
-    static BOOL preventFloater(std::string floaterName); //used to check if a floater should not be made visible due to a restriction
+    static bool preventFloater(std::string floaterName); //used to check if a floater should not be made visible due to a restriction
 };
 
 #endif // RRINTERFACEHELPER_H

@@ -36,9 +36,12 @@ cmake_install.cmake
 /indra/.distcc
 indra/cmake/*
 indra/out/*
+/*.log
+ca*.sh
 
 indra/packages/*
 /indra/build-vc[0-9]*
+build-vc*-64*/
 /indra/CMakeFiles
 /indra/lib/mono/1.0/*.dll
 /indra/lib/mono/indra/*.dll

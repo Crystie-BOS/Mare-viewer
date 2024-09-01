@@ -41,7 +41,7 @@ LLFloaterSearchReplace::~LLFloaterSearchReplace()
 {
 }
 
-BOOL LLFloaterSearchReplace::postBuild()
+bool LLFloaterSearchReplace::postBuild()
 {
     m_pSearchEditor = getChild<LLLineEditor>("search_text");
     m_pSearchEditor->setCommitCallback(boost::bind(&LLFloaterSearchReplace::onSearchClick, this));
@@ -63,7 +63,7 @@ BOOL LLFloaterSearchReplace::postBuild()
     LLButton* pReplaceAllBtn = getChild<LLButton>("replace_all_btn");
     pReplaceAllBtn->setCommitCallback(boost::bind(&LLFloaterSearchReplace::onReplaceAllClick, this));
 
-    return TRUE;
+    return true;
 }
 
 void LLFloaterSearchReplace::onOpen(const LLSD& sdKey)
@@ -107,11 +107,11 @@ bool LLFloaterSearchReplace::hasAccelerators() const
     return false;
 }
 
-BOOL LLFloaterSearchReplace::handleKeyHere(KEY key, MASK mask)
+bool LLFloaterSearchReplace::handleKeyHere(KEY key, MASK mask)
 {
     // Pass this on to the editor we're operating on (or any view up along its hierarchy) if we don't handle the key ourselves
     // (allows Ctrl-F to work when the floater itself has focus - see changeset 0c8947e5f433)
-    BOOL handled = LLFloater::handleKeyHere(key, mask);
+    bool handled = LLFloater::handleKeyHere(key, mask);
     if (!handled)
     {
         // Check if one of our children currently has keyboard focus and if so route edit accellerators to it

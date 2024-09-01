@@ -203,7 +203,7 @@ float RlvSphereEffect::getTweenDuration()
 
 void RlvSphereEffect::setShaderUniforms(LLGLSLShader* pShader)
 {
-    pShader->uniform2f(LLShaderMgr::DEFERRED_SCREEN_RES, gPipeline.mRT->screen.getWidth(), gPipeline.mRT->screen.getHeight());
+    pShader->uniform2f(LLShaderMgr::DEFERRED_SCREEN_RES, static_cast<GLfloat>(gPipeline.mRT->screen.getWidth()), static_cast<GLfloat>(gPipeline.mRT->screen.getHeight()));
     pShader->uniform1i(LLShaderMgr::RLV_EFFECT_MODE, llclamp((int)m_eMode, 0, (int)ESphereMode::Count));
 
     // Pass the sphere origin to the shader
@@ -235,7 +235,7 @@ void RlvSphereEffect::setShaderUniforms(LLGLSLShader* pShader)
 
     // Pass dist extend
     int eDistExtend = (int)m_eDistExtend;
-    pShader->uniform2f(LLShaderMgr::RLV_EFFECT_PARAM3, eDistExtend & (int)ESphereDistExtend::Min, eDistExtend & (int)ESphereDistExtend::Max);
+    pShader->uniform2f(LLShaderMgr::RLV_EFFECT_PARAM3, static_cast<GLfloat>(eDistExtend & (int)ESphereDistExtend::Min), static_cast<GLfloat>(eDistExtend & (int)ESphereDistExtend::Max));
 
     // Pass effect params
     pShader->uniform4fv(LLShaderMgr::RLV_EFFECT_PARAM4, 1, m_Params.get().mV);

@@ -3,9 +3,6 @@
 project(llmessage)
 
 include(00-Common)
-if (LL_TESTS)
-include(GoogleMock)
-endif ()
 include(LLAddBuildTest)
 include(LLCommon)
 include(LLCoreHttp)
@@ -13,7 +10,6 @@ include(LLAddBuildTest)
 include(Python)
 include(Tut)
 include(Python)
-include(JsonCpp)
 set(llmessage_SOURCE_FILES
 		fscorehttputil.cpp
     llassetstorage.cpp
@@ -31,7 +27,6 @@ set(llmessage_SOURCE_FILES
     lldatapacker.cpp
     lldispatcher.cpp
     llexperiencecache.cpp
-    llfiltersd2xmlrpc.cpp
     llgenericstreamingmessage.cpp
     llhost.cpp
     llhttpnode.cpp
@@ -116,7 +111,6 @@ set(llmessage_HEADER_FILES
     lleventflags.h
     llexperiencecache.h
     llextendedstatus.h
-    llfiltersd2xmlrpc.h
     llfollowcamparams.h
     llgenericstreamingmessage.h
     llhost.h
@@ -199,7 +193,6 @@ target_link_libraries(
         llmath
         llcorehttp
         llxml
-        ll::xmlrpc-epi
 )
 target_include_directories( llmessage  INTERFACE   ${CMAKE_CURRENT_SOURCE_DIR})
 

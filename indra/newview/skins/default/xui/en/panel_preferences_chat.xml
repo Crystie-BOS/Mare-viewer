@@ -89,18 +89,6 @@
         width="350">     
     </check_box>
     <text
-       font="SansSerifSmall"
-       height="14"
-       layout="topleft"
-       length="1"       
-       name="email_settings"
-       skip_link_underline="true"
-       left_delta="2"
-       type="string"
-       width="350">
-      [https://accounts.secondlife.com/change_email Email me IMs when I'm offline]
-    </text>
-    <text
         layout="topleft"
         follows="left|top"
         left="24"
@@ -397,12 +385,25 @@
         label="Suppress ad-hoc group IM sessions unless started by a friend"
         follows="top|left"
         layout="topleft"
-        top_pad="4"
+        top_pad="8"
         left="20"
         name="kokua_ignore_nonfriend_ad_hoc_session"
         width="330">
     </check_box>
-         
+    <text
+       font="SansSerifSmall"
+       height="14"
+       layout="topleft"
+       follows="top|left"
+       length="1"       
+       name="email_settings"
+       skip_link_underline="true"
+       left="24"
+       top_pad="8"
+       type="string"
+       width="350">
+      [https://accounts.secondlife.com/change_email Click here to change offline IM settings]
+    </text>         
         </panel>
 
 

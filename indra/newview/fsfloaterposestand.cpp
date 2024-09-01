@@ -33,7 +33,7 @@ FSFloaterPoseStand::~FSFloaterPoseStand()
 {
 }
 
-BOOL FSFloaterPoseStand::postBuild()
+bool FSFloaterPoseStand::postBuild()
 {
     mComboPose = getChild<LLComboBox>("pose_combo");
     mComboPose->setCommitCallback(boost::bind(&FSFloaterPoseStand::onCommitCombo, this));
@@ -111,7 +111,7 @@ void FSFloaterPoseStand::loadPoses()
                 LLUUID anim_id(p_itr->first);
                 if (anim_id.notNull())
                 {
-                    mComboPose->add(LLTrans::getString(p_itr->second["name"]), anim_id);
+                    mComboPose->add((LLTrans::getString(p_itr->second["name"].asString())), anim_id);
                 }
             }
         }

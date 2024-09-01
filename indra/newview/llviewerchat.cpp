@@ -43,7 +43,7 @@
 LLViewerChat::font_change_signal_t LLViewerChat::sChatFontChangedSignal;
 
 //static
-void LLViewerChat::getChatColor(const LLChat& chat, LLColor4& r_color, LLSD args)
+void LLViewerChat::getChatColor(const LLChat& chat, LLUIColor& r_color, F32& r_color_alpha, LLSD args)
 {
     const bool is_local = args.has("is_local") ? args["is_local"].asBoolean() : true;
     if(chat.mMuted)
@@ -75,19 +75,20 @@ void LLViewerChat::getChatColor(const LLChat& chat, LLColor4& r_color, LLSD args
                     {
                         r_color = LLUIColorTable::instance().getColor("AgentChatColor");
                     }
-
+					LLColor4& lgg_color = (LLColor4&)r_color;
                     if (chat.mChatType == CHAT_TYPE_IM || chat.mChatType == CHAT_TYPE_IM_GROUP)
                     {
-                        r_color = LGGContactSets::getInstance()->colorize(chat.mFromID, r_color, LGG_CS_IM);
+                        lgg_color = LGGContactSets::getInstance()->colorize(chat.mFromID, lgg_color, LGG_CS_IM);
                     }
                     else
                     {
-                        r_color = LGGContactSets::getInstance()->colorize(chat.mFromID, r_color, LGG_CS_CHAT);
+                        lgg_color = LGGContactSets::getInstance()->colorize(chat.mFromID, lgg_color, LGG_CS_CHAT);
                     }
                     // </FS:CR>
 
                     //color based on contact sets prefs
-                    LGGContactSets::getInstance()->hasFriendColorThatShouldShow(chat.mFromID, LGG_CS_CHAT, r_color);
+                    LGGContactSets::getInstance()->hasFriendColorThatShouldShow(chat.mFromID, LGG_CS_CHAT, lgg_color);
+					r_color = (LLUIColor)lgg_color;
                 }
                 break;
             case CHAT_SOURCE_OBJECT:
@@ -109,7 +110,7 @@ void LLViewerChat::getChatColor(const LLChat& chat, LLColor4& r_color, LLSD args
                 }
                 break;
             default:
-                r_color.setToWhite();
+                r_color = LLUIColorTable::instance().getColor("White");
         }
 
         // <FS:KC> Keyword alerts
@@ -117,7 +118,7 @@ void LLViewerChat::getChatColor(const LLChat& chat, LLColor4& r_color, LLSD args
         static LLCachedControl<bool> sFSKeywordChangeColor(gSavedPerAccountSettings, "FSKeywordChangeColor");
         if (sFSKeywordChangeColor && FSKeywords::getInstance()->chatContainsKeyword(chat, is_local))
         {
-            r_color = sFSKeywordColor;
+            r_color = (LLUIColor)sFSKeywordColor;
         }
         // </FS:KC>
 
@@ -129,7 +130,11 @@ void LLViewerChat::getChatColor(const LLChat& chat, LLColor4& r_color, LLSD args
             if (distance_squared > dist_near_chat * dist_near_chat)
             {
                 // diminish far-off chat
-                r_color.mV[VALPHA] = 0.8f;
+                r_color_alpha = 0.8f;
+            }
+            else
+            {
+                r_color_alpha = 1.0f;
             }
         }
     }

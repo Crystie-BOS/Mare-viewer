@@ -516,10 +516,17 @@ class WindowsManifest(ViewerManifest):
         # Get shared libs from the shared libs staging directory
         with self.prefix(src=os.path.join(self.args['build'], os.pardir,
                                           'sharedlibs', self.args['buildtype'])):
+            # WebRTC libraries
+            for libfile in (
+                    'llwebrtc.dll',
+            ):
+                self.path(libfile)
+
             # Get fmodstudio dll if needed
             if self.args['fmodstudio'] == 'ON':
                 if(self.args['buildtype'].lower() == 'debug'):
-                    self.path("fmodL.dll")
+                    # self.path("fmodL.dll")
+                    self.path("fmod.dll")
                 else:
                     self.path("fmod.dll")
 
@@ -531,14 +538,16 @@ class WindowsManifest(ViewerManifest):
             # For textures
             self.path("openjp2.dll")
 
-            # Uriparser
-            self.path("uriparser.dll")
-
             # These need to be installed as a SxS assembly, currently a 'private' assembly.
             # See http://msdn.microsoft.com/en-us/library/ms235291(VS.80).aspx
             self.path("msvcp140.dll")
+            self.path_optional("msvcp140_1.dll")
+            self.path_optional("msvcp140_2.dll")
+            self.path_optional("msvcp140_atomic_wait.dll")
+            self.path_optional("msvcp140_codecvt_ids.dll")
             self.path("vcruntime140.dll")
             self.path_optional("vcruntime140_1.dll")
+            self.path_optional("vcruntime140_threads.dll")
 
             # SLVoice executable
             with self.prefix(src=os.path.join(pkgdir, 'bin', 'release')):
@@ -548,21 +557,15 @@ class WindowsManifest(ViewerManifest):
             self.path("vivoxsdk_x64.dll")
             self.path("ortp_x64.dll")
 
-            # OpenSSL
-            self.path("libcrypto-1_1-x64.dll")
-            self.path("libssl-1_1-x64.dll")
-
-            # HTTP/2
-            self.path("nghttp2.dll")
-
-            # Hunspell
-            self.path("libhunspell.dll")
-
             # BugSplat
             if self.args.get('bugsplat'):
                 self.path("BsSndRpt64.exe")
                 self.path("BugSplat64.dll")
                 self.path("BugSplatRc64.dll")
+
+            if self.args['tracy'] == 'ON':
+                with self.prefix(src=os.path.join(pkgdir, 'bin')):
+                    self.path("tracy-profiler.exe")
 
         self.path(src="licenses-win32.txt", dst="licenses.txt")
         self.path("featuretable.txt")
@@ -936,7 +939,6 @@ class DarwinManifest(ViewerManifest):
 
                 with self.prefix(src=relpkgdir, dst=""):
                     self.path("libndofdev.dylib")
-                    self.path("libhunspell-*.dylib")
 
                 with self.prefix(src_dst="cursors_mac"):
                     self.path("*.tif")
@@ -997,24 +999,26 @@ class DarwinManifest(ViewerManifest):
                         print("Skipping %s" % dst)
                     return added
 
+                # WebRTC libraries
+                with self.prefix(src=os.path.join(self.args['build'], os.pardir,
+                                          'sharedlibs', self.args['buildtype'], 'Resources')):
+                    for libfile in (
+                            'libllwebrtc.dylib',
+                    ):
+                        self.path(libfile)
+
+                        oldpath = os.path.join("@rpath", libfile)
+                        self.run_command(
+                            ['install_name_tool', '-change', oldpath,
+                             '@executable_path/../Resources/%s' % libfile,
+                             executable])
+
                 # dylibs is a list of all the .dylib files we expect to need
                 # in our bundled sub-apps. For each of these we'll create a
                 # symlink from sub-app/Contents/Resources to the real .dylib.
                 # Need to get the llcommon dll from any of the build directories as well.
                 libfile_parent = self.get_dst_prefix()
                 dylibs=[]
-                for libfile in (
-                                "libapr-1.0.dylib",
-                                "libaprutil-1.0.dylib",
-                                "libexpat.1.dylib",
-                                # libnghttp2.dylib is a symlink to
-                                # libnghttp2.major.dylib, which is a symlink to
-                                # libnghttp2.version.dylib. Get all of them.
-                                "libnghttp2.*dylib",
-                                "liburiparser.*dylib",
-                                ):
-                    dylibs += path_optional(os.path.join(relpkgdir, libfile), libfile)
-
                 # SLVoice executable
                 with self.prefix(src=os.path.join(pkgdir, 'bin', 'release')):
                     self.path("SLVoice")
@@ -1038,6 +1042,14 @@ class DarwinManifest(ViewerManifest):
                                     "libfmod.dylib",
                                     ):
                             dylibs += path_optional(os.path.join(relpkgdir, libfile), libfile)
+
+                # OpenAL dylibs
+                if self.args['openal'] == 'ON':
+                    for libfile in (
+                                "libopenal.dylib",
+                                "libalut.dylib",
+                                ):
+                        dylibs += path_optional(os.path.join(relpkgdir, libfile), libfile)
 
                 # our apps
                 executable_path = {}
@@ -1610,7 +1622,6 @@ class Linux_x86_64_Manifest(LinuxManifest):
             self.path("libuuid.so")
             self.path("libuuid.so.16")
             self.path("libuuid.so.16.0.22")
-            self.path("libhunspell-1.3.so*")
             #self.path("libGLOD.so")
             self.path("libfreetype.so.*.*")
             #self.path("libjemalloc.so*")
@@ -1719,6 +1730,7 @@ if __name__ == "__main__":
              if BugSplat crash reporting is desired""", default=''),
         dict(name='fmodstudio', description="""Indication if fmod studio libraries are needed""", default='OFF'),
         dict(name='openal', description="""Indication openal libraries are needed""", default='OFF'),
+        dict(name='tracy', description="""Indication tracy profiler is enabled""", default='OFF'),
         ]
     try:
         main(extra=extra_arguments)

@@ -52,11 +52,11 @@ LLFloaterBuildOptions::LLFloaterBuildOptions(const LLSD& key)
 LLFloaterBuildOptions::~LLFloaterBuildOptions()
 {}
 
-BOOL LLFloaterBuildOptions::postBuild()
+bool LLFloaterBuildOptions::postBuild()
 {
     mComboGridMode = getChild<LLComboBox>("combobox grid mode");
 
-    return TRUE;
+    return true;
 }
 
 void LLFloaterBuildOptions::setGridMode(EGridMode mode)
@@ -102,7 +102,7 @@ void LLFloaterBuildOptions::onOpen(const LLSD& key)
 // virtual
 void LLFloaterBuildOptions::onClose(bool app_quitting)
 {
-    mObjectSelection = NULL;
+    mObjectSelection = nullptr;
 }
 
 void commit_grid_mode(LLUICtrl *ctrl)

@@ -59,7 +59,7 @@ class LLFloaterTools
 : public LLFloater
 {
 public:
-    virtual BOOL    postBuild();
+    virtual bool    postBuild();
     static  void*   createPanelPermissions(void*    vdata);
     static  void*   createPanelObject(void* vdata);
     static  void*   createPanelVolume(void* vdata);
@@ -71,7 +71,7 @@ public:
     virtual ~LLFloaterTools();
 
     /*virtual*/ void onOpen(const LLSD& key);
-    /*virtual*/ BOOL canClose();
+    /*virtual*/ bool canClose();
     /*virtual*/ void onClose(bool app_quitting);
     /*virtual*/ void draw();
     /*virtual*/ void onFocusReceived();
@@ -164,6 +164,11 @@ public:
     LLButton    *mBtnDuplicate;
     LLButton    *mBtnDuplicateInPlace;
 
+    LLTextBox*  mTextSelectionCount = nullptr;
+    LLTextBox*  mTextSelectionEmpty = nullptr;
+    LLTextBox*  mTextSelectionFaces = nullptr;
+    LLSlider*   mSliderZoom = nullptr;
+
     // Create buttons
     LLCheckBoxCtrl  *mCheckSticky;
     LLCheckBoxCtrl  *mCheckCopySelection;
@@ -171,9 +176,12 @@ public:
     LLCheckBoxCtrl  *mCheckCopyRotates;
 
     // Land buttons
-    LLRadioGroup*   mRadioGroupLand;
-    LLSlider        *mSliderDozerSize;
-    LLSlider        *mSliderDozerForce;
+    LLRadioGroup*   mRadioGroupLand = nullptr;
+    LLSlider        *mSliderDozerSize = nullptr;
+    LLSlider        *mSliderDozerForce = nullptr;
+    LLTextBox*      mTextBulldozer = nullptr;
+    LLTextBox*      mTextDozerSize = nullptr;
+    LLTextBox*      mTextDozerStrength = nullptr;
 
     LLButton        *mBtnApplyToSelection;
 
@@ -197,9 +205,9 @@ public:
     LLObjectSelectionHandle mObjectSelection;
 
 private:
-    BOOL                    mDirty;
+    bool                    mDirty;
     U32                     mPrecision;
-    BOOL                    mHasSelection;
+    bool                    mHasSelection;
 
     std::map<std::string, std::string> mStatusText;
 
