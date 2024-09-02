@@ -3011,7 +3011,7 @@ void process_chat_from_simulator(LLMessageSystem *msg, void **user_data)
 			            F32 alpha = 1.f;
 			            LLViewerChat::getChatColor(chat, txt_color, alpha);
                         // include the name in the actual text so that it appears in the all pane with the name
-			            LLFloaterScriptDebug::addScriptLine(chat.mFromName + verb + chat.mText,
+			            LLFloaterScriptDebug::addScriptLine(chat.mFromName + verb + mesg_str,
 			                                                chat.mFromName,
 			                                                txt_color % alpha,
 			                                                chat.mFromID);
