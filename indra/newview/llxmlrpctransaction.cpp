@@ -303,7 +303,6 @@ bool LLXMLRPCTransaction::Impl::parseValue(LLSD& target, LLXMLNodePtr src)
 
 bool LLXMLRPCTransaction::Impl::process()
 {
-    LL_WARNS() << "into transaction process" << LL_ENDL;
     if (!mPostH || !mHttpRequest)
     {
         LL_WARNS() << "transaction failed." << LL_ENDL;
