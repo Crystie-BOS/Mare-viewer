@@ -690,7 +690,7 @@ void init_menus()
 
     gSLMMenuUpdater = new LLSLMMenuUpdater();
 
-    gLoginMenuBarView = LLUICtrlFactory::getInstance()->createFromFile<LLMenuBarGL>("menu_login.xml", gMenuHolder, LLViewerMenuHolderGL::child_registry_t::instance());
+    gLoginMenuBarView = LLUICtrlFactory::getInstance()->createFromFile<LLMenuBarGL>(kokualoginmenu, gMenuHolder, LLViewerMenuHolderGL::child_registry_t::instance());
     gLoginMenuBarView->arrangeAndClear();
     LLRect menuBarRect = gLoginMenuBarView->getRect();
     menuBarRect.setLeftTopAndSize(0, menu_bar_holder->getRect().getHeight(), menuBarRect.getWidth(), menuBarRect.getHeight());

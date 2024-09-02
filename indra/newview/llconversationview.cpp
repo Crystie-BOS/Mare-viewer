@@ -706,6 +706,7 @@ void LLConversationViewParticipant::draw()
     LLUIColor* color;
 	// LGGContacts really needs converting to use LLUIColor too, but that's a task for another time
 	LLColor4 lgg_color = sFriendColor; //KKA-848 start with LL default
+	LLUIColor lgg_uicolor;
 
     LLLocalSpeakerMgr *speakerMgr = LLLocalSpeakerMgr::getInstance();
 
@@ -723,7 +724,8 @@ void LLConversationViewParticipant::draw()
                 LGGContactSets::getInstance()->colorize(mUUID, lgg_color, LGG_CS_TAG);
                 LGGContactSets::getInstance()->hasFriendColorThatShouldShow(mUUID, LGG_CS_TAG, lgg_color);
                 LLNetMap::getAvatarMarkColor(mUUID, lgg_color);
-				color = (LLUIColor*)&lgg_color;
+				lgg_uicolor = LLUIColor(lgg_color);
+				color = &lgg_uicolor;
             }
             else
             {
