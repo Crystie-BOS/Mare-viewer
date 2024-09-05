@@ -647,7 +647,7 @@ bool LLFloaterPreference::postBuild()
         getChild<LLComboBox>("language_combobox")->add("System default", LLSD("default"), ADD_TOP, true);
     }
 
-    return true;
+// [SL:KB] - Patch: Viewer-CrashReporting | Checked: 2011-06-11 (Catznip-2.6.c) | Added: Catznip-2.6.0c
 
 #ifndef LL_SEND_CRASH_REPORTS
     // Hide the crash report tab if crash reporting isn't enabled
