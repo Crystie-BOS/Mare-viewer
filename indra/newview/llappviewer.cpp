@@ -372,7 +372,7 @@ LLVector3 gRelativeWindVec(0.0, 0.0, 0.0);
 
 U32 gPacketsIn = 0;
 
-bool                gPrintMessagesThisFrame = false;
+bool gPrintMessagesThisFrame = false;
 
 bool gRandomizeFramerate = false;
 bool gPeriodicSlowFrame = false;
@@ -913,8 +913,6 @@ bool LLAppViewer::init()
         LLError::setFatalFunction([rc](const std::string&){ _exit(rc); });
     }
 
-    // <FS:Ansariel> Get rid of unused LLAllocator
-    //mAlloc.setProfilingEnabled(gSavedSettings.getBOOL("MemProfiling"));
     // Initialize the non-LLCurl libcurl library.  Should be called
     // before consumers (LLTextureFetch).
     mAppCoreHttp.init();
@@ -1471,8 +1469,11 @@ void LLAppViewer::initMaxHeapSize()
     //------------------------------------------------------------------------------------------
     //currently SL is built under 32-bit setting, we set its max heap size no more than 1.6 GB.
 
-    //F32 max_heap_size_gb = llmin(1.6f, (F32)gSavedSettings.getF32("MaxHeapSize")) ;
+ #ifndef LL_X86_64
     F32Gigabytes max_heap_size_gb = (F32Gigabytes)gSavedSettings.getF32("MaxHeapSize") ;
+#else
+    F32Gigabytes max_heap_size_gb = (F32Gigabytes)gSavedSettings.getF32("MaxHeapSize64");
+#endif
 
     LLMemory::initMaxHeapSizeGB(max_heap_size_gb);
 }
