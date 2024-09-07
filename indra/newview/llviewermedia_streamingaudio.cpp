@@ -169,7 +169,7 @@ int LLStreamingAudio_MediaPlugins::isPlaying()
     LLPluginClassMediaOwner::EMediaStatus status =
         mMediaPlugin->getStatus();
     auto nowPlaying = mMediaPlugin->getMediaNowPlaying();
-    if (mNowPlaying != nowPlaying)
+    if (!nowPlaying.empty() && mNowPlaying != nowPlaying)
     {
         mTitle = mMediaPlugin->getMediaTitle();
         mNowPlaying = nowPlaying;
