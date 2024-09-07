@@ -1215,6 +1215,42 @@ bool LLFloaterIMSession::dropPerson(LLUUID* person_id, bool drop)
     return res;
 }
 
+bool LLFloaterIMSession::handleKeyHere( KEY key, MASK mask )
+{
+	bool handled = false;
+	
+	if (key == KEY_RETURN && mask == (MASK_SHIFT | MASK_CONTROL))
+	{
+        if (!gSavedSettings.getBOOL("FSUseSingleLineChatEntry"))
+        {
+            if ((wstring_utf8_length(mInputEditor->getWText()) + wchar_utf8_length('\n')) > mInputEditor->getMaxTextLength())
+            {
+                LLUI::getInstance()->reportBadKeystroke();
+            }
+            else
+            {
+                mInputEditor->insertLinefeed();
+            }
+        }
+        else
+        {
+            if ((wstring_utf8_length(mInputEditor->getWText()) + wchar_utf8_length(llwchar(182))) > mInputEditor->getMaxTextLength())
+            {
+                LLUI::getInstance()->reportBadKeystroke();
+            }
+            else
+            {
+                LLWString line_break(1, llwchar(182));
+                mInputEditor->insertText(line_break);
+            }
+        }
+
+		handled = false;
+	}
+
+	return handled;
+}
+
 bool LLFloaterIMSession::isInviteAllowed() const
 {
     return ( (IM_SESSION_CONFERENCE_START == mDialog)

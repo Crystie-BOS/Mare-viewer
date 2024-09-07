@@ -412,19 +412,49 @@ bool LLFloaterIMNearbyChat::handleKeyHere( KEY key, MASK mask )
 {
     bool handled = false;
 
-    if( KEY_RETURN == key && mask == MASK_CONTROL)
-    {
-        // shout
-        sendChat(CHAT_TYPE_SHOUT);
-        handled = true;
-    }
-    else if (KEY_RETURN == key && mask == MASK_SHIFT)
-    {
-        // whisper
-        sendChat(CHAT_TYPE_WHISPER);
-        handled = true;
-    }
+    if( KEY_RETURN == key)
+	{
+		if (mask == MASK_CONTROL)
+	    {
+	        // shout
+	        sendChat(CHAT_TYPE_SHOUT);
+	        handled = true;
+	    }
+	    else if (mask == MASK_SHIFT)
+	    {
+	        // whisper
+	        sendChat(CHAT_TYPE_WHISPER);
+	        handled = true;
+	    }
+		else if (mask == (MASK_SHIFT | MASK_CONTROL))
+		{
+            if (!gSavedSettings.getBOOL("FSUseSingleLineChatEntry"))
+            {
+                if ((wstring_utf8_length(mInputEditor->getWText()) + wchar_utf8_length('\n')) > mInputEditor->getMaxTextLength())
+                {
+                    LLUI::getInstance()->reportBadKeystroke();
+                }
+                else
+                {
+                    mInputEditor->insertLinefeed();
+                }
+            }
+            else
+            {
+                if ((wstring_utf8_length(mInputEditor->getWText()) + wchar_utf8_length(llwchar(182))) > mInputEditor->getMaxTextLength())
+                {
+                    LLUI::getInstance()->reportBadKeystroke();
+                }
+                else
+                {
+                    LLWString line_break(1, llwchar(182));
+                    mInputEditor->insertText(line_break);
+                }
+            }
 
+			handled = true;
+		}
+	}
 
     if((mask == MASK_ALT) && isTornOff())
     {

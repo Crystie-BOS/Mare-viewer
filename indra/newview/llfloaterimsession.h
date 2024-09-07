@@ -78,6 +78,7 @@ public:
         EAcceptance* accept,
         std::string& tooltip_msg);
 
+	/*virtual*/ bool handleKeyHere( KEY key, MASK mask );
     static LLFloaterIMSession* findInstance(const LLUUID& session_id);
     static LLFloaterIMSession* getInstance(const LLUUID& session_id);
 
