@@ -416,7 +416,11 @@ protected:
 
 // Primary singleton implementation for interfacing
 // with the native webrtc library.
+#if CM_WEBRTC
+class LLWebRTCImpl : public LLWebRTCDeviceInterface
+#else
 class LLWebRTCImpl : public LLWebRTCDeviceInterface, public webrtc::AudioDeviceObserver
+#endif
 {
   public:
     LLWebRTCImpl(LLWebRTCLogCallback* logCallback);
@@ -456,7 +460,11 @@ class LLWebRTCImpl : public LLWebRTCDeviceInterface, public webrtc::AudioDeviceO
     //
     // AudioDeviceObserver
     //
+#if CM_WEBRTC
+    void OnDevicesUpdated();
+#else
     void OnDevicesUpdated() override;
+#endif
 
     //
     // Helpers
