@@ -562,9 +562,10 @@
     </text>
   <text
    layout="topleft"
+   follows="left|top"
    height="15"
-   left="260"
-   top_pad="-18"
+   left="30"
+   top_pad="6"
    width="100"
    name="noise_suppression_label">
      Noise Suppression
@@ -604,7 +605,7 @@
    follows="left|top"
    layout="topleft"
    left="30"
-   top_delta="20"
+   top_delta="34"
    name="Listen from"
    width="112">
      Hear voice from:

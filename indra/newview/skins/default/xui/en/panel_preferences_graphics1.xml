@@ -961,7 +961,7 @@
     layout="topleft"
     left="30"
     name="antialiasing quality label"
-    top_delta="20"
+    top_delta="24"
     width="120">
       Antialiasing Quality:
   </text>
@@ -1341,7 +1341,7 @@
     left="12"
     name="ReflectionProbeText"
     text_readonly_color="LabelDisabledColor"
-    top_delta="24"
+    top_delta="22"
     width="128">
     Reflection Coverage:
   </text>
@@ -1387,7 +1387,7 @@
     max_val="1.5"
     name="RenderExposure"
     show_text="true"
-    top_delta="28"
+    top_delta="24"
     width="260">
   </slider>
 
