@@ -186,7 +186,7 @@ public:
     static U32 getAllocationErrors();
     // </FS:ND>
     template<bool SHARED>
-    class DataLock : LLSharedMutexLockTemplate<SHARED>
+    class DataLock : public LLSharedMutexLockTemplate<SHARED>
     {
     public:
         DataLock(const LLImageBase* image)

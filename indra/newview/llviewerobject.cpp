@@ -6021,6 +6021,7 @@ bool LLViewerObject::isParticleSource() const
 
 void LLViewerObject::setParticleSource(const LLPartSysData& particle_parameters, const LLUUID& owner_id)
 {
+    LL_PROFILE_ZONE_SCOPED_CATEGORY_VIEWER;
     if (mPartSourcep)
     {
         deleteParticleSource();
@@ -6052,6 +6053,7 @@ void LLViewerObject::setParticleSource(const LLPartSysData& particle_parameters,
 
 void LLViewerObject::unpackParticleSource(const S32 block_num, const LLUUID& owner_id)
 {
+    LL_PROFILE_ZONE_SCOPED_CATEGORY_VIEWER;
     if (!mPartSourcep.isNull() && mPartSourcep->isDead())
     {
         mPartSourcep = NULL;
@@ -6087,7 +6089,7 @@ void LLViewerObject::unpackParticleSource(const S32 block_num, const LLUUID& own
             LLViewerTexture* image;
             if (mPartSourcep->mPartSysData.mPartImageID == LLUUID::null)
             {
-                image = LLViewerTextureManager::getFetchedTextureFromFile("pixiesmall.j2c");
+                image = LLViewerFetchedTexture::sDefaultParticleImagep;
             }
             else
             {
@@ -6100,6 +6102,7 @@ void LLViewerObject::unpackParticleSource(const S32 block_num, const LLUUID& own
 
 void LLViewerObject::unpackParticleSource(LLDataPacker &dp, const LLUUID& owner_id, bool legacy)
 {
+    LL_PROFILE_ZONE_SCOPED_CATEGORY_VIEWER;
     if (!mPartSourcep.isNull() && mPartSourcep->isDead())
     {
         mPartSourcep = NULL;
@@ -6134,7 +6137,7 @@ void LLViewerObject::unpackParticleSource(LLDataPacker &dp, const LLUUID& owner_
             LLViewerTexture* image;
             if (mPartSourcep->mPartSysData.mPartImageID == LLUUID::null)
             {
-                image = LLViewerTextureManager::getFetchedTextureFromFile("pixiesmall.j2c");
+                image = LLViewerFetchedTexture::sDefaultParticleImagep;
             }
             else
             {
@@ -7278,6 +7281,7 @@ const std::string& LLViewerObject::getAttachmentItemName() const
 //virtual
 LLVOAvatar* LLViewerObject::getAvatar() const
 {
+    LL_PROFILE_ZONE_SCOPED_CATEGORY_AVATAR;
     if (getControlAvatar())
     {
         return getControlAvatar();

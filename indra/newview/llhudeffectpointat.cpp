@@ -89,6 +89,7 @@ LLHUDEffectPointAt::LLHUDEffectPointAt(const U8 type) :
     mKillTime(0.f),
     mLastSendTime(0.f)
 {
+	mFontBuffer.reset();
     clearPointAtTarget();
 }
 
@@ -352,7 +353,7 @@ void LLHUDEffectPointAt::render()
             std::string name = nameBuffer.mDisplayName;
 
             gViewerWindow->setup3DRender();
-            hud_render_utf8text(name, position, *fontp, LLFontGL::NORMAL, LLFontGL::NO_SHADOW, (F32)(-0.5*fontp->getWidthF32(name)), 3.0, LLColor3(1.f, 0.f, 0.f), FALSE);
+            hud_render_utf8text(name, position, &mFontBuffer, *fontp, LLFontGL::NORMAL, LLFontGL::NO_SHADOW, (F32)(-0.5*fontp->getWidthF32(name)), 3.0, LLColor3(1.f, 0.f, 0.f), FALSE);
 
             glPopMatrix();
         }

@@ -618,46 +618,6 @@ void LLManipScale::renderFaces( const LLBBox& bbox )
     {
         gGL.color4fv( default_normal_color.mV );
         LLGLDepthTest gls_depth(GL_FALSE);
-        // <FS:Ansariel> Remove QUADS rendering mode
-        //gGL.begin(LLRender::QUADS);
-        //{
-        //  // Face 0
-        //  gGL.vertex3f(min.mV[VX], max.mV[VY], max.mV[VZ]);
-        //  gGL.vertex3f(min.mV[VX], min.mV[VY], max.mV[VZ]);
-        //  gGL.vertex3f(max.mV[VX], min.mV[VY], max.mV[VZ]);
-        //  gGL.vertex3f(max.mV[VX], max.mV[VY], max.mV[VZ]);
-
-        //  // Face 1
-        //  gGL.vertex3f(max.mV[VX], min.mV[VY], max.mV[VZ]);
-        //  gGL.vertex3f(max.mV[VX], min.mV[VY], min.mV[VZ]);
-        //  gGL.vertex3f(max.mV[VX], max.mV[VY], min.mV[VZ]);
-        //  gGL.vertex3f(max.mV[VX], max.mV[VY], max.mV[VZ]);
-
-        //  // Face 2
-        //  gGL.vertex3f(min.mV[VX], max.mV[VY], min.mV[VZ]);
-        //  gGL.vertex3f(min.mV[VX], max.mV[VY], max.mV[VZ]);
-        //  gGL.vertex3f(max.mV[VX], max.mV[VY], max.mV[VZ]);
-        //  gGL.vertex3f(max.mV[VX], max.mV[VY], min.mV[VZ]);
-
-        //  // Face 3
-        //  gGL.vertex3f(min.mV[VX], max.mV[VY], max.mV[VZ]);
-        //  gGL.vertex3f(min.mV[VX], max.mV[VY], min.mV[VZ]);
-        //  gGL.vertex3f(min.mV[VX], min.mV[VY], min.mV[VZ]);
-        //  gGL.vertex3f(min.mV[VX], min.mV[VY], max.mV[VZ]);
-
-        //  // Face 4
-        //  gGL.vertex3f(min.mV[VX], min.mV[VY], max.mV[VZ]);
-        //  gGL.vertex3f(min.mV[VX], min.mV[VY], min.mV[VZ]);
-        //  gGL.vertex3f(max.mV[VX], min.mV[VY], min.mV[VZ]);
-        //  gGL.vertex3f(max.mV[VX], min.mV[VY], max.mV[VZ]);
-
-        //  // Face 5
-        //  gGL.vertex3f(min.mV[VX], min.mV[VY], min.mV[VZ]);
-        //  gGL.vertex3f(min.mV[VX], max.mV[VY], min.mV[VZ]);
-        //  gGL.vertex3f(max.mV[VX], max.mV[VY], min.mV[VZ]);
-        //  gGL.vertex3f(max.mV[VX], min.mV[VY], min.mV[VZ]);
-        //}
-        //gGL.end();
         gGL.begin(LLRender::TRIANGLE_STRIP);
         {
             gGL.vertex3f(min.mV[VX], max.mV[VY], min.mV[VZ]);
@@ -676,7 +636,6 @@ void LLManipScale::renderFaces( const LLBBox& bbox )
             gGL.vertex3f(max.mV[VX], max.mV[VY], max.mV[VZ]);
         }
         gGL.end();
-        // </FS:Ansariel>
     }
 
     // Find nearest vertex
@@ -1885,10 +1844,10 @@ void LLManipScale::renderSnapGuides(const LLBBox& bbox)
                 std::string help_text = LLTrans::getString("manip_hint1");
                 LLColor4 help_text_color = LLColor4::white;
                 help_text_color.mV[VALPHA] = clamp_rescale(mHelpTextTimer.getElapsedTimeF32(), sHelpTextVisibleTime, sHelpTextVisibleTime + sHelpTextFadeTime, grid_alpha, 0.f);
-                hud_render_utf8text(help_text, help_text_pos, *big_fontp, LLFontGL::NORMAL, LLFontGL::NO_SHADOW, -0.5f * big_fontp->getWidthF32(help_text), 3.f, help_text_color, false);
+                hud_render_utf8text(help_text, help_text_pos, nullptr, *big_fontp, LLFontGL::NORMAL, LLFontGL::NO_SHADOW, -0.5f * big_fontp->getWidthF32(help_text), 3.f, help_text_color, false);
                 help_text = LLTrans::getString("manip_hint2");
                 help_text_pos -= LLViewerCamera::getInstance()->getUpAxis() * mSnapRegimeOffset * 0.4f;
-                hud_render_utf8text(help_text, help_text_pos, *big_fontp, LLFontGL::NORMAL, LLFontGL::NO_SHADOW, -0.5f * big_fontp->getWidthF32(help_text), 3.f, help_text_color, false);
+                hud_render_utf8text(help_text, help_text_pos, nullptr, *big_fontp, LLFontGL::NORMAL, LLFontGL::NO_SHADOW, -0.5f * big_fontp->getWidthF32(help_text), 3.f, help_text_color, false);
             }
         }
     }

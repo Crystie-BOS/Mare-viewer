@@ -2227,10 +2227,6 @@ void LLAgentCamera::changeCameraToMouselook(bool animate)
         AOEngine::getInstance()->inMouselook(TRUE);         // ## Zi: Animation Overrider
         const U32 old_flags = gAgent.getControlFlags();
         gAgent.setControlFlags(AGENT_CONTROL_MOUSELOOK);
-        if (old_flags != gAgent.getControlFlags())
-        {
-            gAgent.setFlagsDirty();
-        }
 
         if (animate)
         {

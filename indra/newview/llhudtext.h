@@ -35,6 +35,7 @@
 #include "v2math.h"
 #include "llrect.h"
 #include "llfontgl.h"
+#include "llfontvertexbuffer.h"
 #include <set>
 #include <vector>
 
@@ -131,7 +132,7 @@ protected:
     void renderText();
     static void updateAll();
     S32 getMaxLines();
-
+    LLFontVertexBuffer   mFontBuffer; // for llhudeffectlookat & llhudeffectpointat which both render text in Kokua
 private:
     ~LLHUDText();
     bool            mOnHUDAttachment;

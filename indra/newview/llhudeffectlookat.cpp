@@ -251,6 +251,7 @@ LLHUDEffectLookAt::LLHUDEffectLookAt(const U8 type) :
     loadAttentions();
     // initialize current attention set. switches when avatar sex changes.
     mAttentions = &gGirlAttentions;
+	mFontBuffer.reset();
 }
 
 //-----------------------------------------------------------------------------
@@ -575,7 +576,7 @@ void LLHUDEffectLookAt::render()
             std::string name = nameBuffer.mDisplayName;
 
             gViewerWindow->setup3DRender();
-            hud_render_utf8text(name, position, *fontp, LLFontGL::NORMAL, LLFontGL::NO_SHADOW, (F32)(-0.5*fontp->getWidthF32(name)), 3.0, color, FALSE);
+            hud_render_utf8text(name, position, &mFontBuffer, *fontp, LLFontGL::NORMAL, LLFontGL::NO_SHADOW, (F32)(-0.5*fontp->getWidthF32(name)), 3.0, color, FALSE);
 
             glPopMatrix();
         }
