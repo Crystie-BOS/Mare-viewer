@@ -2100,6 +2100,18 @@ endforeach()
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   set_source_files_properties(llviewerstats.cpp PROPERTIES
     COMPILE_FLAGS -Wno-unused-value)
+  set_source_files_properties(
+    gltf/asset.cpp
+    gltfscenemanager.cpp
+    llcontrolavatar.cpp
+    lldrawpoolbump.cpp
+    llface.cpp
+    llfloatertools.cpp
+    llfloaterworldmap.cpp
+    llheroprobemanager.cpp
+    llsurfacepatch.cpp
+    llviewertexture.cpp
+    PROPERTIES COMPILE_FLAGS -Wno-unused-variable)
 endif ()
 
 if (LINUX)
