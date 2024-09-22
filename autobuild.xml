@@ -712,7 +712,7 @@
               <key>hash_algorithm</key>
               <string>sha1</string>
               <key>url</key>
-	      <string>https://bitbucket.org/kokua/3p-fontconfig/downloads/fontconfig-2.12.93-linux64-242660048.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-fontconfig/downloads/fontconfig-2.12.93-linux64-242660048.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -1230,11 +1230,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>275ffb7f60064d8008aed8406f80f34229f651fc</string>
+              <string>a27e42d5d11ba3c200102698243f25d99677e101</string>
               <key>hash_algorithm</key>
               <string>sha1</string>
               <key>url</key>
-              <string>https://github.com/secondlife/3p-libhunspell/releases/download/v1.7.2-r1/libhunspell-1.7.2.10207243663-linux64-10207243663.tar.zst</string>
+              <string>https://bitbucket.org/kokua/3p-hunspell/downloads/libhunspell-1.7.2.242661251-linux64-242661251.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
