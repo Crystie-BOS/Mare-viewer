@@ -1617,7 +1617,6 @@ class Linux_x86_64_Manifest(LinuxManifest):
             self.path("libuuid.so.16")
             self.path("libuuid.so.16.0.22")
             #self.path("libGLOD.so")
-            self.path("libfreetype.so.*.*")
             #self.path("libjemalloc.so*")
 
             #cef plugin

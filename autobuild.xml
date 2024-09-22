@@ -708,9 +708,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>e2419d56960c160670051fbb055fb729</string>
+              <string>fb75f25bd75abbd4a1ecf57d219ccbcd133c4aec</string>
+              <key>hash_algorithm</key>
+              <string>sha1</string>
               <key>url</key>
-              <string>http://automated-builds-secondlife-com.s3.amazonaws.com/hg/repo/p64_3p-fontconfig/rev/314281/arch/Linux/installer/fontconfig-2.11.0-linux64-314281.tar.bz2</string>
+	      <string>https://bitbucket.org/kokua/3p-fontconfig/downloads/fontconfig-2.12.93-linux64-242660048.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -723,7 +725,7 @@
         <key>copyright</key>
         <string>Copyright (C) 2000,2001,2002,2003,2004,2006,2007 Keith Packard, 2005 Patrick Lam, 2009 Roozbeh Pournader, 2008,2009 Red Hat, Inc., 2008 Danilo Šegan, 2012 Google, Inc.</string>
         <key>version</key>
-        <string>2.11.0</string>
+        <string>2.12.93</string>
         <key>name</key>
         <string>fontconfig</string>
         <key>description</key>
