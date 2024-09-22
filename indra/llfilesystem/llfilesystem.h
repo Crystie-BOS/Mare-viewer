@@ -67,10 +67,12 @@ class LLFileSystem
         static S32 getFileSize(const LLUUID& file_id, const LLAssetType::EType file_type);
 
     public:
-        static const S32 READ;
-        static const S32 WRITE;
-        static const S32 READ_WRITE;
-        static const S32 APPEND;
+        /* pacify gcc by defining values in the header to avoid errors from newview references during linking */
+
+        static constexpr S32 READ        = 0x00000001;
+        static constexpr S32 WRITE       = 0x00000002;
+        static constexpr S32 READ_WRITE  = 0x00000003;  // LLFileSystem::READ & LLFileSystem::WRITE
+        static constexpr S32 APPEND      = 0x00000006;  // 0x00000004 & LLFileSystem::WRITE
 
     protected:
         LLAssetType::EType mFileType;
