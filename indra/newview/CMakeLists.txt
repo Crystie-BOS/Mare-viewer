@@ -2110,6 +2110,8 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     llsurfacepatch.cpp
     llviewertexture.cpp
     PROPERTIES COMPILE_FLAGS -Wno-unused-variable)
+  set_source_files_properties(llxmlrpctransaction.cpp PROPERTIES
+    COMPILE_FLAGS -Wno-int-in-bool-context)
 endif ()
 
 if (LINUX)
