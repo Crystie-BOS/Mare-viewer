@@ -1552,8 +1552,6 @@ if (DARWIN)
 endif (DARWIN)
 
 if (LINUX)
-    LIST(APPEND viewer_SOURCE_FILES winevoicevivox.cpp)
-    LIST(APPEND viewer_HEADER_FILES winevoicevivox.h)
     LIST(APPEND viewer_SOURCE_FILES llappviewerlinux.cpp)
     set_source_files_properties(
       llappviewerlinux.cpp
