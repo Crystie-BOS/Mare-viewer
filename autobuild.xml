@@ -16,11 +16,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>c47de417d8b9ac25d1c83299e83d966b</string>
+              <string>cb537fa9ea26aacbeb0b2756bd4c3f6c82cb0b4b</string>
               <key>hash_algorithm</key>
-              <string>md5</string>
+              <string>sha1</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-sdl/downloads/SDL-1.2.15-linux64-181442044.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-sdl/downloads/SDL-1.2.15-linux64-242652357.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
