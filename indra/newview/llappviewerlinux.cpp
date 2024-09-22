@@ -40,8 +40,6 @@
 
 #include <exception>
 
-#include "json/reader.h" // <FS:ND/> To parse manifest.json from pepperflash
-
 #if LL_DBUS_ENABLED
 # include "llappviewerlinux_api_dbus.h"
 
