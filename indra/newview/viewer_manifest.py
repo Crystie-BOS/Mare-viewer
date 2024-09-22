@@ -1612,7 +1612,6 @@ class Linux_x86_64_Manifest(LinuxManifest):
             #self.path("libdb*.so")
             self.path("libexpat.so.*")
             self.path("libSDL-1.2.so.*")
-            self.path("libopenjp2.so*")
             self.path("libuuid.so")
             self.path("libuuid.so.16")
             self.path("libuuid.so.16.0.22")

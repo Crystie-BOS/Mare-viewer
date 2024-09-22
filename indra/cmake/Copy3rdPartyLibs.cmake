@@ -228,14 +228,10 @@ elseif(LINUX)
 
      if( USE_AUTOBUILD_3P )
          list( APPEND release_files
-                 libatk-1.0.so
-                 libopenjp2.so
                  libuuid.so.16
                  libuuid.so.16.0.22
                  libfontconfig.so.1.11.0
                  libfontconfig.so.1
-                 libgmodule-2.0.so
-                 libgobject-2.0.so
                  )
 
 
