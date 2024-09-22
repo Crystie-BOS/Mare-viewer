@@ -242,14 +242,7 @@ public:
     /////////////////////////
     /// @name enable disable voice and features
     //@{
-#if LL_LINUX
-    // <FS:Ansariel> Bypass LLCachedControls for voice status update
-    //virtual bool voiceEnabled()=0;
-    virtual bool voiceEnabled(bool no_cache = false)=0;
-    // </FS:Ansariel>
-#else
     virtual bool voiceEnabled()=0;
-#endif
     virtual void setVoiceEnabled(bool enabled)=0;
     virtual void setLipSyncEnabled(bool enabled)=0;
     virtual bool lipSyncEnabled()=0;
