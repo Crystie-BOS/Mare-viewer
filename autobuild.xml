@@ -132,11 +132,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>3c0ba2a87e78d76c81da95fa87579bf4964242e1</string>
+              <string>037d8e6aef177c0b7ae49a50f0a8235edf2a1aa9</string>
               <key>hash_algorithm</key>
               <string>sha1</string>
               <key>url</key>
-              <string>https://github.com/secondlife/3p-boost/releases/download/v1.86.0-e2bee1e/boost-1.86-linux64-10475904468.tar.zst</string>
+              <string>https://bitbucket.org/kokua/3p-boost-git/downloads/boost-1.86-linux64-242670024.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -246,11 +246,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>dd82abcb51c54b8c30e34f9441fa0aeed26789d9</string>
+              <string>f8de00c84107a58c3c404fe118a15c027d37f815</string>
               <key>hash_algorithm</key>
               <string>sha1</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-colladadom-git/downloads/colladadom-linux64-2.3.0-dev0.g60a1fc0.d20240922.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-colladadom-git/downloads/colladadom-linux64-2.3.0-dev0.g60a1fc0.d20240923.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
