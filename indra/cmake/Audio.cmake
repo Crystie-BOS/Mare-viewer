@@ -22,10 +22,10 @@ if (WINDOWS)
     )
 else (WINDOWS)
   target_link_libraries(ll::vorbis INTERFACE
-        ${ARCH_PREBUILT_DIRS_RELEASE}/libogg.a
         ${ARCH_PREBUILT_DIRS_RELEASE}/libvorbisenc.a
         ${ARCH_PREBUILT_DIRS_RELEASE}/libvorbisfile.a
         ${ARCH_PREBUILT_DIRS_RELEASE}/libvorbis.a
+        ${ARCH_PREBUILT_DIRS_RELEASE}/libogg.a
         )
 endif (WINDOWS)
 
