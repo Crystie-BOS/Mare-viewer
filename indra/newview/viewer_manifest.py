@@ -1414,6 +1414,9 @@ class LinuxManifest(ViewerManifest):
             with self.prefix(src="",dst="res-sdl") :
                 self.path("kokua_icon.bmp","kokua_icon.BMP")
 
+        with self.prefix(src=os.path.join(self.args['build'], os.pardir, "llwebrtc" ), dst="lib"):
+            self.path("libllwebrtc.so")
+
         # plugins
         with self.prefix(src=os.path.join(self.args['build'], os.pardir, 'media_plugins'), dst="bin/llplugin"):
             self.path2basename("cef", "libmedia_plugin_cef.so")
