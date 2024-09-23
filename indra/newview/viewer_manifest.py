@@ -1610,7 +1610,6 @@ class Linux_x86_64_Manifest(LinuxManifest):
             self.path("libapr-1.so*")
             self.path("libaprutil-1.so*")
             #self.path("libdb*.so")
-            self.path("libexpat.so.*")
             self.path("libSDL-1.2.so.*")
             self.path("libuuid.so")
             self.path("libuuid.so.16")
