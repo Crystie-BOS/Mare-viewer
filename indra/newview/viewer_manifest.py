@@ -1425,7 +1425,10 @@ class LinuxManifest(ViewerManifest):
 
         with self.prefix(src=os.path.join(pkgdir, 'lib', config), dst="lib"):
             self.path( "libcef.so" )
-            self.path( "libminigbm.so" )
+            self.path( "libEGL.so" )
+            self.path( "libGLESv2.so" )
+#            self.path( "libminigbm.so" )
+            self.path( "libvk_swiftshader.so" )
 
 #        with self.prefix(src=os.path.join(pkgdir, 'lib', config, 'swiftshader'), dst=os.path.join("bin", "swiftshader") ):
 #            self.path( "*.so" )
