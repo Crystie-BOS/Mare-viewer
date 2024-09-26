@@ -1593,7 +1593,7 @@ bool LLFilePicker::getSaveFile( ESaveFilter filter, const std::string& filename,
     return rtn;
 }
 
-BOOL LLFilePicker::getSaveFileModeless(ESaveFilter filter,
+bool LLFilePicker::getSaveFileModeless(ESaveFilter filter,
                                        const std::string& filename,
                                        void (*callback)(bool, std::string&, void*),
                                        void *userdata)

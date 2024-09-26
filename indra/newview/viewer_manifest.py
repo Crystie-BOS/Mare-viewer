@@ -1414,6 +1414,9 @@ class LinuxManifest(ViewerManifest):
             with self.prefix(src="",dst="res-sdl") :
                 self.path("kokua_icon.bmp","kokua_icon.BMP")
 
+        with self.prefix(src=os.path.join(self.args['build'], os.pardir, "llwebrtc" ), dst="lib"):
+            self.path("libllwebrtc.so")
+
         # plugins
         with self.prefix(src=os.path.join(self.args['build'], os.pardir, 'media_plugins'), dst="bin/llplugin"):
             self.path2basename("cef", "libmedia_plugin_cef.so")
@@ -1425,7 +1428,10 @@ class LinuxManifest(ViewerManifest):
 
         with self.prefix(src=os.path.join(pkgdir, 'lib', config), dst="lib"):
             self.path( "libcef.so" )
-            self.path( "libminigbm.so" )
+            self.path( "libEGL.so" )
+            self.path( "libGLESv2.so" )
+#            self.path( "libminigbm.so" )
+            self.path( "libvk_swiftshader.so" )
 
 #        with self.prefix(src=os.path.join(pkgdir, 'lib', config, 'swiftshader'), dst=os.path.join("bin", "swiftshader") ):
 #            self.path( "*.so" )
@@ -1610,20 +1616,11 @@ class Linux_x86_64_Manifest(LinuxManifest):
             self.path("libapr-1.so*")
             self.path("libaprutil-1.so*")
             #self.path("libdb*.so")
-            self.path("libexpat.so.*")
             self.path("libSDL-1.2.so.*")
-            self.path("libdirectfb-1.*.so.*")
-            self.path("libfusion-1.*.so.*")
-            self.path("libdirect-1.*.so.*")
-            self.path("libopenjp2.so*")
-            self.path("libdirectfb-1.7.so.1")
-            self.path("libfusion-1.7.so.1*")
-            self.path("libdirect-1.7.so.1*")
             self.path("libuuid.so")
             self.path("libuuid.so.16")
             self.path("libuuid.so.16.0.22")
             #self.path("libGLOD.so")
-            self.path("libfreetype.so.*.*")
             #self.path("libjemalloc.so*")
 
             #cef plugin
@@ -1631,26 +1628,11 @@ class Linux_x86_64_Manifest(LinuxManifest):
 #            self.path( "libcef.so" )
 
             # Vivox runtimes
+            with self.prefix(src=os.path.join(pkgdir, 'bin', 'release'), dst="../bin"):
+                    self.path("SLVoice.exe")
             with self.prefix(src=relpkgdir, dst="../bin"):
-                    self.path("SLVoice")
-                    self.path("win32")
-
-            with self.prefix(src=relpkgdir, dst="lib32"):
-                    self.path("libortp.so")
-                    self.path("libsndfile.so.1")
-                    self.path("libvivoxsdk.so")
-                    self.path("libvivoxplatform.so")
-                    self.path("libvivoxoal.so.1") # vivox's sdk expects this soname
-
-            # 32bit libs needed for voice
-            with self.prefix(os.path.join(relpkgdir, "32bit-compat" ), dst="lib32"):
-                    self.path("32bit-libalut.so" , "libalut.so")
-                    self.path("32bit-libalut.so.0" , "libalut.so.0")
-                    self.path("32bit-libopenal.so" , "libopenal.so")
-                    self.path("32bit-libopenal.so.1" , "libopenal.so.1")
-                    self.path("32bit-libalut.so.0.0.0" , "libalut.so.0.0.0")
-                    self.path("32bit-libopenal.so.1.15.1" , "libopenal.so.1.15.1")
-
+                    self.path("vivoxsdk_x64.dll")
+                    self.path("ortp_x64.dll")
 
             if self.args['buildtype'].lower() == 'debug':
              if self.prefix("../packages/lib/debug", dst="lib"):
