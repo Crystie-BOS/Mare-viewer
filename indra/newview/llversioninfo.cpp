@@ -63,6 +63,12 @@ LLVersionInfo::LLVersionInfo():
     // immediately listen on mPump, store arriving URL into mReleaseNotes
     mStore{new LLStoreListener<std::string>(*mPump, mReleaseNotes)}
 {
+    // <FS:Ansariel> Above macro hackery results in extra quotes - fix it if it happens
+    if (LLStringUtil::startsWith(mWorkingChannelName, "\"") && mWorkingChannelName.size() > 2)
+    {
+        mWorkingChannelName = mWorkingChannelName.substr(1, mWorkingChannelName.size() - 2);
+    }
+    // </FS:Ansariel>
 }
 
 void LLVersionInfo::initSingleton()
