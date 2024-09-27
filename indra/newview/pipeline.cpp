@@ -35,6 +35,7 @@
 #include "llviewercontrol.h"
 #include "llfasttimer.h"
 #include "llfontgl.h"
+#include "llfontvertexbuffer.h"
 #include "llnamevalue.h"
 #include "llpointer.h"
 #include "llprimitive.h"
@@ -581,10 +582,18 @@ void LLPipeline::init()
     connectRefreshCachedSettingsSafe("RenderMirrors");
     connectRefreshCachedSettingsSafe("RenderHeroProbeUpdateRate");
     connectRefreshCachedSettingsSafe("RenderHeroProbeConservativeUpdateMultiplier");
-    gSavedSettings.getControl("RenderAutoHideSurfaceAreaLimit")->getCommitSignal()->connect(boost::bind(&LLPipeline::refreshCachedSettings));
-
+    connectRefreshCachedSettingsSafe("RenderAutoHideSurfaceAreaLimit");
     connectRefreshCachedSettingsSafe("RenderGeometryOverloadProtection");
     gSavedSettings.getControl("RenderGeometryOverloadProtection")->getCommitSignal()->connect(boost::bind(&LLPipeline::refreshCachedSettings));
+
+    LLPointer<LLControlVariable> cntrl_ptr = gSavedSettings.getControl("CollectFontVertexBuffers");
+    if (cntrl_ptr.notNull())
+    {
+        cntrl_ptr->getCommitSignal()->connect([](LLControlVariable* control, const LLSD& value, const LLSD& previous)
+        {
+            LLFontVertexBuffer::enableBufferCollection(control->getValue().asBoolean());
+        });
+    }
 }
 
 LLPipeline::~LLPipeline()
@@ -1103,6 +1112,8 @@ void LLPipeline::refreshCachedSettings()
         LLVOAvatar::sMaxNonImpostors = 1;
         LLVOAvatar::updateImpostorRendering(LLVOAvatar::sMaxNonImpostors);
     }
+
+    LLFontVertexBuffer::enableBufferCollection(gSavedSettings.getBOOL("CollectFontVertexBuffers"));
 }
 
 void LLPipeline::releaseGLBuffers()

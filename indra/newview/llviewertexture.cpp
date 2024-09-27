@@ -2512,6 +2512,11 @@ bool LLViewerFetchedTexture::doLoadedCallbacks()
         }
     }
 
+    if (need_readback)
+    {
+        readbackRawImage();
+    }
+
     //
     // Run raw/auxiliary data callbacks
     //
@@ -2761,10 +2766,22 @@ void LLViewerFetchedTexture::readbackRawImage()
     if (mGLTexturep.notNull() && mGLTexturep->getTexName() != 0 &&
         (mRawImage.isNull() || mRawImage->getWidth() < mGLTexturep->getWidth() || mRawImage->getHeight() < mGLTexturep->getHeight() ))
     {
+        if (mRawImage.isNull())
+        {
+            sRawCount++;
+        }
         mRawImage = new LLImageRaw();
         if (!mGLTexturep->readBackRaw(-1, mRawImage, false))
         {
             mRawImage = nullptr;
+            mIsRawImageValid = false;
+            mRawDiscardLevel = INVALID_DISCARD_LEVEL;
+            sRawCount--;
+        }
+        else
+        {
+            mIsRawImageValid = true;
+            mRawDiscardLevel = mGLTexturep->getDiscardLevel();
         }
     }
 }
