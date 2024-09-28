@@ -1553,8 +1553,6 @@ if (DARWIN)
 endif (DARWIN)
 
 if (LINUX)
-    LIST(APPEND viewer_SOURCE_FILES winevoicevivox.cpp)
-    LIST(APPEND viewer_HEADER_FILES winevoicevivox.h)
     LIST(APPEND viewer_SOURCE_FILES llappviewerlinux.cpp)
     set_source_files_properties(
       llappviewerlinux.cpp
@@ -2102,6 +2100,20 @@ endforeach()
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   set_source_files_properties(llviewerstats.cpp PROPERTIES
     COMPILE_FLAGS -Wno-unused-value)
+  set_source_files_properties(
+    gltf/asset.cpp
+    gltfscenemanager.cpp
+    llcontrolavatar.cpp
+    lldrawpoolbump.cpp
+    llface.cpp
+    llfloatertools.cpp
+    llfloaterworldmap.cpp
+    llheroprobemanager.cpp
+    llsurfacepatch.cpp
+    llviewertexture.cpp
+    PROPERTIES COMPILE_FLAGS -Wno-unused-variable)
+  set_source_files_properties(llxmlrpctransaction.cpp PROPERTIES
+    COMPILE_FLAGS -Wno-int-in-bool-context)
 endif ()
 
 if (LINUX)

@@ -123,7 +123,7 @@ public:
 
     bool dialogColorPicker(F32 *r, F32 *g, F32 *b) override;
 
-    U32 getAvailableVRAMMegabytes() override;
+    U32 getAvailableVRAMMegabytes();
 
     /*virtual*/ void *getPlatformWindow();
     /*virtual*/ void bringToFront();

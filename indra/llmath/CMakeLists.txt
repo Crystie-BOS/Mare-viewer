@@ -102,6 +102,11 @@ add_library (llmath ${llmath_SOURCE_FILES})
 target_link_libraries(llmath llcommon llmeshoptimizer)
 target_include_directories( llmath  INTERFACE   ${CMAKE_CURRENT_SOURCE_DIR})
 
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+  set_source_files_properties(llvolume.cpp PROPERTIES
+    COMPILE_FLAGS -Wno-unused-variable)
+endif ()
+
 # Add tests
 if (LL_TESTS)
   include(LLAddBuildTest)

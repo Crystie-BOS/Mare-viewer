@@ -207,12 +207,10 @@ elseif(LINUX)
 
     set(vivox_lib_dir "${ARCH_PREBUILT_DIRS_RELEASE}")
     set(vivox_libs
-        libsndfile.so.1
-        libortp.so
-        libvivoxoal.so.1
-        libvivoxsdk.so
+        ortp_x64.dll
+        vivoxsdk_x64.dll
         )
-    set(slvoice_files SLVoice)
+    set(slvoice_files SLVoice.exe )
 
     # *TODO - update this to use LIBS_PREBUILT_DIR and LL_ARCH_DIR variables
     # or ARCH_PREBUILT_DIRS
@@ -228,16 +226,10 @@ elseif(LINUX)
 
      if( USE_AUTOBUILD_3P )
          list( APPEND release_files
-                 libatk-1.0.so
-                 libfreetype.so.6.6.2
-                 libfreetype.so.6
-                 libopenjp2.so
                  libuuid.so.16
                  libuuid.so.16.0.22
-                 libfontconfig.so.1.8.0
+                 libfontconfig.so.1.11.0
                  libfontconfig.so.1
-                 libgmodule-2.0.so
-                 libgobject-2.0.so
                  )
 
 
