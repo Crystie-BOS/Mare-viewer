@@ -10442,7 +10442,6 @@ void LLPipeline::generateImpostor(LLVOAvatar* avatar, bool preview_avatar, bool 
             END_RENDER_TYPES);
     }
     else
-    {
 //mk
 
     if (visually_muted || too_complex)
@@ -10454,6 +10453,7 @@ void LLPipeline::generateImpostor(LLVOAvatar* avatar, bool preview_avatar, bool 
     }
     else
     {
+//MK
         //hide world geometry
         clearRenderTypeMask(
             RENDER_TYPE_SKY,
@@ -10472,7 +10472,7 @@ void LLPipeline::generateImpostor(LLVOAvatar* avatar, bool preview_avatar, bool 
             RENDER_TYPE_HUD_PARTICLES,
             END_RENDER_TYPES
          );
-//MK
+
             // Render everything on impostors
             andRenderTypeMask(LLPipeline::RENDER_TYPE_ALPHA,
                 LLPipeline::RENDER_TYPE_FULLBRIGHT,
@@ -10488,6 +10488,7 @@ void LLPipeline::generateImpostor(LLVOAvatar* avatar, bool preview_avatar, bool 
                 LLPipeline::RENDER_TYPE_PASS_FULLBRIGHT_ALPHA_MASK,
                 LLPipeline::RENDER_TYPE_PASS_FULLBRIGHT_SHINY,
                 LLPipeline::RENDER_TYPE_PASS_GLOW,
+            	LLPipeline::RENDER_TYPE_PASS_GRASS,
                 LLPipeline::RENDER_TYPE_PASS_SHINY,
                 LLPipeline::RENDER_TYPE_PASS_INVISIBLE,
                 LLPipeline::RENDER_TYPE_PASS_INVISI_SHINY,
@@ -10508,13 +10509,13 @@ void LLPipeline::generateImpostor(LLVOAvatar* avatar, bool preview_avatar, bool 
                 LLPipeline::RENDER_TYPE_PASS_NORMSPEC_MASK,
                 LLPipeline::RENDER_TYPE_PASS_NORMSPEC_EMISSIVE,
                 LLPipeline::RENDER_TYPE_AVATAR,
-            LLPipeline::RENDER_TYPE_CONTROL_AV,
+            	LLPipeline::RENDER_TYPE_CONTROL_AV,
                 LLPipeline::RENDER_TYPE_ALPHA_MASK,
                 LLPipeline::RENDER_TYPE_FULLBRIGHT_ALPHA_MASK,
                 LLPipeline::RENDER_TYPE_SIMPLE,
                 LLPipeline::RENDER_TYPE_MATERIALS,
                 END_RENDER_TYPES);
-        }
+//mk
     }
 
     if (specific_attachment && specific_attachment->isHUDAttachment())
@@ -10700,7 +10701,8 @@ void LLPipeline::generateImpostor(LLVOAvatar* avatar, bool preview_avatar, bool 
     }
 
     F32 old_alpha = LLDrawPoolAvatar::sMinimumAlpha;
-    if (visually_muted)
+
+    if (visually_muted || too_complex)
     { //disable alpha masking for muted avatars (get whole skin silhouette)
         LLDrawPoolAvatar::sMinimumAlpha = 0.f;
     }
@@ -10714,19 +10716,13 @@ void LLPipeline::generateImpostor(LLVOAvatar* avatar, bool preview_avatar, bool 
         LLDrawPoolAvatar::sMinimumAlpha = 0.f;
     }
 //mk
-
     if (preview_avatar || for_profile)
     {
         // previews and profiles don't care about imposters
         renderGeomDeferred(camera);
         renderGeomPostDeferred(camera);
     }
-//MK
-    // Choose the non-deferred rendering when rendering silhouettes
-    //else
-
-     else if (!visually_muted && !silhouette)
-//mk
+    else
     {
         avatar->mImpostor.clear();
         renderGeomDeferred(camera);
@@ -10753,11 +10749,7 @@ void LLPipeline::generateImpostor(LLVOAvatar* avatar, bool preview_avatar, bool 
 
     if (!for_profile)
     { //create alpha mask based on depth buffer (grey out if muted)
-//MK
-        // Choose the non-deferred rendering when rendering silhouettes
-        //if (LLPipeline::sRenderDeferred)
-        if (LLPipeline::sRenderDeferred && !visually_muted && !silhouette)
-//mk
+        if (LLPipeline::sRenderDeferred)
         {
             GLuint buff = GL_COLOR_ATTACHMENT0;
             glDrawBuffers(1, &buff);
@@ -10765,10 +10757,7 @@ void LLPipeline::generateImpostor(LLVOAvatar* avatar, bool preview_avatar, bool 
 
         LLGLDisable blend(GL_BLEND);
 
-//MK
-////if (visually_muted || too_complex)
-        if (visually_muted || too_complex || silhouette)
-//mk
+        if (visually_muted || too_complex)
         {
             gGL.setColorMask(true, true);
         }
