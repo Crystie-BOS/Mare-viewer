@@ -18,9 +18,9 @@
     <menu label="Bearbeiten" name="Edit">
             <menu_item_call label="Kontoübersicht..."  name="Manage My Account"/>
             <menu_item_call label="L$ kaufen"  name="Buy and Sell L$"/>
-            <menu_item_call label="Profil"  name="Profile">
+            <menu_item_call label="Profil"  name="Profile"/>
 	        <menu_item_call label="Textur neu laden"  name="Rebake Texture"/>
-            <menu_item_call label="Aussehen...  name="ChangeOutfit"/>
+            <menu_item_call label="Aussehen..."  name="ChangeOutfit"/>
             <menu_item_check label="Inventar"  name="Inventory"/>
             <menu_item_check label="Gesten"  name="Gestures"/>
     </menu>
@@ -29,6 +29,7 @@
 		    <menu_item_call label="Abwesend"  name="Set Away"/>
             <menu_item_check label="Nicht stören"  name="Do Not Disturb"/>
 	</menu>
+		<menu>
         <menu_item_call
          label="Friends"
          name="My Friends"
@@ -1466,6 +1467,7 @@
             function="File.EnableUpload" />
     </menu_item_call> 
     </menu>
+    <menu>
     <menu_item_separator/>
     <menu_item_call
      enabled="false"
