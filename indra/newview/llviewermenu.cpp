@@ -5306,6 +5306,11 @@ class LLViewMouselook : public view_listener_t
                 vTemp.mV[2]=0.0f;
                 gSavedSettings.setVector3("_NACL_MLFovValues",vTemp);
                 gSavedSettings.setF32("CameraAngle",vTemp.mV[0]);
+                // KKA-1117 I can't see anything wrong in the merge around the handling of the signal
+                // connected to this control setting, however the signal isn't firing.
+                // Work around it by still setting the control variable but also calling
+                // setDefaultFOV directly to do what the signal handler should be doing.
+                LLViewerCamera::getInstance()->setDefaultFOV(vTemp.mV[0]);
             }
             // NaCl End
             gAgentCamera.changeCameraToDefault();
@@ -11652,6 +11657,8 @@ void initialize_menus()
         bool handleEvent(const LLSD& userdata)
         {
             F32 new_fov_rad = mMult ? LLViewerCamera::getInstance()->getDefaultFOV() * mVal : mVal;
+            //KKA-1117 if the signal on CameraAngle actually worked we'd be setting it twice here, however
+            //someone in LL worked around the non-working signal by a direct call to setDefaultFOV here
             LLViewerCamera::getInstance()->setDefaultFOV(new_fov_rad);
             gSavedSettings.setF32("CameraAngle", LLViewerCamera::getInstance()->getView()); // setView may have clamped it.
             return true;
