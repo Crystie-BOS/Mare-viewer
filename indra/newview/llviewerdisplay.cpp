@@ -326,6 +326,11 @@ static void update_tp_display(bool minimized)
                 if(gSavedSettings.getBOOL("FSResetCameraOnTP"))
                 {
                     gSavedSettings.setF32("CameraAngle", camera.getView()); // FS:LO Dont reset rightclick zoom when we teleport however. Fixes FIRE-6246.
+                    // KKA-1117 I can't see anything wrong in the merge around the handling of the signal
+                    // connected to this control setting, however the signal isn't firing.
+                    // Work around it by still setting the control variable but also calling
+                    // setDefaultFOV directly to do what the signal handler should be doing.
+                    LLViewerCamera::getInstance()->setDefaultFOV(camera.getView());
                 }
                 // also, reset the marker for "currently zooming" in the mouselook zoom settings. -Zi
                 LLVector3 vTemp=gSavedSettings.getVector3("_NACL_MLFovValues");
