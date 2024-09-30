@@ -903,6 +903,9 @@ bool LLViewerCamera::isDefaultFOVChanged()
 
 void LLViewerCamera::updateCameraAngle(const LLSD& value)
 {
+    //KKA-1117 this signal never fires. The only time LL code sets the control variable it also calls
+    //setDefaultFOV directly itself. The other client of this is the mouselook mouse wheel zoom code
+	//which now also calls setDefaultFOV directly as well as setting the control variable.
     setDefaultFOV((F32)value.asReal());
 }
 

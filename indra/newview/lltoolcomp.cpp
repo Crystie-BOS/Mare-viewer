@@ -806,7 +806,11 @@ bool LLToolCompGun::handleRightMouseDown(S32 x, S32 y, MASK mask)
         vTemp.mV[2]=1.0f;
         gSavedSettings.setVector3("_NACL_MLFovValues",vTemp);
         gSavedSettings.setF32("CameraAngle",vTemp.mV[1]);
-
+        // KKA-1117 I can't see anything wrong in the merge around the handling of the signal
+        // connected to this control setting, however the signal isn't firing.
+        // Work around it by still setting the control variable but also calling
+        // setDefaultFOV directly to do what the signal handler should be doing.
+        LLViewerCamera::getInstance()->setDefaultFOV(vTemp.mV[1]);
     return true;
     }
     // NaCl End
@@ -829,6 +833,11 @@ bool LLToolCompGun::handleRightMouseUp(S32 x, S32 y, MASK mask)
         vTemp.mV[2]=0.0f;
         gSavedSettings.setVector3("_NACL_MLFovValues",vTemp);
         gSavedSettings.setF32("CameraAngle",vTemp.mV[0]);
+        // KKA-1117 I can't see anything wrong in the merge around the handling of the signal
+        // connected to this control setting, however the signal isn't firing.
+        // Work around it by still setting the control variable but also calling
+        // setDefaultFOV directly to do what the signal handler should be doing.
+        LLViewerCamera::getInstance()->setDefaultFOV(vTemp.mV[0]);
     }
     return true;
 }
@@ -879,6 +888,11 @@ bool LLToolCompGun::handleScrollWheel(S32 x, S32 y, S32 clicks)
         vTemp.mV[VY] = llclamp(vTemp.mV[VY] + (F32)(clicks * 0.1f), LLViewerCamera::getInstance()->getMinView(), LLViewerCamera::getInstance()->getMaxView());
         gSavedSettings.setVector3("_NACL_MLFovValues", vTemp);
         gSavedSettings.setF32("CameraAngle", vTemp.mV[VY]);
+        // KKA-1117 I can't see anything wrong in the merge around the handling of the signal
+        // connected to this control setting, however the signal isn't firing.
+        // Work around it by still setting the control variable but also calling
+        // setDefaultFOV directly to do what the signal handler should be doing.
+        LLViewerCamera::getInstance()->setDefaultFOV(vTemp.mV[VY]);
     }
     else if (clicks > 0 && gSavedSettings.getBOOL("FSScrollWheelExitsMouselook"))
     // NaCl End
