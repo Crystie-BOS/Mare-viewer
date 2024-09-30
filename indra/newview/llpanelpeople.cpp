@@ -713,11 +713,14 @@ bool LLPanelPeople::postBuild()
     mNearbyList->showUsername(false);
     mNearbyList->showPaymentStatus(true);
     mNearbyList->showPermissions(false);
-    mNearbyGearBtn = nearby_tab->getChild<LLButton>("gear_btn");
-    mNearbyAddFriendBtn = nearby_tab->getChild<LLButton>("add_friend_btn");
+    // [Ansariel: Colorful radar]
+    mNearbyList->setUseRangeColors(true);
+    // [/Ansariel: Colorful radar]
     //nearby_tab->setVisibleCallback(boost::bind(&Updater::setActive, mNearbyListUpdater, _2));
     mNearbyListUpdater->setActive(true); // AO: always keep radar active, for chat and channel integration
 //mk
+    mNearbyGearBtn = nearby_tab->getChild<LLButton>("gear_btn");
+    mNearbyAddFriendBtn = nearby_tab->getChild<LLButton>("add_friend_btn");
     nearbyAvatarLimit = (LLWorld::EGetAvatarLimit)gSavedSettings.getU32("KokuaNearbyPeopleLimit"); // KKA-967
     LLPanel* recent_tab = getChild<LLPanel>(RECENT_TAB_NAME);
     mRecentList = recent_tab->getChild<LLAvatarList>("avatar_list");
