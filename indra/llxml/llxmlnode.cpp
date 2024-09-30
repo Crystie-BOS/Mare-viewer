@@ -707,6 +707,9 @@ bool LLXMLNode::parseBuffer(
     // Deinit
     XML_ParserFree(my_parser);
 
+    // KKA-1121 This return false was added before 7.1.10; while it's correct it's a change
+    // in behaviour where previously parse errors would still return true unless caught by the
+    // next test. Rather than revert this I'm going to deal with it in the layered file reader code
     if (!success)
         return false;
 
@@ -860,8 +863,14 @@ bool LLXMLNode::getLayeredXMLNode(LLXMLNodePtr& root,
 
         if (!LLXMLNode::parseFile(layer_filename, updateRoot, NULL))
         {
+            // KKA-1121 This is where the new return false code in parseBuffer does the damage
+            // Previously it'd get a true return and we'd continue with the top level default file
+            // and as much of the layered file as we managed to read. The new false return changes
+            // that to what evenually becomes a fatal error and a viewer exit.
             LL_WARNS() << "Problem reading localized UI description file: " << layer_filename << LL_ENDL;
-            return false;
+            // return false;
+            continue;
+            LL_INFOS() << "KKA-1121 fix: not considering localized UI file read problem as fatal" << LL_ENDL;
         }
 
         std::string nodeName;
