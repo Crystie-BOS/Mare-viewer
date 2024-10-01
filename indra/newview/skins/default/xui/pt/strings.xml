@@ -7,6 +7,7 @@
 	<string name="StartupClearingCache">Limpando o cache...</string>
 	<string name="StartupInitializingTextureCache">Iniciando cache de texturas...</string>
 	<string name="StartupRequireDriverUpdate">Falha na inicialização dos gráficos. Atualize seu driver gráfico!</string>
+	<string name="AboutHeader">
 		[CHANNEL] [VIEWER_VERSION_0].[VIEWER_VERSION_1].[VIEWER_VERSION_2].[VIEWER_VERSION_3] ([ADDRESS_SIZE]bit) 
 [[VIEWER_RELEASE_NOTES_URL] [ReleaseNotes]]</string>
 	<string name="BuildConfig">Configuração do corpo [BUILD_CONFIG]</string>
