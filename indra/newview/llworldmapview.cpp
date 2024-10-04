@@ -188,6 +188,7 @@ LLWorldMapView::LLWorldMapView() :
     mMouseDownY(0),
     mSelectIDStart(0),
     mMapScale(0.f),
+    mMapRatio(0.5),
     mTargetMapScale(0.f),
     mMapIterpTime(MAP_ITERP_TIME_CONSTANT)
 {
@@ -287,7 +288,9 @@ void LLWorldMapView::setScale(F32 scale, bool snap)
         {
             mMapScale = 0.1f;
         }
+        mMapRatio = mMapScale / REGION_WIDTH_METERS;
         mMapIterpTime = MAP_ITERP_TIME_CONSTANT;
+
         F32 ratio = (scale / old_scale);
         mPanX *= ratio;
         mPanY *= ratio;
@@ -361,16 +364,8 @@ bool is_agent_in_region(LLViewerRegion* region, LLSimInfo* info)
 
 void LLWorldMapView::draw()
 {
+    LL_PROFILE_ZONE_SCOPED;
     static LLUIColor map_track_color = LLUIColorTable::instance().getColor("MapTrackColor", LLColor4::white);
-
-    // Ansariel: Replaced slow calls to gSavedSettings with faster LLCachedControl
-    static LLCachedControl<bool> mapShowInfohubs(gSavedSettings, "MapShowInfohubs");
-    static LLCachedControl<bool> mapShowTelehubs(gSavedSettings, "MapShowTelehubs");
-    static LLCachedControl<bool> mapShowLandForSale(gSavedSettings, "MapShowLandForSale");
-    static LLCachedControl<bool> mapShowEvents(gSavedSettings, "MapShowEvents");
-    static LLCachedControl<bool> mapShowPeople(gSavedSettings, "MapShowPeople");
-    static LLCachedControl<bool> showMatureEvents(gSavedSettings, "ShowMatureEvents");
-    static LLCachedControl<bool> showAdultEvents(gSavedSettings, "ShowAdultEvents");
     static LLCachedControl<bool> drawAdvancedRegionInfo(gSavedSettings, "FSAdvancedWorldmapRegionInfo");
     static LLCachedControl<bool> sDrawRegionGridCoordinates(gSavedSettings, "FSShowRegionGridCoordinates", false);
 
@@ -425,13 +420,9 @@ void LLWorldMapView::draw()
     drawMipmap(width, height);
 
     // Draw per sim overlayed information (names, mature, offline...)
-    // <FS:Ansariel> Performance tweak
-    //for (LLWorldMap::sim_info_map_t::const_iterator it = LLWorldMap::getInstance()->getRegionMap().begin();
-    //   it != LLWorldMap::getInstance()->getRegionMap().end(); ++it)
-    LLWorldMap::sim_info_map_t::const_iterator end_it = LLWorldMap::instance().getRegionMap().end();
-    for (LLWorldMap::sim_info_map_t::const_iterator it = LLWorldMap::instance().getRegionMap().begin();
-         it != end_it; ++it)
-    // </FS:Ansariel>
+    static LLCachedControl<bool> show_for_sale(gSavedSettings, "MapShowLandForSale");
+    LLWorldMap::sim_info_map_t::const_iterator end = LLWorldMap::instance().getRegionMap().end();
+    for (LLWorldMap::sim_info_map_t::const_iterator it = LLWorldMap::getInstance()->getRegionMap().begin(); it != end; ++it)
     {
         U64 handle = it->first;
         LLSimInfo* info = it->second;
@@ -440,8 +431,8 @@ void LLWorldMapView::draw()
 
         // Find x and y position relative to camera's center.
         LLVector3d rel_region_pos = origin_global - camera_global;
-        F32 relative_x = (F32)(rel_region_pos.mdV[0] / REGION_WIDTH_METERS) * mMapScale;
-        F32 relative_y = (F32)(rel_region_pos.mdV[1] / REGION_WIDTH_METERS) * mMapScale;
+        F32 relative_x = (F32)(rel_region_pos.mdV[0] * mMapRatio);
+        F32 relative_y = (F32)(rel_region_pos.mdV[1] * mMapRatio);
 
         // Coordinates of the sim in pixels in the UI panel
         // When the view isn't panned, 0,0 = center of rectangle
@@ -475,13 +466,6 @@ void LLWorldMapView::draw()
             gGL.color4f(0.2f, 0.0f, 0.0f, 0.4f);
 
             gGL.getTexUnit(0)->unbind(LLTexUnit::TT_TEXTURE);
-            // <FS:Ansariel> Remove QUADS rendering mode
-            //gGL.begin(LLRender::QUADS);
-            //  gGL.vertex2f(left, top);
-            //  gGL.vertex2f(left, bottom);
-            //  gGL.vertex2f(right, bottom);
-            //  gGL.vertex2f(right, top);
-            //gGL.end();
             gGL.begin(LLRender::TRIANGLES);
             {
                 gGL.vertex2f(left, top);
@@ -493,9 +477,8 @@ void LLWorldMapView::draw()
                 gGL.vertex2f(right, top);
             }
             gGL.end();
-            // </FS:Ansariel>
         }
-        else if (gSavedSettings.getBOOL("MapShowLandForSale") && (level <= DRAW_LANDFORSALE_THRESHOLD))
+        else if (show_for_sale && (level <= DRAW_LANDFORSALE_THRESHOLD))
         {
             // Draw the overlay image "Land for Sale / Land for Auction"
             LLViewerFetchedTexture* overlayimage = info->getLandForSaleImage();
@@ -509,17 +492,6 @@ void LLWorldMapView::draw()
                 {
                     gGL.getTexUnit(0)->bind(overlayimage);
                     gGL.color4f(1.f, 1.f, 1.f, 1.f);
-                    // <FS:Ansariel> Remove QUADS rendering mode
-                    //gGL.begin(LLRender::QUADS);
-                    //  gGL.texCoord2f(0.f, 1.f);
-                    //  gGL.vertex3f(left, top, -0.5f);
-                    //  gGL.texCoord2f(0.f, 0.f);
-                    //  gGL.vertex3f(left, bottom, -0.5f);
-                    //  gGL.texCoord2f(1.f, 0.f);
-                    //  gGL.vertex3f(right, bottom, -0.5f);
-                    //  gGL.texCoord2f(1.f, 1.f);
-                    //  gGL.vertex3f(right, top, -0.5f);
-                    //gGL.end();
                     gGL.begin(LLRender::TRIANGLES);
                     {
                         gGL.texCoord2f(0.f, 1.f);
@@ -537,7 +509,6 @@ void LLWorldMapView::draw()
                         gGL.vertex3f(right, top, -0.5f);
                     }
                     gGL.end();
-                    // </FS:Ansariel>
                 }
             }
         }
@@ -623,13 +594,19 @@ void LLWorldMapView::draw()
         }
     }
 
+    static LLCachedControl<bool> show_infohubs(gSavedSettings, "MapShowInfohubs");
+    static LLCachedControl<bool> show_telehubs(gSavedSettings, "MapShowTelehubs");
+    static LLCachedControl<bool> show_events(gSavedSettings, "MapShowEvents");
+    static LLCachedControl<bool> show_mature_events(gSavedSettings, "ShowMatureEvents");
+    static LLCachedControl<bool> show_adult_events(gSavedSettings, "ShowAdultEvents");
+
     // Draw item infos if we're not zoomed out too much and there's something to draw
-    if ((level <= DRAW_SIMINFO_THRESHOLD) && (mapShowInfohubs ||
-                                              mapShowTelehubs ||
-                                              mapShowLandForSale ||
-                                              mapShowEvents ||
-                                              showMatureEvents ||
-                                              showAdultEvents))
+    if ((level <= DRAW_SIMINFO_THRESHOLD) && (show_infohubs ||
+                                              show_telehubs ||
+                                              show_for_sale ||
+                                              show_events ||
+                                              show_mature_events ||
+                                              show_adult_events))
     {
         drawItems();
     }
@@ -661,7 +638,7 @@ void LLWorldMapView::draw()
 
     // Draw icons for the avatars in each region.
     // Drawn this after the current agent avatar so one can see nearby people
-    if (mapShowPeople && (level <= DRAW_SIMINFO_THRESHOLD))
+    if (gSavedSettings.getBOOL("MapShowPeople") && (level <= DRAW_SIMINFO_THRESHOLD))
     {
         drawAgents();
     }
@@ -829,17 +806,6 @@ bool LLWorldMapView::drawMipmapLevel(S32 width, S32 height, S32 level, bool load
 
                     gGL.color4f(1.f, 1.0f, 1.0f, 1.0f);
 
-                    // <FS:Ansariel> Remove QUADS rendering mode
-                    //gGL.begin(LLRender::QUADS);
-                    //  gGL.texCoord2f(0.f, 1.f);
-                    //  gGL.vertex3f(left, top, 0.f);
-                    //  gGL.texCoord2f(0.f, 0.f);
-                    //  gGL.vertex3f(left, bottom, 0.f);
-                    //  gGL.texCoord2f(1.f, 0.f);
-                    //  gGL.vertex3f(right, bottom, 0.f);
-                    //  gGL.texCoord2f(1.f, 1.f);
-                    //  gGL.vertex3f(right, top, 0.f);
-                    //gGL.end();
                     gGL.begin(LLRender::TRIANGLES);
                     {
                         gGL.texCoord2f(0.f, 1.f);
@@ -857,7 +823,6 @@ bool LLWorldMapView::drawMipmapLevel(S32 width, S32 height, S32 level, bool load
                         gGL.vertex3f(right, top, 0.f);
                     }
                     gGL.end();
-                    // </FS:Ansariel>
 #if DEBUG_DRAW_TILE
                     drawTileOutline(level, top, left, bottom, right);
 #endif // DEBUG_DRAW_TILE
@@ -949,19 +914,12 @@ void LLWorldMapView::drawImageStack(const LLVector3d& global_pos, LLUIImagePtr i
 
 void LLWorldMapView::drawItems()
 {
-    bool mature_enabled = gAgent.canAccessMature();
-    bool adult_enabled = gAgent.canAccessAdult();
-
-    // Ansariel: Replaced slow calls to gSavedSettings with faster LLCachedControl
-    static LLCachedControl<bool> mapShowInfohubs(gSavedSettings, "MapShowInfohubs");
-    static LLCachedControl<bool> mapShowTelehubs(gSavedSettings, "MapShowTelehubs");
-    static LLCachedControl<bool> mapShowLandForSale(gSavedSettings, "MapShowLandForSale");
-    static LLCachedControl<bool> mapShowEvents(gSavedSettings, "MapShowEvents");
-    static LLCachedControl<bool> showMatureEvents(gSavedSettings, "ShowMatureEvents");
-    static LLCachedControl<bool> showAdultEvents(gSavedSettings, "ShowAdultEvents");
-    bool show_mature = mature_enabled && showMatureEvents;
-    bool show_adult = adult_enabled && showAdultEvents;
-
+    static LLCachedControl<bool> show_infohubs(gSavedSettings, "MapShowInfohubs");
+    static LLCachedControl<bool> show_telehubs(gSavedSettings, "MapShowTelehubs");
+    static LLCachedControl<bool> show_events(gSavedSettings, "MapShowEvents");
+    static LLCachedControl<bool> show_mature_events(gSavedSettings, "ShowMatureEvents");
+    static LLCachedControl<bool> show_adult_events(gSavedSettings, "ShowAdultEvents");
+    static LLCachedControl<bool> show_for_sale(gSavedSettings, "MapShowLandForSale");
     // <FS:Ansariel> Performance tweak
     LLWorldMap* world_map = LLWorldMap::getInstance();
 
@@ -977,17 +935,17 @@ void LLWorldMapView::drawItems()
             continue;
         }
         // Infohubs
-        if (mapShowInfohubs)
+        if (show_infohubs)
         {
             drawGenericItems(info->getInfoHub(), sInfohubImage);
         }
         // Telehubs
-        if (mapShowTelehubs)
+        if (show_telehubs)
         {
             drawGenericItems(info->getTeleHub(), sTelehubImage);
         }
         // Land for sale
-        if (mapShowLandForSale)
+        if (show_for_sale)
         {
             drawGenericItems(info->getLandForSale(), sForSaleImage);
             // for 1.23, we're showing normal land and adult land in the same UI; you don't
@@ -999,17 +957,17 @@ void LLWorldMapView::drawItems()
             }
         }
         // PG Events
-        if (mapShowEvents)
+        if (show_events)
         {
             drawGenericItems(info->getPGEvent(), sEventImage);
         }
         // Mature Events
-        if (show_mature)
+        if (show_mature_events && gAgent.canAccessMature())
         {
             drawGenericItems(info->getMatureEvent(), sEventMatureImage);
         }
         // Adult Events
-        if (show_adult)
+        if (show_adult_events && gAgent.canAccessAdult())
         {
             drawGenericItems(info->getAdultEvent(), sEventAdultImage);
         }
@@ -1056,14 +1014,12 @@ void LLWorldMapView::drawAgents()
 void LLWorldMapView::drawFrustum()
 {
     // Draw frustum
-    F32 meters_to_pixels = mMapScale/ REGION_WIDTH_METERS;
-
     F32 horiz_fov = LLViewerCamera::getInstance()->getView() * LLViewerCamera::getInstance()->getAspect();
     F32 far_clip_meters = LLViewerCamera::getInstance()->getFar();
-    F32 far_clip_pixels = far_clip_meters * meters_to_pixels;
+    F32 far_clip_pixels = far_clip_meters * mMapRatio;
 
     F32 half_width_meters = far_clip_meters * tan( horiz_fov / 2 );
-    F32 half_width_pixels = half_width_meters * meters_to_pixels;
+    F32 half_width_pixels = half_width_meters * mMapRatio;
 
     // Compute the frustum coordinates. Take the UI scale into account.
     F32 ctr_x = ((getLocalRect().getWidth() * 0.5f + mPanX)  * LLUI::getScaleFactor().mV[VX]);
@@ -1124,8 +1080,8 @@ LLVector3 LLWorldMapView::globalPosToView( const LLVector3d& global_pos )
     LLVector3 pos_local;
     pos_local.setVec(relative_pos_global);  // convert to floats from doubles
 
-    pos_local.mV[VX] *= mMapScale / REGION_WIDTH_METERS;
-    pos_local.mV[VY] *= mMapScale / REGION_WIDTH_METERS;
+    pos_local.mV[VX] *= mMapRatio;
+    pos_local.mV[VY] *= mMapRatio;
     // leave Z component in meters
 
 

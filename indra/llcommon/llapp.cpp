@@ -85,10 +85,6 @@ LLApp* LLApp::sApplication = NULL;
 // and disables crashlogger
 bool LLApp::sDisableCrashlogger = false;
 
-// Local flag for whether or not to do logging in signal handlers.
-//static
-bool LLApp::sLogInSignal = true;
-
 // static
 // Keeps track of application status
 LLScalarCond<LLApp::EAppStatus> LLApp::sStatus{LLApp::APP_STATUS_STOPPED};
@@ -223,7 +219,7 @@ bool LLApp::parseCommandOptions(int argc, wchar_t** wargv)
         if(wargv[ii][0] != '-')
         {
             LL_INFOS() << "Did not find option identifier while parsing token: "
-                << wargv[ii] << LL_ENDL;
+                << (intptr_t)wargv[ii] << LL_ENDL;
             return false;
         }
         int offset = 1;
@@ -591,6 +587,10 @@ void default_unix_signal_handler(int signum, siginfo_t *info, void *)
     // This runs in the thread that threw the signal.
     // We do the somewhat sketchy operation of blocking in here until the error handler
     // has gracefully stopped the app.
+
+    // FIXME(brad) - we are using this handler for asynchronous signals as well, so sLogInSignal is currently
+    // disabled for safety.  we need to find a way to selectively reenable it when it is safe.
+    // see issue secondlife/viewer#2566
 
     if (LLApp::sLogInSignal)
     {

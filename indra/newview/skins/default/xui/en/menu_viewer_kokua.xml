@@ -434,6 +434,16 @@
           <menu_item_call.on_enable
            function="Self.EnableRemoveAllAttachments" />
         </menu_item_call>
+      <menu_item_call
+       label="Remove selected attachments"
+       layout="topleft"
+       name="Remove Selected Attachments"
+       shortcut="alt|shift|R">
+        <menu_item_call.on_click
+         function="Attachment.Detach" />
+        <menu_item_call.on_enable
+         function="Attachment.EnableDetach" />
+      </menu_item_call>
       </menu>
       <menu_item_separator/>
       <menu_item_call
@@ -507,6 +517,24 @@
           <menu_item_check.on_click
            function="World.AlwaysRun" />
         </menu_item_check>
+        <menu_item_check
+          label="Hear Media and Sound from Avatar"
+          name="Hear Media and Sound from Avatar">
+          <menu_item_check.on_check
+           control="MediaSoundsEarLocation" />
+          <menu_item_check.on_click
+           function="Agent.ToggleHearMediaSoundFromAvatar" />
+        </menu_item_check>
+        <menu_item_check
+          label="Hear Voice from Avatar"
+          name="Hear Voice from Avatar">
+          <menu_item_check.on_check
+           control="VoiceEarLocation" />
+          <menu_item_check.on_click
+           function="Agent.ToggleHearVoiceFromAvatar" />
+          <menu_item_call.on_enable
+           control="EnableVoiceChat" />
+        </menu_item_check>
       <menu_item_separator/>
       <menu_item_check
        label="Gestures..."
@@ -525,7 +553,7 @@
        layout="topleft"
        name="Reset Skeleton">
         <menu_item_call.on_click
-         function="Avatar.ResetSkeleton" />
+         function="Avatar.ResetSelfSkeleton" />
       </menu_item_call>
       <menu_item_call 
        label="Reset skeleton and animations"
@@ -724,43 +752,25 @@
           parameter="flickr"/>
       </menu_item_call>
         <menu_item_separator/>
-        <menu
-         label="Voice morphing"
-         name="VoiceMorphing"
-         visibility_control="VoiceMorphingEnabled">
-            <menu_item_check
-             label="No voice morphing"
-             name="NoVoiceMorphing">
-                <menu_item_check.on_check
-                 function="Communicate.VoiceMorphing.NoVoiceMorphing.Check" />
-                <menu_item_check.on_click
-                 function="Communicate.VoiceMorphing.NoVoiceMorphing.Click" />
-            </menu_item_check>
-            <menu_item_separator/>
-            <menu_item_check
-             label="Preview..."
-             name="Preview">
-                <menu_item_check.on_check
-                 function="Floater.Visible"
-                 parameter="voice_effect" />
-                <menu_item_check.on_click
-                 function="Floater.Toggle"
-                 parameter="voice_effect" />
-            </menu_item_check>
-            <menu_item_call
-             label="Subscribe..."
-             name="Subscribe">
-                <menu_item_call.on_click
-                 function="Communicate.VoiceMorphing.Subscribe" />
-            </menu_item_call>
-            <menu_item_call
-             label="Premium perk..."
-             name="PremiumPerk">
-                <menu_item_call.on_click
-                 function="Communicate.VoiceMorphing.PremiumPerk" />
-            </menu_item_call>
-        </menu>
         <menu_item_check
+          label="Hear Media and Sound from Avatar"
+          name="Hear Media and Sound from Avatar">
+            <menu_item_check.on_check
+             control="MediaSoundsEarLocation" />
+            <menu_item_check.on_click
+             function="Agent.ToggleHearMediaSoundFromAvatar" />
+        </menu_item_check>
+        <menu_item_check
+          label="Hear Voice from Avatar"
+          name="Hear Voice from Avatar">
+            <menu_item_check.on_check
+             control="VoiceEarLocation" />
+            <menu_item_check.on_click
+             function="Agent.ToggleHearVoiceFromAvatar" />
+            <menu_item_call.on_enable
+             control="EnableVoiceChat" />
+        </menu_item_check>
+        <menu_item_separator/>        <menu_item_check
          label="Gestures..."
          name="Gestures"
          shortcut="control|G">
@@ -4896,6 +4906,16 @@
                 <menu_item_check.on_click
                  function="Advanced.HandleAttachedLightParticles"
                  parameter="RenderAttachedParticles" />
+            </menu_item_check>
+            <menu_item_check
+             label="Collect Font Vertex Buffers"
+             name="Collect Font Vertex Buffers">
+                <menu_item_check.on_check
+                 function="CheckControl"
+                 parameter="CollectFontVertexBuffers" />
+                <menu_item_check.on_click
+                 function="ToggleControl"
+                 parameter="CollectFontVertexBuffers" />
             </menu_item_check>
           <menu_item_separator />
           <menu_item_check

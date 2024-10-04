@@ -1848,8 +1848,6 @@ void LLFloaterPreference::refresh()
 
 void LLFloaterPreference::refreshAdvanced()
 {
-    getChild<LLUICtrl>("fsaa")->setValue((LLSD::Integer)  gSavedSettings.getU32("RenderFSAASamples"));
-
     // sliders and their text boxes
     //  mPostProcess = gSavedSettings.getS32("RenderGlowResolutionPow");
     // slider text boxes

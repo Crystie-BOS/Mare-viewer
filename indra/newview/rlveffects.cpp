@@ -23,6 +23,7 @@
 #include "llviewerwindow.h"
 #include "llvoavatarself.h"
 #include "pipeline.h"
+#include "glm/gtc/type_ptr.hpp"
 
 #include "rlveffects.h"
 
@@ -223,10 +224,21 @@ void RlvSphereEffect::setShaderUniforms(LLGLSLShader* pShader)
 //mk
         break;
     }
-    glh::vec4f posSphereOriginGl(posSphereOrigin.mV);
-    const glh::matrix4f& mvMatrix = gGLModelView;
-    mvMatrix.mult_matrix_vec(posSphereOriginGl);
-    pShader->uniform4fv(LLShaderMgr::RLV_EFFECT_PARAM1, 1, posSphereOriginGl.v);
+    //glh::vec4f posSphereOriginGl(posSphereOrigin.mV);
+    //const glh::matrix4f& mvMatrix = gGLModelView;
+    //mvMatrix.mult_matrix_vec(posSphereOriginGl);
+
+    //pShader->uniform4fv(LLShaderMgr::RLV_EFFECT_PARAM1, 1, posSphereOriginGl.v);
+
+    // CA: I believe this is a correct conversion of the above four lines to glm
+    // however setsphere isn't working - no visible effect at all. I don't know yet
+    // whether the glm conversion is wrong or its broken by a change elsewhere
+
+    glm::vec4 posSphereOriginGl(glm::make_vec4(posSphereOrigin.mV));
+    const glm::mat4&  mvMatrix = glm::make_mat4(gGLModelView);
+    posSphereOriginGl = mvMatrix * posSphereOriginGl;
+
+    pShader->uniform4fv(LLShaderMgr::RLV_EFFECT_PARAM1, 1, glm::value_ptr(posSphereOriginGl));
 
     // Pack min/max distance and alpha together
     float nDistMin = m_nDistanceMin.get(), nDistMax = m_nDistanceMax.get();

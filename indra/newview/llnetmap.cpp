@@ -374,17 +374,6 @@ void LLNetMap::draw()
 
                 // Draw using texture.
                 gGL.getTexUnit(0)->bind(regionp->getLand().getSTexture());
-                // <FS:Ansariel> Remove QUADS rendering mode
-                //gGL.begin(LLRender::QUADS);
-                //  gGL.texCoord2f(0.f, 1.f);
-                //  gGL.vertex2f(left, top);
-                //  gGL.texCoord2f(0.f, 0.f);
-                //  gGL.vertex2f(left, bottom);
-                //  gGL.texCoord2f(1.f, 0.f);
-                //  gGL.vertex2f(right, bottom);
-                //  gGL.texCoord2f(1.f, 1.f);
-                //  gGL.vertex2f(right, top);
-                //gGL.end();
                 gGL.begin(LLRender::TRIANGLES);
                 {
                     gGL.texCoord2f(0.f, 1.f);
@@ -402,7 +391,6 @@ void LLNetMap::draw()
                     gGL.vertex2f(right, top);
                 }
                 gGL.end();
-                // </FS:Ansariel>
 
                 gGL.flush();
         }
@@ -470,17 +458,6 @@ void LLNetMap::draw()
             map_center_agent.mV[VY] *= mScale / region_width;
             gGL.getTexUnit(0)->bind(mObjectImagep);
 
-            // <FS:Ansariel> Remove QUADS rendering mode
-            //gGL.begin(LLRender::QUADS);
-            //  gGL.texCoord2f(0.f, 1.f);
-            //  gGL.vertex2f(map_center_agent.mV[VX] - image_half_width, image_half_height + map_center_agent.mV[VY]);
-            //  gGL.texCoord2f(0.f, 0.f);
-            //  gGL.vertex2f(map_center_agent.mV[VX] - image_half_width, map_center_agent.mV[VY] - image_half_height);
-            //  gGL.texCoord2f(1.f, 0.f);
-            //  gGL.vertex2f(image_half_width + map_center_agent.mV[VX], map_center_agent.mV[VY] - image_half_height);
-            //  gGL.texCoord2f(1.f, 1.f);
-            //  gGL.vertex2f(image_half_width + map_center_agent.mV[VX], image_half_height + map_center_agent.mV[VY]);
-            //gGL.end();
             gGL.begin(LLRender::TRIANGLES);
                 gGL.texCoord2f(0.f, 1.f);
                 gGL.vertex2f(map_center_agent.mV[VX] - image_half_width, image_half_height + map_center_agent.mV[VY]);
@@ -496,7 +473,6 @@ void LLNetMap::draw()
                 gGL.texCoord2f(1.f, 1.f);
                 gGL.vertex2f(image_half_width + map_center_agent.mV[VX], image_half_height + map_center_agent.mV[VY]);
             gGL.end();
-            // </FS:Ansariel>
 
         }
 

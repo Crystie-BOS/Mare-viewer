@@ -30,6 +30,7 @@
 #include "llscrolllistcell.h"
 
 #include "llcheckboxctrl.h"
+#include "llfontvertexbuffer.h"
 #include "llui.h"   // LLUIImage
 #include "lluictrlfactory.h"
 
@@ -159,7 +160,7 @@ S32 LLScrollListIcon::getWidth() const
 }
 
 
-void LLScrollListIcon::draw(const LLColor4& color, const LLColor4& highlight_color)  const
+void LLScrollListIcon::draw(const LLColor4& color, const LLColor4& highlight_color)
 {
     if (mIcon)
     {
@@ -239,7 +240,7 @@ S32 LLScrollListBar::getWidth() const
 }
 
 
-void LLScrollListBar::draw(const LLColor4& color, const LLColor4& highlight_color)   const
+void LLScrollListBar::draw(const LLColor4& color, const LLColor4& highlight_color)
 {
     S32 bar_width = getWidth() - mLeftPad - mRightPad;
     S32 left = (S32)(bar_width - bar_width * mRatio);
@@ -311,6 +312,19 @@ bool LLScrollListText::needsToolTip() const
     return mFont->getWidth(mText.getWString().c_str()) > getWidth();
 }
 
+void LLScrollListText::setTextWidth(S32 value)
+{
+    mTextWidth = value;
+    mFontBuffer.reset();
+}
+
+void LLScrollListText::setWidth(S32 width)
+{
+    LLScrollListCell::setWidth(width);
+    mTextWidth = width;
+    mFontBuffer.reset();
+}
+
 //virtual
 bool LLScrollListText::getVisible() const
 {
@@ -344,6 +358,7 @@ void LLScrollListText::setColor(const LLColor4& color)
 void LLScrollListText::setText(const LLStringExplicit& text)
 {
     mText = text;
+    mFontBuffer.reset();
 }
 
 void LLScrollListText::setFontStyle(const U8 font_style)
@@ -351,6 +366,13 @@ void LLScrollListText::setFontStyle(const U8 font_style)
     LLFontDescriptor new_desc(mFont->getFontDesc());
     new_desc.setStyle(font_style);
     mFont = LLFontGL::getFont(new_desc);
+    mFontBuffer.reset();
+}
+
+void LLScrollListText::setAlignment(LLFontGL::HAlign align)
+{
+    mFontAlignment = align;
+    mFontBuffer.reset();
 }
 
 //virtual
@@ -378,7 +400,7 @@ const LLSD LLScrollListText::getAltValue() const
 }
 
 
-void LLScrollListText::draw(const LLColor4& color, const LLColor4& highlight_color) const
+void LLScrollListText::draw(const LLColor4& color, const LLColor4& highlight_color)
 {
     LLColor4 display_color;
     if (mUseColor)
@@ -429,17 +451,18 @@ void LLScrollListText::draw(const LLColor4& color, const LLColor4& highlight_col
         start_x = (F32)getWidth() * 0.5f;
         break;
     }
-    mFont->render(mText.getWString(), 0,
-                    start_x, 0.f,
-                    display_color,
-                    mFontAlignment,
-                    LLFontGL::BOTTOM,
-                    0,
-                    LLFontGL::NO_SHADOW,
-                    string_chars,
-                    getTextWidth(),
-                    &right_x,
-                    true);
+    mFontBuffer.render(mFont,
+                       mText.getWString(), 0,
+                       start_x, 0.f,
+                       display_color,
+                       mFontAlignment,
+                       LLFontGL::BOTTOM,
+                       0,
+                       LLFontGL::NO_SHADOW,
+                       string_chars,
+                       getTextWidth(),
+                       &right_x,
+                       true);
 }
 
 //
@@ -489,7 +512,7 @@ LLScrollListCheck::~LLScrollListCheck()
     mCheckBox = NULL;
 }
 
-void LLScrollListCheck::draw(const LLColor4& color, const LLColor4& highlight_color) const
+void LLScrollListCheck::draw(const LLColor4& color, const LLColor4& highlight_color)
 {
     mCheckBox->draw();
 }
@@ -610,7 +633,7 @@ void LLScrollListIconText::setWidth(S32 width)
 }
 
 
-void LLScrollListIconText::draw(const LLColor4& color, const LLColor4& highlight_color)  const
+void LLScrollListIconText::draw(const LLColor4& color, const LLColor4& highlight_color)
 {
     LLColor4 display_color;
     if (mUseColor)
@@ -668,7 +691,9 @@ void LLScrollListIconText::draw(const LLColor4& color, const LLColor4& highlight
         start_icon_x = (S32)(center - (((F32)icon_space + mFont->getWidth(mText.getWString().c_str())) * 0.5f));
         break;
     }
-    mFont->render(mText.getWString(), 0,
+    mFontBuffer.render(
+        mFont,
+        mText.getWString(), 0,
         start_text_x, 0.f,
         display_color,
         mFontAlignment,

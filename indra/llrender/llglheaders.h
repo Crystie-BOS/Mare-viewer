@@ -46,7 +46,7 @@
 // LL_WINDOWS
 
 // windows gl headers depend on things like APIENTRY, so include windows.
-#include "llwin32headerslean.h"
+#include "llwin32headers.h"
 
 //----------------------------------------------------------------------------
 #include <GL/gl.h>
@@ -824,7 +824,6 @@ extern PFNGLPOLYGONOFFSETCLAMPPROC              glPolygonOffsetClamp;
 #define GL_EXT_separate_specular_color 1
 #define GL_GLEXT_PROTOTYPES
 #include "GL/glext.h"
-// #include <OpenGL/OpenGLAvailability.h>
 
 
 #include "GL/glh_extensions.h"

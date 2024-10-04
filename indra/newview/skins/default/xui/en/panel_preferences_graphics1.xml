@@ -927,8 +927,43 @@
     left="30"
     name="antialiasing label"
     top_delta="20"
-    width="100">
+    width="120">
       Antialiasing:
+  </text>
+    <combo_box
+      control_name="RenderFSAAType"
+      height="20"
+      initial_value="false"
+      label="Antialiasing"
+      layout="topleft"
+      left_pad="40"
+      name="fsaa"
+      top_delta="0"
+      width="90">
+        <combo_box.item
+          label="Disabled"
+          name="FSAADisabled"
+          value="0" />
+        <combo_box.item
+          label="FXAA"
+          name="FXAA"
+          value="1" />
+        <combo_box.item
+          label="SMAA"
+          name="SMAA"
+          value="2" />
+    </combo_box>
+  <text
+    type="string"
+    length="1"
+    follows="left|top"
+    height="20"
+    layout="topleft"
+    left="30"
+    name="antialiasing quality label"
+    top_delta="24"
+    width="120">
+      Antialiasing Quality:
   </text>
   <combo_box
     control_name="RenderFSAASamples"
@@ -937,29 +972,26 @@
     label="Antialiasing"
     layout="topleft"
     left_pad="40"
-    name="fsaa"
+    name="fsaa quality"
     top_delta="0"
     width="90">
     <combo_box.item
-      label="Disabled"
-      name="FSAADisabled"
+      label="Low"
+      name="Low"
       value="0" />
     <combo_box.item
-      label="FXAA"
-      name="FXAA"
+      label="Medium"
+      name="Medium"
+      value="1" />
+    <combo_box.item
+      label="High"
+      name="High"
       value="2" />
-      </combo_box>
-  </panel>
-
-<!--LOD/SHaders Settings-->
-    <panel
-     top_pad="5"
-     bottom="-1"
-     left="1"
-     right="-1"
-     follows="all"
-     label="Advanced"
-     name="Advanced" >
+    <combo_box.item
+      label="Ultra"
+      name="Ultra"
+      value="3" />
+  </combo_box>
   <text
     type="string"
     length="1"
@@ -967,10 +999,10 @@
     height="16"
     layout="topleft"
     name="MeshText"
-    top_delta="20"
+    top_delta="16"
     left="10"
-    width="148">
-     Mesh Level of Detail LOD
+    width="128">
+    Mesh
   </text>
 
   <slider
@@ -1309,7 +1341,7 @@
     left="12"
     name="ReflectionProbeText"
     text_readonly_color="LabelDisabledColor"
-    top_delta="24"
+    top_delta="22"
     width="128">
     Reflection Coverage:
   </text>
@@ -1355,7 +1387,7 @@
     max_val="1.5"
     name="RenderExposure"
     show_text="true"
-    top_delta="28"
+    top_delta="24"
     width="260">
   </slider>
 
@@ -1455,6 +1487,26 @@
       value="1"/>
   </combo_box>
   <!-- End of mirror settings -->
+  <!-- Sharpening Settings -->
+  <slider
+    control_name="RenderCASSharpness"
+    decimal_digits="1"
+    follows="left|top"
+    height="16"
+    increment="0.1"
+    initial_value="160"
+    label="Sharpening:"
+    label_width="145"
+    layout="topleft"
+    left="420"
+    min_val="0.0"
+    max_val="1.0"
+    name="RenderSharpness"
+    show_text="true"
+    top_delta="24"
+    width="260">
+  </slider>
+  <!-- End of Sharpening Settings-->
     </panel>
 </tab_container>
 </panel>

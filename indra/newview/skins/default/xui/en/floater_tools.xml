@@ -2878,7 +2878,7 @@ even though the user gets a free copy.
              label="New Script"
              label_selected="New Script"
              layout="topleft"
-             left="10"
+             left="8"
              name="button new script"
              top="8"
              width="80" />
@@ -2919,17 +2919,29 @@ even though the user gets a free copy.
                <button.commit_callback
                 function="Tools.SelectedScriptAction"
                 parameter="reset" />
-            </button>			 
+            </button>
+            <filter_editor
+             follows="left|top|right"
+             label="Enter filter text"
+             layout="topleft"
+             top_pad="8"
+             left="10"
+             text_pad_left="10"
+             max_length_chars="300"
+             highlight_text_field="true"
+             name="contents_filter"
+             height="23"
+             width="275" />			 
             <panel_inventory_object
              border="true"
              border_visible="true"
              bevel_style="in"
              follows="left|top|right"
-             height="387"
+             height="380"
              layout="topleft"
              left="10"
              name="contents_inventory"
-             top="55"
+             top_pad="4"
              width="275" />
 		</panel>
         </tab_container>
