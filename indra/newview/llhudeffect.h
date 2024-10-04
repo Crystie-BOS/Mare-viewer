@@ -28,7 +28,6 @@
 #define LL_LLHUDEFFECT_H
 
 #include "llhudobject.h"
-#include "llfontvertexbuffer.h"
 
 #include "lluuid.h"
 #include "v4coloru.h"
@@ -45,7 +44,6 @@ public:
     bool getNeedsSendToSim() const;
     void setOriginatedHere(const bool orig_here);
     bool getOriginatedHere() const;
-	LLFontVertexBuffer      mFontBuffer;
 
     void setDuration(const F32 duration);
     void setColor(const LLColor4U &color);

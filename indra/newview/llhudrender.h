@@ -28,7 +28,6 @@
 #define LL_LLHUDRENDER_H
 
 #include "llfontgl.h"
-#include "llfontvertexbuffer.h"
 
 class LLVector3;
 class LLFontGL;
