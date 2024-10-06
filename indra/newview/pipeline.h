@@ -167,10 +167,6 @@ public:
     void combineGlow(LLRenderTarget* src, LLRenderTarget* dst);
     void visualizeBuffers(LLRenderTarget* src, LLRenderTarget* dst, U32 bufferIndex);
 
-//MK
-    void renderSpheres();
-//mk
-
     void init();
     void cleanup();
     bool isInit() { return mInitialized; };

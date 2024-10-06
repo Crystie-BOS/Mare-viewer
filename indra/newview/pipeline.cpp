@@ -7959,23 +7959,6 @@ void LLPipeline::renderFinalize()
 
     combineGlow(&mRT->screen, &mPostMap);
 
-    //// [RLVa:KB] - @setsphere
-    //LLRenderTarget* pRenderBuffer = &mRT->screen;
-    //if (gRRenabled)
-    //{
-    //  if (gAgent.mRRInterface.mContainsSetsphere)
-    //  {
-    //      LLShaderEffectParams params(pRenderBuffer, &mRT->screen, false);
-    //      LLVfxManager::instance().runEffect(EVisualEffect::RlvSphere, &params);
-    //      pRenderBuffer = params.m_pDstBuffer;
-    //  }
-    //}
-    //// [/RLVa:KB]
-
-//MK
-    renderSpheres();
-//mk
-
     gGLViewport[0] = gViewerWindow->getWorldViewRectRaw().mLeft;
     gGLViewport[1] = gViewerWindow->getWorldViewRectRaw().mBottom;
     gGLViewport[2] = gViewerWindow->getWorldViewRectRaw().getWidth();
@@ -8025,6 +8008,14 @@ void LLPipeline::renderFinalize()
         }
     }
 
+    // MK by CA - move setsphere so it's not subject to changes around which render buffer is prime 
+    if (gRRenabled && gAgent.mRRInterface.mContainsSetsphere)
+    {
+        LLShaderEffectParams params(finalBuffer, finalBuffer, false);
+        LLVfxManager::instance().runEffect(EVisualEffect::RlvSphere, &params);
+    }
+    // mk by CA
+
     // Present the screen target.
 
     gDeferredPostNoDoFNoiseProgram.bind(); // Add noise as part of final render to screen pass to avoid damaging other post effects
@@ -8064,24 +8055,6 @@ void LLPipeline::renderFinalize()
     // flush calls made to "addTrianglesDrawn" so far to stats machinery
     recordTrianglesDrawn();
 }
-
-//MK
-void LLPipeline::renderSpheres()
-{
-    // [RLVa:KB] - @setsphere
-    LLRenderTarget* pRenderBuffer = &mRT->screen;
-    if (gRRenabled)
-    {
-        if (gAgent.mRRInterface.mContainsSetsphere)
-        {
-            LLShaderEffectParams params(pRenderBuffer, &mRT->screen, false);
-            LLVfxManager::instance().runEffect(EVisualEffect::RlvSphere, &params);
-            pRenderBuffer = params.m_pDstBuffer;
-        }
-    }
-    // [/RLVa:KB]
-}
-//mk
 
 void LLPipeline::bindLightFunc(LLGLSLShader& shader)
 {
