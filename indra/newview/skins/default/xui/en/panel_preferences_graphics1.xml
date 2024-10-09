@@ -848,15 +848,15 @@
 
   </panel>
 
-<!--Hardware-->
+<!--Advanced-->
     <panel
      top_pad="5"
      bottom="-1"
      left="1"
      right="-1"
      follows="all"
-     label="Hardware"
-     name="Hardware" >
+     label="Advanced"
+     name="Advanced" >
 
   <text
     type="string"
@@ -1296,6 +1296,18 @@
       function="Pref.RenderOptionUpdate" />
   </check_box>
   
+  </panel>
+
+<!--PBR (and other viewer 7 new options)-->
+    <panel
+     top_pad="5"
+     bottom="-1"
+     left="1"
+     right="-1"
+     follows="all"
+     label="PBR"
+     name="PBR" >
+
   <text
     type="string"
     length="1"
@@ -1498,7 +1510,7 @@
     label="Sharpening:"
     label_width="145"
     layout="topleft"
-    left="420"
+    left="12"
     min_val="0.0"
     max_val="1.0"
     name="RenderSharpness"
@@ -1514,7 +1526,7 @@
     follows="left|top"
     height="16"
     layout="topleft"
-    left="420"
+    left="12"
     name="TonemapTypeText"
     text_readonly_color="LabelDisabledColor"
     top_delta="25"
@@ -1549,7 +1561,7 @@
    tool_tip="Mix between linear and tone mapped colors"
    label_width="145"
    layout="topleft"
-   left="420"
+   left="12"
    min_val="0.0"
    max_val="1.0"
    name="TonemapMix"
@@ -1558,6 +1570,8 @@
    width="260">
   </slider>
   <!-- End of Tone Mapping Settings-->
+
+
     </panel>
 </tab_container>
 </panel>
