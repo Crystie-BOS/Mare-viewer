@@ -246,11 +246,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>dd82abcb51c54b8c30e34f9441fa0aeed26789d9</string>
+              <string>c088fe0be9ce7e42983c3c7708abe4ac8bd5a894</string>
               <key>hash_algorithm</key>
               <string>sha1</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-colladadom-git/downloads/colladadom-linux64-2.3.0-dev0.g60a1fc0.d20240922.tar.bz2</string>
+              <string>https://github.com/secondlife/3p-colladadom/releases/download/v2.3-r8/colladadom-2.3.0-r8-linux64-10476582237.tar.zst</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -1426,11 +1426,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>d50f6d5ef609d7fb75a3692c730a59d8123228bd</string>
+              <string>6ab8108ea0a42e0bd462568c495e5ce5c4cdc0ff</string>
               <key>hash_algorithm</key>
               <string>sha1</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-libxml2-git/downloads/libxml2-2.13.3-dev0.g8c41b2c.d20240922-linux64-2.13.3-r1.tar.bz2</string>
+              <string>https://github.com/secondlife/3p-libxml2/releases/download/v2.13.3-r1/libxml2-2.13.3-r1-linux64-10329675166.tar.zst</string>
             </map>
             <key>name</key>
             <string>linux64</string>
