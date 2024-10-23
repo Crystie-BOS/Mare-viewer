@@ -132,11 +132,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>037d8e6aef177c0b7ae49a50f0a8235edf2a1aa9</string>
+              <string>3c0ba2a87e78d76c81da95fa87579bf4964242e1</string>
               <key>hash_algorithm</key>
               <string>sha1</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-boost-git/downloads/boost-1.86-linux64-242670024.tar.bz2</string>
+              <string>https://github.com/secondlife/3p-boost/releases/download/v1.86.0-e2bee1e/boost-1.86-linux64-10475904468.tar.zst</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -246,11 +246,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>f8de00c84107a58c3c404fe118a15c027d37f815</string>
+              <string>c088fe0be9ce7e42983c3c7708abe4ac8bd5a894</string>
               <key>hash_algorithm</key>
               <string>sha1</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-colladadom-git/downloads/colladadom-linux64-2.3.0-dev0.g60a1fc0.d20240923.tar.bz2</string>
+              <string>https://github.com/secondlife/3p-colladadom/releases/download/v2.3-r8/colladadom-2.3.0-r8-linux64-10476582237.tar.zst</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -712,7 +712,7 @@
               <key>hash_algorithm</key>
               <string>sha1</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-fontconfig/downloads/fontconfig-2.12.93-linux64-242660048.tar.bz2</string>
+	      <string>https://bitbucket.org/kokua/3p-fontconfig/downloads/fontconfig-2.12.93-linux64-242660048.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -1230,11 +1230,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>a27e42d5d11ba3c200102698243f25d99677e101</string>
+              <string>275ffb7f60064d8008aed8406f80f34229f651fc</string>
               <key>hash_algorithm</key>
               <string>sha1</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-hunspell/downloads/libhunspell-1.7.2.242661251-linux64-242661251.tar.bz2</string>
+              <string>https://github.com/secondlife/3p-libhunspell/releases/download/v1.7.2-r1/libhunspell-1.7.2.10207243663-linux64-10207243663.tar.zst</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -1426,11 +1426,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>d50f6d5ef609d7fb75a3692c730a59d8123228bd</string>
+              <string>6ab8108ea0a42e0bd462568c495e5ce5c4cdc0ff</string>
               <key>hash_algorithm</key>
               <string>sha1</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-libxml2-git/downloads/libxml2-2.13.3-dev0.g8c41b2c.d20240922-linux64-2.13.3-r1.tar.bz2</string>
+              <string>https://github.com/secondlife/3p-libxml2/releases/download/v2.13.3-r1/libxml2-2.13.3-r1-linux64-10329675166.tar.zst</string>
             </map>
             <key>name</key>
             <string>linux64</string>
