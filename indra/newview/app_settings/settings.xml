@@ -12396,7 +12396,7 @@
     <key>Type</key>
     <string>F32</string>
     <key>Value</key>
-    <real>1</real>
+    <real>1.5</real>
   </map>
   
   <key>RenderReflectionProbeDrawDistance</key>
@@ -13247,7 +13247,7 @@
         <key>Type</key>
         <string>F32</string>
         <key>Value</key>
-        <real>1.0</real>
+        <real>0.7</real>
     </map>
     <key>RenderTonemapType</key>
     <map>
@@ -13258,7 +13258,7 @@
         <key>Type</key>
         <string>U32</string>
         <key>Value</key>
-        <integer>0</integer>
+        <integer>1</integer>
     </map>
     <key>ReplaySession</key>
     <map>
