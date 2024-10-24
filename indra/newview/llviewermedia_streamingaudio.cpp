@@ -34,6 +34,7 @@
 
 #include "llmimetypes.h"
 #include "lldir.h"
+#include "llnotificationmanager.h"
 
 LLStreamingAudio_MediaPlugins::LLStreamingAudio_MediaPlugins() :
     mMediaPlugin(NULL),
@@ -158,6 +159,8 @@ void LLStreamingAudio_MediaPlugins::update()
         mMediaPlugin->idle();
 }
 
+extern void send_chat_from_viewer(const std::string& utf8_out_text, EChatType type, S32 channel);
+
 int LLStreamingAudio_MediaPlugins::isPlaying()
 {
     if (!mMediaPlugin)
@@ -165,6 +168,21 @@ int LLStreamingAudio_MediaPlugins::isPlaying()
 
     LLPluginClassMediaOwner::EMediaStatus status =
         mMediaPlugin->getStatus();
+    auto nowPlaying = mMediaPlugin->getMediaNowPlaying();
+    if (!nowPlaying.empty() && mNowPlaying != nowPlaying)
+    {
+        mTitle = mMediaPlugin->getMediaTitle();
+        mNowPlaying = nowPlaying;
+        auto text = llformat("Now playing %s.", nowPlaying.c_str());
+        LLChat chat{text};
+        chat.mFromName = mTitle;
+        chat.mSourceType = CHAT_SOURCE_SYSTEM;
+        LLNotificationsUI::LLNotificationManager::instance().onChat(chat, LLSD{});
+        if (gSavedSettings.getBOOL("StreamMetadataAnnounceToChat"))
+        {
+            send_chat_from_viewer(text, CHAT_TYPE_NORMAL, gSavedSettings.getS32("StreamMetadataAnnounceChannel"));
+        }
+    }
 
     switch (status)
     {

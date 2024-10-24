@@ -294,6 +294,22 @@ void MediaPluginLibVLC::eventCallbacks(const libvlc_event_t* event, void* ptr)
         }
     }
     break;
+    case libvlc_MediaMetaChanged:
+        auto title = libvlc_media_get_meta(parent->mLibVLCMedia, libvlc_meta_Title);
+        if (title)
+        {
+            LLPluginMessage message(LLPLUGIN_MESSAGE_CLASS_MEDIA, "title_text");
+            message.setValue("title", title);
+            parent->sendMessage(message);
+        }
+        auto now_playing = libvlc_media_get_meta(parent->mLibVLCMedia, libvlc_meta_NowPlaying);
+        if (now_playing)
+        {
+            LLPluginMessage message(LLPLUGIN_MESSAGE_CLASS_MEDIA, "nowplaying_text");
+            message.setValue("nowplaying", now_playing);
+            parent->sendMessage(message);
+        }
+        break;
     }
 }
 
@@ -347,6 +363,11 @@ void MediaPluginLibVLC::playMedia()
         libvlc_event_attach(em, libvlc_MediaPlayerPositionChanged, eventCallbacks, this);
         libvlc_event_attach(em, libvlc_MediaPlayerLengthChanged, eventCallbacks, this);
         libvlc_event_attach(em, libvlc_MediaPlayerTitleChanged, eventCallbacks, this);
+    }
+    auto event_manager = libvlc_media_event_manager(mLibVLCMedia);
+    if (event_manager)
+    {
+        libvlc_event_attach(event_manager, libvlc_MediaMetaChanged, eventCallbacks, this);
     }
 
     libvlc_video_set_callbacks(mLibVLCMediaPlayer, lock, unlock, display, &mLibVLCCallbackContext);
