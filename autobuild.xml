@@ -1170,11 +1170,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>6ce5ab27d3898dd57dfc461277259709</string>
+              <string>a2c7779a9703234d91394f8edcfef1f83689ddb0</string>
               <key>hash_algorithm</key>
-              <string>md5</string>
+              <string>sha1</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokuaprivate/3p-kdu8/downloads/kdu-8.2.1.212680020-linux64-212680020.tar.bz2</string>
+              <string>https://bitbucket.org/kokuaprivate/3p-kdu8/downloads/kdu-8.2.1.242980512-linux64-242980512.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
