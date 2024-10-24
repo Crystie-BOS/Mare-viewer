@@ -62,6 +62,7 @@ private:
     LLPluginClassMedia *mMediaPlugin;
 
     std::string mURL;
+    std::string mNowPlaying;
     std::string mArtist;
     std::string mTitle;
 
