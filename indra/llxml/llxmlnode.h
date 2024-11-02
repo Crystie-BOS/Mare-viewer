@@ -297,6 +297,7 @@ protected:
     bool removeChild(LLXMLNode* child);
     bool isFullyDefault();
 
+    std::string getXMLRPCTextContents() const;
     bool parseXmlRpcArrayValue(LLSD& target);
     bool parseXmlRpcStructValue(LLSD& target);
 
