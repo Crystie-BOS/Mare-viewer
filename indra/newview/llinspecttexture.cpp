@@ -32,6 +32,9 @@
 #include "lltexturectrl.h"
 #include "lltrans.h"
 #include "llviewertexturelist.h"
+// CA KKA-1127 respect @viewtexture
+#include "llagent.h"
+// ca
 
 
 // ============================================================================
@@ -41,6 +44,10 @@
 LLToolTip* LLInspectTextureUtil::createInventoryToolTip(LLToolTip::Params p)
 {
     const LLSD& sdTooltip = p.create_params;
+    
+    // CA KKA-1127 respect @viewtexture
+    if (gRRenabled && gAgent.mRRInterface.mContainsViewTexture) return NULL;
+    // ca
 
     if (sdTooltip.has("thumbnail_id") && sdTooltip["thumbnail_id"].asUUID().notNull())
     {
