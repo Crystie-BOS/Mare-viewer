@@ -5,7 +5,7 @@
  can_minimize="true"
  can_resize="false"
  can_close="true"
- height="475"
+ height="490"
  layout="topleft"
  name="Snapshot"
  single_instance="true"
@@ -14,7 +14,7 @@
  save_visibility="false"
  title="SNAPSHOT"
  width="624"
- min_height="455">
+ min_height="490">
     <floater.string
      name="unknown">
         unknown
@@ -115,7 +115,7 @@
 	   top_delta="0"
        width="31" />
 	<panel
-     height="179"
+     height="195"
      layout="topleft"
 	 follows="top|left"
      left="0"
@@ -419,7 +419,7 @@
    height="21"
    layout="topleft"
    name="img_info_border"
-   top_pad="0"
+   top_pad="22"
    right="-130"
    follows="left|top|right"
    left_delta="0"/>
@@ -433,7 +433,7 @@
     left="220"
     halign="left"
     name="image_res_text"
-    top_delta="5"
+    top_delta="4"
     width="250">
        [WIDTH]px (width) x [HEIGHT]px (height)
    </text>
@@ -470,7 +470,7 @@
          control_name="HideBalanceInSnapshots"
          label="Hide L$ balance"
          layout="topleft"
-         top_pad="0"
+         top_pad="-8"
          left="30"
          width="180"
          name="hide_balance_check" />
