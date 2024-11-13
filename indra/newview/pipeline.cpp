@@ -354,10 +354,22 @@ void validate_framebuffer_object();
 // target -- RenderTarget to add attachments to
 bool addDeferredAttachments(LLRenderTarget& target, bool for_impostor = false)
 {
+    U32 orm = GL_RGBA;
+    U32 norm = GL_RGBA16F;
+    U32 emissive = GL_RGB16F;
+
+    bool hdr = gSavedSettings.getBOOL("RenderHDREnabled") && gGLManager.mGLVersion > 4.05f;
+
+    if (!hdr)
+    {
+        norm = GL_RGBA;
+        emissive = GL_RGB;
+    }
+
     bool valid = true
-        && target.addColorAttachment(GL_RGBA) // frag-data[1] specular OR PBR ORM
-        && target.addColorAttachment(GL_RGBA16F)                              // frag_data[2] normal+fogmask, See: class1\deferred\materialF.glsl & softenlight
-        && target.addColorAttachment(GL_RGB16F);                  // frag_data[3] PBR emissive OR material env intensity
+        && target.addColorAttachment(orm)       // frag-data[1] specular OR PBR ORM
+        && target.addColorAttachment(norm)      // frag_data[2] normal+fogmask, See: class1\deferred\materialF.glsl & softenlight
+        && target.addColorAttachment(emissive); // frag_data[3] PBR emissive OR material env intensity
     return valid;
 }
 
@@ -796,6 +808,9 @@ LLPipeline::eFBOStatus LLPipeline::doAllocateScreenBuffer(U32 resX, U32 resY)
 bool LLPipeline::allocateScreenBufferInternal(U32 resX, U32 resY)
 {
     LL_PROFILE_ZONE_SCOPED_CATEGORY_DISPLAY;
+
+    bool hdr = gGLManager.mGLVersion > 4.05f && gSavedSettings.getBOOL("RenderHDREnabled");
+
     if (mRT == &mMainRT)
     { // hacky -- allocate auxillary buffer
 
@@ -841,7 +856,7 @@ bool LLPipeline::allocateScreenBufferInternal(U32 resX, U32 resY)
     if (!mRT->deferredScreen.allocate(resX, resY, GL_RGBA, true)) return false;
     if (!addDeferredAttachments(mRT->deferredScreen)) return false;
 
-    GLuint screenFormat = GL_RGBA16F;
+    GLuint screenFormat = hdr ? GL_RGBA16F : GL_RGBA;
 
     if (!mRT->screen.allocate(resX, resY, screenFormat)) return false;
 
@@ -849,7 +864,7 @@ bool LLPipeline::allocateScreenBufferInternal(U32 resX, U32 resY)
 
     if (shadow_detail > 0 || ssao || RenderDepthOfField)
     { //only need mRT->deferredLight for shadows OR ssao OR dof
-        if (!mRT->deferredLight.allocate(resX, resY, GL_RGBA16F)) return false;
+        if (!mRT->deferredLight.allocate(resX, resY, screenFormat)) return false;
     }
     else
     {
@@ -883,22 +898,22 @@ bool LLPipeline::allocateScreenBufferInternal(U32 resX, U32 resY)
         }
 
         //water reflection texture (always needed as scratch space whether or not transparent water is enabled)
-        mWaterDis.allocate(resX, resY, GL_RGBA16F, true);
+        mWaterDis.allocate(resX, resY, screenFormat, true);
 
         if(RenderScreenSpaceReflections)
         {
-            mSceneMap.allocate(resX, resY, GL_RGBA16F, true);
+            mSceneMap.allocate(resX, resY, screenFormat, true);
         }
         else
         {
             mSceneMap.release();
         }
 
-        mPostMap.allocate(resX, resY, GL_RGBA16F);
+        mPostMap.allocate(resX, resY, screenFormat);
 
         // used to scale down textures
         // See LLViwerTextureList::updateImagesCreateTextures and LLImageGL::scaleDown
-        mDownResMap.allocate(4, 4, GL_RGBA);
+        mDownResMap.allocate(1024, 1024, GL_RGBA);
 
         mBakeMap.allocate(LLAvatarAppearanceDefines::SCRATCH_TEX_WIDTH, LLAvatarAppearanceDefines::SCRATCH_TEX_HEIGHT, GL_RGBA);
     }
@@ -4120,6 +4135,13 @@ void LLPipeline::renderGeomPostDeferred(LLCamera& camera)
     {
         LLGLState::checkStates(GL_FALSE);
     }
+
+    // turn off atmospherics and water haze for low detail reflection probe
+    static LLCachedControl<S32> probe_level(gSavedSettings, "RenderReflectionProbeLevel", 0);
+    bool low_detail_probe = probe_level == 0 && gCubeSnapshot;
+    done_atmospherics = done_atmospherics || low_detail_probe;
+    done_water_haze   = done_water_haze || low_detail_probe;
+
 
     while ( iter1 != mPools.end() )
     {
@@ -7937,15 +7959,20 @@ void LLPipeline::renderFinalize()
     gGL.setColorMask(true, true);
     glClearColor(0, 0, 0, 0);
 
-    copyScreenSpaceReflections(&mRT->screen, &mSceneMap);
+    bool hdr = gGLManager.mGLVersion > 4.05f && gSavedSettings.getBOOL("RenderHDREnabled");
 
-    generateLuminance(&mRT->screen, &mLuminanceMap);
+    if (hdr)
+    {
+        copyScreenSpaceReflections(&mRT->screen, &mSceneMap);
 
-    generateExposure(&mLuminanceMap, &mExposureMap);
+        generateLuminance(&mRT->screen, &mLuminanceMap);
 
-    tonemap(&mRT->screen, &mPostMap);
+        generateExposure(&mLuminanceMap, &mExposureMap);
 
-    applyCAS(&mPostMap, &mRT->screen);
+        tonemap(&mRT->screen, &mPostMap);
+
+        applyCAS(&mPostMap, &mRT->screen);
+    }
 
     generateSMAABuffers(&mRT->screen);
 
@@ -8555,8 +8582,9 @@ void LLPipeline::renderDeferredLighting()
         }
 
         static LLCachedControl<S32> local_light_count(gSavedSettings, "RenderLocalLightCount", 256);
+        static LLCachedControl<S32> probe_level(gSavedSettings, "RenderReflectionProbeLevel", 0);
 
-        if (local_light_count > 0)
+        if (local_light_count > 0 && (!gCubeSnapshot || probe_level > 0))
         {
             gGL.setSceneBlendType(LLRender::BT_ADD);
             std::list<LLVector4>        fullscreen_lights;
