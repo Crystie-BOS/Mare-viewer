@@ -1564,8 +1564,8 @@ void LLViewerFetchedTexture::postCreateTexture()
     if (!needsToSaveRawImage())
     {
         mNeedsAux = false;
-        destroyRawImage();
     }
+    destroyRawImage(); // will save raw image if needed
 
     mNeedsCreateTexture = false;
 }

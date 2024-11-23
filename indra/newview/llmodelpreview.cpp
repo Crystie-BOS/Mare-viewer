@@ -227,6 +227,8 @@ LLModelPreview::~LLModelPreview()
     }
     mBaseModel.clear();
     mBaseScene.clear();
+
+    LLLoadedCallbackEntry::cleanUpCallbackList(&mCallbackTextureList);
 }
 
 void LLModelPreview::updateDimentionsAndOffsets()
@@ -553,7 +555,7 @@ void LLModelPreview::rebuildUploadData()
                         {
                             // in case user provided a missing file later
                             texture->setIsMissingAsset(false);
-                            texture->setLoadedCallback(LLModelPreview::textureLoadedCallback, 0, true, false, this, NULL, false);
+                            texture->setLoadedCallback(LLModelPreview::textureLoadedCallback, 0, true, false, this, &mCallbackTextureList, false);
                             texture->forceToSaveRawImage(0, F32_MAX);
                             texture->updateFetch();
                             if (mModelLoader)
@@ -3195,8 +3197,6 @@ LLJoint* LLModelPreview::lookupJointByName(const std::string& str, void* opaque)
 
 U32 LLModelPreview::loadTextures(LLImportMaterial& material, void* opaque)
 {
-    (void)opaque;
-
     if (material.mDiffuseMapFilename.size())
     {
         material.mOpaqueData = new LLPointer< LLViewerFetchedTexture >;
@@ -3210,7 +3210,8 @@ U32 LLModelPreview::loadTextures(LLImportMaterial& material, void* opaque)
         }
         // Todo: might cause a crash if preview gets closed before we get the callback.
         // Use a callback list or guard callback in some way
-        tex->setLoadedCallback(LLModelPreview::textureLoadedCallback, 0, true, false, opaque, NULL, false);
+        LLModelPreview* preview = (LLModelPreview*)opaque;
+        tex->setLoadedCallback(LLModelPreview::textureLoadedCallback, 0, true, false, opaque, &preview->mCallbackTextureList, false);
         tex->forceToSaveRawImage(0, F32_MAX);
         material.setDiffuseMap(tex->getID()); // record tex ID
         return 1;
