@@ -1255,9 +1255,9 @@
       initial_value="false"
       label="Vintage Mode"
       layout="topleft"
-      left="420"
+      left="8"
       name="VintageMode"
-      top_delta="20"
+      top_delta="16"
       width="240">
         <check_box.commit_callback
           function="Pref.RenderOptionUpdate" />
