@@ -354,7 +354,7 @@
   </check_box>
   <slider
     control_name="RenderExposure"
-    disabled_control="RenderVintageMode"
+    enabled_control="RenderDisableVintageMode"
     decimal_digits="1"
     follows="left|top"
     height="16"
@@ -1250,10 +1250,10 @@
   </check_box>
 
     <check_box
-      control_name="RenderVintageMode"
+      control_name="RenderDisableVintageMode"
       height="16"
       initial_value="false"
-      label="Vintage Mode"
+      label="HDR and Emissive"
       layout="topleft"
       left="8"
       name="VintageMode"

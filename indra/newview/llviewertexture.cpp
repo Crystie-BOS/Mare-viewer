@@ -560,7 +560,10 @@ void LLViewerTexture::updateClass()
         // lower discard bias over time when free memory is available
         if (sDesiredDiscardBias > 1.f && over_pct < 0.f)
         {
-            sDesiredDiscardBias -= gFrameIntervalSeconds * 0.01f;
+            static LLCachedControl<F32> high_mem_discard_decrement(gSavedSettings, "RenderHighMemMinDiscardDecrement", .1f);
+
+            F32 decrement = high_mem_discard_decrement - llmin(over_pct, 0.f);
+            sDesiredDiscardBias -= decrement * gFrameIntervalSeconds;
         }
     }
 
@@ -622,7 +625,7 @@ void LLViewerTexture::updateClass()
         }
     }
 
-    sDesiredDiscardBias = llclamp(sDesiredDiscardBias, 1.f, 5.f);
+    sDesiredDiscardBias = llclamp(sDesiredDiscardBias, 1.f, 4.f);
 
     LLViewerTexture::sFreezeImageUpdates = false;
 }

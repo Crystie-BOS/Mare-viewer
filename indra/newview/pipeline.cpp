@@ -351,8 +351,9 @@ bool addDeferredAttachments(LLRenderTarget& target, bool for_impostor = false)
     U32 norm = GL_RGBA16F;
     U32 emissive = GL_RGB16F;
 
-    bool hdr = gSavedSettings.getBOOL("RenderHDREnabled") && gGLManager.mGLVersion > 4.05f;
-    LLCachedControl<bool> has_emissive(gSavedSettings, "RenderEnableEmissiveBuffer", false);
+    static LLCachedControl<bool> has_emissive(gSavedSettings, "RenderEnableEmissiveBuffer", false);
+    static LLCachedControl<bool> has_hdr(gSavedSettings, "RenderHDREnabled", true);
+    bool hdr = has_hdr() && gGLManager.mGLVersion > 4.05f;
 
     if (!hdr)
     {
@@ -807,7 +808,8 @@ bool LLPipeline::allocateScreenBufferInternal(U32 resX, U32 resY)
 {
     LL_PROFILE_ZONE_SCOPED_CATEGORY_DISPLAY;
 
-    bool hdr = gGLManager.mGLVersion > 4.05f && gSavedSettings.getBOOL("RenderHDREnabled");
+    static LLCachedControl<bool> has_hdr(gSavedSettings, "RenderHDREnabled", true);
+    bool hdr = gGLManager.mGLVersion > 4.05f && has_hdr();
 
     if (mRT == &mMainRT)
     { // hacky -- allocate auxillary buffer
@@ -7912,7 +7914,8 @@ void LLPipeline::renderFinalize()
     gGL.setColorMask(true, true);
     glClearColor(0, 0, 0, 0);
 
-    bool hdr = gGLManager.mGLVersion > 4.05f && gSavedSettings.getBOOL("RenderHDREnabled");
+    static LLCachedControl<bool> has_hdr(gSavedSettings, "RenderHDREnabled", true);
+    bool hdr = gGLManager.mGLVersion > 4.05f && has_hdr();
 
     if (hdr)
     {
@@ -8536,6 +8539,7 @@ void LLPipeline::renderDeferredLighting()
             std::list<LLVector4>        fullscreen_lights;
             LLDrawable::drawable_list_t spot_lights;
             LLDrawable::drawable_list_t fullscreen_spot_lights;
+            LLSettingsSky::ptr_t        psky        = LLEnvironment::instance().getCurrentSky();
 
             if (!gCubeSnapshot)
             {
@@ -8631,6 +8635,8 @@ void LLPipeline::renderDeferredLighting()
                         gDeferredLightProgram.uniform1f(LLShaderMgr::LIGHT_SIZE, s);
                         gDeferredLightProgram.uniform3fv(LLShaderMgr::DIFFUSE_COLOR, 1, col.mV);
                         gDeferredLightProgram.uniform1f(LLShaderMgr::LIGHT_FALLOFF, volume->getLightFalloff(DEFERRED_LIGHT_FALLOFF));
+                        gDeferredLightProgram.uniform1i(LLShaderMgr::CLASSIC_MODE, (psky->canAutoAdjust()) ? 1 : 0);
+
                         gGL.syncMatrices();
 
                         mCubeVB->drawRange(LLRender::TRIANGLE_FAN, 0, 7, 8, get_box_fan_indices(camera, center));
@@ -8691,6 +8697,8 @@ void LLPipeline::renderDeferredLighting()
                     gDeferredSpotLightProgram.uniform1f(LLShaderMgr::LIGHT_SIZE, s);
                     gDeferredSpotLightProgram.uniform3fv(LLShaderMgr::DIFFUSE_COLOR, 1, col.mV);
                     gDeferredSpotLightProgram.uniform1f(LLShaderMgr::LIGHT_FALLOFF, volume->getLightFalloff(DEFERRED_LIGHT_FALLOFF));
+                    gDeferredSpotLightProgram.uniform1i(LLShaderMgr::CLASSIC_MODE, (psky->canAutoAdjust()) ? 1 : 0);
+
                     gGL.syncMatrices();
 
                     mCubeVB->drawRange(LLRender::TRIANGLE_FAN, 0, 7, 8, get_box_fan_indices(camera, center));
@@ -8729,6 +8737,7 @@ void LLPipeline::renderDeferredLighting()
                         gDeferredMultiLightProgram[idx].uniform4fv(LLShaderMgr::MULTI_LIGHT, count, (GLfloat*)light);
                         gDeferredMultiLightProgram[idx].uniform4fv(LLShaderMgr::MULTI_LIGHT_COL, count, (GLfloat*)col);
                         gDeferredMultiLightProgram[idx].uniform1f(LLShaderMgr::MULTI_LIGHT_FAR_Z, far_z);
+                        gDeferredMultiLightProgram[idx].uniform1i(LLShaderMgr::CLASSIC_MODE, (psky->canAutoAdjust()) ? 1 : 0);
                         far_z = 0.f;
                         count = 0;
                         mScreenTriangleVB->setBuffer();
@@ -8766,6 +8775,8 @@ void LLPipeline::renderDeferredLighting()
                     gDeferredMultiSpotLightProgram.uniform1f(LLShaderMgr::LIGHT_SIZE, light_size_final);
                     gDeferredMultiSpotLightProgram.uniform3fv(LLShaderMgr::DIFFUSE_COLOR, 1, col.mV);
                     gDeferredMultiSpotLightProgram.uniform1f(LLShaderMgr::LIGHT_FALLOFF, light_falloff_final);
+                    gDeferredMultiSpotLightProgram.uniform1i(LLShaderMgr::CLASSIC_MODE, (psky->canAutoAdjust()) ? 1 : 0);
+
                     mScreenTriangleVB->drawArrays(LLRender::TRIANGLES, 0, 3);
                 }
 
