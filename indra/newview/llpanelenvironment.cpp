@@ -1100,7 +1100,9 @@ void LLPanelEnvironmentInfo::onEnvironmentChanged(LLEnvironment::EnvSelection_t 
     else if ((env == LLEnvironment::ENV_PARCEL)
              && (getParcelId() == LLViewerParcelMgr::instance().getAgentParcelId()))
     {
-        if (LLParcel* parcel = getParcel())
+        // gives unused error under gcc if (LLParcel* parcel = getParcel())
+        LLParcel* parcel = getParcel();
+        if (parcel)
         {
             // first for parcel own settings, second is for case when parcel uses region settings
             if (mCurEnvVersion < new_version

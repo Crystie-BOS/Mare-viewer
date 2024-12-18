@@ -6298,7 +6298,7 @@ void LLVolumeGeometryManager::rebuildMesh(LLSpatialGroup* group)
             static std::vector<LLVertexBuffer*> locked_buffer;
             locked_buffer.resize(0);
 
-            U32 buffer_count = 0;
+            //unused U32 buffer_count = 0;
 
             for (LLSpatialGroup::element_iter drawable_iter = group->getDataBegin(); drawable_iter != group->getDataEnd(); ++drawable_iter)
             {
