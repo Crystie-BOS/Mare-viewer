@@ -5380,7 +5380,10 @@ void LLVOAvatar::updateVisibility()
 
         if (sDebugInvisible)
         {
-            if (LLNameValue* firstname = getNVPair("FirstName"))
+        		// gcc doesn't like this construct
+            //if (LLNameValue* firstname = getNVPair("FirstName"))
+            LLNameValue* firstname = getNVPair("FirstName");
+            if (firstname)
             {
                 LL_DEBUGS("Avatar") << avString() << " updating visibility" << LL_ENDL;
             }
