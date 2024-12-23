@@ -2784,10 +2784,6 @@ void process_chat_from_simulator(LLMessageSystem *msg, void **user_data)
     {
         //bool visible_in_chat_bubble = false;
 
-        //MK
-        std::string verb;
-        //mk
-
         color.setVec(1.f, 1.f, 1.f, 1.f);
         msg->getStringFast(_PREHASH_ChatData, _PREHASH_Message, mesg);
 
@@ -2998,11 +2994,11 @@ void process_chat_from_simulator(LLMessageSystem *msg, void **user_data)
                                 }
                             }
                         }
-                        verb = " executes command: ";
+                        chat.mText = "executes command: ";
                     }
                     else
                     {
-                        verb = " fails command: ";
+                        chat.mText = "fails command: ";
                     }
                     //KKA-757 Add option to divert it to the script debug/error floater instead
                     if (kokua_restrained_love_debug_to_script_debug_floater)
@@ -3011,7 +3007,7 @@ void process_chat_from_simulator(LLMessageSystem *msg, void **user_data)
 			            F32 alpha = 1.f;
 			            LLViewerChat::getChatColor(chat, txt_color, alpha);
                         // include the name in the actual text so that it appears in the all pane with the name
-			            LLFloaterScriptDebug::addScriptLine(chat.mFromName + verb + mesg_str,
+			            LLFloaterScriptDebug::addScriptLine(chat.mFromName + " " +chat.mText + mesg_str,
 			                                                chat.mFromName,
 			                                                txt_color % alpha,
 			                                                chat.mFromID);
@@ -3039,8 +3035,6 @@ void process_chat_from_simulator(LLMessageSystem *msg, void **user_data)
                         from_name = gAgent.mRRInterface.getCensoredMessage(from_name);
                         chat.mFromName = from_name;
                     }
-
-                    verb = ": ";
                 }
                 break;
             }
@@ -3087,9 +3081,7 @@ void process_chat_from_simulator(LLMessageSystem *msg, void **user_data)
                     }
                 }
             }
-            ////            chat.mText = "";
             //mk
-            chat.mText += verb;
             chat.mText += mesg;
         }
 
