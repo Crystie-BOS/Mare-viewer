@@ -14451,22 +14451,13 @@
     <key>ThrottleBandwidthKBPS</key>
     <map>
       <key>Comment</key>
-      <string>Maximum allowable downstream UDP bandwidth (kilo bits per second, max. recommended=1500)</string>
+      <string>Maximum allowable downstream bandwidth (kilo bits per second)</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
       <string>F32</string>
       <key>Value</key>
-      <real>1500.0</real>
-      <key>SanityCheckType</key>
-      <string>LessThanEquals</string>
-      <key>SanityValue</key>
-      <array>
-        <real>1500.0</real>
-      </array>
-      <key>SanityComment</key>
-      <string>3000Kbps is the simulator's maximum, however the viewer can burst to 2x the configured value so 1500 or lower is recommended</string>
-
+      <real>3000.0</real>
     </map>
     <key>ToolTipDelay</key>
     <map>
