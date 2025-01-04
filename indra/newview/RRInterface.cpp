@@ -4609,6 +4609,35 @@ bool RRInterface::forceEnvironment (std::string command, std::string option)
         //updateAndSave (&(params->mGlow));
     }
     else if (command == "scenegamma") {
+        // KKA-1133 LL Viewer 7.1.11 significantly changed the behaviour of setGamma. The following attempts to get it looking as it did previously.
+        // As Marine commented, this looks suspiciously like a log curve, but this linear approximation should give acceptable results.
+        // Input 0 is mapped to 0.5, 1 to 1, 5 to 2 and 20 to 2.9. The default value of 1 is the same in old and new versions setGamma.
+        if (val > 20.0)
+        {
+            val = 20.0;
+        }
+        if (val <= 0.0)
+        {
+            val = 0.25;
+        }
+        else
+        {
+            if (val < 1.0)
+            {
+                val = (F32)(0.5 + (val * 0.5));
+            }
+            else
+            {
+                if (val < 5.0)
+                {
+                    val = (F32)(1.0 + ((val - 1.0) * 0.25));
+                }
+                else
+                {
+                    val = (F32)(2.0 + ((val - 5.0) * 0.06));
+                }
+            }
+        }
         psky->setGamma(val);
         psky->update();
         LLEnvironment::instance().updateEnvironment(LLEnvironment::TRANSITION_INSTANT);
@@ -4984,7 +5013,7 @@ bool RRInterface::forceEnvironment (std::string command, std::string option)
         psky->update();
         LLEnvironment::instance().updateEnvironment(LLEnvironment::TRANSITION_INSTANT);
     }
-    // sunglowfocus 0-0.5, sunglowsize 0-2, scenegamma 0-10, starbrightness 0-2
+    // sunglowfocus 0-0.5, sunglowsize 0-2, scenegamma 0-20, starbrightness 0-2
     // cloudcolor rgb 0-1, cloudxydensity xyd 0-1, cloudcoverage 0-1, cloudscale 0-1, clouddetail xyd 0-1
     // cloudscrollx 0-1, cloudscrolly 0-1, drawclassicclouds 0/1
 
@@ -5117,7 +5146,43 @@ std::string RRInterface::getEnvironment (std::string command)
 
     else if (command == "sunglowfocus") str << (-psky->getGlow().mV[2]) / 5; // negation is intended, 5 is SLIDER_SCALE_GLOW_B
     else if (command == "sunglowsize")      str << 2 - psky->getGlow().mV[0] / 20; // 2 is UI size, 20 is SLIDER_SCALE_GLOW_R
-    else if (command == "scenegamma")       str << psky->getGamma();
+    else if (command == "scenegamma")
+    {
+        // KKA-1133 We need to reverse the mapping we did in setenv so a script can read back the same value it put in
+        float gamma = psky->getGamma();
+        
+        if (gamma > 2.9)
+        {
+            gamma = 20.0;
+        }
+        else
+        {
+            if (gamma <= 0.5)
+            {
+                gamma = 0.0;
+            }
+            else
+            {
+                if (gamma < 1.0)
+                {
+                    gamma = (float)((gamma - 0.5) * 2.0);
+                }
+                else
+                {
+                    if (gamma < 2.0)
+                    {
+                        gamma = (float)(1.0 + ((gamma - 1.0) * 4.0));
+                    }
+                    else
+                    {
+                        gamma = (float)(5.0 + ((gamma - 2.0) / 0.06));
+                    }
+                }
+            }
+        }
+
+        str << gamma;
+    }
 
     else if (command == "sunazim" || command == "sunazimuth") { // sun azimuth
         LLQuaternion orig_quat = psky->getSunRotation();
