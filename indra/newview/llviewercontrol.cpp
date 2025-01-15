@@ -266,6 +266,8 @@ static bool handleDisableVintageMode(const LLSD& newvalue)
 
 static bool handleEnableHDR(const LLSD& newvalue)
 {
+    gPipeline.mReflectionMapManager.reset();
+    gPipeline.mHeroProbeManager.reset();
     return handleReleaseGLBufferChanged(newvalue) && handleSetShaderChanged(newvalue);
 }
 
@@ -453,11 +455,11 @@ static bool handleReflectionProbeDetailChanged(const LLSD& newvalue)
     if (gPipeline.isInit())
     {
         LLPipeline::refreshCachedSettings();
+        gPipeline.mReflectionMapManager.reset();
+        gPipeline.mHeroProbeManager.reset();
         gPipeline.releaseGLBuffers();
         gPipeline.createGLBuffers();
         LLViewerShaderMgr::instance()->setShaders();
-        gPipeline.mReflectionMapManager.reset();
-        gPipeline.mHeroProbeManager.reset();
     }
     return true;
 }
