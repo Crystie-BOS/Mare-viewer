@@ -8609,7 +8609,18 @@
       <key>Type</key>
       <string>U32</string>
       <key>Value</key>
-			<integer>64</integer>
+      <integer>0</integer>
+    </map>
+    <key>KokuaNonvisibleObjectsInMemoryTimeMax</key>
+    <map>
+      <key>Comment</key>
+      <string>Maximum setting for NonvisibleObjectsInMemoryTime (applies when set to 0).</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>U32</string>
+      <key>Value</key>
+      <integer>1200</integer>
     </map>
     <key>NoPreload</key>
     <map>
@@ -13579,7 +13590,7 @@
     <key>SceneLoadHighMemoryBound</key>
     <map>
       <key>Comment</key>
-      <string>in MB, when total memory usage above this threshold, minimum invisible objects are kept in memory </string>
+      <string>in MB, when total memory usage above this threshold, minimum invisible objects are kept in memory. Applies when system memory is below KokuaSceneLoadMemoryThreshold </string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
@@ -13590,13 +13601,46 @@
     <key>SceneLoadLowMemoryBound</key>
     <map>
       <key>Comment</key>
-      <string>in MB, when total memory usage above this threshold, start to reduce invisible objects kept in memory </string>
+      <string>in MB, when total memory usage above this threshold, start to reduce invisible objects kept in memory. Applies when system memory is below KokuaSceneLoadMemoryThreshold </string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
       <string>U32</string>
       <key>Value</key>
       <integer>750</integer>
+    </map>
+    <key>KokuaSceneLoadMemoryThreshold</key>
+    <map>
+      <key>Comment</key>
+      <string>in MB, when system memory is equal or over KokuaSceneLoad*MemoryBound will be used instead of SceneLoad*MemoryBound. Default 8GB</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>U32</string>
+      <key>Value</key>
+      <integer>8192</integer>
+    </map>
+    <key>KokuaSceneLoadHighMemoryBound</key>
+    <map>
+      <key>Comment</key>
+      <string>in MB, when total memory usage above this threshold, minimum invisible objects are kept in memory. Applies when system memory is above KokuaSceneLoadMemoryThreshold </string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>U32</string>
+      <key>Value</key>
+      <integer>6144</integer>
+    </map>
+    <key>KokuaSceneLoadLowMemoryBound</key>
+    <map>
+      <key>Comment</key>
+      <string>in MB, when total memory usage above this threshold, start to reduce invisible objects kept in memory. Applies when system memory is above KokuaSceneLoadMemoryThreshold </string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>U32</string>
+      <key>Value</key>
+      <integer>4096</integer>
     </map>
     <key>SceneLoadMinRadius</key>
     <map>
@@ -15275,22 +15319,13 @@
     <key>ThrottleBandwidthKBPS</key>
     <map>
       <key>Comment</key>
-      <string>Maximum allowable downstream UDP bandwidth (kilo bits per second, max. recommended=1500)</string>
+      <string>Maximum allowable downstream bandwidth (kilo bits per second)</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
       <string>F32</string>
       <key>Value</key>
-      <real>1500.0</real>
-      <key>SanityCheckType</key>
-      <string>LessThanEquals</string>
-      <key>SanityValue</key>
-      <array>
-        <real>1500.0</real>
-      </array>
-      <key>SanityComment</key>
-      <string>3000Kbps is the simulator's maximum, however the viewer can burst to 2x the configured value so 1500 or lower is recommended</string>
-
+      <real>3000.0</real>
     </map>
     <key>ToolTipDelay</key>
     <map>
