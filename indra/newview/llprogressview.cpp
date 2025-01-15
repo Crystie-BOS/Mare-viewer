@@ -86,6 +86,7 @@ bool LLProgressView::postBuild()
 
     mProgressText = getChild<LLTextBox>("progress_text");
     mMessageText = getChild<LLTextBox>("message_text");
+    mMessageTextRectInitial = mMessageText->getRect(); // auto resizes, save initial size
 
     // media control that is used to play intro video
     mMediaCtrl = getChild<LLMediaCtrl>("login_media_panel");
@@ -96,6 +97,12 @@ bool LLProgressView::postBuild()
 
     mCancelBtn = getChild<LLButton>("cancel_btn");
     mCancelBtn->setClickedCallback(  LLProgressView::onCancelButtonClicked, NULL );
+
+    mLayoutPanel4 = getChild<LLView>("panel4");
+    mLayoutPanel4RectInitial = mLayoutPanel4->getRect();
+
+    mLayoutMOTD = getChild<LLView>("panel_motd");
+    mLayoutMOTDRectInitial = mLayoutMOTD->getRect();
 
     getChild<LLTextBox>("title_text")->setText(LLStringExplicit(
         LLAppViewer::instance()->getSecondLifeTitle() + " " +
@@ -345,6 +352,18 @@ void LLProgressView::setMessage(const std::string& msg)
 {
     mMessage = msg;
     mMessageText->setValue(mMessage);
+    S32 height = mMessageText->getTextPixelHeight();
+    S32 delta  = height - mMessageTextRectInitial.getHeight();
+    if (delta > 0)
+    {
+        mLayoutPanel4->reshape(mLayoutPanel4RectInitial.getWidth(), mLayoutPanel4RectInitial.getHeight() + delta);
+        mLayoutMOTD->reshape(mLayoutMOTDRectInitial.getWidth(), mLayoutMOTDRectInitial.getHeight() + delta);
+    }
+    else
+    {
+        mLayoutPanel4->reshape(mLayoutPanel4RectInitial.getWidth(), mLayoutPanel4RectInitial.getHeight());
+        mLayoutMOTD->reshape(mLayoutMOTDRectInitial.getWidth(), mLayoutMOTDRectInitial.getHeight());
+    }
 }
 
 void LLProgressView::loadLogo(const std::string &path,
@@ -382,6 +401,7 @@ void LLProgressView::loadLogo(const std::string &path,
     data.mOffsetRect = offset_rect;
     mLogosList.push_back(data);
 }
+
 
 void LLProgressView::initLogos()
 {
