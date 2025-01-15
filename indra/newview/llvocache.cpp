@@ -484,13 +484,22 @@ void LLVOCacheEntry::updateDebugSettings()
     //starts to put restrictions from low_mem_bound_MB, apply tightest restrictions when hits high_mem_bound_MB
     static LLCachedControl<U32> low_mem_bound_MB(gSavedSettings,"SceneLoadLowMemoryBound");
     static LLCachedControl<U32> high_mem_bound_MB(gSavedSettings,"SceneLoadHighMemoryBound");
+    //CA: additional values for higher memory systems and a threshold determining when to apply them
+    static LLCachedControl<U32> kokua_scene_load_threshold(gSavedSettings,"KokuaSceneLoadMemoryThreshold");
+    static LLCachedControl<U32> kokua_low_mem_bound_MB(gSavedSettings,"KokuaSceneLoadLowMemoryBound");
+    static LLCachedControl<U32> kokua_high_mem_bound_MB(gSavedSettings,"KokuaSceneLoadHighMemoryBound");
 
     LLMemory::updateMemoryInfo() ;
     U32 allocated_mem = LLMemory::getAllocatedMemKB().value();
     static const F32 KB_to_MB = 1.f / 1024.f;
-    U32 clamped_memory = (U32)llclamp(allocated_mem * KB_to_MB, (F32) low_mem_bound_MB, (F32) high_mem_bound_MB);
-    const F32 adjust_range = (F32)(high_mem_bound_MB - low_mem_bound_MB);
-    const F32 adjust_factor = (high_mem_bound_MB - clamped_memory) / adjust_range; // [0, 1]
+	//CA: decide which set of memory bounds apply (inspired by FS:Beq, although the implementation is different)
+    static bool low_memory_system = LLMemory::getAvailableMemKB() * KB_to_MB < kokua_scene_load_threshold;
+    const F32 use_low_mem_bound_MB = (F32)low_memory_system ? (F32)low_mem_bound_MB : (F32)kokua_low_mem_bound_MB;
+    const F32 use_high_mem_bound_MB = (F32)low_memory_system ? (F32)high_mem_bound_MB : (F32)kokua_high_mem_bound_MB;
+    //LL_INFOS() << "System memory " << LLMemory::getAvailableMemKB() * KB_to_MB << " threshold " << kokua_scene_load_threshold << " using low: " << use_low_mem_bound_MB << " high: " << use_high_mem_bound_MB << LL_ENDL;
+    U32 clamped_memory = (U32)llclamp(allocated_mem * KB_to_MB, (F32) use_low_mem_bound_MB, (F32) use_high_mem_bound_MB);
+    const F32 adjust_range = (F32)(use_high_mem_bound_MB - use_low_mem_bound_MB);
+    const F32 adjust_factor = (use_high_mem_bound_MB - clamped_memory) / adjust_range; // [0, 1]
 
     //min radius: all objects within this radius remain loaded in memory
     static LLCachedControl<F32> min_radius(gSavedSettings,"SceneLoadMinRadius");
@@ -508,9 +517,14 @@ void LLVOCacheEntry::updateDebugSettings()
 
     //the number of frames invisible objects stay in memory
     static LLCachedControl<U32> inv_obj_time(gSavedSettings,"NonvisibleObjectsInMemoryTime");
+    static LLCachedControl<U32> max_frames(gSavedSettings,"KokuaNonvisibleObjectsInMemoryTimeMax");
     static const U32 MIN_FRAMES = 10;
-    static const U32 MAX_FRAMES = 64;
-    const U32 clamped_frames = inv_obj_time ? llclamp((U32) inv_obj_time, MIN_FRAMES, MAX_FRAMES) : MAX_FRAMES; // [10, 64], with zero => 64
+	// CA: Follow FS:Beq's lead by upping the max limit to a lot more than 64 frames
+	// The upper limit becomes a debug setting, with a default of 1200 for 20mins at 60fps. The debug setting
+	// NonvisibleObjectsInMemoryTime also gets a default of 0 in settings.xml to use the maximum
+    // static const U32 MAX_FRAMES = 64;
+    const U32 clamped_frames = inv_obj_time ? llclamp((U32) inv_obj_time, MIN_FRAMES, max_frames) : max_frames; // [10, 1200], with zero => 1200
+    //LL_INFOS() << "Clamped frames: " << clamped_frames << LL_ENDL;
     sMinFrameRange = MIN_FRAMES + (U32)((clamped_frames - MIN_FRAMES) * adjust_factor);
 }
 #endif // LL_TEST
