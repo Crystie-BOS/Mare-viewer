@@ -543,6 +543,41 @@
     name="MaxLights"
     top_delta="16"
     width="434" />
+    <text
+      type="string"
+      length="1"
+      follows="left|top"
+      height="16"
+      layout="topleft"
+      top_delta="16"
+      left="30"
+      width="130"
+      name="MaxTextureResolutionLabel"
+      text_readonly_color="LabelDisabledColor">
+        Maximum LOD resolution:
+    </text>
+    <combo_box
+     control_name="RenderMaxTextureResolution"
+     height="19"
+     layout="topleft"
+     left_pad="40"
+     top_delta="0"
+     name="MaxTextureResolution"
+     tool_tip="Maximum resolution for 'level of detail' textures"
+     width="90">
+        <combo_box.item
+          label="512"
+          name="512"
+          value="512"/>
+        <combo_box.item
+          label="1024"
+          name="1024"
+          value="1024"/>
+        <combo_box.item
+          label="2048"
+          name="2048"
+          value="2048"/>
+    </combo_box>
   <check_box
     control_name="RenderVSyncEnable"
     height="16"
