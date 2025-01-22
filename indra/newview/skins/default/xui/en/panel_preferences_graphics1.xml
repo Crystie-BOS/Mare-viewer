@@ -543,6 +543,41 @@
     name="MaxLights"
     top_delta="16"
     width="434" />
+    <text
+      type="string"
+      length="1"
+      follows="left|top"
+      height="16"
+      layout="topleft"
+      top_delta="18"
+      left="30"
+      width="180"
+      name="MaxTextureResolutionLabel"
+      text_readonly_color="LabelDisabledColor">
+        Maximum LOD (Texture) resolution:
+    </text>
+    <combo_box
+     control_name="RenderMaxTextureResolution"
+     height="19"
+     layout="topleft"
+     left_pad="16"
+     top_delta="0"
+     name="MaxTextureResolution"
+     tool_tip="Maximum resolution for 'level of detail' textures"
+     width="90">
+        <combo_box.item
+          label="512"
+          name="512"
+          value="512"/>
+        <combo_box.item
+          label="1024"
+          name="1024"
+          value="1024"/>
+        <combo_box.item
+          label="2048"
+          name="2048"
+          value="2048"/>
+    </combo_box>
   <check_box
     control_name="RenderVSyncEnable"
     height="16"
@@ -550,7 +585,7 @@
     label="Enable VSync (Viewer tries to match monitor refresh rate)"
     layout="topleft"
     left="26"
-    top_delta="18"
+    top_delta="20"
     name="vsync"
     tool_tip="Synchronizes the frame rate to the refresh rate of the monitor, which results in smooth performance."
     width="315" />
