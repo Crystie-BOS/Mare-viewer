@@ -38,9 +38,6 @@
 // Length of the "#RLV/" string constant in characters.
 #define RR_HRLVS_LENGTH 5
 
-// Set to 1 for Tattoo and Alpha wearables support
-#define ALPHA_AND_TATTOO 1
-
 #define EXTREMUM 1000000.f
 
 #define ALPHA_ALMOST_OPAQUE 0.99f
@@ -60,11 +57,10 @@
 #define WS_SOCKS "socks"
 #define WS_UNDERPANTS "underpants"
 #define WS_UNDERSHIRT "undershirt"
-#if ALPHA_AND_TATTOO
 #define WS_ALPHA "alpha"
 #define WS_TATTOO "tattoo"
 #define WS_PHYSICS "physics"
-#endif
+#define WS_UNIVERSAL "universal"
 
 //#include <set>
 #include <deque>

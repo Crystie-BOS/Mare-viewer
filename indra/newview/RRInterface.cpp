@@ -2120,16 +2120,6 @@ bool RRInterface::force (LLUUID object_uuid, std::string command, std::string op
     }
     else if (command=="remoutfit") { // remoutfit:shoes
         if (option=="") {
-//          gAgentWearables.removeWearable (WT_GLOVES, false, 0);
-//          gAgentWearables.removeWearable (WT_JACKET, false, 0);
-//          gAgentWearables.removeWearable (WT_PANTS, false, 0);
-//          gAgentWearables.removeWearable (WT_SHIRT, false, 0);
-//          gAgentWearables.removeWearable (WT_SHOES, false, 0);
-//          gAgentWearables.removeWearable (WT_SKIRT, false, 0);
-//          gAgentWearables.removeWearable (WT_SOCKS, false, 0);
-//          gAgentWearables.removeWearable (WT_UNDERPANTS, false, 0);
-//          gAgentWearables.removeWearable (WT_UNDERSHIRT, false, 0);
-
             for (int i = LLWearableData::MAX_CLOTHING_LAYERS - 1; i >= 0; --i) {
                 removeItemFromAvatar (gInventory.getItem(gAgentWearables.getWearableItemID (LLWearableType::WT_GLOVES, i)));
                 removeItemFromAvatar (gInventory.getItem(gAgentWearables.getWearableItemID (LLWearableType::WT_JACKET, i)));
@@ -2140,14 +2130,10 @@ bool RRInterface::force (LLUUID object_uuid, std::string command, std::string op
                 removeItemFromAvatar (gInventory.getItem(gAgentWearables.getWearableItemID (LLWearableType::WT_SOCKS, i)));
                 removeItemFromAvatar (gInventory.getItem(gAgentWearables.getWearableItemID (LLWearableType::WT_UNDERPANTS, i)));
                 removeItemFromAvatar (gInventory.getItem(gAgentWearables.getWearableItemID (LLWearableType::WT_UNDERSHIRT, i)));
-
-#if ALPHA_AND_TATTOO
-//          gAgentWearables.removeWearable (WT_ALPHA, false, 0);
-//          gAgentWearables.removeWearable (WT_TATTOO, false, 0);
                 removeItemFromAvatar (gInventory.getItem(gAgentWearables.getWearableItemID (LLWearableType::WT_ALPHA, i)));
                 removeItemFromAvatar (gInventory.getItem(gAgentWearables.getWearableItemID (LLWearableType::WT_TATTOO, i)));
                 removeItemFromAvatar (gInventory.getItem(gAgentWearables.getWearableItemID (LLWearableType::WT_PHYSICS, i)));
-#endif
+                removeItemFromAvatar (gInventory.getItem(gAgentWearables.getWearableItemID (LLWearableType::WT_UNIVERSAL, i)));
             }
         }
         else {
@@ -2155,7 +2141,6 @@ bool RRInterface::force (LLUUID object_uuid, std::string command, std::string op
             if (type != LLWearableType::WT_INVALID) {
                  // clothes only, not skin, eyes, hair or shape
                 if (LLWearableType::getInstance()->getAssetType(type) == LLAssetType::AT_CLOTHING) {
-//                  gAgentWearables.removeWearable (type, false, 0); // remove by layer
                     for (int i = LLWearableData::MAX_CLOTHING_LAYERS - 1; i >= 0; --i) {
                         removeItemFromAvatar (gInventory.getItem(gAgentWearables.getWearableItemID (type, i)));
                     }
@@ -2582,11 +2567,10 @@ std::string RRInterface::getOutfitLayerAsString (LLWearableType::EType layer)
         case LLWearableType::WT_SOCKS: return WS_SOCKS;
         case LLWearableType::WT_UNDERPANTS: return WS_UNDERPANTS;
         case LLWearableType::WT_UNDERSHIRT: return WS_UNDERSHIRT;
-#if ALPHA_AND_TATTOO
         case LLWearableType::WT_ALPHA: return WS_ALPHA;
         case LLWearableType::WT_TATTOO: return WS_TATTOO;
         case LLWearableType::WT_PHYSICS: return WS_PHYSICS;
-#endif
+        case LLWearableType::WT_UNIVERSAL: return WS_UNIVERSAL;
         case LLWearableType::WT_EYES: return WS_EYES;
         case LLWearableType::WT_HAIR: return WS_HAIR;
         case LLWearableType::WT_SHAPE: return WS_SHAPE;
@@ -2606,11 +2590,10 @@ LLWearableType::EType RRInterface::getOutfitLayerAsType (std::string layer)
     if (layer==WS_SOCKS) return LLWearableType::WT_SOCKS;
     if (layer==WS_UNDERPANTS) return LLWearableType::WT_UNDERPANTS;
     if (layer==WS_UNDERSHIRT) return LLWearableType::WT_UNDERSHIRT;
-#if ALPHA_AND_TATTOO
     if (layer==WS_ALPHA) return LLWearableType::WT_ALPHA;
     if (layer==WS_TATTOO) return LLWearableType::WT_TATTOO;
     if (layer==WS_PHYSICS) return LLWearableType::WT_PHYSICS;
-#endif
+    if (layer==WS_UNIVERSAL) return LLWearableType::WT_UNIVERSAL;
     if (layer==WS_EYES) return LLWearableType::WT_EYES;
     if (layer==WS_HAIR) return LLWearableType::WT_HAIR;
     if (layer==WS_SHAPE) return LLWearableType::WT_SHAPE;
@@ -2629,13 +2612,10 @@ std::string RRInterface::getOutfit (std::string layer)
     if (layer==WS_SOCKS) return (gAgentWearables.getWearable (LLWearableType::WT_SOCKS, 0) != NULL? "1" : "0");
     if (layer==WS_UNDERPANTS) return (gAgentWearables.getWearable (LLWearableType::WT_UNDERPANTS, 0) != NULL? "1" : "0");
     if (layer==WS_UNDERSHIRT) return (gAgentWearables.getWearable (LLWearableType::WT_UNDERSHIRT, 0) != NULL? "1" : "0");
-#if ALPHA_AND_TATTOO
-//  if (layer==WS_ALPHA) return (gAgent.getWearable (LLWearableType::WT_ALPHA, 0) != NULL? "1" : "0");
-//  if (layer==WS_TATTOO) return (gAgent.getWearable (LLWearableType::WT_TATTOO, 0) != NULL? "1" : "0");
     if (layer==WS_ALPHA) return (gAgentWearables.getWearable (LLWearableType::WT_ALPHA, 0) != NULL? "1" : "0");
     if (layer==WS_TATTOO) return (gAgentWearables.getWearable (LLWearableType::WT_TATTOO, 0) != NULL? "1" : "0");
     if (layer==WS_PHYSICS) return (gAgentWearables.getWearable (LLWearableType::WT_PHYSICS, 0) != NULL? "1" : "0");
-#endif
+    if (layer==WS_UNIVERSAL) return (gAgentWearables.getWearable (LLWearableType::WT_UNIVERSAL, 0) != NULL? "1" : "0");
     if (layer==WS_EYES) return (gAgentWearables.getWearable (LLWearableType::WT_EYES, 0) != NULL? "1" : "0");
     if (layer==WS_HAIR) return (gAgentWearables.getWearable (LLWearableType::WT_HAIR, 0) != NULL? "1" : "0");
     if (layer==WS_SHAPE) return (gAgentWearables.getWearable (LLWearableType::WT_SHAPE, 0) != NULL? "1" : "0");
@@ -2643,9 +2623,7 @@ std::string RRInterface::getOutfit (std::string layer)
             +getOutfit (WS_SHIRT)+getOutfit (WS_SHOES)+getOutfit (WS_SKIRT)
             +getOutfit (WS_SOCKS)+getOutfit (WS_UNDERPANTS)+getOutfit (WS_UNDERSHIRT)
             +getOutfit (WS_SKIN)+getOutfit (WS_EYES)+getOutfit (WS_HAIR)+getOutfit (WS_SHAPE)
-#if ALPHA_AND_TATTOO
-            +getOutfit (WS_ALPHA)+getOutfit (WS_TATTOO)+getOutfit (WS_PHYSICS)
-#endif
+            +getOutfit (WS_ALPHA)+getOutfit (WS_TATTOO)+getOutfit (WS_PHYSICS)+getOutfit(WS_UNIVERSAL)
             ;
 }
 
