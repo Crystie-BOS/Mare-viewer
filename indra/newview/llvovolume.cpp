@@ -5954,7 +5954,12 @@ void LLVolumeGeometryManager::rebuildGeom(LLSpatialGroup* group)
                     continue;
                 }
 
-                LLFetchedGLTFMaterial *gltf_mat = (LLFetchedGLTFMaterial*) facep->getTextureEntry()->getGLTFRenderMaterial();
+                LLFetchedGLTFMaterial* gltf_mat = nullptr;
+                const LLTextureEntry* te = facep->getTextureEntry();
+                if (te)
+                {
+                    gltf_mat = (LLFetchedGLTFMaterial*)te->getGLTFRenderMaterial();
+                } // if not te, continue?
                 bool is_pbr = gltf_mat != nullptr;
 
                 if (is_pbr)
@@ -6016,10 +6021,9 @@ void LLVolumeGeometryManager::rebuildGeom(LLSpatialGroup* group)
                 {
                     cur_total += facep->getGeomCount();
 
-                    const LLTextureEntry* te = facep->getTextureEntry();
                     LLViewerTexture* tex = facep->getTexture();
 
-                    if (te->getGlow() > 0.f)
+                    if (te && te->getGlow() > 0.f)
                     {
                         emissive = true;
                     }
@@ -6114,6 +6118,7 @@ void LLVolumeGeometryManager::rebuildGeom(LLSpatialGroup* group)
                             facep->mLastUpdateTime = gFrameTimeSeconds;
                         }
 
+                        if (te)
                         {
                             LLGLTFMaterial* gltf_mat = te->getGLTFRenderMaterial();
 
@@ -6177,6 +6182,11 @@ void LLVolumeGeometryManager::rebuildGeom(LLSpatialGroup* group)
                                 facep->setState(LLFace::FULLBRIGHT);
                                 add_face(sFullbrightFaces, fullbright_count, facep);
                             }
+                        }
+                        else // no texture entry
+                        {
+                            facep->setState(LLFace::FULLBRIGHT);
+                            add_face(sFullbrightFaces, fullbright_count, facep);
                         }
                     }
                 }
