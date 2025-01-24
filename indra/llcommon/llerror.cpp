@@ -1614,11 +1614,11 @@ namespace LLError
     std::string LLUserWarningMsg::sLocalizedOutOfMemoryWarning;
     LLUserWarningMsg::Handler LLUserWarningMsg::sHandler;
 
-    void LLUserWarningMsg::show(const std::string& message)
+    void LLUserWarningMsg::show(const std::string& message, S32 error_code)
     {
         if (sHandler)
         {
-            sHandler(std::string(), message);
+            sHandler(std::string(), message, error_code);
         }
     }
 
@@ -1626,7 +1626,7 @@ namespace LLError
     {
         if (sHandler && !sLocalizedOutOfMemoryTitle.empty())
         {
-            sHandler(sLocalizedOutOfMemoryTitle, sLocalizedOutOfMemoryWarning);
+            sHandler(sLocalizedOutOfMemoryTitle, sLocalizedOutOfMemoryWarning, ERROR_BAD_ALLOC);
         }
     }
 
@@ -1637,7 +1637,7 @@ namespace LLError
             "Second Life viewer couldn't access some of the files it needs and will be closed."
             "\n\nPlease reinstall viewer from  https://secondlife.com/support/downloads/ and "
             "contact https://support.secondlife.com if issue persists after reinstall.";
-        sHandler("Missing Files", error_string);
+        sHandler("Missing Files", error_string, ERROR_MISSING_FILES);
     }
 
     void LLUserWarningMsg::setHandler(const LLUserWarningMsg::Handler &handler)
