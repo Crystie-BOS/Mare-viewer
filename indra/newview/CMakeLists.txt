@@ -188,6 +188,7 @@ set(viewer_SOURCE_FILES
     lldrawpooltree.cpp
     lldrawpoolwater.cpp
     lldrawpoolwlsky.cpp
+    lldrawpoolwaterexclusion.cpp
     lldynamictexture.cpp
     llemote.cpp
     llenvironment.cpp
@@ -905,6 +906,7 @@ set(viewer_HEADER_FILES
     lldrawpooltree.h
     lldrawpoolwater.h
     lldrawpoolwlsky.h
+    lldrawpoolwaterexclusion.h
     lldynamictexture.h
     llemote.h
     llenvironment.h

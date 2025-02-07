@@ -306,6 +306,10 @@ public:
                               BOOL include_trash,
                               LLInventoryCollectFunctor& add);
 //mk
+    bool hasMatchingDescendents(const LLUUID& id,
+        bool include_trash,
+        LLInventoryCollectFunctor& add);
+
     // Collect all items in inventory that are linked to item_id.
     // Assumes item_id is itself not a linked item.
     item_array_t collectLinksTo(const LLUUID& item_id);
