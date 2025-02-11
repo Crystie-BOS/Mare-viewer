@@ -1778,6 +1778,7 @@ bool LLViewerWindow::handleDeviceChange(LLWindow *window)
 
 bool LLViewerWindow::handleDPIChanged(LLWindow *window, F32 ui_scale_factor, S32 window_width, S32 window_height)
 {
+    LLFontGL::sResolutionGeneration++;
     if (ui_scale_factor >= MIN_UI_SCALE && ui_scale_factor <= MAX_UI_SCALE)
     {
         LLViewerWindow::reshape(window_width, window_height);
@@ -1789,6 +1790,12 @@ bool LLViewerWindow::handleDPIChanged(LLWindow *window, F32 ui_scale_factor, S32
         LL_WARNS() << "DPI change caused UI scale to go out of bounds: " << ui_scale_factor << LL_ENDL;
         return false;
     }
+}
+
+bool LLViewerWindow::handleDisplayChanged()
+{
+    LLFontGL::sResolutionGeneration++;
+    return false;
 }
 
 bool LLViewerWindow::handleWindowDidChangeScreen(LLWindow *window)
@@ -1962,6 +1969,7 @@ LLViewerWindow::LLViewerWindow(const Params& p)
     mDisplayScale.setVec(llmax(1.f / mWindow->getPixelAspectRatio(), 1.f), llmax(mWindow->getPixelAspectRatio(), 1.f));
     mDisplayScale *= ui_scale_factor;
     LLUI::setScaleFactor(mDisplayScale);
+    LLFontGL::sResolutionGeneration++;
 
     {
         LLCoordWindow size;
@@ -2544,6 +2552,7 @@ void LLViewerWindow::reshape(S32 width, S32 height)
 
         bool display_scale_changed = mDisplayScale != LLUI::getScaleFactor();
         LLUI::setScaleFactor(mDisplayScale);
+        LLFontGL::sResolutionGeneration++;
 
         // update our window rectangle
         mWindowRectScaled.mRight = mWindowRectScaled.mLeft + ll_round((F32)width / mDisplayScale.mV[VX]);
