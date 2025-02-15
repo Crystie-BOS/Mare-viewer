@@ -1061,7 +1061,7 @@ F32 LLWindowMacOSX::getGamma()
         &greenGamma,
         &blueMin,
         &blueMax,
-        &blueGamma) == noErr)
+        &blueGamma) == kCGErrorSuccess)
     {
         // So many choices...
         // Let's just return the green channel gamma for now.
@@ -1112,7 +1112,7 @@ bool LLWindowMacOSX::setGamma(const F32 gamma)
         &greenGamma,
         &blueMin,
         &blueMax,
-        &blueGamma) != noErr)
+        &blueGamma) != kCGErrorSuccess)
     {
         return false;
     }
@@ -1127,7 +1127,7 @@ bool LLWindowMacOSX::setGamma(const F32 gamma)
         gamma,
         blueMin,
         blueMax,
-        gamma) != noErr)
+        gamma) != kCGErrorSuccess)
     {
         return false;
     }
@@ -1179,7 +1179,7 @@ bool LLWindowMacOSX::setCursorPosition(const LLCoordWindow position)
     newPosition.y = screen_pos.mY;
 
     CGSetLocalEventsSuppressionInterval(0.0);
-    if(CGWarpMouseCursorPosition(newPosition) == noErr)
+    if(CGWarpMouseCursorPosition(newPosition) == kCGErrorSuccess)
     {
         result = true;
     }
