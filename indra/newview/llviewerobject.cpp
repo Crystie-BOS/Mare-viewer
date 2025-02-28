@@ -1291,7 +1291,7 @@ U32 LLViewerObject::processUpdateMessage(LLMessageSystem *mesgsys,
 #endif
                 //clear cost and linkset cost
                 setObjectCostStale();
-                if (isSelected())
+                if (isSelected() && gFloaterTools)
                 {
                     gFloaterTools->dirty();
                 }
@@ -1730,7 +1730,7 @@ U32 LLViewerObject::processUpdateMessage(LLMessageSystem *mesgsys,
 #endif
                 setObjectCostStale();
 
-                if (isSelected())
+                if (isSelected() && gFloaterTools)
                 {
                     gFloaterTools->dirty();
                 }
@@ -3748,7 +3748,7 @@ void LLViewerObject::setObjectCost(F32 cost)
     mObjectCost = cost;
     mCostStale = false;
 
-    if (isSelected())
+    if (isSelected() && gFloaterTools)
     {
         gFloaterTools->dirty();
     }
@@ -3768,7 +3768,7 @@ void LLViewerObject::setLinksetCost(F32 cost)
         iter++;
     }
 
-    if (needs_refresh)
+    if (needs_refresh && gFloaterTools)
     {
         gFloaterTools->dirty();
     }
@@ -3779,7 +3779,7 @@ void LLViewerObject::setPhysicsCost(F32 cost)
     mPhysicsCost = cost;
     mCostStale = false;
 
-    if (isSelected())
+    if (isSelected() && gFloaterTools)
     {
         gFloaterTools->dirty();
     }
@@ -3790,7 +3790,7 @@ void LLViewerObject::setLinksetPhysicsCost(F32 cost)
     mLinksetPhysicsCost = cost;
     mCostStale = false;
 
-    if (isSelected())
+    if (isSelected() && gFloaterTools)
     {
         gFloaterTools->dirty();
     }

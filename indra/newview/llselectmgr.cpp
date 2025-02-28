@@ -7319,7 +7319,10 @@ void dialog_refresh_all()
     // *TODO: Eliminate all calls into outside classes below, make those
     // objects register with the update signal.
 
-    gFloaterTools->dirty();
+    if (gFloaterTools)
+    {
+        gFloaterTools->dirty();
+    }
 
     gMenuObject->needsArrange();
 
