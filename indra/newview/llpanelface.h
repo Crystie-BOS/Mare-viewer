@@ -139,6 +139,8 @@ protected:
     void updateMediaSettings();
     void updateMediaTitle();
 
+    bool isMediaTexSelected();
+
     void getState();
 
     void sendTexture();            // applies and sends texture
@@ -238,6 +240,7 @@ protected:
     void onCommitShiny();
     void onCommitAlphaMode();
     void onCommitFullbright();
+    void onCommitHideWater();
     void onCommitGlow();
     void onCommitPlanarAlign();
     void onCommitRepeatsPerMeter();
@@ -314,6 +317,7 @@ private:
     LLRadioGroup* mRadioPbrType { nullptr };
 
     LLCheckBoxCtrl* mCheckFullbright { nullptr };
+    LLCheckBoxCtrl* mCheckHideWater{ nullptr };
 
     LLTextBox* mLabelColorTransp { nullptr };
     LLSpinCtrl* mCtrlColorTransp { nullptr }; // transparency = 1 - alpha
@@ -571,6 +575,7 @@ private:
     LLMenuButton*   mMenuClipboardTexture;
 
     bool mIsAlpha;
+    bool mExcludeWater { false };
 
     LLSD            mClipboardParams;
 
