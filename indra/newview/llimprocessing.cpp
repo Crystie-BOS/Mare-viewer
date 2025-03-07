@@ -955,74 +955,66 @@ void LLIMProcessing::processNewMessage(LLUUID from_id,
             group_id = aux_id;
                 has_inventory = binary_bucket_size > 1;
                 from_group = true; // inaccurate value correction
-            if (has_inventory)
-            {
-                std::string str_bucket = ll_safe_string((char*)binary_bucket, binary_bucket_size);
-
-                typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-                boost::char_separator<char> sep("|", "", boost::keep_empty_tokens);
-                tokenizer tokens(str_bucket, sep);
-                tokenizer::iterator iter = tokens.begin();
-
-                asset_type = (LLAssetType::EType)(atoi((*(iter++)).c_str()));
-                iter++; // wearable type if applicable, otherwise asset type
-                item_name = std::string((*(iter++)).c_str());
-                // Note There is more elements in 'tokens' ...
-
-
-                for (int i = 0; i < 6; i++)
+                if (has_inventory)
                 {
-                    LL_WARNS() << *(iter++) << LL_ENDL;
-                    iter++;
+                    std::string str_bucket = ll_safe_string((char*)binary_bucket, binary_bucket_size);
+
+                    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+                    boost::char_separator<char> sep("|", "", boost::keep_empty_tokens);
+                    tokenizer tokens(str_bucket, sep);
+                    tokenizer::iterator iter = tokens.begin();
+
+                    asset_type = (LLAssetType::EType)(atoi((*(iter++)).c_str()));
+                    iter++; // wearable type if applicable, otherwise asset type
+                    item_name = std::string((*(iter++)).c_str());
                 }
             }
-        }
-        else
-        {
-            // All info is in binary bucket, read it for more information.
-            struct notice_bucket_header_t
+            else
             {
-                U8 has_inventory;
-                U8 asset_type;
-                LLUUID group_id;
-            };
-            struct notice_bucket_full_t
-            {
-                struct notice_bucket_header_t header;
-                U8 item_name[DB_INV_ITEM_NAME_BUF_SIZE];
-            }*notice_bin_bucket;
+                // All info is in binary bucket, read it for more information.
+                struct notice_bucket_header_t
+                {
+                    U8 has_inventory;
+                    U8 asset_type;
+                    LLUUID group_id;
+                };
+                struct notice_bucket_full_t
+                {
+                    struct notice_bucket_header_t header;
+                    U8 item_name[DB_INV_ITEM_NAME_BUF_SIZE];
+                }*notice_bin_bucket;
 
-            // Make sure the binary bucket is big enough to hold the header
-            // and a null terminated item name.
-            if ((binary_bucket_size < (S32)((sizeof(notice_bucket_header_t) + sizeof(U8))))
-                || (binary_bucket[binary_bucket_size - 1] != '\0'))
-            {
-                LL_WARNS("Messaging") << "Malformed group notice binary bucket" << LL_ENDL;
-                break;
+                // Make sure the binary bucket is big enough to hold the header
+                // and a null terminated item name.
+                if ((binary_bucket_size < (S32)((sizeof(notice_bucket_header_t) + sizeof(U8))))
+                    || (binary_bucket[binary_bucket_size - 1] != '\0'))
+                {
+                    LL_WARNS("Messaging") << "Malformed group notice binary bucket" << LL_ENDL;
+                    break;
+                }
+
+                notice_bin_bucket = (struct notice_bucket_full_t*) &binary_bucket[0];
+                has_inventory = notice_bin_bucket->header.has_inventory;
+                asset_type = notice_bin_bucket->header.asset_type;
+                group_id = notice_bin_bucket->header.group_id;
+                item_name = ll_safe_string((const char*)notice_bin_bucket->item_name);
             }
 
-            notice_bin_bucket = (struct notice_bucket_full_t*) &binary_bucket[0];
-            has_inventory = notice_bin_bucket->header.has_inventory;
-            asset_type = notice_bin_bucket->header.asset_type;
-            group_id = notice_bin_bucket->header.group_id;
-            item_name = ll_safe_string((const char*)notice_bin_bucket->item_name);
-        }
-
-        if (group_id != from_id)
-        {
-            agent_id = from_id;
-        }
-        else
-        {
+            if (group_id != from_id)
+            {
+                agent_id = from_id;
+            }
+            else
+            {
                 auto index = original_name.find(" Resident");
-            if (index != std::string::npos)
-            {
-                original_name = original_name.substr(0, index);
-            }
+                if (index != std::string::npos)
+                {
+                    original_name = original_name.substr(0, index);
+                }
 
-            // The group notice packet does not have an AgentID.  Obtain one from the name cache.
-            // If last name is "Resident" strip it out so the cache name lookup works.
-            std::string legacy_name = gCacheName->buildLegacyName(original_name);
+                // The group notice packet does not have an AgentID.  Obtain one from the name cache.
+                // If last name is "Resident" strip it out so the cache name lookup works.
+                std::string legacy_name = gCacheName->buildLegacyName(original_name);
                 agent_id = LLAvatarNameCache::getInstance()->findIdByName(legacy_name);
 
             if (agent_id.isNull())

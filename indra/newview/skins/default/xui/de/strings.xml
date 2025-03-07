@@ -32,7 +32,6 @@ Sichtweite: [DRAW_DISTANCE] m
 Bandbreite: [NET_BANDWITH] kbit/s
 LOD-Faktor: [LOD_FACTOR]
 Darstellungsqualität: [RENDER_QUALITY]
-Erweitertes Beleuchtungsmodell: [GPU_SHADERS]
 Texturspeicher: [TEXTURE_MEMORY] MB</string>
 	<string name="AboutOSXHiDPI">HiDPI-Anzeigemodus: [HIDPI]</string>
 	<string name="AboutLibs">J2C-Decoderversion: [J2C_VERSION]
