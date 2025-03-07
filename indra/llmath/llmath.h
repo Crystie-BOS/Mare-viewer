@@ -358,10 +358,14 @@ inline F32 snap_to_sig_figs(F32 foo, S32 sig_figs)
     return new_foo;
 }
 
+#ifdef __GNUC__
+using std::lerp;
+#else
 inline F32 lerp(F32 a, F32 b, F32 u)
 {
     return a + ((b - a) * u);
 }
+#endif
 
 inline F32 lerp2d(F32 x00, F32 x01, F32 x10, F32 x11, F32 u, F32 v)
 {
