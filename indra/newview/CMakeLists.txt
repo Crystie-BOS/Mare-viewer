@@ -2148,6 +2148,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     gltfscenemanager.cpp
     llcontrolavatar.cpp
     lldrawpoolbump.cpp
+    lldrawpoolwater.cpp
     llface.cpp
     llfloatertools.cpp
     llfloaterworldmap.cpp
