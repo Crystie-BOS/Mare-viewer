@@ -135,8 +135,10 @@ void sampleReflectionProbesWater(inout vec3 ambenv, inout vec3 glossenv,
 void sampleReflectionProbes(inout vec3 ambenv, inout vec3 glossenv,
         vec2 tc, vec3 pos, vec3 norm, float glossiness, bool transparent, vec3 amblit_linear);
 
+/*
 void sampleReflectionProbesLegacy(inout vec3 ambenv, inout vec3 glossenv, inout vec3 legacyenv,
         vec2 tc, vec3 pos, vec3 norm, float glossiness, float envIntensity, bool transparent, vec3 amblit);
+*/
 
 
 vec3 getPositionWithNDC(vec3 ndc);
