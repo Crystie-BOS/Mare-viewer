@@ -717,7 +717,7 @@ std::unique_ptr<std::vector<std::string>> LLFilePicker::navOpenFilterProc(ELoadF
         case FFLOAD_HDRI:
             allowedv->push_back("exr");
 			break; // CA: added, appears to be an omission in LL source
-    case FFLOAD_MODEL:
+        case FFLOAD_MODEL:
         case FFLOAD_COLLADA:
             allowedv->push_back("dae");
             break;

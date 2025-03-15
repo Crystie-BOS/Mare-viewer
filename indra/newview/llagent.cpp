@@ -4812,9 +4812,14 @@ void LLAgent::doTeleportViaLandmark(const LLUUID& landmark_asset_id)
         return;
     }
 //mk
-    bool is_local(false);
-    LLViewerRegion* regionp  = getRegion();
+    LLViewerRegion* regionp = getRegion();
+    if (!regionp)
+    {
+        LL_WARNS("Teleport") << "called when agent region is null" << LL_ENDL;
+        return;
+    }
 
+    bool is_local(false);
     if (LLLandmark* landmark = gLandmarkList.getAsset(landmark_asset_id, NULL))
     {
         LLVector3d pos_global;
