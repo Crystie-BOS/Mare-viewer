@@ -652,7 +652,7 @@
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokuaprivate/3p-fmodstudio/downloads/fmodstudio-2.02.15-darwin64-231711605.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-fmodstudio/downloads/fmodstudio-2.02.15-darwin64-231711605.tar.bz2</string>
             </map>
             <key>name</key>
             <string>darwin64</string>
@@ -666,7 +666,7 @@
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokuaprivate/3p-fmodstudio/downloads/fmodstudio-2.02.15-linux64-231720132.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-fmodstudio/downloads/fmodstudio-2.02.15-linux64-231720132.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -680,7 +680,7 @@
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokuaprivate/3p-fmodstudio/downloads/fmodstudio-2.02.15-windows64-231741822.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-fmodstudio/downloads/fmodstudio-2.02.15-windows64-231741822.tar.bz2</string>
             </map>
             <key>name</key>
             <string>windows64</string>
@@ -1160,7 +1160,7 @@
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokuaprivate/3p-kdu8/downloads/kdu-8.2.1.212651713-darwin64-212651713.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-kdu8/downloads/kdu-8.2.1.212651713-darwin64-212651713.tar.bz2</string>
             </map>
             <key>name</key>
             <string>darwin64</string>
@@ -1174,7 +1174,7 @@
               <key>hash_algorithm</key>
               <string>sha1</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokuaprivate/3p-kdu8/downloads/kdu-8.2.1.242980512-linux64-242980512.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-kdu8/downloads/kdu-8.2.1.242980512-linux64-242980512.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -1188,7 +1188,7 @@
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokuaprivate/3p-kdu8/downloads/kdu-8.2.1.212692226-windows64-212692226.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-kdu8/downloads/kdu-8.2.1.212692226-windows64-212692226.tar.bz2</string>
             </map>
             <key>name</key>
             <string>windows64</string>
@@ -1653,7 +1653,7 @@
               <key>hash</key>
               <string>bc3d95f2663fd88465cd0ddaf794055f</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokuaprivate/llphysicsextensions_tpv/downloads/llphysicsextensions_tpv-1.0.579391-darwin64-579391.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/llphysicsextensions_tpv/downloads/llphysicsextensions_tpv-1.0.579391-darwin64-579391.tar.bz2</string>
             </map>
             <key>name</key>
             <string>darwin64</string>
@@ -1679,7 +1679,7 @@
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokuaprivate/llphysicsextensions_tpv/downloads/llphysicsextensions_tpv-1.0.579391-windows64-579391.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/llphysicsextensions_tpv/downloads/llphysicsextensions_tpv-1.0.579391-windows64-579391.tar.bz2</string>
             </map>
             <key>name</key>
             <string>windows64</string>
