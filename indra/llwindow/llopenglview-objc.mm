@@ -657,9 +657,19 @@ attributedStringInfo getSegments(NSAttributedString *str)
             unsigned(replacementRange.location),
             unsigned(replacementRange.length)
         };
+
+#if __clang_major__ > 16
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wvla-cxx-extension"
+#endif
         
         int string_length = [aString length];
         unichar text[string_length];
+
+#if __clang_major__ > 16
+#pragma clang diagnostic pop
+#endif
+
         attributedStringInfo segments;
         // I used 'respondsToSelector:@selector(string)'
         // to judge aString is an attributed string or not.
