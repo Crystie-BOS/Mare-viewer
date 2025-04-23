@@ -399,7 +399,7 @@ LLFloaterPreference::LLFloaterPreference(const LLSD& key)
     mCommitCallbackRegistrar.add("Pref.Advanced",               boost::bind(&LLFloaterPreference::onClickAdvanced, this));
 
   //from Advanced
-    mCommitCallbackRegistrar.add("Pref.UpdateIndirectMaxNonImpostors", boost::bind(&LLFloaterPreference::updateMaxNonImpostorsAdvanced,this));
+    mCommitCallbackRegistrar.add("Pref.UpdateIndirectMaxNonImpostorsAdvanced", boost::bind(&LLFloaterPreference::updateMaxNonImpostorsAdvanced,this));
 
     sSkin = gSavedSettings.getString("SkinCurrent");
 
@@ -1072,6 +1072,7 @@ void LLFloaterPreference::updateComplexityModeAdvanced(const LLSD& newvalue)
     bool enable_complexity = newvalue.asInteger() != LLVOAvatar::AV_RENDER_ONLY_SHOW_FRIENDS;
     getChild<LLSliderCtrl>("IndirectMaxComplexity")->setEnabled(enable_complexity);
     getChild<LLSliderCtrl>("IndirectMaxNonImpostors")->setEnabled(enable_complexity);
+    getChild<LLSliderCtrl>("IndirectMaxNonImpostorsAdvanced")->setEnabled(enable_complexity);
 }
 
 void LLFloaterPreference::updateComplexityTextAdvanced()
@@ -1886,7 +1887,7 @@ void LLFloaterPreference::refreshAdvanced()
     LLAvatarComplexityControls::setIndirectControls();
     setMaxNonImpostorsTextAdvanced(
         gSavedSettings.getU32("RenderAvatarMaxNonImpostors"),
-        getChild<LLTextBox>("IndirectMaxNonImpostorsText", true));
+        getChild<LLTextBox>("IndirectMaxNonImpostorsTextAdvanced", true));
     LLAvatarComplexityControls::setText(
         gSavedSettings.getU32("RenderAvatarMaxComplexityAdvanced"),
         getChild<LLTextBox>("IndirectMaxComplexityTextAdvanced", true));
@@ -1894,7 +1895,7 @@ void LLFloaterPreference::refreshAdvanced()
 
     bool enable_complexity = gSavedSettings.getS32("RenderAvatarComplexityMode") != LLVOAvatar::AV_RENDER_ONLY_SHOW_FRIENDS;
     getChild<LLSliderCtrl>("IndirectMaxComplexity")->setEnabled(enable_complexity);
-    getChild<LLSliderCtrl>("IndirectMaxNonImpostors")->setEnabled(enable_complexity);
+    getChild<LLSliderCtrl>("IndirectMaxNonImpostorsAdvanced")->setEnabled(enable_complexity);
 }
 
 void LLFloaterPreference::onCommitWindowedMode()
@@ -2156,7 +2157,7 @@ void LLFloaterPreference::updateMaxNonImpostorsAdvanced()
 {
     // Called when the IndirectMaxNonImpostors control changes
     // Responsible for fixing the slider label (IndirectMaxNonImpostorsText) and setting RenderAvatarMaxNonImpostors
-    LLSliderCtrl* ctrl = getChild<LLSliderCtrl>("IndirectMaxNonImpostors",true);
+    LLSliderCtrl* ctrl = getChild<LLSliderCtrl>("IndirectMaxNonImpostorsAdvanced",true);
     U32 value = ctrl->getValue().asInteger();
 
     if (0 == value || LLVOAvatar::NON_IMPOSTORS_MAX_SLIDER <= value)
@@ -2166,6 +2167,7 @@ void LLFloaterPreference::updateMaxNonImpostorsAdvanced()
     gSavedSettings.setU32("RenderAvatarMaxNonImpostors", value);
     LLVOAvatar::updateImpostorRendering(value); // make it effective immediately
     setMaxNonImpostorsTextAdvanced(value, getChild<LLTextBox>("IndirectMaxNonImpostorsText"));
+    setMaxNonImpostorsTextAdvanced(value, getChild<LLTextBox>("IndirectMaxNonImpostorsTextAdvanced"));
 }
 
 void LLFloaterPreference::updateIndirectMaxNonImpostorsAdvanced(const LLSD& newvalue)
@@ -2174,7 +2176,7 @@ void LLFloaterPreference::updateIndirectMaxNonImpostorsAdvanced(const LLSD& newv
     if ((value != 0) && (value != gSavedSettings.getU32("IndirectMaxNonImpostors")))
     {
         gSavedSettings.setU32("IndirectMaxNonImpostors", value);
-        setMaxNonImpostorsTextAdvanced(value, getChild<LLTextBox>("IndirectMaxNonImpostorsText"));
+        setMaxNonImpostorsTextAdvanced(value, getChild<LLTextBox>("IndirectMaxNonImpostorsTextAdvanced"));
     }
 }
 
@@ -2259,6 +2261,7 @@ void LLFloaterPreference::updateMaxNonImpostors()
     gSavedSettings.setU32("RenderAvatarMaxNonImpostors", value);
     LLVOAvatar::updateImpostorRendering(value); // make it effective immediately
     setMaxNonImpostorsText(value, getChild<LLTextBox>("IndirectMaxNonImpostorsText"));
+    setMaxNonImpostorsText(value, getChild<LLTextBox>("IndirectMaxNonImpostorsTextAdvanced"));
 }
 
 void LLFloaterPreference::updateIndirectMaxNonImpostors(const LLSD& newvalue)
@@ -2269,6 +2272,8 @@ void LLFloaterPreference::updateIndirectMaxNonImpostors(const LLSD& newvalue)
         gSavedSettings.setU32("IndirectMaxNonImpostors", value);
     }
     setMaxNonImpostorsText(value, getChild<LLTextBox>("IndirectMaxNonImpostorsText"));
+    // This is called when the debug setting changes so we also need to drive the text box in the Advanced section
+    setMaxNonImpostorsText(value, getChild<LLTextBox>("IndirectMaxNonImpostorsTextAdvanced"));
 }
 
 void LLFloaterPreference::setMaxNonImpostorsText(U32 value, LLTextBox* text_box)
