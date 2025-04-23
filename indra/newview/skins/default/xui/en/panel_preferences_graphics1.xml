@@ -806,13 +806,13 @@
     height="16"
     increment="1"
     initial_value="12"
-    label="Max. # of non-impostors:"
+    label="Max. # animated avatars:"
     label_width="185"
     layout="topleft"
     left="30"
     min_val="1"
     max_val="66"
-    name="IndirectMaxNonImpostors"
+    name="IndirectMaxNonImpostorsAdvanced"
     show_text="false"
     top_delta="16"
     width="400">
@@ -829,7 +829,7 @@
     top_delta="0"
     left_delta="404"
     text_readonly_color="LabelDisabledColor"
-    name="IndirectMaxNonImpostorsText"
+    name="IndirectMaxNonImpostorsTextAdvanced"
     width="65">
        0
   </text>
