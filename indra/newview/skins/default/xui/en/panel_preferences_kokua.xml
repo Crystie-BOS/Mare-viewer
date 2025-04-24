@@ -476,12 +476,12 @@
             <check_box
             top_pad="20"
             initial_value="true"
-            label="Do not show money balance on snapshots"
+            label="Show money balance on snapshots"
             layout="topleft"
             left="15"
-            name="HideBalanceInSnapshots"
+            name="RenderBalanceInSnapshots"
             width="350"
-            control_name="HideBalanceInSnapshots"
+            control_name="RenderBalanceInSnapshot"
             tool_tip="When enabled, your avatar will not turn to face the objects you select." />
             <check_box
             font="SansSerifSmall"

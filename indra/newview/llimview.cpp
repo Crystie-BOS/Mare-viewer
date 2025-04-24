@@ -3200,9 +3200,16 @@ void LLIMMgr::addMessage(
     bool is_announcement, // <FS:Ansariel> Special parameter indicating announcements
     bool keyword_alert_performed, // <FS:Ansariel> Pass info if keyword alert has been performed
     bool is_region_msg,
-    U32 timestamp)      // May be zero
+    U32 timestamp,  // May be zero
+    LLUUID display_id,
+    std::string_view display_name)
 {
     LLUUID other_participant_id = target_id;
+    std::string message_display_name = (display_name.empty()) ? from : std::string(display_name);
+    if (display_id.isNull() && (display_name.empty()))
+    {
+        display_id = other_participant_id;
+    }
 
     LLUUID new_session_id = session_id;
     if (new_session_id.isNull())
@@ -3352,7 +3359,7 @@ void LLIMMgr::addMessage(
             }
 
             //Play sound for new conversations
-            if (!skip_message & !gAgent.isDoNotDisturb() && (gSavedSettings.getBOOL("PlaySoundNewConversation")))
+            if (!skip_message && !gAgent.isDoNotDisturb() && (gSavedSettings.getBOOL("PlaySoundNewConversation")))
             {
                 make_ui_sound("UISndNewIncomingIMSession");
             }

@@ -167,8 +167,19 @@
          left="30"
 		 height="16"
          top_pad="8"
-         width="180"
+         width="80"
+         control_name="RenderUIInSnapshot"
          name="ui_check" />
+       <check_box
+         label="L$ Balance"
+         layout="topleft"
+         left_pad="16"
+         height="16"
+         top_delta="0"
+         width="80"
+         control_name="RenderBalanceInSnapshot"
+         enabled_control="RenderUIInSnapshot"
+         name="balance_check" />
         <check_box
          label="HUDs"
          layout="topleft"
@@ -176,6 +187,7 @@
          left="30"
          top_pad="1"
          width="180"
+         control_name="RenderHUDInSnapshot"
          name="hud_check" />
         <check_box
          label="Freeze frame (fullscreen)"
@@ -454,12 +466,4 @@
     width="115">
     Take a 360 snapshot
    </text>
-        <check_box		
-         control_name="HideBalanceInSnapshots"
-         label="Hide L$ balance"
-         layout="topleft"
-         top_pad="0"
-         left="30"
-         width="180"
-         name="hide_balance_check" />
 </floater>

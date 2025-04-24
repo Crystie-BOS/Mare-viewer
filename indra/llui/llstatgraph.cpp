@@ -37,7 +37,6 @@
 #include "lltracerecording.h"
 #include "lltracethreadrecorder.h"
 #include "llwindow.h"
-//#include "llviewercontrol.h"
 
 ///////////////////////////////////////////////////////////////////////////////////
 

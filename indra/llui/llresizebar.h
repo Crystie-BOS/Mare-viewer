@@ -64,7 +64,7 @@ public:
     void            setResizeLimits( S32 min_size, S32 max_size ) { mMinSize = min_size; mMaxSize = max_size; }
     void            setEnableSnapping(bool enable) { mSnappingEnabled = enable; }
     void            setAllowDoubleClickSnapping(bool allow) { mAllowDoubleClickSnapping = allow; }
-    bool            canResize() { return getEnabled() && mMaxSize > mMinSize; }
+    bool            canResize() const { return getEnabled() && mMaxSize > mMinSize; }
     void            setResizeListener(boost::function<void(void*)> listener) {mResizeListener = listener;}
     bool            isShowDragHandle() const { return mShowDragHandle; }
     void            setImagePanel(LLPanel * panelp);

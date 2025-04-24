@@ -123,7 +123,7 @@ public:
 // [SL:KB] - Patch: Control-ScrollList | Checked: Catznip-5.2
     virtual const std::string &getColumnName() const { return mColumnName; }
 // [/SL:KB]
-    virtual const std::string &getToolTip() const { return mToolTip; }
+    virtual const std::string& getToolTip() const { return mToolTip; }
     virtual void            setToolTip(const std::string &str) { mToolTip = str; }
     virtual bool            getVisible() const { return true; }
     virtual void            setWidth(S32 width) { mWidth = width; }
