@@ -135,6 +135,8 @@ public:
     S32 getSquareMetersLeft() const;
     LLRegionDetails mRegionDetails;
 
+    void setBalanceVisible(bool visible);
+
     LLPanelNearByMedia* getNearbyMediaPanel() { return mPanelNearByMedia; }
     BOOL getAudioStreamEnabled() const;
     void setBackgroundColor( const LLColor4& color );

@@ -114,9 +114,7 @@ public:
     void setThreshold(S32 threshold, F32 newval);
     void setClickedCallback(callback_t cb);
 
-    virtual void draw();
-
-    /*virtual*/ void setValue(const LLSD& value);
+    void draw() override;
 
 private:
     LLTrace::StatType<LLTrace::CountAccumulator>*   mNewStatFloatp;

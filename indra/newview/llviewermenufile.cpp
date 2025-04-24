@@ -946,6 +946,7 @@ class LLFileTakeSnapshotToDisk : public view_listener_t
         bool render_ui = gSavedSettings.getBOOL("RenderUIInSnapshot");
         bool render_hud = gSavedSettings.getBOOL("RenderHUDInSnapshot");
         bool no_force_low = gSavedSettings.getBOOL("KokuaRLVNoForceLowResSnapshots");
+        bool render_balance = gSavedSettings.getBOOL("RenderBalanceInSnapshot");
 
         bool high_res = gSavedSettings.getBOOL("HighResSnapshot");
         if (high_res && (!gRRenabled || (gRRenabled && (!gAgent.mRRInterface.hasLockedHuds() || no_force_low))))
@@ -976,6 +977,7 @@ class LLFileTakeSnapshotToDisk : public view_listener_t
                                        render_hud,
                                        false,
                                        render_no_post,
+                                       render_balance,
                                        LLSnapshotModel::SNAPSHOT_TYPE_COLOR,
                                        high_res ? S32_MAX : MAX_SNAPSHOT_IMAGE_SIZE)) //per side
         {

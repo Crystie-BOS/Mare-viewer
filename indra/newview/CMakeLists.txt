@@ -123,6 +123,7 @@ set(viewer_SOURCE_FILES
     llagentwearables.cpp
     llanimstatelabels.cpp
     llappcorehttp.cpp
+    llappearancelistener.cpp
     llappearancemgr.cpp
     llappviewer.cpp
     llappviewerlistener.cpp
@@ -842,6 +843,7 @@ set(viewer_HEADER_FILES
     llanimstatelabels.h
     llappcorehttp.h
     llappearance.h
+    llappearancelistener.h
     llappearancemgr.h
     llappviewer.h
     llappviewerlistener.h

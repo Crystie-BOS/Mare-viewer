@@ -52,6 +52,7 @@
 
 #include "llfirstuse.h"
 #include "llfloaterimnearbychat.h"
+#include "llfloaterimnearbychatlistener.h"
 #include "llagent.h" // gAgent
 #include "llgesturemgr.h"
 #include "llmultigesture.h"
@@ -73,6 +74,8 @@
 #include "kokuarlvmode.h" // for RLV_ALWAYS_ON
 
 S32 LLFloaterIMNearbyChat::sLastSpecialChatChannel = 0;
+
+static LLFloaterIMNearbyChatListener sChatListener;
 
 constexpr S32 EXPANDED_HEIGHT = 266;
 constexpr S32 COLLAPSED_HEIGHT = 60;
