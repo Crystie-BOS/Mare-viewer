@@ -643,7 +643,7 @@ void LLFloaterIMNearbyChat::sendChat( EChatType type )
 {
     if (mInputEditor)
     {
-        LLWString text = mInputEditor->getWText();
+        LLWString text = mInputEditor->getConvertedText();
         sendChatWithText(type, text);
         mInputEditor->setText(LLStringExplicit(""));
 
