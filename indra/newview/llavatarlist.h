@@ -114,11 +114,13 @@ public:
 
     boost::signals2::connection setItemDoubleClickCallback(const mouse_signal_t::slot_type& cb);
 
+    boost::signals2::connection setItemClickedCallback(const mouse_signal_t::slot_type& cb);
+
     virtual S32 notifyParent(const LLSD& info);
 
     void handleDisplayNamesOptionChanged();
 
-    void setShowCompleteName(bool show) { mShowCompleteName = show;};
+    void setShowCompleteName(bool show, bool force = false) { mShowCompleteName = show; mForceCompleteName = force; };
     static std::string getNameToDisplay(const LLAvatarName &av_name);
 protected:
     void refresh();
@@ -131,6 +133,7 @@ protected:
     void updateLastInteractionTimes();
     void rebuildNames();
     void onItemDoubleClicked(LLUICtrl* ctrl, S32 x, S32 y, MASK mask);
+    void onItemClicked(LLUICtrl* ctrl, S32 x, S32 y, MASK mask);
     void updateAvatarNames();
 
 private:
@@ -145,6 +148,7 @@ private:
     bool mShowSpeakingIndicator;
     bool mShowPermissions;
     bool mShowCompleteName;
+    bool mForceCompleteName;
     bool mShowRange;
     bool mShowFirstSeen;
     bool mShowStatusFlags;
@@ -170,6 +174,7 @@ private:
 
     commit_signal_t mRefreshCompleteSignal;
     mouse_signal_t mItemDoubleClickSignal;
+    mouse_signal_t mItemClickedSignal;
 };
 
 /** Abstract comparator for avatar items */
