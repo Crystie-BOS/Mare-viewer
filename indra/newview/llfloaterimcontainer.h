@@ -208,7 +208,7 @@ public:
     void reSelectConversation();
     void updateSpeakBtnState();
     static bool isConversationLoggingAllowed();
-    void flashConversationItemWidget(const LLUUID& session_id, bool is_flashes);
+    void flashConversationItemWidget(const LLUUID& session_id, bool is_flashes, bool alternate_color = false);
     void setConversationItemWidgetIsTyping(const LLUUID& session_id, bool is_typing); //KKA-779 Add a FS-style "is typing" indication in Conversations floater
     void highlightConversationItemWidget(const LLUUID& session_id, bool is_highlighted);
     bool isScrolledOutOfSight(LLConversationViewSession* conversation_item_widget);

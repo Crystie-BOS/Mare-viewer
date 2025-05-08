@@ -90,7 +90,7 @@ public:
 
     virtual void refresh();
 
-    /*virtual*/ void setFlashState(bool flash_state);
+    /*virtual*/ void setFlashState(bool flash_state, bool alternate_color = false);
     void setHighlightState(bool hihglight_state);
     void setIsTyping(bool is_typing); //KKA-779 Add a FS-style "is typing" indication in Conversations floater
 
@@ -112,6 +112,7 @@ private:
     LLFlashTimer*           mFlashTimer;
     bool                    mFlashStateOn;
     bool                    mFlashStarted;
+    bool                    mIsAltFlashColor;
 
     bool                    mCollapsedMode;
     bool                    mHasArrow;
