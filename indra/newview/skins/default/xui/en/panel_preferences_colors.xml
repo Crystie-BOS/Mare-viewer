@@ -35,7 +35,7 @@
        left="30"
        height="12"
        name="font_colors"
-       top_pad="15"
+       top_pad="8"
        width="120">
        Chat Message Colors:
      </text>
@@ -77,7 +77,7 @@
        height="24"
        label_height="0"
        layout="topleft"
-       left="190"
+       left="150"
        name="agent"
        top_pad="-15"
        width="44" >
@@ -109,7 +109,7 @@
        label_height="0"
        label_width="60"
        layout="topleft"
-       left="360"
+       left="260"
        name="objects"
        top_pad="-15"
        width="44">
@@ -142,9 +142,9 @@
        label_height="0"
        label_width="44"
        layout="topleft"
-       left="40"
+       left="370"
        name="friends"
-       top_pad="22"
+       top_pad="-15"
        width="44" >
        <color_swatch.init_callback
        function="Pref.getUIColor"
@@ -173,9 +173,9 @@
        height="24"
        label_height="0"
        layout="topleft"
-       left="190"
+       left="40"
        name="lindens"
-       top_pad="-15"
+       top_pad="20"
        width="44">
        <color_swatch.init_callback
        function="Pref.getUIColor"
@@ -206,7 +206,7 @@
        label_height="0"
        label_width="60"
        layout="topleft"
-       left="360"
+       left="150"
        name="muted"
        top_pad="-15"
        width="44">
@@ -239,9 +239,9 @@
        label_height="0"
        label_width="44"
        layout="topleft"
-       left="40"
+       left="260"
        name="system"
-       top_pad="22"
+       top_pad="-15"
        width="44" >
        <color_swatch.init_callback
        function="Pref.getUIColor"
@@ -270,7 +270,7 @@
        height="24"
        label_height="0"
        layout="topleft"
-       left="190"
+       left="370"
        name="script_error"
        top_pad="-15"
        width="44">
@@ -302,9 +302,9 @@
        label_height="0"
        label_width="60"
        layout="topleft"
-       left="360"
+       left="40"
        name="ObjectIMColor"
-       top_pad="-15"
+       top_pad="20"
        width="44">
        <color_swatch.init_callback
        function="Pref.getUIColor"
@@ -334,9 +334,9 @@
        height="24"
        label_height="0"
        layout="topleft"
-       left="40"
+       left="150"
        name="owner"
-       top_pad="22"
+       top_pad="-15"
        width="44" >
        <color_swatch.init_callback
        function="Pref.getUIColor"
@@ -366,7 +366,7 @@
        height="24"
        label_height="0"
        layout="topleft"
-       left="190"
+       left="260"
        name="links"
        top_pad="-15"
        width="44" >
@@ -397,7 +397,7 @@
 		   height="24"
 		   label_height="0"
 		   layout="topleft"
-		   left="360"
+		   left="370"
 		   name="audiostream"
 		   top_pad="-15"
 		   width="44" >
@@ -453,6 +453,108 @@
        width="95">
        Direct
      </text>
+  <text
+   follows="left|top"
+   layout="topleft"
+   left="30"
+   height="12"
+   name="mentions_colors"
+   top_pad="20"
+   width="170">
+    Chat mentions highlight colors:
+  </text>
+  <color_swatch
+   can_apply_immediately="true"
+   color="EmphasisColor"
+   follows="left|top"
+   height="24"
+   label_height="0"
+   layout="topleft"
+   left="40"
+   name="mentions"
+   top_pad="10"
+   width="44" >
+    <color_swatch.init_callback
+         function="Pref.getUIColor"
+         parameter="ChatMentionFont" />
+    <color_swatch.commit_callback
+         function="Pref.applyUIColor"
+         parameter="ChatMentionFont" />
+    </color_swatch>
+  <text
+   type="string"
+   length="1"
+   follows="left|top"
+   height="10"
+   layout="topleft"
+   left_pad="5"
+   mouse_opaque="false"
+   name="text_mentions"
+   top_delta="5"
+   width="95">
+    Mentions
+  </text>
+
+  <color_swatch
+   can_apply_immediately="true"
+   follows="left|top"
+   height="24"
+   label_height="0"
+   layout="topleft"
+   left="150"
+   name="mention_self"
+   top_pad="-15"
+   width="44" >
+    <color_swatch.init_callback
+         function="Pref.getUIColor"
+         parameter="ChatSelfMentionHighlight" />
+    <color_swatch.commit_callback
+         function="Pref.applyUIColor"
+         parameter="ChatSelfMentionHighlight" />
+  </color_swatch>
+  <text
+   type="string"
+   length="1"
+   follows="left|top"
+   height="10"
+   layout="topleft"
+   left_pad="5"
+   mouse_opaque="false"
+   name="text_mentions_self"
+   top_delta="5"
+   width="95">
+    Me
+  </text>
+  <color_swatch
+     can_apply_immediately="true"
+     follows="left|top"
+     height="24"
+     label_height="0"
+     layout="topleft"
+     left="260"
+     name="mention_others"
+     top_pad="-15"
+     width="44" >
+        <color_swatch.init_callback
+             function="Pref.getUIColor"
+             parameter="ChatMentionHighlight" />
+        <color_swatch.commit_callback
+             function="Pref.applyUIColor"
+             parameter="ChatMentionHighlight" />
+    </color_swatch>
+    <text
+     type="string"
+     length="1"
+     follows="left|top"
+     height="10"
+     layout="topleft"
+     left_pad="5"
+     mouse_opaque="false"
+     name="text_mentions_others"
+     top_delta="5"
+     width="95">
+        Others
+    </text>
      <check_box
        control_name="FSColorIMsDistinctly"
        follows="left|top"
@@ -508,7 +610,7 @@
        follows="left|top"
        layout="topleft"
        left="20"
-       top_pad="22"
+       top_pad="14"
        height="12"
        name="KokuaColorFriendNamesInConversationsFloater"
        width="450"
@@ -558,7 +660,7 @@
        follows="left|top"
        layout="topleft"
        left="20"
-       top_pad="22"
+       top_pad="14"
        height="12"
        name="KokuaColorFriendNamesInConversationsFloaterAsNameTags"
        width="450"

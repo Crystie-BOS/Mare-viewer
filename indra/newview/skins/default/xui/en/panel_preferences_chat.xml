@@ -190,9 +190,9 @@
         layout="topleft"
         left="24"
         name="play_sound"
-        width="100"
+        width="60"
         follows="top|left"
-        top_pad="8"
+        top_pad="6"
         visible="true">
       Play sound:
     </text>
@@ -201,41 +201,50 @@
         height="14"
         label="New conversation"
         layout="topleft"
-        left_pad="15"
-        top_pad="-10"
+        left_pad="5"
+        top_pad="-8"
         name="new_conversation"
-        width="150" />
+        width="100" />
     <check_box
         control_name="PlaySoundIncomingVoiceCall"
         height="14"
         label="Incoming voice call"
         layout="topleft"
-        top_pad="6"
+        top_pad="4"
         name="incoming_voice_call"
-        width="150" />
+        width="100" />
     <check_box
         control_name="PlaySoundTeleportOffer"
         height="14"
         label="Teleport offer"
         layout="topleft"
-        left_pad="35"
-        top_pad="-38"
+        left_pad="18"
+        top_pad="-32"
         name="teleport_offer"
-        width="150" />
+        width="100" />
     <check_box
         control_name="PlaySoundInventoryOffer"
         height="14"
         label="Inventory offer"
         layout="topleft"
-        top_pad="6"
+        top_pad="4"
         name="inventory_offer"
-        width="150" />
+        width="100" />
+    <check_box
+        control_name="PlaySoundChatMention"
+        height="14"
+        label="Chat mention"
+        layout="topleft"
+        left_pad="7"
+        top_pad="-32"
+        name="chat_mention"
+        width="130" />
     <text
         name="logging_label"
         layout="topleft"
         left="24"
         follows="top|left"
-        top_pad="8"
+        top_pad="26"
         height="12"
         width="55">
         Save:
