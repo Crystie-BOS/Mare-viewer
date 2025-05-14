@@ -1118,7 +1118,6 @@ void LLPanelFace::updateUI(bool force_set_values /*false*/)
         }
         mRadioPbrType->setEnabled(editable);
         const bool pbr_selected = mComboMatMedia->getCurrentIndex() == MATMEDIA_PBR;
-        const bool media_selected = mComboMatMedia->getCurrentIndex() == MATMEDIA_MEDIA;
         const bool texture_info_selected = pbr_selected && mRadioPbrType->getSelectedIndex() != PBRTYPE_RENDER_MATERIAL_ID;
 
         mCheckSyncSettings->setEnabled(editable);
@@ -1443,7 +1442,7 @@ void LLPanelFace::updateUI(bool force_set_values /*false*/)
             mShinyScaleFlipU->setValue(norm_scale_flip_s);
             mBumpyScaleFlipU->setValue(spec_scale_flip_s);
 
-            mTexScaleU->setEnabled(editable && (has_material || media_selected));
+            mTexScaleU->setEnabled(editable && has_material);
             mShinyScaleU->setEnabled(editable && has_material && specmap_id.notNull());
             mBumpyScaleU->setEnabled(editable && has_material && normmap_id.notNull());
 
@@ -1507,7 +1506,7 @@ void LLPanelFace::updateUI(bool force_set_values /*false*/)
             bool norm_scale_tentative = !identical_norm_scale_t;
             bool spec_scale_tentative = !identical_spec_scale_t;
 
-            mTexScaleV->setEnabled(editable && (has_material || media_selected));
+            mTexScaleV->setEnabled(editable && has_material);
             mShinyScaleV->setEnabled(editable && has_material && specmap_id.notNull());
             mBumpyScaleV->setEnabled(editable && has_material && normmap_id.notNull());
 
@@ -1564,7 +1563,7 @@ void LLPanelFace::updateUI(bool force_set_values /*false*/)
             mShinyOffsetU->setTentative(LLSD(spec_offset_u_tentative));
             mBumpyOffsetU->setTentative(LLSD(norm_offset_u_tentative));
 
-            mTexOffsetU->setEnabled(editable && (has_material || media_selected));
+            mTexOffsetU->setEnabled(editable && has_material);
             mShinyOffsetU->setEnabled(editable && has_material && specmap_id.notNull());
             mBumpyOffsetU->setEnabled(editable && has_material && normmap_id.notNull());
 
@@ -1598,7 +1597,7 @@ void LLPanelFace::updateUI(bool force_set_values /*false*/)
             mBumpyOffsetV->setTentative(LLSD(norm_offset_v_tentative));
             mShinyOffsetV->setTentative(LLSD(spec_offset_v_tentative));
 
-            mTexOffsetV->setEnabled(editable && (has_material || media_selected));
+            mTexOffsetV->setEnabled(editable && has_material);
             mShinyOffsetV->setEnabled(editable && has_material && specmap_id.notNull());
             mBumpyOffsetV->setEnabled(editable && has_material && normmap_id.notNull());
             mTexDuplicate->setEnabled(editable);
@@ -1628,7 +1627,7 @@ void LLPanelFace::updateUI(bool force_set_values /*false*/)
             F32 norm_rot_deg = norm_rotation * RAD_TO_DEG;
             F32 spec_rot_deg = spec_rotation * RAD_TO_DEG;
 
-            mTexRotate->setEnabled(editable && (has_material || media_selected));
+            mTexRotate->setEnabled(editable && has_material);
             mShinyRotate->setEnabled(editable && has_material && specmap_id.notNull());
             mBumpyRotate->setEnabled(editable && has_material && normmap_id.notNull());
 
@@ -1745,7 +1744,7 @@ void LLPanelFace::updateUI(bool force_set_values /*false*/)
                     mTexRepeat->setValue(editable ? repeats : 1.0f);
                 }
                 mTexRepeat->setTentative(LLSD(repeats_tentative));
-                mTexRepeat->setEnabled(!identical_planar_texgen && enabled && (has_material || media_selected));
+                mTexRepeat->setEnabled(has_material && !identical_planar_texgen && enabled);
             }
         }
 

@@ -3195,12 +3195,16 @@ bool LLFolderBridge::dragCategoryIntoFolder(LLInventoryCategory* inv_cat,
                     if (dest_res == MY_OUTFITS_SUBFOLDER && create_outfit)
                     {
                         // turn it into outfit
-                        dropToMyOutfitsSubfolder(inv_cat, mUUID, LLFolderType::FT_OUTFIT, cb);
+                        dropToMyOutfitsSubfolder(inv_cat, mUUID, cb);
                     }
                     else
                     {
-                        // or link it?
-                        dropToMyOutfitsSubfolder(inv_cat, mUUID, LLFolderType::FT_NONE, cb);
+                        LLInvFVBridge::changeCategoryParent(
+                            model,
+                            (LLViewerInventoryCategory*)inv_cat,
+                            mUUID,
+                            move_is_into_trash);
+                        if (cb) cb->fire(inv_cat->getUUID());
                     }
                     break;
                 case MY_OUTFITS_SUBFOLDER:
@@ -4364,20 +4368,18 @@ void LLFolderBridge::perform_pasteFromClipboard()
                         return;
                     }
                 }
-                // <FS:Ansariel> Unable to copy&paste into outfits anymore
-                //if (move_is_into_outfit)
-                if (move_is_into_my_outfits)
-                // </FS:Ansariel>
+                if (move_is_into_outfit)
                 {
-                    // <FS:Ansariel> Unable to copy&paste into outfits anymore
-                    //if (!move_is_into_my_outfits && item && can_move_to_outfit(item, move_is_into_current_outfit))
-                    if (move_is_into_outfit && item && can_move_to_outfit(item, move_is_into_current_outfit))
-                    // </FS:Ansariel>
+                    bool handled = false;
+                    if (mUUID != my_outifts_id
+                        && dest_folder->getPreferredType() == LLFolderType::FT_OUTFIT
+                        && item
+                        && can_move_to_outfit(item, move_is_into_current_outfit))
                     {
-                        // todo: this is going to create dupplicate folders?
                         dropToOutfit(item, move_is_into_current_outfit, cb);
+                        handled = true;
                     }
-                    else if (/*move_is_into_my_outfits &&*/ LLAssetType::AT_CATEGORY == obj->getType()) // <FS:Ansariel> Unable to copy&paste into outfits anymore
+                    else if (move_is_into_my_outfits && LLAssetType::AT_CATEGORY == obj->getType())
                     {
                         LLViewerInventoryCategory* cat = model->getCategory(item_id);
                         U32 max_items_to_wear = gSavedSettings.getU32("WearFolderLimit");
@@ -4386,39 +4388,39 @@ void LLFolderBridge::perform_pasteFromClipboard()
                             if (mUUID == my_outifts_id)
                             {
                                 dropToMyOutfits(cat, cb);
-                            }
-                            else if (move_is_into_my_outfits)
-                            {
-                                EMyOutfitsSubfolderType res = myoutfit_object_subfolder_type(model, mUUID, my_outifts_id);
-                                if (res == MY_OUTFITS_SUBFOLDER)
-                                {
-                                    // turn it into outfit
-                                    dropToMyOutfitsSubfolder(cat, mUUID, LLFolderType::FT_OUTFIT, cb);
-                                }
-                                else
-                                {
-                                    dropToMyOutfitsSubfolder(cat, mUUID, LLFolderType::FT_NONE, cb);
-                                }
-                            }
-                        }
-                        else if (cat && can_move_to_my_outfits_as_subfolder(model, cat))
-                        {
-                            if (LLClipboard::instance().isCutMode())
-                            {
-                                changeCategoryParent(model, cat, parent_id, false);
-                                if (cb) cb->fire(item_id);
+                                handled = true;
                             }
                             else
                             {
-                                copy_inventory_category(model, cat, parent_id);
+                                EMyOutfitsSubfolderType dest_res = myoutfit_object_subfolder_type(model, mUUID, my_outifts_id);
+                                if (dest_res == MY_OUTFITS_SUBFOLDER)
+                                {
+                                    // turn it into outfit
+                                    dropToMyOutfitsSubfolder(cat, mUUID, cb);
+                                    handled = true;
+                                }
                             }
                         }
-                        else
+                        if (!handled && cat && can_move_to_my_outfits_as_subfolder(model, cat))
                         {
-                            LLNotificationsUtil::add("MyOutfitsPasteFailed");
+                            EMyOutfitsSubfolderType dest_res = myoutfit_object_subfolder_type(model, mUUID, my_outifts_id);
+                            if (dest_res == MY_OUTFITS_SUBFOLDER || mUUID == my_outifts_id)
+                            {
+                                if (LLClipboard::instance().isCutMode())
+                                {
+                                    changeCategoryParent(model, cat, parent_id, false);
+                                }
+                                else
+                                {
+                                    copy_inventory_category(model, cat, parent_id);
+                                }
+                                if (cb) cb->fire(item_id);
+                                handled = true;
+                            }
                         }
                     }
-                    else
+
+                    if (!handled)
                     {
                         LLNotificationsUtil::add("MyOutfitsPasteFailed");
                     }
@@ -5873,12 +5875,11 @@ void LLFolderBridge::dropToMyOutfits(LLInventoryCategory* inv_cat, LLPointer<LLI
                                  inv_cat->getThumbnailUUID());
 }
 
-void LLFolderBridge::dropToMyOutfitsSubfolder(LLInventoryCategory* inv_cat, const LLUUID& dest_id, LLFolderType::EType preferred_type, LLPointer<LLInventoryCallback> cb)
+void LLFolderBridge::dropToMyOutfitsSubfolder(LLInventoryCategory* inv_cat, const LLUUID& dest_id, LLPointer<LLInventoryCallback> cb)
 {
-    const LLUUID outfits_id = getInventoryModel()->findCategoryUUIDForType(LLFolderType::FT_MY_OUTFITS);
     inventory_func_type func = boost::bind(outfitFolderCreatedCallback, inv_cat->getUUID(), _1, cb, mInventoryPanel);
     getInventoryModel()->createNewCategory(dest_id,
-        preferred_type,
+        LLFolderType::FT_OUTFIT,
         inv_cat->getName(),
         func,
         inv_cat->getThumbnailUUID());
