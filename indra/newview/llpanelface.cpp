@@ -4264,8 +4264,8 @@ void LLPanelFace::onCopyTexture()
                 if (te_data["te"].has("imageid") || pbr_id.notNull())
                 {
                     LLUUID img_id = te_data["te"]["imageid"].asUUID();
-                    bool pbr_from_library = false;
-                    bool pbr_full_perm = false;
+                    // unused bool pbr_from_library = false;
+                    // unused bool pbr_full_perm = false;
                     bool is_creator = false;
 
                     if (objectp->permCopy()
