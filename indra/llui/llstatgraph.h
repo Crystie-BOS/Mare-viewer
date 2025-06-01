@@ -155,9 +155,9 @@ private:
 
     callback_t mClickedCallback;
 
-    /*virtual*/ bool handleMouseDown(S32 x, S32 y, MASK mask);
-    /*virtual*/ bool handleMouseUp(S32 x, S32 y, MASK mask);
-    /*virtual*/ bool handleHover(S32 x, S32 y, MASK mask);
+    /*virtual*/ bool handleMouseDown(S32 x, S32 y, MASK mask) override;
+    /*virtual*/ bool handleMouseUp(S32 x, S32 y, MASK mask) override;
+    /*virtual*/ bool handleHover(S32 x, S32 y, MASK mask) override;
 };
 
 #endif  // LL_LLSTATGRAPH_H
