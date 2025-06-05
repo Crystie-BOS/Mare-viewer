@@ -71,6 +71,9 @@
 #include "llclipboard.h"
 #include "llhttpretrypolicy.h"
 #include "llsettingsvo.h"
+#include "llinventorylistener.h"
+
+LLInventoryListener sInventoryListener;
 
 // do-nothing ops for use in callbacks.
 void no_op_inventory_func(const LLUUID&) {}
@@ -754,13 +757,11 @@ S32 LLViewerInventoryCategory::getViewerDescendentCount() const
     return descendents_actual;
 }
 
-LLSD LLViewerInventoryCategory::exportLLSD() const
+void LLViewerInventoryCategory::exportLLSD(LLSD & cat_data) const
 {
-    LLSD cat_data = LLInventoryCategory::exportLLSD();
+    LLInventoryCategory::exportLLSD(cat_data);
     cat_data[INV_OWNER_ID] = mOwnerID;
     cat_data[INV_VERSION] = mVersion;
-
-    return cat_data;
 }
 
 bool LLViewerInventoryCategory::importLLSD(const LLSD& cat_data)
@@ -969,10 +970,7 @@ void LLInventoryCallbackManager::fire(U32 callback_id, const LLUUID& item_id)
     }
 }
 
-//void rez_attachment_cb(const LLUUID& inv_item, LLViewerJointAttachment *attachmentp)
-// [SL:KB] - Patch: Appearance-DnDWear | Checked: 2010-09-28 (Catznip-3.4)
 void rez_attachment_cb(const LLUUID& inv_item, LLViewerJointAttachment *attachmentp, bool replace)
-// [/SL:KB]
 {
     if (inv_item.isNull())
         return;
@@ -980,10 +978,7 @@ void rez_attachment_cb(const LLUUID& inv_item, LLViewerJointAttachment *attachme
     LLViewerInventoryItem *item = gInventory.getItem(inv_item);
     if (item)
     {
-// [SL:KB] - Patch: Appearance-DnDWear | Checked: 2010-09-28 (Catznip-3.4)
         rez_attachment(item, attachmentp, replace);
-// [/SL:KB]
-//      rez_attachment(item, attachmentp);
     }
 }
 
@@ -1518,7 +1513,7 @@ void update_inventory_category(
 //            && (updates.size() != 1 || !updates.has("thumbnail")))
 // [SL:KB] - Patch: Inventory-UserProtectedFolders | Checked: Catznip-5.2
         if ((LLFolderType::lookupIsProtectedType(obj->getPreferredType(), LLUUID::null))
-            && (updates.size() != 1 || !updates.has("thumbnail")))
+            && (updates.size() != 1 || !(updates.has("thumbnail") || updates.has("favorite"))))
 // [/SL:KB]
         {
             LLNotificationsUtil::add("CannotModifyProtectedCategories");

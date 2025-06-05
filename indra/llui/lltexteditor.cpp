@@ -274,7 +274,9 @@ LLTextEditor::LLTextEditor(const LLTextEditor::Params& p) :
     mShowChatMentionPicker(false),
     mEnableTooltipPaste(p.enable_tooltip_paste),
     mPassDelete(false),
-    mKeepSelectionOnReturn(false)
+    mKeepSelectionOnReturn(false),
+    mSelectAllOnFocusReceived(false),
+    mSelectedOnFocusReceived(false)
 {
     mSourceID.generate();
 
@@ -434,6 +436,7 @@ void LLTextEditor::selectNext(const std::string& search_text_in, bool case_insen
 // [/SL:KB]
 
     mIsSelecting = true;
+    mSelectedOnFocusReceived = false;
     mSelectionEnd = mCursorPos;
     mSelectionStart = llmin((S32)getLength(), (S32)(mCursorPos + search_text.size()));
 }
@@ -725,6 +728,13 @@ bool LLTextEditor::canSelectAll() const
     return true;
 }
 
+//virtual
+void LLTextEditor::deselect()
+{
+    LLTextBase::deselect();
+    mSelectedOnFocusReceived = false;
+}
+
 // virtual
 void LLTextEditor::selectAll()
 {
@@ -740,6 +750,11 @@ void LLTextEditor::selectByCursorPosition(S32 prev_cursor_pos, S32 next_cursor_p
     startSelection();
     setCursorPos(next_cursor_pos);
     endSelection();
+}
+
+void LLTextEditor::setSelectAllOnFocusReceived(bool b)
+{
+    mSelectAllOnFocusReceived = b;
 }
 
 void LLTextEditor::insertEmoji(llwchar emoji)
@@ -843,8 +858,16 @@ bool LLTextEditor::handleMouseDown(S32 x, S32 y, MASK mask)
     // Delay cursor flashing
     resetCursorBlink();
 
+    mSelectedOnFocusReceived = false;
     if (handled && !gFocusMgr.getMouseCapture())
     {
+        if (!mask && mSelectAllOnFocusReceived)
+        {
+            mIsSelecting = false;
+            mSelectionStart = getLength();
+            mSelectionEnd = 0;
+            mSelectedOnFocusReceived = true;
+        }
         gFocusMgr.setMouseCapture( this );
     }
     return handled;
@@ -2312,6 +2335,11 @@ void LLTextEditor::focusLostHelper()
     if( gEditMenuHandler == this )
     {
         gEditMenuHandler = NULL;
+    }
+
+    if (mSelectedOnFocusReceived)
+    {
+        deselect();
     }
 
     if (mCommitOnFocusLost)
