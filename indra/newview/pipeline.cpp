@@ -10851,6 +10851,381 @@ void LLPipeline::generateImpostor(LLVOAvatar* avatar, bool preview_avatar, bool 
     // previews can't be muted or impostered
     bool visually_muted = !for_profile && !preview_avatar && avatar->isVisuallyMuted();
     LL_DEBUGS_ONCE("AvatarRenderPipeline") << "Avatar " << avatar->getID()
+                              << " is " << ( visually_muted ? "" : "not ") << "visually muted"
+                              << LL_ENDL;
+    bool too_complex = !for_profile && !preview_avatar && avatar->isTooComplex();
+    LL_DEBUGS_ONCE("AvatarRenderPipeline") << "Avatar " << avatar->getID()
+                              << " is " << ( too_complex ? "" : "not ") << "too complex"
+                              << LL_ENDL;
+
+    pushRenderTypeMask();
+
+    if (visually_muted || too_complex)
+    {
+        // only show jelly doll geometry
+        andRenderTypeMask(LLPipeline::RENDER_TYPE_AVATAR,
+                            LLPipeline::RENDER_TYPE_CONTROL_AV,
+                            END_RENDER_TYPES);
+    }
+    else
+    {
+        //hide world geometry
+        clearRenderTypeMask(
+            RENDER_TYPE_SKY,
+            RENDER_TYPE_WL_SKY,
+            RENDER_TYPE_TERRAIN,
+            RENDER_TYPE_GRASS,
+            RENDER_TYPE_CONTROL_AV, // Animesh
+            RENDER_TYPE_TREE,
+            RENDER_TYPE_VOIDWATER,
+            RENDER_TYPE_WATER,
+            RENDER_TYPE_ALPHA_PRE_WATER,
+            RENDER_TYPE_PASS_GRASS,
+            RENDER_TYPE_HUD,
+            RENDER_TYPE_PARTICLES,
+            RENDER_TYPE_CLOUDS,
+            RENDER_TYPE_HUD_PARTICLES,
+            END_RENDER_TYPES
+         );
+    }
+
+    if (specific_attachment && specific_attachment->isHUDAttachment())
+    { //enable HUD rendering
+        setRenderTypeMask(RENDER_TYPE_HUD, END_RENDER_TYPES);
+    }
+
+    S32 occlusion = sUseOcclusion;
+    sUseOcclusion = 0;
+
+    sReflectionRender = ! sRenderDeferred;
+
+    sShadowRender = true;
+    sImpostorRender = true;
+
+    LLViewerCamera* viewer_camera = LLViewerCamera::getInstance();
+
+    {
+        markVisible(avatar->mDrawable, *viewer_camera);
+
+        if (preview_avatar)
+        {
+            // Only show rigged attachments for preview
+            // For the sake of performance and so that static
+            // objects won't obstruct previewing changes
+            LLVOAvatar::attachment_map_t::iterator iter;
+            for (iter = avatar->mAttachmentPoints.begin();
+                iter != avatar->mAttachmentPoints.end();
+                ++iter)
+            {
+                LLViewerJointAttachment *attachment = iter->second;
+                for (LLViewerJointAttachment::attachedobjs_vec_t::iterator attachment_iter = attachment->mAttachedObjects.begin();
+                    attachment_iter != attachment->mAttachedObjects.end();
+                    ++attachment_iter)
+                {
+                    LLViewerObject* attached_object = attachment_iter->get();
+                    if (attached_object)
+                    {
+                        if (attached_object->isRiggedMesh())
+                        {
+                            markVisible(attached_object->mDrawable->getSpatialBridge(), *viewer_camera);
+                        }
+                        else
+                        {
+                            // sometimes object is a linkset and rigged mesh is a child
+                            LLViewerObject::const_child_list_t& child_list = attached_object->getChildren();
+                            for (LLViewerObject::child_list_t::const_iterator iter = child_list.begin();
+                                iter != child_list.end(); iter++)
+                            {
+                                LLViewerObject* child = *iter;
+                                if (child->isRiggedMesh())
+                                {
+                                    markVisible(attached_object->mDrawable->getSpatialBridge(), *viewer_camera);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            if (specific_attachment)
+            {
+                markVisible(specific_attachment->mDrawable->getSpatialBridge(), *viewer_camera);
+            }
+            else
+            {
+                LLVOAvatar::attachment_map_t::iterator iter;
+                LLVOAvatar::attachment_map_t::iterator begin = avatar->mAttachmentPoints.begin();
+                LLVOAvatar::attachment_map_t::iterator end = avatar->mAttachmentPoints.end();
+
+                for (iter = begin;
+                    iter != end;
+                    ++iter)
+                {
+                    LLViewerJointAttachment* attachment = iter->second;
+                    for (LLViewerJointAttachment::attachedobjs_vec_t::iterator attachment_iter = attachment->mAttachedObjects.begin();
+                        attachment_iter != attachment->mAttachedObjects.end();
+                        ++attachment_iter)
+                    {
+                        LLViewerObject* attached_object = attachment_iter->get();
+                        if (attached_object)
+                        {
+                            markVisible(attached_object->mDrawable->getSpatialBridge(), *viewer_camera);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    stateSort(*LLViewerCamera::getInstance(), result);
+
+    LLCamera camera = *viewer_camera;
+    LLVector2 tdim;
+    U32 resY = 0;
+    U32 resX = 0;
+
+    if (!preview_avatar)
+    {
+        const LLVector4a* ext = avatar->mDrawable->getSpatialExtents();
+        LLVector3 pos(avatar->getRenderPosition()+avatar->getImpostorOffset());
+
+        camera.lookAt(viewer_camera->getOrigin(), pos, viewer_camera->getUpAxis());
+
+        LLVector4a half_height;
+        half_height.setSub(ext[1], ext[0]);
+        half_height.mul(0.5f);
+
+        LLVector4a left;
+        left.load3(camera.getLeftAxis().mV);
+        left.mul(left);
+        llassert(left.dot3(left).getF32() > F_APPROXIMATELY_ZERO);
+        left.normalize3fast();
+
+        LLVector4a up;
+        up.load3(camera.getUpAxis().mV);
+        up.mul(up);
+        llassert(up.dot3(up).getF32() > F_APPROXIMATELY_ZERO);
+        up.normalize3fast();
+
+        tdim.mV[0] = fabsf(half_height.dot3(left).getF32());
+        tdim.mV[1] = fabsf(half_height.dot3(up).getF32());
+
+        gGL.matrixMode(LLRender::MM_PROJECTION);
+        gGL.pushMatrix();
+
+        F32 distance = (pos-camera.getOrigin()).length();
+        F32 fov = atanf(tdim.mV[1]/distance)*2.f*RAD_TO_DEG;
+        F32 aspect = tdim.mV[0]/tdim.mV[1];
+        glm::mat4 persp = glm::perspective(glm::radians(fov), aspect, 1.f, 256.f);
+        set_current_projection(persp);
+        gGL.loadMatrix(glm::value_ptr(persp));
+
+        gGL.matrixMode(LLRender::MM_MODELVIEW);
+        gGL.pushMatrix();
+
+        F32 ogl_mat[16];
+        camera.getOpenGLTransform(ogl_mat);
+        glm::mat4 mat = glm::make_mat4((GLfloat*) OGL_TO_CFR_ROTATION) * glm::make_mat4(ogl_mat);
+
+        gGL.loadMatrix(glm::value_ptr(mat));
+        set_current_modelview(mat);
+
+        glClearColor(0.0f,0.0f,0.0f,0.0f);
+        gGL.setColorMask(true, true);
+
+        // get the number of pixels per angle
+        F32 pa = gViewerWindow->getWindowHeightRaw() / (RAD_TO_DEG * viewer_camera->getView());
+
+        //get resolution based on angle width and height of impostor (double desired resolution to prevent aliasing)
+        resY = llmin(nhpo2((U32) (fov*pa)), (U32) 512);
+        resX = llmin(nhpo2((U32) (atanf(tdim.mV[0]/distance)*2.f*RAD_TO_DEG*pa)), (U32) 512);
+
+        if (!for_profile)
+        {
+            if (!avatar->mImpostor.isComplete())
+            {
+                avatar->mImpostor.allocate(resX, resY, GL_RGBA, true);
+
+                if (LLPipeline::sRenderDeferred)
+                {
+                    addDeferredAttachments(avatar->mImpostor, true);
+                }
+
+                gGL.getTexUnit(0)->bind(&avatar->mImpostor);
+                gGL.getTexUnit(0)->setTextureFilteringOption(LLTexUnit::TFO_POINT);
+                gGL.getTexUnit(0)->unbind(LLTexUnit::TT_TEXTURE);
+            }
+            else if (resX != avatar->mImpostor.getWidth() || resY != avatar->mImpostor.getHeight())
+            {
+                avatar->mImpostor.resize(resX, resY);
+            }
+
+            avatar->mImpostor.bindTarget();
+        }
+    }
+
+    F32 old_alpha = LLDrawPoolAvatar::sMinimumAlpha;
+
+    if (visually_muted || too_complex)
+    { //disable alpha masking for muted avatars (get whole skin silhouette)
+        LLDrawPoolAvatar::sMinimumAlpha = 0.f;
+    }
+
+    if (preview_avatar || for_profile)
+    {
+        // previews and profiles don't care about imposters
+        renderGeomDeferred(camera);
+        renderGeomPostDeferred(camera);
+    }
+    else
+    {
+        avatar->mImpostor.clear();
+        renderGeomDeferred(camera);
+
+        renderGeomPostDeferred(camera);
+
+        // Shameless hack time: render it all again,
+        // this time writing the depth
+        // values we need to generate the alpha mask below
+        // while preserving the alpha-sorted color rendering
+        // from the previous pass
+        //
+        sImpostorRenderAlphaDepthPass = true;
+        // depth-only here...
+        //
+        gGL.setColorMask(false,false);
+        renderGeomPostDeferred(camera);
+
+        sImpostorRenderAlphaDepthPass = false;
+
+    }
+
+    LLDrawPoolAvatar::sMinimumAlpha = old_alpha;
+
+    if (!for_profile)
+    { //create alpha mask based on depth buffer (grey out if muted)
+        if (LLPipeline::sRenderDeferred)
+        {
+            GLuint buff = GL_COLOR_ATTACHMENT0;
+            glDrawBuffers(1, &buff);
+        }
+
+        LLGLDisable blend(GL_BLEND);
+
+        if (visually_muted || too_complex)
+        {
+            gGL.setColorMask(true, true);
+        }
+        else
+        {
+            gGL.setColorMask(false, true);
+        }
+
+        gGL.getTexUnit(0)->unbind(LLTexUnit::TT_TEXTURE);
+
+        LLGLDepthTest depth(GL_TRUE, GL_FALSE, GL_GREATER);
+
+        gGL.flush();
+
+        gGL.pushMatrix();
+        gGL.loadIdentity();
+        gGL.matrixMode(LLRender::MM_PROJECTION);
+        gGL.pushMatrix();
+        gGL.loadIdentity();
+
+        static const F32 clip_plane = 0.99999f;
+
+        gDebugProgram.bind();
+
+        if (visually_muted)
+        {   // Visually muted avatar
+            LLColor4 muted_color(avatar->getMutedAVColor());
+            LL_DEBUGS_ONCE("AvatarRenderPipeline") << "Avatar " << avatar->getID() << " MUTED set solid color " << muted_color << LL_ENDL;
+            gGL.diffuseColor4fv( muted_color.mV );
+        }
+        else if (!preview_avatar)
+        { //grey muted avatar
+            LL_DEBUGS_ONCE("AvatarRenderPipeline") << "Avatar " << avatar->getID() << " MUTED set grey" << LL_ENDL;
+            gGL.diffuseColor4fv(LLColor4::pink.mV );
+        }
+
+        gGL.begin(LLRender::TRIANGLES);
+        {
+            gGL.vertex3f(-1.f, -1.f, clip_plane);
+            gGL.vertex3f(1.f, -1.f, clip_plane);
+            gGL.vertex3f(1.f, 1.f, clip_plane);
+
+            gGL.vertex3f(-1.f, -1.f, clip_plane);
+            gGL.vertex3f(1.f, 1.f, clip_plane);
+            gGL.vertex3f(-1.f, 1.f, clip_plane);
+        }
+        gGL.end();
+        gGL.flush();
+
+        gDebugProgram.unbind();
+
+        gGL.popMatrix();
+        gGL.matrixMode(LLRender::MM_MODELVIEW);
+        gGL.popMatrix();
+    }
+
+    if (!preview_avatar && !for_profile)
+    {
+        avatar->mImpostor.flush();
+        avatar->setImpostorDim(tdim);
+    }
+
+    sUseOcclusion = occlusion;
+    sReflectionRender = false;
+    sImpostorRender = false;
+    sShadowRender = false;
+    popRenderTypeMask();
+
+    if (!preview_avatar)
+    {
+        gGL.matrixMode(LLRender::MM_PROJECTION);
+        gGL.popMatrix();
+        gGL.matrixMode(LLRender::MM_MODELVIEW);
+        gGL.popMatrix();
+    }
+
+    if (!preview_avatar && !for_profile)
+    {
+        avatar->mNeedsImpostorUpdate = false;
+        avatar->cacheImpostorValues();
+        avatar->mLastImpostorUpdateFrameTime = gFrameTimeSeconds;
+    }
+
+    LLVertexBuffer::unbind();
+    LLGLState::checkStates();
+}
+
+/** broken version
+void LLPipeline::generateImpostor(LLVOAvatar* avatar, bool preview_avatar, bool for_profile, LLViewerObject* specific_attachment)
+{
+    LL_PROFILE_ZONE_SCOPED_CATEGORY_PIPELINE;
+    LL_PROFILE_GPU_ZONE("generateImpostor");
+    LLGLState::checkStates();
+
+    static LLCullResult result;
+    result.clear();
+    grabReferences(result);
+
+    if (!avatar || avatar->isDead() || !avatar->mDrawable)
+    {
+        LL_WARNS_ONCE("AvatarRenderPipeline") << "Avatar is " << (avatar ? "not drawable" : "null") << LL_ENDL;
+        return;
+    }
+    LL_DEBUGS_ONCE("AvatarRenderPipeline") << "Avatar " << avatar->getID() << " is drawable" << LL_ENDL;
+
+    assertInitialized();
+
+    // previews can't be muted or impostered
+    bool visually_muted = !for_profile && !preview_avatar && avatar->isVisuallyMuted();
+    LL_DEBUGS_ONCE("AvatarRenderPipeline") << "Avatar " << avatar->getID()
         << " is " << (visually_muted ? "" : "not ") << "visually muted"
         << LL_ENDL;
     bool too_complex = !for_profile && !preview_avatar && avatar->isTooComplex();
@@ -11321,6 +11696,7 @@ void LLPipeline::generateImpostor(LLVOAvatar* avatar, bool preview_avatar, bool 
     LLVertexBuffer::unbind();
     LLGLState::checkStates();
 }
+*/
 
 bool LLPipeline::hasRenderBatches(const U32 type) const
 {
