@@ -560,8 +560,8 @@ public:
     S32         mSpecialRenderMode; // special lighting
 
 //MK
-    BOOL        getVisible() { return mVisible; }
-    BOOL        isSilhouette() { return mRenderAsSilhouette; }
+    bool        getVisible() { return mVisible; }
+    bool        isSilhouette() { return mRenderAsSilhouette; }
 //mk
 private:
     friend class LLPipeline;
@@ -601,7 +601,7 @@ private:
     mutable F64         mCachedBuddyListUpdateTime = 0.0;
 
 //MK
-    BOOL        mRenderAsSilhouette; // TRUE when the avatar is farther than RRInterface::mShowavsDistMax, calculated once during each frame
+    bool        mRenderAsSilhouette; // TRUE when the avatar is farther than RRInterface::mShowavsDistMax, calculated once during each frame
 //mk
 
     VisualMuteSettings      mVisuallyMuteSetting;           // Always or never visually mute this AV

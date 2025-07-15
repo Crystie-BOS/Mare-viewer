@@ -8435,7 +8435,7 @@ bool LLVOAvatar::detachObject(LLViewerObject *viewer_object)
 void LLVOAvatar::sitDown(bool bSitting)
 {
 //MK
-    BOOL was_sitting = mIsSitting;
+    bool was_sitting = mIsSitting;
 //mk
     mIsSitting = bSitting;
     if (isSelf())
@@ -11591,7 +11591,7 @@ bool LLVOAvatar::shouldImpostor(const F32 rank_factor)
 //MK
     if (!isSelf() && mRenderAsSilhouette)
     {
-        return false;
+        return true;
     }
 //mk
     if (isSelf())
@@ -11611,7 +11611,7 @@ bool LLVOAvatar::needsImpostorUpdate() const
 //MK
     if (mRenderAsSilhouette)
     {
-        return false;
+        return true;
     }
 //mk
     return mNeedsImpostorUpdate;
@@ -12480,7 +12480,7 @@ bool LLVOAvatar::isTextureVisible(LLAvatarAppearanceDefines::ETextureIndex type,
             static LLCachedControl<U32> RestrainedLoveAvatarShadows(gSavedSettings, "RestrainedLoveAvatarShadows", 2);
             if (RestrainedLoveAvatarShadows == 1)
             {
-                return false;
+                return true;
             }
         }
 //mk
