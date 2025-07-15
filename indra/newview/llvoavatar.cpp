@@ -3390,7 +3390,10 @@ void LLVOAvatar::idleUpdateLoadingEffect()
                                                                  LLPartData::LL_PART_TARGET_POS_MASK );
 
             // do not generate particles for dummy or overly-complex avatars
-            if (!mIsDummy && !isTooComplex() && !isTooSlow())
+//MK by CA
+            //if (!mIsDummy && !isTooComplex() && !isTooSlow())
+            if (!mIsDummy && !isTooComplex() && !isTooSlow() && !isSilhouette())
+//mk by CA
             {
                 setParticleSource(particle_parameters, getID());
             }
@@ -4304,7 +4307,10 @@ bool LLVOAvatar::isVisuallyMuted()
         }
         else
         {
-            muted = isTooComplex() || isTooSlow();
+//MK by CA
+            //muted = isTooComplex() || isTooSlow();
+            muted = isTooComplex() || isTooSlow() || isSilhouette();
+//mk by CA
         }
     }
 
@@ -4699,7 +4705,7 @@ void LLVOAvatar::updateFootstepSounds()
 void LLVOAvatar::computeUpdatePeriod()
     {
 //MK
-    mRenderAsSilhouette = FALSE;
+    mRenderAsSilhouette = false;
     if (gRRenabled && !isSelf() && gAgentAvatarp && getRezzedStatus() >= 2) // fully rezzed
     {
         LLVector3d my_head_pos (gAgent.getPosGlobalFromAgent(gAgentAvatarp->mHeadp->getWorldPosition()));
@@ -11581,11 +11587,11 @@ void LLVOAvatar::updateImpostors()
 // virtual
 bool LLVOAvatar::isImpostor()
 {
-
+//MK by CA
     //return isVisuallyMuted() || (sLimitNonImpostors && (mUpdatePeriod > 1));
     return isSilhouette() || isVisuallyMuted() || (sLimitNonImpostors && (mUpdatePeriod > 1));
+//mk by CA
 }
-//mk
 bool LLVOAvatar::shouldImpostor(const F32 rank_factor)
 {
 //MK
@@ -12324,7 +12330,10 @@ LLVOAvatar::AvatarOverallAppearance LLVOAvatar::getOverallAppearance() const
         {   // Always want to see this AV as an impostor
             result = AOA_JELLYDOLL;
         }
-        else if (isTooComplex() || isTooSlow())
+//MK by CA
+        else if (isTooComplex() || isTooSlow() || isSilhouette())
+        //else if (isTooComplex() || isTooSlow())
+//mk by CA
         {
             result = AOA_JELLYDOLL;
         }
@@ -12351,7 +12360,10 @@ void LLVOAvatar::calcMutedAVColor()
         new_color = LLColor4::grey4;
         change_msg = " blocked: color is grey4";
     }
-    else if (!isTooComplex() && !isTooSlow())
+//MK by CA
+    else if (!isTooComplex() && !isTooSlow() && !isSilhouette())
+    //else if (!isTooComplex() && !isTooSlow())
+//mk by CA
     {
         new_color = LLColor4::white;
         change_msg = " simple imposter ";

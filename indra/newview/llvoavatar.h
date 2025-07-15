@@ -561,7 +561,7 @@ public:
 
 //MK
     bool        getVisible() { return mVisible; }
-    bool        isSilhouette() { return mRenderAsSilhouette; }
+    bool        isSilhouette() const { return mRenderAsSilhouette; } //CA: we need this const now
 //mk
 private:
     friend class LLPipeline;
