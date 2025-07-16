@@ -657,19 +657,9 @@ attributedStringInfo getSegments(NSAttributedString *str)
             unsigned(replacementRange.location),
             unsigned(replacementRange.length)
         };
-
-#if __clang_major__ > 16
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wvla-cxx-extension"
-#endif
         
         int string_length = [aString length];
-        unichar text[string_length];
-
-#if __clang_major__ > 16
-#pragma clang diagnostic pop
-#endif
-
+        unichar *text = new unichar[string_length];
         attributedStringInfo segments;
         // I used 'respondsToSelector:@selector(string)'
         // to judge aString is an attributed string or not.
@@ -697,6 +687,8 @@ attributedStringInfo getSegments(NSAttributedString *str)
             // we must clear the marked text when aString is null.
             [self unmarkText];
         }
+
+        delete [] text;
     } else {
         if (mHasMarkedText)
         {
