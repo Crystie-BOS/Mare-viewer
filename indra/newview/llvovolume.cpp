@@ -5561,7 +5561,11 @@ void LLVolumeGeometryManager::registerFace(LLSpatialGroup* group, LLFace* facep,
 
     auto* gltf_mat = (LLFetchedGLTFMaterial*)te->getGLTFRenderMaterial();
     llassert(gltf_mat == nullptr || dynamic_cast<LLFetchedGLTFMaterial*>(te->getGLTFRenderMaterial()) != nullptr);
-    if (gltf_mat != nullptr)
+//MK by CA
+//Quick'n'dirty fix to get camtextures working again - pretend PBR textures are BP
+//    if (gltf_mat != nullptr)
+    if (gltf_mat != nullptr && !(gRRenabled && gAgent.mRRInterface.mContainsCamTextures))
+//mk by CA
     {
         mat_id = gltf_mat->getHash(); // TODO: cache this hash
         if (!facep->hasMedia() || (tex && tex->getType() != LLViewerTexture::MEDIA_TEXTURE))
