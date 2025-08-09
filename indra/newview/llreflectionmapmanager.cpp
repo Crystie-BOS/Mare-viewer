@@ -1146,7 +1146,7 @@ void LLReflectionMapManager::updateUniforms()
         {
             if (refmap->mViewerObject && refmap->mViewerObject->getVolume())
             { // have active manual probes live-track the object they're associated with
-                LLVOVolume* vobj = (LLVOVolume*)refmap->mViewerObject.get();
+                LLVOVolume* vobj = (LLVOVolume*)refmap->mViewerObject;
 
                 refmap->mOrigin.load3(vobj->getPositionAgent().mV);
 
