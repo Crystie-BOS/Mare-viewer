@@ -124,7 +124,8 @@ public:
     LLSpatialGroup* mGroup = nullptr;
 
     // viewer object this probe is tracking (if any)
-    LLPointer<LLViewerObject> mViewerObject = nullptr;
+    // LLPointer<LLViewerObject> mViewerObject = nullptr; // gcc doesn't like this; reverted to pre 7.2.0 form
+    LLViewerObject* mViewerObject = nullptr;
 
     // what priority should this probe have (higher is higher priority)
     // currently only 0 or 1
