@@ -1125,7 +1125,7 @@ void LLFloaterWorldMap::buildAvatarIDList()
     }
     for (std::multimap<std::string, LLUUID>::iterator bit = buddymap.begin(); bit != buddymap.end(); ++bit)
     {
-        mFriendCombo->addSimpleElement((*it).second, ADD_BOTTOM, (*it).first);
+        mFriendCombo->addSimpleElement((*bit).second, ADD_BOTTOM, (*bit).first);
     }
     // </FS:Ansariel>
 
