@@ -78,7 +78,6 @@
 
 //MK
 #include "llfloaterimnearbychat.h"
-#include "llviewerregion.h"
 //mk
 
 //CA
@@ -88,7 +87,6 @@
 #include "llcombobox.h"
 #include "lllayoutstack.h"
 #include "llstartup.h"
-#include "lggcontactsets.h"
 //ca
 
 const F32 FRIEND_LIST_UPDATE_TIMEOUT =  0.5f;
