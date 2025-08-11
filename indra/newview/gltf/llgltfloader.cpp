@@ -1156,7 +1156,7 @@ bool LLGLTFLoader::populateModelFromMesh(LLModel* pModel, const std::string& bas
             for (size_t i = 0; i < jointCnt; ++i)
             {
                 // Process joint name and idnex
-                S32 joint = gltf_skin.mJoints[i];
+                // unused S32 joint = gltf_skin.mJoints[i];
                 if (gltf_joint_index_use[i] <= 0)
                 {
                     // unsupported (-1) joint, drop it
@@ -1177,7 +1177,7 @@ bool LLGLTFLoader::populateModelFromMesh(LLModel* pModel, const std::string& bas
             // Todo: sort and add by usecount
             for (size_t i = 0; i < jointCnt; ++i)
             {
-                S32 joint = gltf_skin.mJoints[i];
+                // unused S32 joint = gltf_skin.mJoints[i];
                 if (gltf_joint_index_use[i] != 0)
                 {
                     // this step needs only joints that have zero uses
@@ -1204,7 +1204,7 @@ bool LLGLTFLoader::populateModelFromMesh(LLModel* pModel, const std::string& bas
             for (size_t i = 0; i < jointCnt; ++i)
             {
                 // Process joint name and idnex
-                S32 joint = gltf_skin.mJoints[i];
+                //unused S32 joint = gltf_skin.mJoints[i];
                 if (gltf_joint_index_use[i] < 0)
                 {
                     // unsupported (-1) joint, drop it
@@ -1664,7 +1664,7 @@ void LLGLTFLoader::checkGlobalJointUsage()
         S32 used_joints = 0;
         for (S32 i = 0; i < joint_count; ++i)
         {
-            S32 joint = gltf_skin.mJoints[i];
+            //unused S32 joint = gltf_skin.mJoints[i];
             if (mJointUsage[skin_idx][i] == 0)
             {
                 // Joint is unused, log it

@@ -6055,9 +6055,12 @@ void LLAppViewer::forceExceptionThreadCrash()
     thread->start();
 }
 
-void LLAppViewer::initMainloopTimeout(std::string_view state, F32 secs)
+// <FS:ND> Change from std::string to char const*, saving a lot of object construction/destruction per frame
+//void LLAppViewer::initMainloopTimeout(const std::string& state, F32 secs)
+void LLAppViewer::initMainloopTimeout( char const* state, F32 secs)
+// </FS:ND>
 {
-    if (!mMainloopTimeout)
+    if(!mMainloopTimeout)
     {
         mMainloopTimeout = new LLWatchdogTimeout();
         resumeMainloopTimeout(state, secs);
@@ -6073,11 +6076,14 @@ void LLAppViewer::destroyMainloopTimeout()
     }
 }
 
-void LLAppViewer::resumeMainloopTimeout(std::string_view state, F32 secs)
+// <FS:ND> Change from std::string to char const*, saving a lot of object construction/destruction per frame
+//void LLAppViewer::resumeMainloopTimeout(const std::string& state, F32 secs)
+void LLAppViewer::resumeMainloopTimeout( char const* state, F32 secs)
+// </FS:ND>
 {
-    if (mMainloopTimeout)
+    if(mMainloopTimeout)
     {
-        if (secs < 0.0f)
+        if(secs < 0.0f)
         {
             static LLCachedControl<F32> mainloop_timeout(gSavedSettings, "MainloopTimeoutDefault", 60.f);
             secs = mainloop_timeout;
@@ -6096,7 +6102,10 @@ void LLAppViewer::pauseMainloopTimeout()
     }
 }
 
-void LLAppViewer::pingMainloopTimeout(std::string_view state, F32 secs)
+// <FS:ND> Change from std::string to char const*, saving a lot of object construction/destruction per frame
+//void LLAppViewer::pingMainloopTimeout(const std::string& state, F32 secs)
+void LLAppViewer::pingMainloopTimeout( char const* state, F32 secs)
+// </FS:ND>
 {
     LL_PROFILE_ZONE_SCOPED_CATEGORY_APP;
 

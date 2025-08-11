@@ -347,13 +347,13 @@
    length="1"
    follows="left|top"
    layout="topleft"
-   left="27"
-   top_delta="25"
+   left="30"
+   top_delta="22"
    name="Listen media from"
    height="15"
-   width="165"
-   halign="right">
-      Hear media and sounds from
+   word_wrap="true"
+   width="160">
+      Hear media and sounds from:
   </text>
   <combo_box
    control_name="MediaSoundsEarLocation"
@@ -373,15 +373,15 @@
       name="avatar_position"
       value="1" />
 </combo_box>
+
   <text
    follows="left|top"
    layout="topleft"
    height="15"
-   left="27"
-   width="165"
-   top_pad="2"
-   name="media_autoplay_label"
-   halign="right">
+   left="30"
+   top_pad="8"
+   width="160"
+   name="media_autoplay_label">
     Auto-play media
   </text>
   <combo_box
@@ -390,7 +390,7 @@
         follows="left|top"
         layout="topleft"
         height="23"
-        left_delta="170"
+        left_pad="5"
         top_delta="-4"
         name="media_auto_play_combo"
         width="130">
@@ -407,15 +407,15 @@
         name="autoplay_ask"
         value="2"/>
   </combo_box>
-   <text
+    <text
         follows="left|top"
         layout="topleft"
+        top_pad="8"
         height="15"
-        left="27"
-        top_pad="2"
-        width="165"
+        left="30"
+        width="160"
         name="media_firstinteract_label"
-        halign="right">
+        halign="left">
             Media first-interact
     </text>
     <combo_box
@@ -424,7 +424,7 @@
     follows="left|top"
     layout="topleft"
     height="23"
-    left_delta="170"
+    left_pad="5"
     top_delta="-4"
     width="130"
     name="media_first_interact_combo"
@@ -462,18 +462,18 @@
             name="media_first_click_all"
             value="65535"/>
     </combo_box>
- 	<check_box
-		name="media_show_on_others_btn"
-		control_name="MediaShowOnOthers"
-		value="true"
+   <check_box
+    name="media_show_on_others_btn"
+    control_name="MediaShowOnOthers"
+    enabled_control="AudioStreamingMedia"
+    value="true"
     follows="left|top"
-    layout="topleft"
-		height="15"
-		tool_tip="Uncheck this to hide media attached to other avatars nearby"
-		label="Play media attached to other avatars"
-		left="25"
-    top_pad="2"
-   width="230"/>
+    tool_tip="Uncheck this to hide media attached to other avatars nearby"
+    label="Play media attached to other avatars"
+    left="25"
+    width="15"
+    top_delta="30"
+    height="15"/>
   <check_box
     name="media_huds_autoplay"
     control_name="MediaAutoPlayHuds"
@@ -481,12 +481,24 @@
     value="true"
     follows="left|top"
     layout="topleft"
-    top_pad="2"
     tool_tip="Uncheck this to make HUDs follow the standard media auto-play setting"
     label="Auto-play media attached to your HUD"
     left="25"
+    top_pad="2"
     width="15"
     height="15"/>
+ 	<check_box
+		name="media_show_on_others_btn"
+		control_name="MediaShowOnOthers"
+		value="true"
+    follows="left|top"
+    layout="topleft"
+		height="15"
+		top_pad="2"
+		tool_tip="Uncheck this to hide media attached to other avatars nearby"
+		label="Play media attached to other avatars"
+		left="25"
+    width="230"/>
   <check_box
    name="gesture_audio_play_btn"
    control_name="EnableGestureSounds"
@@ -598,14 +610,13 @@
      top_pad="16">
 	  Voice Chat Settings
     </text>
-
   <text
    layout="topleft"
-   follows="left"
+   follows="left|top"
    height="15"
-   width="165"
+   width="160"
    name="noise_suppression_label"
-   left="23"
+   left="25"
    top_delta="22"
    halign="right">
      Microphone Noise Suppression
@@ -615,7 +626,7 @@
    enabled_control="EnableVoiceChat"
    follows="left|top"
    layout="topleft"
-   left_delta="170"
+   left_delta="180"
    top_delta="-6"
    width="130"
    height="23"
@@ -646,42 +657,18 @@
    length="1"
    follows="left|top"
    layout="topleft"
-   left="23"
-   top_delta="30"
+   left="25"
+   top_delta="34"
    name="Listen from"
-   width="165"
-   height="15"
-   halign="right">
-     Hear voice from
+   width="160">
+     Hear voice from:
   </text>
-	<icon
-		follows="left|top"
-		height="18"
-		image_name="Cam_FreeCam_Off"
-		layout="topleft"
-		name="camera_icon"
-		mouse_opaque="false"
-		visible="true"
-		width="18"
-		left_pad="-4"
-		top_delta="-5"/>
-	<icon
-		follows="left|top"
-		height="18"
-		image_name="Move_Walk_Off"
-		layout="topleft"
-		left_pad="170" 
-		name="avatar_icon"
-		mouse_opaque="false"
-		visible="true"
-		width="18"
-		top_delta="0" />
   <combo_box
    enabled_control="EnableVoiceChat"
    control_name="VoiceEarLocation"
    follows="left|top"
    layout="topleft"
-   left_delta="170"
+   left_delta="180"
    top_delta="-6"
    width="130"
    height="23"
@@ -695,6 +682,18 @@
       name="avatar_position"
       value="1" />
 </combo_box>
+
+   <check_box
+     control_name="ShowVoiceVisualizer"
+     follows="left|top"
+     height="15"
+     label="Show voice visualizers over avatars"
+     tool_tip="Shows Voice Indicator (white dot) over avatars"
+     layout="topleft"
+     left="28"
+     name="ShowVoiceVisualizer"
+     top_pad="8"
+     width="237"/>   
   <check_box
    control_name="LipSyncEnabled"
    enabled_control="EnableVoiceChat"
@@ -725,9 +724,9 @@
    tool_tip="Check to enable voice echo cancellation"
    label="Echo Cancellation"
    layout="topleft"
-   left="260"
+   left="28"
    name="enable_echo_cancellation"
-   top_pad="-15"
+   top_pad="8"
    width="200"/>
   <check_box
    follows="top|left"
@@ -749,8 +748,8 @@
    label="Automatic Gain Control"
    layout="topleft"
    name="voice_automatic_gain_control"
-   left="260"
-   top_pad="-15"
+   left="28"
+   top_pad="8"
    width="200"/>
   <check_box
    name="gesture_audio_play_btn"
@@ -761,8 +760,8 @@
    height="15"
    tool_tip="Check this to hear sounds from gestures"
    label="Play sounds from gestures"
-   top_pad="5"
-   left="20"/>
+   top_pad="8"
+   left="28"/>
   <check_box
    control_name="VoiceVisualizerEnabled"
    enabled_control="EnableVoiceChat"
@@ -771,8 +770,8 @@
    label="Show voice dot above avatars"
    layout="topleft"
    name="voice_dot_visualizer"
-   left="260"
-   top_pad="-15"
+   left="28"
+   top_pad="8"
    width="200"/>
   <button
    control_name="ShowDeviceSettings"

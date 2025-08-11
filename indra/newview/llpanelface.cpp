@@ -1504,6 +1504,7 @@ void LLPanelFace::updateUI(bool force_set_values /*false*/)
                 mBumpyScaleU->setValue(norm_scale_s);
             }
 
+
             mTexScaleFlipU->setValue(diff_scale_flip_s);
             mShinyScaleFlipU->setValue(norm_scale_flip_s);
             mBumpyScaleFlipU->setValue(spec_scale_flip_s);
