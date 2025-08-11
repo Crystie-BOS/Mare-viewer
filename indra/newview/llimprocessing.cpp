@@ -2052,10 +2052,10 @@ void LLIMProcessing::requestOfflineMessages()
     if (!requested
         && gMessageSystem
         && !gDisconnected
-        && LLMuteList::getInstance()->isLoaded()
         && isAgentAvatarValid()
         && gAgent.getRegion()
-        && gAgent.getRegion()->capabilitiesReceived())
+        && gAgent.getRegion()->capabilitiesReceived()
+        && (LLMuteList::getInstance()->isLoaded() || LLMuteList::getInstance()->getLoadFailed()))
     {
         std::string cap_url = gAgent.getRegionCapability("ReadOfflineMsgs");
         // KKA-699 - start using the new cap now that simulator fixes are in place

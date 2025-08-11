@@ -90,6 +90,7 @@ protected:
     LLColorSwatchCtrl* mColorSwatch = nullptr;
 
     std::string mSearchFilter;
+    std::string mOldText;
 };
 
 #endif //LLFLOATERDEBUGSETTINGS_H

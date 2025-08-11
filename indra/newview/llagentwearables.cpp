@@ -1179,12 +1179,12 @@ void LLAgentWearables::setWearableOutfit(const LLInventoryItem::item_array_t& it
     {
         gAgentAvatarp->setCompositeUpdatesEnabled(true);
 
-        // If we have not yet declouded, we may want to use
+        // If we have not yet loaded core parts, we may want to use
         // baked texture UUIDs sent from the first objectUpdate message
-        // don't overwrite these. If we have already declouded, we've saved
-        // these ids as the last known good textures and can invalidate without
-        // re-clouding.
-        if (!gAgentAvatarp->getIsCloud())
+        // don't overwrite these. If we have parts already, we've saved
+        // these texture ids as the last known good textures and can
+        // invalidate without having to recloud avatar.
+        if (!gAgentAvatarp->getHasMissingParts())
         {
             gAgentAvatarp->invalidateAll();
         }
@@ -1370,7 +1370,7 @@ void LLAgentWearables::findAttachmentsAddRemoveInfo(LLInventoryModel::item_array
 
     if (gRRenabled)
     {
-        if (gAgentAvatarp && !gAgentAvatarp->getIsCloud() && !gAgent.mRRInterface.mUserUpdateAttachmentsFirstCall && !gAgent.mRRInterface.mUserUpdateAttachmentsCalledManually)
+        if (gAgentAvatarp && !gAgentAvatarp->getHasMissingParts() && !gAgent.mRRInterface.mUserUpdateAttachmentsFirstCall && !gAgent.mRRInterface.mUserUpdateAttachmentsCalledManually)
         {
             LLInventoryModel::cat_array_t cat_array;
             LLInventoryModel::item_array_t item_array;

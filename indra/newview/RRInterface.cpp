@@ -5916,7 +5916,7 @@ bool RRInterface::canWear(LLInventoryItem* item)
     if (!gAgentAvatarp) return true;
 
     // If we are still a cloud, allow to wear whatever the restrictions (we are probably logging on)
-    if (gAgentAvatarp && gAgentAvatarp->getIsCloud())
+    if (gAgentAvatarp && gAgentAvatarp->getHasMissingParts())
     {
         return true;
     }
@@ -5937,7 +5937,7 @@ bool RRInterface::canWear(LLInventoryItem* item)
             const LLViewerInventoryItem *vitem = dynamic_cast<const LLViewerInventoryItem*>(item);
             if (vitem) {
                 //LLWearableType::EType type = vitem->getWearableType();
-                //if (gAgentAvatarp && gAgentAvatarp->getIsCloud())
+                //if (gAgentAvatarp && gAgentAvatarp->getHasMissingParts())
                 //{
                 //  if (type == LLWearableType::WT_SHAPE
                 //      || type == LLWearableType::WT_HAIR
@@ -5966,12 +5966,12 @@ bool RRInterface::canWear(LLWearableType::EType type, bool from_server /*= false
     // isn't valid yet
     if (!gAgentAvatarp) return true;
 
-    if (gAgentAvatarp && gAgentAvatarp->getIsCloud())
+    if (gAgentAvatarp && gAgentAvatarp->getHasMissingParts())
     {
         return true;
     }
     //// If we are still a cloud, we can always wear bodyparts because we are still logging on
-    //if (gAgentAvatarp && gAgentAvatarp->getIsCloud())
+    //if (gAgentAvatarp && gAgentAvatarp->getHasMissingParts())
     //{
     //  if (type == LLWearableType::WT_SHAPE
     //      || type == LLWearableType::WT_HAIR

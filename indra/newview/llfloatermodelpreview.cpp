@@ -165,7 +165,7 @@ bool LLFloaterModelPreview::postBuild()
     for (S32 lod = 0; lod <= LLModel::LOD_HIGH; ++lod)
     {
         LLComboBox* lod_source_combo = getChild<LLComboBox>("lod_source_" + lod_name[lod]);
-        lod_source_combo->setCommitCallback(boost::bind(&LLFloaterModelPreview::onLoDSourceCommit, this, lod, true));
+        lod_source_combo->setCommitCallback(boost::bind(&LLFloaterModelPreview::onLoDSourceCommit, this, lod));
         lod_source_combo->setCurrentByIndex(mLODMode[lod]);
 
         getChild<LLButton>("lod_browse_" + lod_name[lod])->setCommitCallback(boost::bind(&LLFloaterModelPreview::onBrowseLOD, this, lod));
@@ -357,14 +357,14 @@ void LLFloaterModelPreview::initModelPreview()
 }
 
 //static
-bool LLFloaterModelPreview::showModelPreview()
+void LLFloaterModelPreview::showModelPreview(const LLUUID& dest_folder)
 {
     LLFloaterModelPreview* fmp = (LLFloaterModelPreview*)LLFloaterReg::getInstance("upload_model");
     if (fmp && !fmp->isModelLoading())
     {
+        fmp->setUploadDestination(dest_folder);
         fmp->loadHighLodModel();
     }
-    return true;
 }
 
 void LLFloaterModelPreview::onUploadOptionChecked(LLUICtrl* ctrl)
@@ -527,7 +527,7 @@ void LLFloaterModelPreview::onClickCalculateBtn()
     gMeshRepo.uploadModel(mModelPreview->mUploadData, mModelPreview->mPreviewScale,
                           childGetValue("upload_textures").asBoolean(),
                           upload_skinweights, upload_joint_positions, lock_scale_if_joint_position,
-                          mUploadModelUrl, false,
+                          mUploadModelUrl, mDestinationFolderId, false,
                           getWholeModelFeeObserverHandle());
 
     toggleCalculateButton(false);
@@ -787,7 +787,7 @@ void LLFloaterModelPreview::onLODParamCommit(S32 lod, bool enforce_tri_limit)
         LLComboBox* lod_source_combo = getChild<LLComboBox>("lod_source_" + lod_name[i]);
         if (lod_source_combo->getCurrentIndex() == LLModelPreview::USE_LOD_ABOVE)
         {
-            onLoDSourceCommit(i, false);
+            onLoDSourceCommit(i);
         }
         else
         {
@@ -1697,7 +1697,7 @@ void LLFloaterModelPreview::onUpload(void* user_data)
     gMeshRepo.uploadModel(mp->mModelPreview->mUploadData, mp->mModelPreview->mPreviewScale,
                           mp->childGetValue("upload_textures").asBoolean(),
                           upload_skinweights, upload_joint_positions, lock_scale_if_joint_position,
-                          mp->mUploadModelUrl,
+                          mp->mUploadModelUrl, mp->mDestinationFolderId,
                           true, LLHandle<LLWholeModelFeeObserver>(), mp->getWholeModelUploadObserverHandle());
 }
 
@@ -1798,7 +1798,7 @@ void LLFloaterModelPreview::toggleCalculateButton(bool visible)
     }
 }
 
-void LLFloaterModelPreview::onLoDSourceCommit(S32 lod, bool refresh_ui)
+void LLFloaterModelPreview::onLoDSourceCommit(S32 lod)
 {
     mModelPreview->updateLodControls(lod);
 
@@ -1811,8 +1811,10 @@ void LLFloaterModelPreview::onLoDSourceCommit(S32 lod, bool refresh_ui)
         // rebuild LoD to update triangle counts
         onLODParamCommit(lod, true);
     }
-    else if (refresh_ui && index == LLModelPreview::USE_LOD_ABOVE)
+    else if (index == LLModelPreview::USE_LOD_ABOVE)
     {
+        // refresh to pick triangle counts
+        mModelPreview->mDirty = true;
         // Update mUploadData for updateStatusMessages
         mModelPreview->rebuildUploadData();
         // Update UI with new triangle values

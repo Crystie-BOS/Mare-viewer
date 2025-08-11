@@ -265,14 +265,14 @@ void LLFloaterSettingsDebug::updateControl(LLControlVariable* controlp)
         getChildView("copy_btn")->setVisible(TRUE);
         getChildView("sanity_warning_btn")->setVisible(!controlp->isSane());
 
-        std::string old_text = mComment->getText();
         std::string new_text = controlp->getComment();
         // Don't setText if not nessesary, it will reset scroll
         // This is a debug UI that reads from xml, there might
         // be use cases where comment changes, but not the name
-        if (old_text != new_text)
+        if (mOldText != new_text)
         {
             mComment->setText(controlp->getComment());
+            mOldText = new_text;
         }
 
         mValSpinner1->setMaxValue(F32_MAX);
@@ -525,6 +525,7 @@ void LLFloaterSettingsDebug::updateControl(LLControlVariable* controlp)
           }
           default:
             mComment->setText(std::string("unknown"));
+            mOldText = "unknown";
             break;
         }
     }

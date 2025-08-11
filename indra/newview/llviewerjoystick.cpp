@@ -934,6 +934,10 @@ void LLViewerJoystick::moveObjects(bool reset)
         {
             gAgent.clearAFK();
         }
+        else
+        {
+            gAwayTriggerTimer.reset();
+        }
 
         if (sDelta[0] || sDelta[1] || sDelta[2])
         {
@@ -1111,6 +1115,10 @@ void LLViewerJoystick::moveAvatar(bool reset)
         if (gAwayTimer.getElapsedTimeF32() > LLAgent::MIN_AFK_TIME)
         {
             gAgent.clearAFK();
+        }
+        else
+        {
+            gAwayTriggerTimer.reset();
         }
 
         setCameraNeedsUpdate(true);
@@ -1324,9 +1332,16 @@ void LLViewerJoystick::moveFlycam(bool reset)
     }
 
     // Clear AFK state if moved beyond the deadzone
-    if (!is_zero && gAwayTimer.getElapsedTimeF32() > LLAgent::MIN_AFK_TIME)
+    if (!is_zero)
+    {
+        if (gAwayTimer.getElapsedTimeF32() > LLAgent::MIN_AFK_TIME)
     {
         gAgent.clearAFK();
+    }
+        else
+        {
+            gAwayTriggerTimer.reset();
+        }
     }
 
     sFlycamPosition += LLVector3(sDelta) * sFlycamRotation;
@@ -1395,6 +1410,10 @@ bool LLViewerJoystick::toggleFlycam()
     if (gAwayTimer.getElapsedTimeF32() > LLAgent::MIN_AFK_TIME)
     {
         gAgent.clearAFK();
+    }
+    else
+    {
+        gAwayTriggerTimer.reset();
     }
 
     mOverrideCamera = !mOverrideCamera;
