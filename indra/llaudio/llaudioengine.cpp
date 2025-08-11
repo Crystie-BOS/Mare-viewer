@@ -40,10 +40,6 @@
 #include "llaudiodecodemgr.h"
 #include "llassetstorage.h"
 
-
-// necessary for grabbing sounds from sim (implemented in viewer)
-extern void request_sound(const LLUUID &sound_guid);
-
 LLAudioEngine* gAudiop = NULL;
 
 // NaCl - Sound explorer
