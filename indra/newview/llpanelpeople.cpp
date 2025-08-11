@@ -1555,9 +1555,12 @@ void LLPanelPeople::onAvatarListCommitted(LLAvatarList* list)
     const std::string& cur_tab = getActiveTabName();
     if (list == mNearbyList)
     {
-        uuid_vec_t selected_uuids;
-        getCurrentItemIDs(selected_uuids);
-        mMiniMap->setSelected(selected_uuids);
+        if (cur_tab == NEARBY_TAB_NAME)
+        {
+            uuid_vec_t selected_uuids;
+            getCurrentItemIDs(selected_uuids);
+            mMiniMap->setSelected(selected_uuids);
+        }
     }
     // Make sure only one of the friends lists (online/all) has selection.
     else if (cur_tab == FRIENDS_TAB_NAME)
