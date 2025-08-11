@@ -967,6 +967,10 @@ void LLPanelPeople::updateNearbyList()
   LLWorld::getInstance()->getAvatars(&mNearbyList->getIDs(), &positions, gAgent.getPositionGlobal(), gSavedSettings.getF32("NearMeRange"),nearbyAvatarLimit);
     // /KKA-967
     mNearbyList->setDirty(true,true); // AO: These optional arguements force updating even when we're not a visible window.
+#ifdef LL_DISCORD
+    if (gSavedSettings.getBOOL("EnableDiscord"))
+        LLAppViewer::updateDiscordPartyMaxSize((S32)mNearbyList->getIDs().size());
+#endif
     DISTANCE_COMPARATOR.updateAvatarsPositions(positions, mNearbyList->getIDs());
 
     //Compare new list with last radar cache, updating fields and processing changes

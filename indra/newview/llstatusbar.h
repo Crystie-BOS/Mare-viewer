@@ -73,7 +73,8 @@ public:
     void        debitBalance(S32 debit);
     void        creditBalance(S32 credit);
 
-    // Request the latest currency balance from the server
+    // Request the latest currency balance from the server.
+    // Reply at process_money_balance_reply()
     static void sendMoneyBalanceRequest();
 
     void        setHealth(S32 percent);
@@ -111,6 +112,7 @@ private:
     void onClickBuyCurrency();
     void onVolumeChanged(const LLSD& newvalue);
     void onVoiceChanged(const LLSD& newvalue);
+    void onObscureBalanceChanged(const LLSD& newvalue);
 
     void onMouseEnterPresetsCamera();
     void onMouseEnterPresets();
