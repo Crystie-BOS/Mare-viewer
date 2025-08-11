@@ -25,22 +25,45 @@ if (USE_FMODSTUDIO)
 
     target_link_libraries(ll::fmodstudio INTERFACE ${FMODSTUDIO_LIBRARY})
     target_include_directories( ll::fmodstudio SYSTEM INTERFACE  ${FMODSTUDIO_INCLUDE_DIR})
-  else (FMODSTUDIO_LIBRARY AND FMODSTUDIO_INCLUDE_DIR)
-    # If not, we're going to try to get the package listed in autobuild.xml
-    # Note: if you're not using INSTALL_PROPRIETARY, the package URL should be local (file:/// URL)
-    # as accessing the private LL location will fail if you don't have the credential
-    include(Prebuilt)
-    use_prebuilt_binary(fmodstudio)
+  else ()
     if (WINDOWS)
-      target_link_libraries( ll::fmodstudio INTERFACE  fmod_vc)
-    elseif (DARWIN)
-      #despite files being called libfmod.dylib, we are searching for fmod
-      target_link_libraries( ll::fmodstudio INTERFACE  fmod)
-    elseif (LINUX)
-      target_link_libraries( ll::fmodstudio INTERFACE  fmod)
-    endif (WINDOWS)
+      # let's try to find a locally installed FModStudio SDK
+      set(_progfiles_x86 "ProgramFiles(x86)")
+      if (NOT "$ENV{${_progfiles_x86}}" STREQUAL "")
+        # under windows 64 bit machine
+        file(TO_CMAKE_PATH "$ENV{${_progfiles_x86}}" _programfiles)
+      else ()
+        # under windows 32 bit machine
+        file(TO_CMAKE_PATH "$ENV{ProgramFiles}" _programfiles)
+      endif ()
+      unset(_progfiles_x86)
+  
+      if (EXISTS "${_programfiles}/FMOD SoundSystem/FMOD Studio API Windows/api/core/lib/x64/fmod_vc.lib")
+        set(FMODSTUDIO_INSTALL_DIR "${_programfiles}/FMOD SoundSystem/FMOD Studio API Windows/api/core")
+        target_link_libraries( ll::fmodstudio INTERFACE  ${FMODSTUDIO_INSTALL_DIR}/lib/x64/fmod_vc)
+        target_include_directories( ll::fmodstudio SYSTEM INTERFACE ${FMODSTUDIO_INSTALL_DIR}/inc)
+        MESSAGE(STATUS "${FMODSTUDIO_INSTALL_DIR} exists and used")
+      endif()
+      unset(_programfiles)
+    endif()
 
-    target_include_directories( ll::fmodstudio SYSTEM INTERFACE ${LIBS_PREBUILT_DIR}/include/fmodstudio)
+    if (${FMODSTUDIO_INSTALL_DIR} STREQUAL "")
+      # If not, we're going to try to get the package listed in autobuild.xml
+      # Note: if you're not using INSTALL_PROPRIETARY, the package URL should be local (file:/// URL)
+      # as accessing the private LL location will fail if you don't have the credential
+      include(Prebuilt)
+      use_prebuilt_binary(fmodstudio)
+      if (WINDOWS)
+        target_link_libraries( ll::fmodstudio INTERFACE  fmod_vc)
+      elseif (DARWIN)
+        #despite files being called libfmod.dylib, we are searching for fmod
+        target_link_libraries( ll::fmodstudio INTERFACE  fmod)
+      elseif (LINUX)
+        target_link_libraries( ll::fmodstudio INTERFACE  fmod)
+      endif (WINDOWS)
+
+      target_include_directories( ll::fmodstudio SYSTEM INTERFACE ${LIBS_PREBUILT_DIR}/include/fmodstudio)
+    endif ()
   endif (FMODSTUDIO_LIBRARY AND FMODSTUDIO_INCLUDE_DIR)
 else()
   set( USE_FMODSTUDIO "OFF")
