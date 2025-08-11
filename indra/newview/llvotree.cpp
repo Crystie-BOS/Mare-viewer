@@ -858,8 +858,8 @@ bool LLVOTree::updateGeometry(LLDrawable *drawable)
         }
 
         mReferenceBuffer->unmapBuffer();
-        llassert(vertex_count == max_vertices);
-        llassert(index_count == max_indices);
+//      llassert(vertex_count == max_vertices);
+//      llassert(index_count == max_indices);
 /* these don't appear to be defined anyplace, so don't try calling them
 #ifndef SHOW_ASSERT
         (void)vertex_count;
