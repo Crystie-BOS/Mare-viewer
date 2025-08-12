@@ -3884,6 +3884,7 @@ bool LLAgent::leftButtonGrabbed() const
 //        return mControlsTakenCount[CONTROL_LBUTTON_DOWN_INDEX] > 0;
 //    }
 // original version...
+    const bool camera_mouse_look = gAgentCamera.cameraMouselook();
     return (!camera_mouse_look && mControlsTakenCount[CONTROL_LBUTTON_DOWN_INDEX] > 0)
         || (camera_mouse_look && mControlsTakenCount[CONTROL_ML_LBUTTON_DOWN_INDEX] > 0)
         || (!camera_mouse_look && mControlsTakenPassedOnCount[CONTROL_LBUTTON_DOWN_INDEX] > 0)
