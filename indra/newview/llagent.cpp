@@ -3551,14 +3551,20 @@ void LLAgent::initOriginGlobal(const LLVector3d &origin_global)
 
 bool LLAgent::leftButtonGrabbed() const
 {
-    if (gAgentCamera.cameraMouselook())
-    {
-        return mControlsTakenCount[CONTROL_ML_LBUTTON_DOWN_INDEX] > 0;
-    }
-    else
-    {
-        return mControlsTakenCount[CONTROL_LBUTTON_DOWN_INDEX] > 0;
-    }
+// this change breaks content - reverting while LL consider a fix
+//    if (gAgentCamera.cameraMouselook())
+//    {
+//        return mControlsTakenCount[CONTROL_ML_LBUTTON_DOWN_INDEX] > 0;
+//    }
+//    else
+//    {
+//        return mControlsTakenCount[CONTROL_LBUTTON_DOWN_INDEX] > 0;
+//    }
+// original version...
+    return (!camera_mouse_look && mControlsTakenCount[CONTROL_LBUTTON_DOWN_INDEX] > 0)
+        || (camera_mouse_look && mControlsTakenCount[CONTROL_ML_LBUTTON_DOWN_INDEX] > 0)
+        || (!camera_mouse_look && mControlsTakenPassedOnCount[CONTROL_LBUTTON_DOWN_INDEX] > 0)
+        || (camera_mouse_look && mControlsTakenPassedOnCount[CONTROL_ML_LBUTTON_DOWN_INDEX] > 0);
 }
 
 bool LLAgent::rotateGrabbed() const
