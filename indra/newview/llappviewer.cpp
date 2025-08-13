@@ -6343,7 +6343,8 @@ void LLAppViewer::initDiscordSocial()
 
 void LLAppViewer::toggleDiscordIntegration(const LLSD& value)
 {
-    static const uint64_t APPLICATION_ID = 1394782217405862001;
+    //static const uint64_t APPLICATION_ID = 1394782217405862001; // original
+    static const uint64_t APPLICATION_ID = 1405111261854695515; // Kokua Viewer
     if (value.asBoolean())
     {
         discordpp::AuthorizationArgs args{};
