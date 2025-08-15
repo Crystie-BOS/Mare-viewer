@@ -75,14 +75,14 @@ if(WINDOWS)
     endif (USE_BUGSPLAT)
 
     if (TARGET ll::fmodstudio)
-        # fmodL is included for logging, only one should be picked by manifest
-        # set(release_files ${release_files} fmodL.dll)
-		if (NOT ${FMODSTUDIO_INSTALL_DIR} EQUAL "")
-		  set(fmod_lib_dir ${FMODSTUDIO_INSTALL_DIR}/lib/x64)
-          set(fmod_files fmod.dll)
-		else ()
-          set(release_files ${release_files} fmod.dll)
- 		endif ()
+      # fmodL is included for logging, only one should be picked by manifest
+      # set(release_files ${release_files} fmodL.dll)
+      if (NOT ${FMODSTUDIO_INSTALL_DIR} EQUAL "")
+        set(fmod_lib_dir ${FMODSTUDIO_INSTALL_DIR}/lib/x64)
+        set(fmod_files fmod.dll)
+      else ()
+        set(release_files ${release_files} fmod.dll)
+      endif ()
     endif ()
 
     if (TARGET ll::openal)
@@ -262,8 +262,8 @@ else(WINDOWS)
     set(release_src_dir "${CMAKE_SOURCE_DIR}/../libraries/i686-linux/lib/release")
     set(release_files "")
 
-	set(fmod_lib_dir "${ARCH_PREBUILT_DIRS_RELEASE}")
-	set(fmod_libs "")
+    set(fmod_lib_dir "${ARCH_PREBUILT_DIRS_RELEASE}")
+    set(fmod_libs "")
 
     set(debug_llkdu_src "")
     set(debug_llkdu_dst "")
