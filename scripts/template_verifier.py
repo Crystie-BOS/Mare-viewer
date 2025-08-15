@@ -138,8 +138,11 @@ def fetch(url):
     if url.startswith('file://'):
         # just open the file directly because urllib is dumb about these things
         file_name = url[len('file://'):]
-        with open(file_name, 'rb') as f:
-            return f.read()
+        try:
+            with open(file_name, 'rb') as f:
+                return f.read()
+        except FileNotFoundError:
+            return b""
     else:
         with urllib.request.urlopen(url) as res:
             body = res.read()
