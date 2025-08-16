@@ -114,9 +114,6 @@ private:
     const std::string&      getActiveTabName() const;
     LLUUID                  getCurrentItemID() const;
     void                    getCurrentItemIDs(uuid_vec_t& selected_uuids) const;
-//MK
-//  void                    reportToNearbyChat(std::string message);
-//mk
     void                    setSortOrder(LLAvatarList* list, ESortOrder order, bool save = true);
 
     // UI callbacks
