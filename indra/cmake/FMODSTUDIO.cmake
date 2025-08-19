@@ -47,7 +47,7 @@ if (USE_FMODSTUDIO)
       unset(_programfiles)
     endif()
 
-    if (${FMODSTUDIO_INSTALL_DIR} STREQUAL "")
+    if (NOT FMODSTUDIO_INSTALL_DIR)
       # If not, we're going to try to get the package listed in autobuild.xml
       # Note: if you're not using INSTALL_PROPRIETARY, the package URL should be local (file:/// URL)
       # as accessing the private LL location will fail if you don't have the credential
