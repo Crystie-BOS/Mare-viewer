@@ -17,7 +17,6 @@ include(FMODSTUDIO)
 macro(to_staging_dirs from_dir targets)
     set( targetDir "${SHARED_LIB_STAGING_DIR}")
     copy_if_different("${from_dir}" "${targetDir}" out_targets ${ARGN})
-
     list(APPEND "${targets}" "${out_targets}")
 endmacro()
 
@@ -76,9 +75,14 @@ if(WINDOWS)
     endif (USE_BUGSPLAT)
 
     if (TARGET ll::fmodstudio)
-        # fmodL is included for logging, only one should be picked by manifest
-        # set(release_files ${release_files} fmodL.dll)
+      # fmodL is included for logging, only one should be picked by manifest
+      # set(release_files ${release_files} fmodL.dll)
+      if (NOT ${FMODSTUDIO_INSTALL_DIR} EQUAL "")
+        set(fmod_lib_dir ${FMODSTUDIO_INSTALL_DIR}/lib/x64)
+        set(fmod_files fmod.dll)
+      else ()
         set(release_files ${release_files} fmod.dll)
+      endif ()
     endif ()
 
     if (TARGET ll::openal)
@@ -224,8 +228,8 @@ elseif(LINUX)
     set(release_files
        )
 
-     if( USE_AUTOBUILD_3P )
-         list( APPEND release_files
+    if( USE_AUTOBUILD_3P )
+        list( APPEND release_files
                  libuuid.so.16
                  libuuid.so.16.0.22
                  libfontconfig.so.1.11.0
@@ -239,11 +243,11 @@ elseif(LINUX)
                 libaprutil-1.so.0
                 )
         endif()
-     endif()
+    endif()
     if (TARGET ll::fmodstudio)
       # set(debug_files ${debug_files} "libfmodL.so")
       set(release_files ${release_files} "libfmod.so")
-     endif()
+    endif()
 
 else(WINDOWS)
     message(STATUS "WARNING: unrecognized platform for staging 3rd party libs, skipping...")
@@ -257,6 +261,9 @@ else(WINDOWS)
     # or ARCH_PREBUILT_DIRS
     set(release_src_dir "${CMAKE_SOURCE_DIR}/../libraries/i686-linux/lib/release")
     set(release_files "")
+
+    set(fmod_lib_dir "${ARCH_PREBUILT_DIRS_RELEASE}")
+    set(fmod_libs "")
 
     set(debug_llkdu_src "")
     set(debug_llkdu_dst "")
@@ -289,6 +296,14 @@ to_staging_dirs(
     third_party_targets
     ${vivox_libs}
     )
+
+if (NOT ${fmod_lib_dir} EQUAL "")
+to_staging_dirs(
+    ${fmod_lib_dir}
+    third_party_targets
+    ${fmod_files}
+    )
+endif ()
 
 to_staging_dirs(
     ${release_src_dir}
