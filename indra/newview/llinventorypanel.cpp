@@ -828,6 +828,7 @@ void LLInventoryPanel::itemChanged(const LLUUID& item_id, U32 mask, const LLInve
             // Remove the item's UI.
             LLFolderViewFolder* parent = view_item->getParentFolder();
             removeItemID(viewmodel_item->getUUID());
+            bool was_favorite = view_item->isFavorite();
             view_item->destroyView();
             if(parent)
             {
@@ -841,7 +842,7 @@ void LLInventoryPanel::itemChanged(const LLUUID& item_id, U32 mask, const LLInve
                         updateFolderLabel(viewmodel_folder->getUUID());
                     }
                 }
-                if (view_item->isFavorite())
+                if (was_favorite)
                 {
                     parent->updateHasFavorites(false); // favorite was removed
                 }
@@ -2605,6 +2606,7 @@ bool LLInventoryFavoritesItemsPanel::removeFavorite(const LLUUID& id, const LLIn
         {
             removeItemID(viewmodel_item->getUUID());
         }
+        bool was_favorite = view_item->isFavorite();
         view_item->destroyView();
         if (parent)
         {
@@ -2614,7 +2616,7 @@ bool LLInventoryFavoritesItemsPanel::removeFavorite(const LLUUID& id, const LLIn
             {
                 updateFolderLabel(viewmodel_folder->getUUID());
             }
-            if (view_item->isFavorite())
+            if (was_favorite)
             {
                 parent->updateHasFavorites(false); // favorite was removed
             }
