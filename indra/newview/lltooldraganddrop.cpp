@@ -2180,7 +2180,7 @@ EAcceptance LLToolDragAndDrop::dad3dRezAttachmentFromInv(
     }
 
 // [RLVa:KB] - Checked: 2013-02-13 (RLVa-1.4.8)
-    bool fReplace = !(mask & MASK_CONTROL);
+// now unused    bool fReplace = !(mask & MASK_CONTROL);
 // [/RLVa:KB]
 
 
