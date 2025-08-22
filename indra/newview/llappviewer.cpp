@@ -6316,7 +6316,7 @@ void LLAppViewer::initDiscordSocial()
     gDiscordTimestampsStart = time(nullptr);
     gDiscordClient = std::make_shared<discordpp::Client>();
     // gDiscordClient->SetApplicationId(1394782217405862001);
-    gDiscordClient->SetApplicationId(1405111261854695515); // Kokua 
+    gDiscordClient->SetApplicationId(1408359819408052255); // Kokua 
     updateDiscordActivity();
 }
 
