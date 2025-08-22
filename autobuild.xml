@@ -3073,11 +3073,11 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>dc21df8b051c425163acf3eff8f06e32f407c9e0</string>
+              <string>93a5ec2de044dd8400dea3fa9c6ffc0af76da431</string>
               <key>hash_algorithm</key>
               <string>sha1</string>
               <key>url</key>
-              <string>https://api.github.com/repos/secondlife/3p-discord-sdk/releases/assets/279333706</string>
+              <string>https://bitbucket.org/kokua/3p-discord-sdk/downloads/discord_sdk-1.5.10839-darwin-252341330.tar.bz2</string>
             </map>
             <key>name</key>
             <string>darwin64</string>
