@@ -6315,8 +6315,8 @@ void LLAppViewer::initDiscordSocial()
     gDiscordPartyMaxSize = 0;
     gDiscordTimestampsStart = time(nullptr);
     gDiscordClient = std::make_shared<discordpp::Client>();
-    // gDiscordClient->SetApplicationId(1394782217405862001);
-    gDiscordClient->SetApplicationId(1408359819408052255); // Kokua 
+    gDiscordClient->SetApplicationId(1394782217405862001);
+    // gDiscordClient->SetApplicationId(1408359819408052255); // Kokua - we'll use the LL one as recommended by Signal 2025-08-24
     updateDiscordActivity();
 }
 
