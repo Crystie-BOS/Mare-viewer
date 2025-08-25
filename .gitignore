@@ -120,3 +120,4 @@ web/secondlife.com.*
 
 .env
 .vscode
+/scripts/messages/*.sha1

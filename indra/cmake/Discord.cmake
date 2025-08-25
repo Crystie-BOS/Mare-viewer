@@ -1,3 +1,5 @@
+message(STATUS "Processing Discord (${CMAKE_BUILD_TYPE})")
+
 include(Prebuilt)
 
 include_guard()
