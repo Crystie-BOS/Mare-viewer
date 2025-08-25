@@ -78,7 +78,6 @@
 
 //MK
 #include "llfloaterimnearbychat.h"
-#include "llviewerregion.h"
 //mk
 
 //CA
@@ -88,7 +87,6 @@
 #include "llcombobox.h"
 #include "lllayoutstack.h"
 #include "llstartup.h"
-#include "lggcontactsets.h"
 //ca
 
 const F32 FRIEND_LIST_UPDATE_TIMEOUT =  0.5f;
@@ -685,9 +683,6 @@ bool LLPanelPeople::postBuild()
     mAllFriendList->setShowCompleteName(!gSavedSettings.getBOOL("FriendsListHideUsernames"));
 
     LLPanel* nearby_tab = getChild<LLPanel>(NEARBY_TAB_NAME);
-//CA switching to always active (commenting this line was missed when the other always active change was merged in
-//  mNearbyList = nearby_tab->getChild<LLAvatarList>("avatar_list");
-//ca
     mNearbyList = nearby_tab->getChild<LLAvatarList>("avatar_list");
     mNearbyList->setNoItemsCommentText(getString("no_one_near"));
     mNearbyList->setNoItemsMsg(getString("no_one_near"));
@@ -697,14 +692,14 @@ bool LLPanelPeople::postBuild()
     //colouring based on contact sets
     mNearbyList->setUseContactColors(true);
     mMiniMap = nearby_tab->getChild<LLNetMap>("Net Map", true);
-  mMiniMap->setToolTipMsg(getString("ToolTipMsg"));
-  mMiniMap->setParcelNameMsg(getString("ParcelNameMsg"));
-  mMiniMap->setParcelSalePriceMsg(getString("ParcelSalePriceMsg"));
-  mMiniMap->setParcelSaleAreaMsg(getString("ParcelSaleAreaMsg"));
-  mMiniMap->setParcelOwnerMsg(getString("ParcelOwnerMsg"));
-  mMiniMap->setRegionNameMsg(getString("RegionNameMsg"));
-  mMiniMap->setToolTipHintMsg(getString("ToolTipHintMsg"));
-  mMiniMap->setAltToolTipHintMsg(getString("AltToolTipHintMsg"));
+    mMiniMap->setToolTipMsg(getString("ToolTipMsg"));
+    mMiniMap->setParcelNameMsg(getString("ParcelNameMsg"));
+    mMiniMap->setParcelSalePriceMsg(getString("ParcelSalePriceMsg"));
+    mMiniMap->setParcelSaleAreaMsg(getString("ParcelSaleAreaMsg"));
+    mMiniMap->setParcelOwnerMsg(getString("ParcelOwnerMsg"));
+    mMiniMap->setRegionNameMsg(getString("RegionNameMsg"));
+    mMiniMap->setToolTipHintMsg(getString("ToolTipHintMsg"));
+    mMiniMap->setAltToolTipHintMsg(getString("AltToolTipHintMsg"));
 //MK
     mNearbyList->showRange(true);
     mNearbyList->showFirstSeen(!gSavedSettings.getBOOL("NearbyListHideFirstSeen"));
@@ -1558,14 +1553,19 @@ void LLPanelPeople::onNearbyAvatarListDoubleClicked(LLUICtrl* ctrl)
 
 void LLPanelPeople::onAvatarListCommitted(LLAvatarList* list)
 {
-    if (getActiveTabName() == NEARBY_TAB_NAME)
+    // FM: Since the nearby list is always active we can get this event for the mNearbyList even if we are in another tab
+    const std::string& cur_tab = getActiveTabName();
+    if (list == mNearbyList)
     {
-        uuid_vec_t selected_uuids;
-        getCurrentItemIDs(selected_uuids);
-        mMiniMap->setSelected(selected_uuids);
+        if (cur_tab == NEARBY_TAB_NAME)
+        {
+            uuid_vec_t selected_uuids;
+            getCurrentItemIDs(selected_uuids);
+            mMiniMap->setSelected(selected_uuids);
+        }
     }
     // Make sure only one of the friends lists (online/all) has selection.
-    else if (getActiveTabName() == FRIENDS_TAB_NAME)
+    else if (cur_tab == FRIENDS_TAB_NAME)
     {
         if (list == mOnlineFriendList)
             mAllFriendList->resetSelection(true);
