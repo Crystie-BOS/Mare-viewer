@@ -6336,6 +6336,13 @@ void LLAppViewer::updateDiscordActivity()
     discordpp::ActivityTimestamps timestamps;
     timestamps.SetStart(gDiscordTimestampsStart);
     activity.SetTimestamps(timestamps);
+    // show Kokua icon as small image
+    discordpp::ActivityAssets assets;
+    assets.SetSmallImage("kokua-logo");
+    assets.SetSmallText("Kokua Viewer");
+    assets.SetLargeImage("sl-logo");
+    assets.SetLargeText("Second Life");
+    activity.SetAssets(assets);
 
     if (gAgent.getID() == LLUUID::null)
     {
