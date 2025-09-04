@@ -85,6 +85,11 @@ public:
     void onEditAttachment();
     void onRemoveAttachment();
 
+    void updateMenuItemsVisibility() {};
+    LLToggleableMenu* getGearMenu();
+    LLToggleableMenu* getSortMenu();
+    bool getTrashMenuVisible() { return false; }
+
     // <FS:Ansariel> Show avatar complexity in appearance floater
     void updateAvatarComplexity(U32 complexity);
 
@@ -97,6 +102,7 @@ private:
     LLWearableItemsList*            mCOFItemsList;
     LLScrollListCtrl*               mTempItemsList;
     LLWearingGearMenu*              mGearMenu;
+    boost::signals2::connection     mGearMenuConnection;
     LLListContextMenu*              mContextMenu;
     LLListContextMenu*              mAttachmentsMenu;
 

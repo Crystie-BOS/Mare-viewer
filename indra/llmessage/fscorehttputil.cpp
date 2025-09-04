@@ -78,7 +78,7 @@ namespace FSCoreHttpUtil
             httpAdapter(new LLCoreHttpUtil::HttpCoroutineAdapter("genericGetCoro", policyId));
         LLCore::HttpRequest::ptr_t httpRequest(new LLCore::HttpRequest);
 
-        options->setWantHeaders(true);
+        if (options) options->setWantHeaders(true);
 
         LL_INFOS("HttpCoroutineAdapter", "genericGetCoroRaw") << "Generic GET for " << url << LL_ENDL;
 
