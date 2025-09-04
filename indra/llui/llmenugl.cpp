@@ -46,6 +46,7 @@
 #include "llfocusmgr.h"
 #include "llcoord.h"
 #include "llwindow.h"
+#include "llemojihelper.h"
 #include "llcriticaldamp.h"
 #include "lluictrlfactory.h"
 
@@ -1412,6 +1413,7 @@ void LLMenuItemBranchDownGL::openMenu( void )
     }
     else
     {
+        LLEmojiHelper::instance().hideHelper(nullptr, true);
         if (branch->getTornOff())
         {
             LLFloater * branch_parent = dynamic_cast<LLFloater *>(branch->getParent());

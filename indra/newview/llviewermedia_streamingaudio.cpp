@@ -108,7 +108,16 @@ void LLStreamingAudio_MediaPlugins::start(const std::string& url)
         }
 #endif //LL_DARWIN
         mURL = test_url;
-        mMediaPlugin->loadURI ( test_url );
+        std::string snt_url = test_url;
+        LLStringUtil::trim(snt_url);
+        size_t pos = snt_url.find(' ');
+        if (pos != std::string::npos)
+        {
+            // fmod permited having names after the url and people were using it.
+            // People label their streams this way, ignore the 'label'.
+            snt_url = snt_url.substr(0, pos);
+        }
+        mMediaPlugin->loadURI(snt_url);
         LL_INFOS() << "Attempting to play internet stream: " << mURL << LL_ENDL;
         mMediaPlugin->start();
         LL_INFOS() << "Playing stream..." << LL_ENDL;

@@ -410,6 +410,11 @@ LLFloaterPreference::LLFloaterPreference(const LLSD& key)
     mCommitCallbackRegistrar.add("Pref.ClearLog",               boost::bind(&LLConversationLog::onClearLog, &LLConversationLog::instance()));
     mCommitCallbackRegistrar.add("Pref.DeleteTranscripts",      boost::bind(&LLFloaterPreference::onDeleteTranscripts, this));
     mCommitCallbackRegistrar.add("UpdateFilter", boost::bind(&LLFloaterPreference::onUpdateFilterTerm, this, false)); // <FS:ND/> Hook up for filtering
+#ifdef LL_DISCORD
+    gSavedSettings.getControl("EnableDiscord")->getCommitSignal()->connect(boost::bind(&LLAppViewer::updateDiscordActivity));
+    gSavedSettings.getControl("ShowDiscordActivityDetails")->getCommitSignal()->connect(boost::bind(&LLAppViewer::updateDiscordActivity));
+    gSavedSettings.getControl("ShowDiscordActivityState")->getCommitSignal()->connect(boost::bind(&LLAppViewer::updateDiscordActivity));
+#endif
     mCommitCallbackRegistrar.add("Pref.ClearSettings",          boost::bind(&LLFloaterPreference::onClickClearSettings, this));
     mCommitCallbackRegistrar.add("Pref.ClearColorSettings",     boost::bind(&LLFloaterPreference::onClickClearColorSettings, this));
     mCommitCallbackRegistrar.add("PreviewUISound",              boost::bind(&LLFloaterPreference::onClickPreviewUISound, this, _2));
@@ -611,6 +616,11 @@ bool LLFloaterPreference::postBuild()
         LL_WARNS() << "Failed to load labels from " << user_filename << ". Using default." << LL_ENDL;
         getChild<LLComboBox>("language_combobox")->add("System default", LLSD("default"), ADD_TOP, true);
     }
+
+#ifndef LL_DISCORD
+    LLPanel* panel = getChild<LLPanel>("privacy_preferences_discord");
+    getChild<LLTabContainer>("privacy_tab_container")->removeTabPanel(panel);
+#endif
 
 // [SL:KB] - Patch: Viewer-CrashReporting | Checked: 2011-06-11 (Catznip-2.6.c) | Added: Catznip-2.6.0c
 
@@ -2607,7 +2617,21 @@ void LLFloaterPreference::selectChatPanel()
 
 void LLFloaterPreference::changed()
 {
+    if (LLConversationLog::instance().getIsLoggingEnabled())
+    {
     getChild<LLButton>("clear_log")->setEnabled(LLConversationLog::instance().getConversations().size() > 0);
+    }
+    else
+    {
+        // onClearLog clears list, then notifies changed() and only then clears file,
+        // so check presence of conversations before checking file, file will cleared later.
+        llstat st;
+        bool has_logs = LLConversationLog::instance().getConversations().size() > 0
+                        && LLFile::stat(LLConversationLog::instance().getFileName(), &st) == 0
+                        && S_ISREG(st.st_mode)
+                        && st.st_size > 0;
+        getChild<LLButton>("clear_log")->setEnabled(has_logs);
+    }
 
     // set 'enable' property for 'Delete transcripts...' button
     updateDeleteTranscriptsButton();

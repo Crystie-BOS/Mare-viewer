@@ -1259,7 +1259,7 @@ protected:
                 menu->setItemEnabled("Voice Call", false);
                 menu->setItemEnabled("Chat History", false);
                 menu->setItemEnabled("Invite Group", false);
-                menu->setItemEnabled("Zoom In", false);
+                menu->setItemEnabled("Zoom In", true);
                 menu->setItemEnabled("Report Abuse", false);
                 menu->setItemEnabled("Share", false);
                 menu->setItemEnabled("Pay", false);

@@ -219,6 +219,7 @@ protected:
     bool        mCustomGammaSet;
 
     LPWSTR      mIconResource;
+    LPWSTR      mIconSmallResource;
     bool        mInputProcessingPaused;
 
     // The following variables are for Language Text Input control.
@@ -250,6 +251,11 @@ protected:
     void updateWindowRect();
     RECT mRect;
     RECT mClientRect;
+
+    void updateWindowTheme();
+    bool isSystemAppDarkMode();
+    void setCustomIcon();
+    bool mCurrentDarkMode { false };
 
     struct LLWindowWin32Thread;
     LLWindowWin32Thread* mWindowThread = nullptr;
@@ -286,6 +292,7 @@ private:
 
 extern LLW32MsgCallback gAsyncMsgCallback;
 extern LPWSTR gIconResource;
+extern LPWSTR gIconSmallResource;
 
 S32 OSMessageBoxWin32(const std::string& text, const std::string& caption, U32 type);
 
