@@ -169,7 +169,7 @@ private:
 //  void                    onGlobalVisToggleButtonClicked();
     // </FS:Ansariel> Firestorm callback handler
 
-    LLFilterEditor*         mFilterEditor;
+//unused    LLFilterEditor*         mFilterEditor;
     LLTabContainer*         mTabContainer;
     LLAvatarList*           mOnlineFriendList;
     LLAvatarList*           mAllFriendList;
@@ -208,10 +208,10 @@ private:
     boost::signals2::connection mGroupsFilterCommitConnection;
     boost::signals2::connection mRecentFilterCommitConnection;
     //MK
-    LLMenuButton*            mNearbyGearButton;
-    LLMenuButton*            mFriendsGearButton;
-    LLMenuButton*            mGroupsGearButton;
-    LLMenuButton*            mRecentGearButton;
+//unused    LLMenuButton*            mNearbyGearButton;
+//unused    LLMenuButton*            mFriendsGearButton;
+//unused    LLMenuButton*            mGroupsGearButton;
+//unused    LLMenuButton*            mRecentGearButton;
 
     std::string                mFilterSubString;
     std::string                mFilterSubStringOrig;
