@@ -2925,9 +2925,13 @@ bool LLVoiceWebRTCConnection::connectionStateMachine()
             }
             // else was already posted by llwebrtc::terminate().
             break;
+        }
+
         case VOICE_STATE_WAIT_FOR_CLOSE:
             break;
+
         case VOICE_STATE_CLOSED:
+        {
             if (!mShutDown)
             {
                 mVoiceConnectionState = VOICE_STATE_START_SESSION;
@@ -2993,7 +2997,7 @@ void LLVoiceWebRTCConnection::OnDataReceivedImpl(const std::string &data, bool b
         return;
     }
 
-    boost::json::error_code ec;
+    boost::system::error_code ec;
     boost::json::value voice_data_parsed = boost::json::parse(data, ec);
     if (!ec)  // don't collect comments
     {

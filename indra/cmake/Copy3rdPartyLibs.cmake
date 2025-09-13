@@ -58,11 +58,6 @@ if(WINDOWS)
         openjp2.dll
         )
 
-    if(LLCOMMON_LINK_SHARED)
-        set(release_files ${release_files} libapr-1.dll)
-        set(release_files ${release_files} libaprutil-1.dll)
-    endif()
-
     # Filenames are different for 32/64 bit BugSplat file and we don't
     # have any control over them so need to branch.
     if (USE_BUGSPLAT)
@@ -196,15 +191,6 @@ elseif(DARWIN)
       set(release_files ${release_files} libfmod.dylib)
     endif ()
 
-    if(LLCOMMON_LINK_SHARED)
-        set(release_files ${release_files}
-            libapr-1.0.dylib
-            libapr-1.dylib
-            libaprutil-1.0.dylib
-            libaprutil-1.dylib
-            )
-    endif()
-
     if (TARGET ll::discord_sdk)
       list(APPEND release_files libdiscord_partner_sdk.dylib)
     endif ()
@@ -247,13 +233,6 @@ elseif(LINUX)
                  libfontconfig.so.1
                  )
 
-
-        if(LLCOMMON_LINK_SHARED)
-            set(release_files ${release_files}
-                libapr-1.so.0
-                libaprutil-1.so.0
-                )
-        endif()
     endif()
     if (TARGET ll::fmodstudio)
       # set(debug_files ${debug_files} "libfmodL.so")

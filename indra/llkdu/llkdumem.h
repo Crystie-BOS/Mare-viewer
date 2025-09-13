@@ -27,17 +27,9 @@
 #ifndef LL_LLKDUMEM_H
 #define LL_LLKDUMEM_H
 
-
-//<FS:TS> Silence Clang warning the flag doesn't for some reason
-#if LL_DARWIN
-#pragma clang diagnostic ignored "-Woverloaded-virtual"
-#pragma clang diagnostic ignored "-Wreturn-type"
-#endif
-//</FS:TS>
+#include "llpreprocessor.h"
 
 // Support classes for reading and writing from memory buffers in KDU
-#define KDU_NO_THREADS
-
 #define kdu_xxxx "kdu_image.h"
 #include "include_kdu_xxxx.h"
 
@@ -49,7 +41,6 @@
 #include "include_kdu_xxxx.h"
 
 #include "kdu_sample_processing.h"
-#include "kdu_utils.h"
 #include "image_local.h"
 #include "stdtypes.h"
 
@@ -63,9 +54,7 @@ public:
         mCurPos = 0;
     }
 
-    ~LLKDUMemSource()
-    {
-    }
+    ~LLKDUMemSource() = default;
 
     int read(kdu_core::kdu_byte *buf, int num_bytes)
     {
@@ -103,9 +92,7 @@ public:
         mOutputSize = &output_size;
     }
 
-    ~LLKDUMemTarget()
-    {
-    }
+    ~LLKDUMemTarget() = default;
 
     bool write(const kdu_core::kdu_byte *buf, int num_bytes)
     {

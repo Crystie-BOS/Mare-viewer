@@ -166,14 +166,8 @@ private:
     S32 mNumComponents;
     bool mUseYCC;
     kdu_dims mDims;
+    kdu_push_pull_params mParams;
     kdu_sample_allocator mAllocator;
-
-    // <FS:ND> KDU 8.0.1 compatibiliy
-#if KDU_MAJOR_VERSION >= 8
-    kdu_push_pull_params mPushPullParams;
-#endif
-    // </FS:ND>
-
     kdu_tile_comp mComps[4];
     kdu_line_buf mLines[4];
     kdu_pull_ifc mEngines[4];
@@ -265,7 +259,7 @@ LLImageJ2CKDU::LLImageJ2CKDU() : LLImageJ2CImpl(),
     mCodeStreamp(),
     mTPosp(),
     mTileIndicesp(),
-    mRawImagep(NULL),
+    mRawImagep(nullptr),
     mDecodeState(),
     mBlocksSize(-1),
     mPrecinctsSize(-1),
@@ -305,17 +299,17 @@ void LLImageJ2CKDU::setupCodeStream(LLImageJ2C &base, bool keep_codestream, ECod
         // two U32s and a pointer, so it's not as if it would be a huge overhead
         // to allocate a new one every time.
         // Also -- why is base.getData() tested specifically here? If that returns
-        // NULL, shouldn't we bail out of the whole method?
+        // nullptr, shouldn't we bail out of the whole method?
         if (!mInputp && base.getData())
         {
             // The compressed data has been loaded
             // Setup the source for the codestream
-            mInputp.reset(new LLKDUMemSource(base.getData(), data_size));
+            mInputp = std::make_unique<LLKDUMemSource>(base.getData(), data_size);
         }
 
         if (mInputp)
         {
-            // This is LLKDUMemSource::reset(), not boost::scoped_ptr::reset().
+            // This is LLKDUMemSource::reset(), not std::unique_ptr::reset().
             mInputp->reset();
         }
 
@@ -325,11 +319,8 @@ void LLImageJ2CKDU::setupCodeStream(LLImageJ2C &base, bool keep_codestream, ECod
         // *TODO: This seems to be wrong. The base class should have no idea of
         // how j2c compression works so no good way of computing what's the byte
         // range to be used.
-#if (KDU_MAJOR_VERSION*10000 + KDU_MINOR_VERSION*100 + KDU_PATCH_VERSION) >= 80200
-    mCodeStreamp->set_max_bytes(max_bytes, false);
-#else
-        mCodeStreamp->set_max_bytes(max_bytes, true);
-#endif
+        mCodeStreamp->set_max_bytes(max_bytes);
+
         //  If you want to flip or rotate the image for some reason, change
         // the resolution, or identify a restricted region of interest, this is
         // the place to do it.  You may use "kdu_codestream::change_appearance"
@@ -474,8 +465,8 @@ bool LLImageJ2CKDU::initDecode(LLImageJ2C &base, LLImageRaw &raw_image, F32 deco
         mCodeStreamp->change_appearance(false, true, false);
 
         // Apply loading discard level and cropping if required
-        kdu_dims* region_kdu = NULL;
-        if (region != NULL)
+        kdu_dims* region_kdu = nullptr;
+        if (region != nullptr)
         {
             region_kdu = new kdu_dims;
             region_kdu->pos.x  = region[0];
@@ -492,7 +483,7 @@ bool LLImageJ2CKDU::initDecode(LLImageJ2C &base, LLImageRaw &raw_image, F32 deco
         if (region_kdu)
         {
             delete region_kdu;
-            region_kdu = NULL;
+            region_kdu = nullptr;
         }
 
         // Resize raw_image according to the image to be decoded
@@ -503,12 +494,12 @@ bool LLImageJ2CKDU::initDecode(LLImageJ2C &base, LLImageRaw &raw_image, F32 deco
 
         if (!mTileIndicesp)
         {
-            mTileIndicesp.reset(new kdu_dims);
+            mTileIndicesp = std::make_unique<kdu_dims>();
         }
         mCodeStreamp->get_valid_tiles(*mTileIndicesp);
         if (!mTPosp)
         {
-            mTPosp.reset(new kdu_coords);
+            mTPosp = std::make_unique<kdu_coords>();
             mTPosp->y = 0;
             mTPosp->x = 0;
         }
@@ -518,7 +509,7 @@ bool LLImageJ2CKDU::initDecode(LLImageJ2C &base, LLImageRaw &raw_image, F32 deco
         base.setLastError(msg.what());
         return false;
     }
-    catch (kdu_exception kdu_value)
+    catch (const kdu_exception& kdu_value)
     {
         // KDU internally throws kdu_exception. It's possible that such an
         // exception might leak out into our code. Catch kdu_exception
@@ -618,8 +609,7 @@ bool LLImageJ2CKDU::decodeImpl(LLImageJ2C &base, LLImageRaw &raw_image, F32 deco
                     kdu_coords offset = tile_dims.pos - dims.pos;
                     int row_gap = channels*dims.size.x; // inter-row separation
                     kdu_byte *buf = buffer + offset.y*row_gap + offset.x*channels;
-                    mDecodeState.reset(new LLKDUDecodeState(tile, buf, row_gap,
-                                                            mCodeStreamp.get()));
+                    mDecodeState = std::make_unique<LLKDUDecodeState>(tile, buf, row_gap, mCodeStreamp.get());
                 }
                 // Do the actual processing
                 F32 remaining_time = limit_time ? decode_time - decode_timer.getElapsedTimeF32().value() : 0.0f;
@@ -644,7 +634,7 @@ bool LLImageJ2CKDU::decodeImpl(LLImageJ2C &base, LLImageRaw &raw_image, F32 deco
                 cleanupCodeStream();
                 return true; // done
             }
-            catch (kdu_exception kdu_value)
+            catch (const kdu_exception& kdu_value)
             {
                 // KDU internally throws kdu_exception. It's possible that such an
                 // exception might leak out into our code. Catch kdu_exception
@@ -854,7 +844,7 @@ bool LLImageJ2CKDU::encodeImpl(LLImageJ2C &base, const LLImageRaw &raw_image, co
         base.setLastError(msg.what());
         return false;
     }
-    catch (kdu_exception kdu_value)
+    catch (const kdu_exception& kdu_value)
     {
         // KDU internally throws kdu_exception. It's possible that such an
         // exception might leak out into our code. Catch kdu_exception
@@ -888,7 +878,7 @@ bool LLImageJ2CKDU::getMetadata(LLImageJ2C &base)
         base.setLastError(msg.what());
         return false;
     }
-    catch (kdu_exception kdu_value)
+    catch (const kdu_exception& kdu_value)
     {
         // KDU internally throws kdu_exception. It's possible that such an
         // exception might leak out into our code. Catch kdu_exception
@@ -1020,8 +1010,8 @@ void LLImageJ2CKDU::findDiscardLevelsBoundaries(LLImageJ2C &base)
         //std::cout << "Parsing discard level = " << discard_level << std::endl;
         // Create the input codestream object.
         setupCodeStream(base, true, MODE_FAST);
-        mCodeStreamp->apply_input_restrictions(0, 4, discard_level, 0, NULL);
-        mCodeStreamp->set_max_bytes(KDU_LONG_MAX,true);
+        mCodeStreamp->apply_input_restrictions(0, 4, discard_level, 0, nullptr);
+        mCodeStreamp->set_max_bytes(KDU_LONG_MAX,false);
         siz_params *siz_in = mCodeStreamp->access_siz();
 
         // Create the output codestream object.
@@ -1118,27 +1108,10 @@ void LLImageJ2CKDU::findDiscardLevelsBoundaries(LLImageJ2C &base)
 
 void set_default_colour_weights(kdu_params *siz)
 {
-    kdu_params *cod = siz->access_cluster(COD_params);
-    assert(cod != NULL);
-//KKA-726: as of KDU 8.0.5 some of these parameters moved from COD to ENC
     kdu_params *enc = siz->access_cluster(ENC_params);
-    assert(enc != NULL);
-
-bool is_ge_805 = false;
-#if KDU_MAJOR_VERSION > 8
-    is_ge_805 = true;
-#elif KDU_MAJOR_VERSION == 8
-#if KDU_MINOR_VERSION > 0
- is_ge_805 = true;
-#elif KDU_PATCH_VERSION >=5
- is_ge_805 = true;
-#endif
-#endif
-
-    if (!is_ge_805)
-    {
-        enc = cod; // 804 and below - all in COD
-    }
+    assert(enc != nullptr);
+    kdu_params *cod = siz->access_cluster(COD_params);
+    assert(cod != nullptr);
 
     bool can_use_ycc = true;
     bool rev0 = false;
@@ -1184,7 +1157,6 @@ bool is_ge_805 = false;
     // These example weights are adapted from numbers generated by Marcus Nadenau
     // at EPFL, for a viewing distance of 15 cm and a display resolution of
     // 300 DPI.
-
     enc->parse_string("Cband_weights:C0="
         "{0.0901},{0.2758},{0.2758},"
         "{0.7018},{0.8378},{0.8378},{1}");
@@ -1213,7 +1185,7 @@ byte buffer, spacing successive output samples apart by `gap' bytes
 all necessary level shifting, type conversion, rounding and truncation. */
 {
     int width = src.get_width();
-    if (src.get_buf32() != NULL)
+    if (src.get_buf32() != nullptr)
     { // Decompressed samples have a 32-bit representation (integer or float)
         assert(precision >= 8); // Else would have used 16 bit representation
         kdu_sample32 *sp = src.get_buf32();
@@ -1374,29 +1346,14 @@ LLKDUDecodeState::LLKDUDecodeState(kdu_tile tile, kdu_byte *buf, S32 row_gap,
         }
         bool use_shorts = (mComps[c].get_bit_depth(true) <= 16);
         mLines[c].pre_create(&mAllocator,mDims.size.x,mReversible[c],use_shorts,0,0);
-
-        // <FS:ND> KDU 8.0.1 compatibiliy
-#if KDU_MAJOR_VERSION >= 8
         if (res.which() == 0) // No DWT levels used
         {
-            mEngines[c] = kdu_decoder(res.access_subband(LL_BAND),&mAllocator,mPushPullParams,use_shorts);
+            mEngines[c] = kdu_decoder(res.access_subband(LL_BAND), &mAllocator, mParams, use_shorts);
         }
         else
         {
-            mEngines[c] = kdu_synthesis(res,&mAllocator,mPushPullParams,use_shorts);
+            mEngines[c] = kdu_synthesis(res, &mAllocator, mParams, use_shorts);
         }
-#else
-        // </FS:ND>
-        if (res.which() == 0) // No DWT levels used
-        {
-            mEngines[c] = kdu_decoder(res.access_subband(LL_BAND),&mAllocator,use_shorts);
-        }
-        else
-        {
-            mEngines[c] = kdu_synthesis(res,&mAllocator,use_shorts);
-        }
-#endif // <FS:ND/> KDU 8.0.1 compatibiliy
-
     }
     mAllocator.finalize(*codestreamp); // Actually creates buffering resources
     for (c = 0; c < mNumComponents; c++)
@@ -1473,7 +1430,7 @@ kdc_flow_control::kdc_flow_control (kdu_supp::kdu_image_in_base *img_in, kdu_cod
     this->codestream = codestream;
     codestream.get_valid_tiles(valid_tile_indices);
     tile_idx = valid_tile_indices.pos;
-    tile = codestream.open_tile(tile_idx,NULL);
+    tile = codestream.open_tile(tile_idx, nullptr);
 
     // Set up the individual components
     num_components = codestream.get_num_components(true);
@@ -1482,7 +1439,7 @@ kdc_flow_control::kdc_flow_control (kdu_supp::kdu_image_in_base *img_in, kdu_cod
     kdc_component_flow_control *comp = components;
     for (n = 0; n < num_components; n++, comp++)
     {
-        comp->line = NULL;
+        comp->line = nullptr;
         comp->reader = img_in;
         kdu_coords subsampling;
         codestream.get_subsampling(n,subsampling,true);
@@ -1499,12 +1456,12 @@ kdc_flow_control::kdc_flow_control (kdu_supp::kdu_image_in_base *img_in, kdu_cod
     assert(num_components >= 0);
 
     tile.set_components_of_interest(num_components);
-    max_buffer_memory = engine.create(codestream,tile,false,NULL,false,1,NULL,NULL,false);
+    max_buffer_memory = engine.create(codestream, tile, false, nullptr, false, 1, nullptr, nullptr,false);
 }
 
 kdc_flow_control::~kdc_flow_control()
 {
-    if (components != NULL)
+    if (components != nullptr)
     {
         delete[] components;
     }
@@ -1531,8 +1488,8 @@ bool kdc_flow_control::advance_components()
                 if (comp->ratio_counter < 0)
                 {
                     found_line = true;
-                    comp->line = engine.exchange_line(n,NULL,NULL);
-                    assert(comp->line != NULL);
+                    comp->line = engine.exchange_line(n,nullptr,nullptr);
+                    assert(comp->line != nullptr);
                     if (comp->line->get_width())
                     {
                         comp->reader->get(n,*(comp->line),0);
@@ -1559,9 +1516,9 @@ void kdc_flow_control::process_components()
             assert(comp->ratio_counter >= 0);
             assert(comp->remaining_lines > 0);
             comp->remaining_lines--;
-            assert(comp->line != NULL);
-            engine.exchange_line(n,comp->line,NULL);
-            comp->line = NULL;
+            assert(comp->line != nullptr);
+            engine.exchange_line(n,comp->line,nullptr);
+            comp->line = nullptr;
         }
     }
 }
