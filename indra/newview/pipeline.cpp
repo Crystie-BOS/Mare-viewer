@@ -428,6 +428,8 @@ void LLPipeline::init()
     sRenderAttachedLights = gSavedSettings.getBOOL("RenderAttachedLights");
     sRenderAttachedParticles = gSavedSettings.getBOOL("RenderAttachedParticles");
 
+    mReflectionMapManager.refreshSettings();
+
     mInitialized = true;
 
     stop_glerror();

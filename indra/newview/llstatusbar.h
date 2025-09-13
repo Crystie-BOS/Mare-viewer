@@ -110,6 +110,7 @@ public:
 private:
 
     void onClickBuyCurrency();
+    void onClickShop();
     void onVolumeChanged(const LLSD& newvalue);
     void onVoiceChanged(const LLSD& newvalue);
     void onObscureBalanceChanged(const LLSD& newvalue);
