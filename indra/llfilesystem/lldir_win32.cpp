@@ -366,14 +366,14 @@ U32 LLDir_Win32::countFilesInDir(const std::string &dirname, const std::string &
 }
 
 // get the next file in the directory
-// AO: Used by LGG selection beams
+// AO: Used by LGG selection beams & preferences backup
 bool LLDir_Win32::getNextFileInDir(const std::string &dirname, const std::string &mask, std::string &fname)
 {
     bool fileFound = FALSE;
     fname = "";
 
     WIN32_FIND_DATAW FileData;
-    llutf16string pathname = utf8str_to_utf16str(dirname) + utf8str_to_utf16str(mask);
+    std::wstring pathname = ll_convert<std::wstring>(dirname) + ll_convert<std::wstring>(mask);
 
     if (pathname != mCurrentDir)
     {
@@ -420,7 +420,7 @@ bool LLDir_Win32::getNextFileInDir(const std::string &dirname, const std::string
     if (fileFound)
     {
         // convert from TCHAR to char
-        fname = utf16str_to_utf8str(FileData.cFileName);
+        fname = ll_convert<std::string>(FileData.cFileName);
     }
 
     return fileFound;
