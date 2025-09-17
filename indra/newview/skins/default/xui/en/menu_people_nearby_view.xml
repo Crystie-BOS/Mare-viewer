@@ -107,7 +107,7 @@
     </menu_item_check>
     <menu_item_check
        label="Double Click Teleport To"
-       name="zoom_in">
+       name="teleport">
       <menu_item_check.on_click
          function="People.Nearby.ViewShow.Action"
          parameter="teleport"/>
@@ -156,6 +156,16 @@
         <menu_item_check.on_check
          function="CheckControl"
          parameter="NearbyListHideFirstSeen" />
+    </menu_item_check>
+    <menu_item_check
+         label="Color Friends"
+         name="show_friends">
+        <menu_item_check.on_click
+         function="ToggleControl"
+         parameter="KokuaNearbyShowFriends" />
+        <menu_item_check.on_check
+         function="CheckControl"
+         parameter="KokuaNearbyShowFriends"/>
     </menu_item_check>
   <menu_item_separator/>
     <menu
