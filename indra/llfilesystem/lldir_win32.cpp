@@ -420,7 +420,7 @@ bool LLDir_Win32::getNextFileInDir(const std::string &dirname, const std::string
     if (fileFound)
     {
         // convert from TCHAR to char
-        fname = ll_convert<std::string>(FileData.cFileName);
+        fname = ll_convert<std::string>(std::wstring(FileData.cFileName));
     }
 
     return fileFound;

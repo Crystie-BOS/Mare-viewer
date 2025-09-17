@@ -650,7 +650,7 @@ void LLPluginProcessChild::createConsole()
         TCHAR buffer[1024];
         if (FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL , GetLastError(), 0, buffer, 1024, NULL))
         {
-            LL_WARNS("PluginChild") << "Error creating console: " << buffer << LL_ENDL;
+            LL_WARNS("PluginChild") << "Error creating console: " << ll_convert<std::string>(std::wstring(buffer)) << LL_ENDL;
         }
         else
         {

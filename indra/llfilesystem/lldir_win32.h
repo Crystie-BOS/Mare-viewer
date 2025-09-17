@@ -50,7 +50,7 @@ public:
     /*virtual*/ std::string getLLPluginFilename(std::string base_name);
 
 private:
-    bool getNextFileInDir(const std::wstring &dirname, const std::string &mask, std::string &fname); //FS:LGG for LGG's particle beam & prefs backup
+//    bool getNextFileInDir(const std::string &dirname, const std::string &mask, std::string &fname); //FS:LGG for LGG's particle beam & prefs backup
     void* mDirSearch_h{ nullptr };
     std::wstring mCurrentDir;
 };
