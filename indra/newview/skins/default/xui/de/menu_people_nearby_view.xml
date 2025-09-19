@@ -7,4 +7,5 @@
 	<menu_item_check label="Symbole für Personen anzeigen" name="view_icons"/>
 	<menu_item_check label="Karte anzeigen" name="view_map"/>
 	<menu_item_check label="Benutzernamen ausblenden" name="view_usernames"/>
+  <menu_item_check label="Freunde hervorheben" name="show_friends">
 </toggleable_menu>
