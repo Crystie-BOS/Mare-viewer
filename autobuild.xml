@@ -1158,11 +1158,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>03c00384223b1d92f46f0282dd6b9ba6</string>
+              <string>52bba9fc0fe54c553b6c57e066a67634</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-kdu8/downloads/kdu-8.2.1.212692226-windows64-212692226.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-kdu8/downloads/kdu-8.4.1.252631828-windows64-252631828.tar.bz2</string>
             </map>
             <key>name</key>
             <string>windows64</string>
@@ -1175,7 +1175,7 @@
         <key>copyright</key>
         <string>Kakadu software</string>
         <key>version</key>
-        <string>8.2.1</string>
+        <string>8.4.1</string>
         <key>name</key>
         <string>kdu</string>
         <key>description</key>
