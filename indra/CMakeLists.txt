@@ -18,9 +18,6 @@ if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.31.0")
     cmake_policy(SET CMP0179 NEW)
 endif()
 
-# As of XCode 12 this no longer defaults sensibly - adopt the fix implemented in CMake 3.18.1
-set(CMAKE_OSX_ARCHITECTURES $(NATIVE_ARCH_ACTUAL) CACHE STRING "Set arch to actual" FORCE)
-
 set(ROOT_PROJECT_NAME "Kokua" CACHE STRING
     "The root project/makefile/solution name. Defaults to Kokua.")
 project(${ROOT_PROJECT_NAME})

@@ -1863,6 +1863,10 @@ void LLSplashScreenMacOSX::showImpl()
 
 void LLSplashScreenMacOSX::updateImpl(const std::string& mesg)
 {
+    if(mWindow != NULL)
+    {
+        CFStringCreateWithCString(NULL, mesg.c_str(), kCFStringEncodingUTF8);
+    }
 }
 
 
@@ -1941,14 +1945,14 @@ void LLWindowMacOSX::spawnWebBrowser(const std::string& escaped_url, bool async)
 }
 void LLWindowMacOSX::openFile(const std::string& file_name )
 {
-        LL_INFOS() << "Opening file " << file_name << LL_ENDL;
-    FSRef appRef;
-    OSStatus os_result = FSPathMakeRef((UInt8*)file_name.c_str(),
-                       &appRef,NULL);
-    if(os_result >= 0)
-    {
-        os_result = LSOpenFSRef(&appRef, NULL);
-    }
+	LL_INFOS() << "Opening file " << file_name << LL_ENDL;
+
+
+    CFStringRef URL =  CFStringCreateWithCString(NULL, file_name.c_str(), kCFStringEncodingASCII);
+    CFURLRef pathRef = CFURLCreateWithString(NULL, URL, NULL);
+    if (pathRef) {
+        OSStatus status = LSOpenCFURLRef(pathRef, NULL);
+	}
 }
 
 // String should match ndof, so string mapping code was copied as is

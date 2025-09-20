@@ -78,6 +78,7 @@ else()
   find_library(COREAUDIO_LIBRARY CoreAudio)
   find_library(COREGRAPHICS_LIBRARY CoreGraphics)
   find_library(AUDIOTOOLBOX_LIBRARY AudioToolbox)
+  find_library(AVFOUNDATION_LIBRARY AVfoundation) # for microphone permission request
 
   target_link_libraries( ll::oslibraries INTERFACE
           ${COCOA_LIBRARY}
@@ -88,6 +89,7 @@ else()
           ${COREAUDIO_LIBRARY}
           ${AUDIOTOOLBOX_LIBRARY}
           ${COREGRAPHICS_LIBRARY}
+          ${AVFOUNDATION_LIBRARY}
           )
 endif()
 
