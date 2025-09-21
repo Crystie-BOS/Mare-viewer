@@ -60,6 +60,8 @@ if (USE_FMODSTUDIO)
 		  		fmod_vc
 		  		fmod.dll
 		  		fmod.so
+		  		libfmod.dylib
+		  		libfmodstudio.dylib
 		  		PATHS "${ARCH_PREBUILT_DIRS_RELEASE}" REQUIRED NO_DEFAULT_PATH)
 		  
 		  target_link_libraries(ll::fmodstudio INTERFACE ${FMODSTUDIO_LIBRARY})

@@ -1130,11 +1130,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>dbc1ee7b1bef94b48f8b09a66655a4b7</string>
+              <string>349942c1b246d7dee7c2be451675faf3</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-kdu8/downloads/kdu-8.2.1.212651713-darwin64-212651713.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-kdu8/downloads/kdu-8.4.1.252641000-darwin64-252641000.tar.bz2</string>
             </map>
             <key>name</key>
             <string>darwin64</string>
