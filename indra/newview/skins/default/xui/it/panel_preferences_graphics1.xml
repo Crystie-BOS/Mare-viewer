@@ -32,6 +32,7 @@
 	</text>
 	<check_box initial_value="true" label="Esegui sempre il rendering degli amici" name="AlwaysRenderFriends"/>
 	<button label="Eccezioni..." name="RenderExceptionsButton"/>
+	<button label="Eccezioni..." name="RenderExceptionsButtonAdvanced"/>
 	<button label="Salva impostazioni come valori predefiniti" name="PrefSaveButton" width="240" left="4"/>
 	<button label="Carica valore predefinito" name="PrefLoadButton" width="145" left_pad="7"/>
 	min_val=&quot;0.125&quot;

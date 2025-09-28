@@ -143,7 +143,6 @@ protected:
     void updateMeterText(LLUICtrl* ctrl);
     // callback for defaults
     void setHardwareDefaults();
-    void setRecommended();
     // callback for when client modifies a render option
     void onRenderOptionEnable();
     // callback for when client turns on impostors
@@ -228,28 +227,13 @@ public:
 //These were in LLFloaterPreferenceGraphicsAdvanced, all have Advanced appended to their names
     /*virtual*/ bool postBuildAdvanced();
     void disableUnavailableSettingsAdvanced();
-    void refreshEnabledGraphicsAdvanced();
     void refreshEnabledStateAdvanced();
     void updateSliderTextAdvanced(LLSliderCtrl* ctrl, LLTextBox* text_box);
-    void updateMaxNonImpostorsAdvanced();
-    void updateIndirectMaxNonImpostorsAdvanced(const LLSD& newvalue);
-    void setMaxNonImpostorsTextAdvanced(U32 value, LLTextBox* text_box);
-    void setMaxComplexityTextAdvanced(U32 value, LLTextBox* text_box);
-    void updateComplexityModeAdvanced(const LLSD& newvalue);
-    void updateComplexityTextAdvanced();
     void updateObjectMeshDetailTextAdvanced();
     void refreshAdvanced();
-    // callback for when client modifies a render option
-    void onRenderOptionEnableAdvanced();
-  void onAdvancedAtmosphericsEnableAdvanced();
 protected:
 
-    boost::signals2::connection mComplexityChangedSignalAdvanced;
-    boost::signals2::connection mComplexityModeChangedSignalAdvanced;
     boost::signals2::connection mLODFactorChangedSignalAdvanced;
-    boost::signals2::connection	mImpostorsChangedSignalAdvanced;
-private:
-     void updateMaxComplexityAdvanced();
 
 public:
 //End Advanced section
@@ -265,7 +249,8 @@ private:
     void updateMaxNonImpostors();
     void updateIndirectMaxNonImpostors(const LLSD& newvalue);
     void setMaxNonImpostorsText(U32 value, LLTextBox* text_box);
-    void updateMaxComplexity();
+    void updateComplexityMode(U32 value);
+    void updateMaxComplexity(LLUICtrl* ctrl);
     void updateComplexityText();
     static bool loadFromFilename(const std::string& filename, std::map<std::string, std::string> &label_map);
 
@@ -427,7 +412,7 @@ private:
 class LLAvatarComplexityControls
 {
   public:
-    static void updateMax(LLSliderCtrl* slider, LLTextBox* value_label, bool short_val = false);
+    static void updateMax(U32 indirect_value);
     static void setText(U32 value, LLTextBox* text_box, bool short_val = false);
     static void updateMaxRenderTime(LLSliderCtrl* slider, LLTextBox* value_label, bool short_val = false);
     static void setRenderTimeText(F32 value, LLTextBox* text_box, bool short_val = false);
