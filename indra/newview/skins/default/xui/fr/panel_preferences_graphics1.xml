@@ -32,6 +32,7 @@
 	</text>
 	<check_box initial_value="true" label="Toujours effectuer le rendu des amis" name="AlwaysRenderFriends"/>
 	<button label="Exceptions..." name="RenderExceptionsButton"/>
+	<button label="Exceptions..." name="RenderExceptionsButtonAdvanced"/>
 	<button label="Enregistrer les paramètres comme préréglage" name="PrefSaveButton" width="260" />
 	<button label="Charger un préréglage" name="PrefLoadButton" width="132"/>
 	min_val=&quot;0,125&quot;

@@ -266,8 +266,7 @@
     top_delta="30"
     width="418">
     <slider.commit_callback
-      function="Pref.UpdateIndirectMaxComplexity"
-      parameter="IndirectMaxComplexityText" />
+      function="Pref.UpdateIndirectMaxComplexity" />
   </slider>
   <text
     type="string"
@@ -725,7 +724,7 @@
     label="Exceptions..."
     follows="top|left"
     left="380"
-    name="RenderExceptionsButton"
+    name="RenderExceptionsButtonAdvanced"
     top_delta="0"
     width="100">
     <button.commit_callback
@@ -749,8 +748,7 @@
     top_delta="28"
     width="400">
     <slider.commit_callback
-      function="Pref.UpdateIndirectMaxComplexity"
-      parameter="IndirectMaxComplexityText" />
+      function="Pref.UpdateIndirectMaxComplexity" />
   </slider>
   <text
     type="string"
@@ -784,8 +782,7 @@
     top_delta="16"
     width="400">
     <slider.commit_callback
-      function="Pref.UpdateIndirectMaxNonImpostors"
-      parameter="IndirectNonImpostorsText" />
+      function="Pref.UpdateIndirectMaxNonImpostors" />
   </slider>
   <text
     type="string"

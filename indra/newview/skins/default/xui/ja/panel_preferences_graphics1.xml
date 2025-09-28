@@ -51,6 +51,7 @@
 	</text>
 	<check_box label="フレンドは常に描画" name="AlwaysRenderFriends"/>
 	<button label="例外…" name="RenderExceptionsButton"/>
+	<button label="例外…" name="RenderExceptionsButtonAdvanced"/>
 	<button label="設定をプリセットとして保存…" name="PrefSaveButton"/>
 	<button label="プリセットを読み込む…" name="PrefLoadButton"/>
 	<button label="プリセットを削除…" name="PrefDeleteButton"/>

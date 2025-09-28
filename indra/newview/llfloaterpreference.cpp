@@ -381,7 +381,7 @@ LLFloaterPreference::LLFloaterPreference(const LLSD& key)
     mCommitCallbackRegistrar.add("Pref.HardwareDefaults",       boost::bind(&LLFloaterPreference::setHardwareDefaults, this));
     mCommitCallbackRegistrar.add("Pref.AvatarImpostorsEnable",  boost::bind(&LLFloaterPreference::onAvatarImpostorsEnable, this));
     mCommitCallbackRegistrar.add("Pref.UpdateIndirectMaxNonImpostors", boost::bind(&LLFloaterPreference::updateMaxNonImpostors, this));
-    mCommitCallbackRegistrar.add("Pref.UpdateIndirectMaxComplexity",    boost::bind(&LLFloaterPreference::updateMaxComplexity, this));
+    mCommitCallbackRegistrar.add("Pref.UpdateIndirectMaxComplexity",    boost::bind(&LLFloaterPreference::updateMaxComplexity, this, _1));
     mCommitCallbackRegistrar.add("Pref.RenderOptionUpdate",     boost::bind(&LLFloaterPreference::onRenderOptionEnable, this));
     mCommitCallbackRegistrar.add("Pref.WindowedMod",            boost::bind(&LLFloaterPreference::onCommitWindowedMode, this));
     mCommitCallbackRegistrar.add("Pref.UpdateSliderText",       boost::bind(&LLFloaterPreference::refreshUI,this));
@@ -398,9 +398,6 @@ LLFloaterPreference::LLFloaterPreference(const LLSD& key)
     mCommitCallbackRegistrar.add("Pref.SpellChecker",           boost::bind(&LLFloaterPreference::onClickSpellChecker, this));
     mCommitCallbackRegistrar.add("Pref.Advanced",               boost::bind(&LLFloaterPreference::onClickAdvanced, this));
 
-  //from Advanced
-    mCommitCallbackRegistrar.add("Pref.UpdateIndirectMaxNonImpostorsAdvanced", boost::bind(&LLFloaterPreference::updateMaxNonImpostorsAdvanced,this));
-
     sSkin = gSavedSettings.getString("SkinCurrent");
 
     mCommitCallbackRegistrar.add("Pref.ClickActionChange",      boost::bind(&LLFloaterPreference::onClickActionChange, this));
@@ -410,7 +407,8 @@ LLFloaterPreference::LLFloaterPreference(const LLSD& key)
     gSavedSettings.getControl("UseDisplayNames")->getCommitSignal()->connect(boost::bind(&handleDisplayNamesOptionChanged,  _2));
 
     gSavedSettings.getControl("AppearanceCameraMovement")->getCommitSignal()->connect(boost::bind(&handleAppearanceCameraMovementChanged,  _2));
-    gSavedSettings.getControl("WindLightUseAtmosShaders")->getCommitSignal()->connect(boost::bind(&LLFloaterPreference::onAtmosShaderChange, this));
+    // <FM>: The relevant control is not present currently after moving settings back from Advanced Graphics floater//
+//  gSavedSettings.getControl("WindLightUseAtmosShaders")->getCommitSignal()->connect(boost::bind(&LLFloaterPreference::onAtmosShaderChange, this));
 
     LLAvatarPropertiesProcessor::getInstance()->addObserver( gAgent.getID(), this );
 
@@ -430,13 +428,6 @@ LLFloaterPreference::LLFloaterPreference(const LLSD& key)
     mCommitCallbackRegistrar.add("PreviewUISound",              boost::bind(&LLFloaterPreference::onClickPreviewUISound, this, _2));
     mCommitCallbackRegistrar.add("Pref.BrowseCrashLogs",        boost::bind(&LLFloaterPreference::onClickBrowseCrashLogs, this));
     mCommitCallbackRegistrar.add("Pref.BrowseSettingsDir",      boost::bind(&LLFloaterPreference::onClickBrowseSettingsDir, this));
-
-    mCommitCallbackRegistrar.add("Pref.RenderOptionUpdate",            boost::bind(&LLFloaterPreference::onRenderOptionEnable, this));
-    mCommitCallbackRegistrar.add("Pref.UpdateIndirectMaxComplexity",   boost::bind(&LLFloaterPreference::updateMaxComplexity,this));
-
-    mCommitCallbackRegistrar.add("Pref.Cancel", boost::bind(&LLFloaterPreference::onBtnCancel, this, _2));
-    mCommitCallbackRegistrar.add("Pref.OK",     boost::bind(&LLFloaterPreference::onBtnOK, this, _2));
-
 }
 
 void LLFloaterPreference::processProperties( void* pData, EAvatarProcessorType type )
@@ -597,8 +588,7 @@ bool LLFloaterPreference::postBuild()
     fov_slider->setMinValue(LLViewerCamera::getInstance()->getMinView());
     fov_slider->setMaxValue(LLViewerCamera::getInstance()->getMaxView());
 
-    bool enable_complexity = gSavedSettings.getS32("RenderAvatarComplexityMode") != LLVOAvatar::AV_RENDER_ONLY_SHOW_FRIENDS;
-    getChild<LLSliderCtrl>("IndirectMaxComplexity")->setEnabled(enable_complexity);
+    updateComplexityMode(gSavedSettings.getS32("RenderAvatarComplexityMode"));
 #if RLV_ALWAYS_ON
     // leave the ShowRLVMenu control active, delete the rest, fade out enable RLV
     getChild<LLCheckBoxCtrl>("EnableRLV")->setEnabled(FALSE);
@@ -761,10 +751,9 @@ LLFloaterPreference::~LLFloaterPreference()
     {
         LLAvatarPropertiesProcessor::getInstance()->removeObserver(gAgent.getID(), this);
     }
-    mComplexityChangedSignalAdvanced.disconnect();
-    mComplexityModeChangedSignalAdvanced.disconnect();
+    mComplexityChangedSignal.disconnect();
     mLODFactorChangedSignalAdvanced.disconnect();
-    mImpostorsChangedSignalAdvanced.disconnect();
+    mImpostorsChangedSignal.disconnect();
 }
 
 void LLFloaterPreference::draw()
@@ -1021,14 +1010,16 @@ void LLFloaterPreference::onOpen(const LLSD& key)
     LLButton* save_btn = findChild<LLButton>("PrefSaveButton");
     LLButton* delete_btn = findChild<LLButton>("PrefDeleteButton");
     LLButton* exceptions_btn = findChild<LLButton>("RenderExceptionsButton");
+    LLButton* exceptions2_btn = findChild<LLButton>("RenderExceptionsButtonAdvanced");
     LLButton* auto_adjustments_btn = findChild<LLButton>("AutoAdjustmentsButton");
 
-    if (load_btn && save_btn && delete_btn && exceptions_btn && auto_adjustments_btn)
+    if (load_btn && save_btn && delete_btn && exceptions_btn && exceptions2_btn && auto_adjustments_btn)
     {
         load_btn->setEnabled(started);
         save_btn->setEnabled(started);
         delete_btn->setEnabled(started);
         exceptions_btn->setEnabled(started);
+        exceptions2_btn->setEnabled(started);
         auto_adjustments_btn->setEnabled(started);
     }
 
@@ -1043,52 +1034,6 @@ void LLFloaterPreference::onOpen(const LLSD& key)
 void LLFloaterPreference::onRenderOptionEnable()
 {
     refreshEnabledGraphics();
-    onRenderOptionEnableAdvanced();
-}
-
-void LLFloaterPreference::onRenderOptionEnableAdvanced()
-{
-    LLFloaterPreference* instance = LLFloaterReg::findTypedInstance<LLFloaterPreference>("preferences");
-    if (instance)
-    {
-        instance->refresh();
-    }
-}
-
-void LLFloaterPreference::onAdvancedAtmosphericsEnableAdvanced()
-{
-    LLFloaterPreference* instance = LLFloaterReg::findTypedInstance<LLFloaterPreference>("preferences");
-    if (instance)
-    {
-        instance->refresh();
-    }
-}
-
-void LLFloaterPreference::refreshEnabledGraphicsAdvanced()
-{
-    refreshEnabledStateAdvanced();
-}
-
-void LLFloaterPreference::updateMaxComplexityAdvanced()
-{
-    // Called when the IndirectMaxComplexity control changes
-    LLAvatarComplexityControls::updateMax(
-        getChild<LLSliderCtrl>("IndirectMaxComplexity"),
-        getChild<LLTextBox>("IndirectMaxComplexityText"));
-}
-
-void LLFloaterPreference::updateComplexityModeAdvanced(const LLSD& newvalue)
-{
-    bool enable_complexity = newvalue.asInteger() != LLVOAvatar::AV_RENDER_ONLY_SHOW_FRIENDS;
-    getChild<LLSliderCtrl>("IndirectMaxComplexity")->setEnabled(enable_complexity);
-    getChild<LLSliderCtrl>("IndirectMaxNonImpostors")->setEnabled(enable_complexity);
-    getChild<LLSliderCtrl>("IndirectMaxNonImpostorsAdvanced")->setEnabled(enable_complexity);
-}
-
-void LLFloaterPreference::updateComplexityTextAdvanced()
-{
-    LLAvatarComplexityControls::setText(gSavedSettings.getU32("RenderAvatarMaxComplexity"),
-        getChild<LLTextBox>("IndirectMaxComplexityText", true));
 }
 
 void LLFloaterPreference::updateObjectMeshDetailTextAdvanced()
@@ -1098,7 +1043,7 @@ void LLFloaterPreference::updateObjectMeshDetailTextAdvanced()
 
 void LLFloaterPreference::onAvatarImpostorsEnable()
 {
-    refreshEnabledGraphicsAdvanced();
+    refreshEnabledStateAdvanced();
 }
 
 //static
@@ -1348,13 +1293,14 @@ void LLFloaterPreference::updateUserInfo(const std::string& visibility)
     }
 }
 
+// static
 void LLFloaterPreference::refreshEnabledGraphics()
 {
     LLFloaterPreference* instance = LLFloaterReg::findTypedInstance<LLFloaterPreference>("preferences");
     if (instance)
     {
         instance->refresh();
-        instance->refreshEnabledGraphicsAdvanced();
+        instance->refreshEnabledStateAdvanced();
     }
 }
 
@@ -1621,6 +1567,8 @@ void LLFloaterPreference::refreshEnabledState()
 
 void LLFloaterPreference::refreshEnabledStateAdvanced()
 {
+// <FM>: Currently unavailable after moving from Advanced Graphics floater into main Preferences
+#if 0
     LLComboBox* ctrl_reflections = getChild<LLComboBox>("Reflections");
     LLTextBox* reflections_text = getChild<LLTextBox>("ReflectionsText");
 
@@ -1658,6 +1606,7 @@ void LLFloaterPreference::refreshEnabledStateAdvanced()
 
     terrain_detail->setEnabled(false);
     terrain_text->setEnabled(false);
+#endif
 
     // WindLight
     //LLCheckBoxCtrl* ctrl_wind_light = getChild<LLCheckBoxCtrl>("WindLightUseAtmosShaders");
@@ -1679,10 +1628,13 @@ void LLFloaterPreference::refreshEnabledStateAdvanced()
     ctrl_deferred->setEnabled(enabled);
 #endif
 
+// <FM>: Currently unavailable after moving from Advanced Graphics floater into main Preferences
+#if 0
     LLCheckBoxCtrl* ctrl_pbr = getChild<LLCheckBoxCtrl>("UsePBRShaders");
 
     //PBR
     ctrl_pbr->setEnabled(true);
+#endif
 
     LLCheckBoxCtrl* ctrl_ssao = getChild<LLCheckBoxCtrl>("UseSSAO");
     LLCheckBoxCtrl* ctrl_dof = getChild<LLCheckBoxCtrl>("UseDoF");
@@ -1690,14 +1642,14 @@ void LLFloaterPreference::refreshEnabledStateAdvanced()
     LLTextBox* shadow_text = getChild<LLTextBox>("RenderShadowDetailText");
 
     // note, okay here to get from ctrl_deferred as it's twin, ctrl_deferred2 will alway match it
-    enabled = enabled && LLFeatureManager::getInstance()->isFeatureAvailable("RenderDeferredSSAO");// && (ctrl_deferred->get() ? true : false);
+    enabled &= LLFeatureManager::getInstance()->isFeatureAvailable("RenderDeferredSSAO");// && (ctrl_deferred->get() ? true : false);
 
     //ctrl_deferred->set(gSavedSettings.getBOOL("RenderDeferred"));
 
     ctrl_ssao->setEnabled(enabled);
     ctrl_dof->setEnabled(enabled);
 
-    enabled = enabled && LLFeatureManager::getInstance()->isFeatureAvailable("RenderShadowDetail");
+    enabled &= LLFeatureManager::getInstance()->isFeatureAvailable("RenderShadowDetail");
 
     ctrl_shadow->setEnabled(enabled);
     shadow_text->setEnabled(enabled);
@@ -1714,11 +1666,14 @@ void LLFloaterPreference::refreshEnabledStateAdvanced()
         getChildView("texture compression")->setEnabled(false);
     }
 
+// <FM>: Currently unavailable after moving from Advanced Graphics floater into main Preferences
+#if 0
     // if no windlight shaders, turn off nighttime brightness, gamma, and fog distance
     LLUICtrl* gamma_ctrl = getChild<LLUICtrl>("gamma");
     gamma_ctrl->setEnabled(!gPipeline.canUseWindLightShaders());
     getChildView("(brightness, lower is brighter)")->setEnabled(!gPipeline.canUseWindLightShaders());
     getChildView("fog")->setEnabled(!gPipeline.canUseWindLightShaders());
+#endif
     getChildView("antialiasing restart")->setVisible(!LLFeatureManager::getInstance()->isFeatureAvailable("RenderDeferred"));
 
     // now turn off any features that are unavailable
@@ -1760,7 +1715,7 @@ void LLAvatarComplexityControls::setIndirectMaxArc()
     }
     else
     {
-        // This is the inverse of the calculation in updateMaxComplexity
+        // This is the inverse of the calculation in LLAvatarComplexityControls::updateMax
         indirect_max_arc = (U32)ll_round(((log(F32(max_arc)) - MIN_ARC_LOG) / ARC_LIMIT_MAP_SCALE)) + MIN_INDIRECT_ARC_LIMIT;
     }
     gSavedSettings.setU32("IndirectMaxComplexity", indirect_max_arc);
@@ -1768,11 +1723,14 @@ void LLAvatarComplexityControls::setIndirectMaxArc()
 
 void LLFloaterPreference::disableUnavailableSettingsAdvanced()
 {
+// <FM>: Currently unavailable after moving from Advanced Graphics floater into main Preferences
+#if 0
     LLComboBox* ctrl_reflections   = getChild<LLComboBox>("Reflections");
     LLTextBox* reflections_text = getChild<LLTextBox>("ReflectionsText");
     LLCheckBoxCtrl* ctrl_avatar_cloth  = getChild<LLCheckBoxCtrl>("AvatarCloth");
     LLCheckBoxCtrl* ctrl_wind_light    = getChild<LLCheckBoxCtrl>("WindLightUseAtmosShaders");
     LLCheckBoxCtrl* ctrl_deferred = getChild<LLCheckBoxCtrl>("UseLightShaders");
+#endif
     LLComboBox* ctrl_shadows = getChild<LLComboBox>("ShadowDetail");
     LLTextBox* shadows_text = getChild<LLTextBox>("RenderShadowDetailText");
     LLCheckBoxCtrl* ctrl_ssao = getChild<LLCheckBoxCtrl>("UseSSAO");
@@ -1784,8 +1742,8 @@ void LLFloaterPreference::disableUnavailableSettingsAdvanced()
     // disabled windlight
     if (!LLFeatureManager::getInstance()->isFeatureAvailable("WindLightUseAtmosShaders"))
     {
-        ctrl_wind_light->setEnabled(false);
-        ctrl_wind_light->setValue(false);
+//        ctrl_wind_light->setEnabled(false);
+//        ctrl_wind_light->setValue(false);
 
         sky->setEnabled(false);
         sky_text->setEnabled(false);
@@ -1801,8 +1759,8 @@ void LLFloaterPreference::disableUnavailableSettingsAdvanced()
         ctrl_dof->setEnabled(false);
         ctrl_dof->setValue(false);
 
-        ctrl_deferred->setEnabled(false);
-        ctrl_deferred->setValue(false);
+//        ctrl_deferred->setEnabled(false);
+//        ctrl_deferred->setValue(false);
     }
 
     // disabled deferred
@@ -1818,8 +1776,8 @@ void LLFloaterPreference::disableUnavailableSettingsAdvanced()
         ctrl_dof->setEnabled(false);
         ctrl_dof->setValue(false);
 
-        ctrl_deferred->setEnabled(false);
-        ctrl_deferred->setValue(false);
+//        ctrl_deferred->setEnabled(false);
+//        ctrl_deferred->setValue(false);
     }
 
     // disabled deferred SSAO
@@ -1850,6 +1808,8 @@ void LLFloaterPreference::disableUnavailableSettingsAdvanced()
     exposureSlider->setEnabled(is_not_vintage);
     cas_slider->setEnabled(is_not_vintage);
 
+// <FM>: Currently unavailable after moving from Advanced Graphics floater into main Preferences
+#if 0
     // disabled reflections
     if (!LLFeatureManager::getInstance()->isFeatureAvailable("RenderReflectionDetail"))
     {
@@ -1864,6 +1824,7 @@ void LLFloaterPreference::disableUnavailableSettingsAdvanced()
         ctrl_avatar_cloth->setEnabled(false);
         ctrl_avatar_cloth->setValue(false);
     }
+#endif
 }
 
 void LLFloaterPreference::refresh()
@@ -1871,10 +1832,9 @@ void LLFloaterPreference::refresh()
     LLPanel::refresh();
     setMaxNonImpostorsText(
         gSavedSettings.getU32("RenderAvatarMaxNonImpostors"),
-        getChild<LLTextBox>("IndirectMaxNonImpostorsText", true));
-    LLAvatarComplexityControls::setText(
-        gSavedSettings.getU32("RenderAvatarMaxComplexity"),
-        getChild<LLTextBox>("IndirectMaxComplexityText", true));
+        getChild<LLTextBox>("IndirectMaxNonImpostorsTextAdvanced", true));
+
+    updateComplexityText();
     refreshEnabledState();
     refreshAdvanced();
     updateClickActionViews();
@@ -1895,17 +1855,8 @@ void LLFloaterPreference::refreshAdvanced()
     updateSliderTextAdvanced(getChild<LLSliderCtrl>("SkyMeshDetail",        true), getChild<LLTextBox>("SkyMeshDetailText",         true));
     updateSliderTextAdvanced(getChild<LLSliderCtrl>("TerrainDetail",        true), getChild<LLTextBox>("TerrainDetailText",         true));
     LLAvatarComplexityControls::setIndirectControls();
-    setMaxNonImpostorsTextAdvanced(
-        gSavedSettings.getU32("RenderAvatarMaxNonImpostors"),
-        getChild<LLTextBox>("IndirectMaxNonImpostorsTextAdvanced", true));
-    LLAvatarComplexityControls::setText(
-        gSavedSettings.getU32("RenderAvatarMaxComplexityAdvanced"),
-        getChild<LLTextBox>("IndirectMaxComplexityTextAdvanced", true));
-    refreshEnabledState();
 
-    bool enable_complexity = gSavedSettings.getS32("RenderAvatarComplexityMode") != LLVOAvatar::AV_RENDER_ONLY_SHOW_FRIENDS;
-    getChild<LLSliderCtrl>("IndirectMaxComplexity")->setEnabled(enable_complexity);
-    getChild<LLSliderCtrl>("IndirectMaxNonImpostorsAdvanced")->setEnabled(enable_complexity);
+    updateComplexityMode(gSavedSettings.getS32("RenderAvatarComplexityMode"));
 }
 
 void LLFloaterPreference::onCommitWindowedMode()
@@ -1918,7 +1869,8 @@ void LLFloaterPreference::onChangeQuality(const LLSD& data)
     U32 level = (U32)(data.asReal());
     LLFeatureManager::getInstance()->setGraphicsLevel(level, true);
     refreshEnabledGraphics();
-    refresh();
+// Already done in function above
+//    refresh();
 }
 
 void LLFloaterPreference::onClickSetSounds()
@@ -2163,50 +2115,10 @@ void LLFloaterPreference::updateSliderTextAdvanced(LLSliderCtrl* ctrl, LLTextBox
     }
 }
 
-void LLFloaterPreference::updateMaxNonImpostorsAdvanced()
-{
-    // Called when the IndirectMaxNonImpostors control changes
-    // Responsible for fixing the slider label (IndirectMaxNonImpostorsText) and setting RenderAvatarMaxNonImpostors
-    LLSliderCtrl* ctrl = getChild<LLSliderCtrl>("IndirectMaxNonImpostorsAdvanced",true);
-    U32 value = ctrl->getValue().asInteger();
-
-    if (0 == value || LLVOAvatar::NON_IMPOSTORS_MAX_SLIDER <= value)
-    {
-        value=0;
-    }
-    gSavedSettings.setU32("RenderAvatarMaxNonImpostors", value);
-    LLVOAvatar::updateImpostorRendering(value); // make it effective immediately
-    setMaxNonImpostorsTextAdvanced(value, getChild<LLTextBox>("IndirectMaxNonImpostorsText"));
-    setMaxNonImpostorsTextAdvanced(value, getChild<LLTextBox>("IndirectMaxNonImpostorsTextAdvanced"));
-}
-
-void LLFloaterPreference::updateIndirectMaxNonImpostorsAdvanced(const LLSD& newvalue)
-{
-    U32 value = newvalue.asInteger();
-    if ((value != 0) && (value != gSavedSettings.getU32("IndirectMaxNonImpostors")))
-    {
-        gSavedSettings.setU32("IndirectMaxNonImpostors", value);
-        setMaxNonImpostorsTextAdvanced(value, getChild<LLTextBox>("IndirectMaxNonImpostorsTextAdvanced"));
-    }
-}
-
-void LLFloaterPreference::setMaxNonImpostorsTextAdvanced(U32 value, LLTextBox* text_box)
-{
-    if (0 == value)
-    {
-        text_box->setText(LLTrans::getString("no_limit"));
-    }
-    else
-    {
-        text_box->setText(llformat("%d", value));
-    }
-}
-
-void LLAvatarComplexityControls::updateMax(LLSliderCtrl* slider, LLTextBox* value_label, bool short_val)
+void LLAvatarComplexityControls::updateMax(U32 indirect_value)
 {
     // Called when the IndirectMaxComplexity control changes
-    // Responsible for fixing the slider label (IndirectMaxComplexityText) and setting RenderAvatarMaxComplexity
-    U32 indirect_value = slider->getValue().asInteger();
+    // Responsible for fixing the slider label (IndirectMaxComplexityText/Advanced) and setting RenderAvatarMaxComplexity
     U32 max_arc;
 
     if (INDIRECT_MAX_ARC_OFF == indirect_value)
@@ -2224,7 +2136,6 @@ void LLAvatarComplexityControls::updateMax(LLSliderCtrl* slider, LLTextBox* valu
     }
 
     gSavedSettings.setU32("RenderAvatarMaxComplexity", (U32)max_arc);
-    setText(max_arc, value_label, short_val);
 }
 
 void LLAvatarComplexityControls::setText(U32 value, LLTextBox* text_box, bool short_val)
@@ -2261,7 +2172,7 @@ void LLFloaterPreference::updateMaxNonImpostors()
 {
     // Called when the IndirectMaxNonImpostors control changes
     // Responsible for fixing the slider label (IndirectMaxNonImpostorsText) and setting RenderAvatarMaxNonImpostors
-    LLSliderCtrl* ctrl = getChild<LLSliderCtrl>("IndirectMaxNonImpostors", true);
+    LLSliderCtrl* ctrl = getChild<LLSliderCtrl>("IndirectMaxNonImpostorsAdvanced", true);
     U32 value = ctrl->getValue().asInteger();
 
     if (0 == value || LLVOAvatar::NON_IMPOSTORS_MAX_SLIDER <= value)
@@ -2270,8 +2181,8 @@ void LLFloaterPreference::updateMaxNonImpostors()
     }
     gSavedSettings.setU32("RenderAvatarMaxNonImpostors", value);
     LLVOAvatar::updateImpostorRendering(value); // make it effective immediately
-    setMaxNonImpostorsText(value, getChild<LLTextBox>("IndirectMaxNonImpostorsText"));
-    setMaxNonImpostorsText(value, getChild<LLTextBox>("IndirectMaxNonImpostorsTextAdvanced"));
+    // <FM>: Text label update done through the signal set on "RenderAvatarMaxNonImpostors" settings value
+    //setMaxNonImpostorsText(value, getChild<LLTextBox>("IndirectMaxNonImpostorsTextAdvanced"));
 }
 
 void LLFloaterPreference::updateIndirectMaxNonImpostors(const LLSD& newvalue)
@@ -2281,8 +2192,6 @@ void LLFloaterPreference::updateIndirectMaxNonImpostors(const LLSD& newvalue)
     {
         gSavedSettings.setU32("IndirectMaxNonImpostors", value);
     }
-    setMaxNonImpostorsText(value, getChild<LLTextBox>("IndirectMaxNonImpostorsText"));
-    // This is called when the debug setting changes so we also need to drive the text box in the Advanced section
     setMaxNonImpostorsText(value, getChild<LLTextBox>("IndirectMaxNonImpostorsTextAdvanced"));
 }
 
@@ -2298,18 +2207,30 @@ void LLFloaterPreference::setMaxNonImpostorsText(U32 value, LLTextBox* text_box)
     }
 }
 
-void LLFloaterPreference::updateMaxComplexity()
+void LLFloaterPreference::updateMaxComplexity(LLUICtrl *ctrl)
 {
-    // Called when the IndirectMaxComplexity control changes
-    LLAvatarComplexityControls::updateMax(
-        getChild<LLSliderCtrl>("IndirectMaxComplexity"),
-        getChild<LLTextBox>("IndirectMaxComplexityText"));
+    // Called when the IndirectMaxComplexity/Advanced slider control changes
+    LLAvatarComplexityControls::updateMax(ctrl->getValue().asInteger());
+    // Not needed as we have a signal on the underlaying "RenderAvatarMaxComplexity" settings value?
+    // updateComplexityText();
 }
 
 void LLFloaterPreference::updateComplexityText()
 {
-    LLAvatarComplexityControls::setText(gSavedSettings.getU32("RenderAvatarMaxComplexity"),
-        getChild<LLTextBox>("IndirectMaxComplexityText", true));
+    U32 max_complexity = gSavedSettings.getU32("RenderAvatarMaxComplexity");
+    LLAvatarComplexityControls::setText(max_complexity, getChild<LLTextBox>("IndirectMaxComplexityText", true));
+    LLAvatarComplexityControls::setText(max_complexity, getChild<LLTextBox>("IndirectMaxComplexityTextAdvanced", true));
+}
+
+void LLFloaterPreference::updateComplexityMode(U32 value)
+{
+    bool enable_complexity = value != LLVOAvatar::AV_RENDER_ONLY_SHOW_FRIENDS;
+    getChild<LLSliderCtrl>("IndirectMaxComplexity")->setEnabled(enable_complexity);
+    getChild<LLSliderCtrl>("IndirectMaxComplexityText")->setEnabled(enable_complexity);
+    getChild<LLSliderCtrl>("IndirectMaxComplexityAdvanced")->setEnabled(enable_complexity);
+    getChild<LLSliderCtrl>("IndirectMaxComplexityTextAdvanced")->setEnabled(enable_complexity);
+    getChild<LLSliderCtrl>("IndirectMaxNonImpostorsAdvanced")->setEnabled(enable_complexity);
+    getChild<LLSliderCtrl>("IndirectMaxNonImpostorsTextAdvanced")->setEnabled(enable_complexity);
 }
 
 bool LLFloaterPreference::loadFromFilename(const std::string& filename, std::map<std::string, std::string> &label_map)
@@ -2367,8 +2288,7 @@ void LLFloaterPreference::onChangeMaturity()
 
 void LLFloaterPreference::onChangeComplexityMode(const LLSD& newvalue)
 {
-    bool enable_complexity = newvalue.asInteger() != LLVOAvatar::AV_RENDER_ONLY_SHOW_FRIENDS;
-    getChild<LLSliderCtrl>("IndirectMaxComplexity")->setEnabled(enable_complexity);
+    updateComplexityMode(newvalue.asInteger());
 }
 
 std::string get_category_path(LLFolderType::EType cat_type)
@@ -2489,6 +2409,8 @@ void LLFloaterPreference::onClickActionChange()
 
 void LLFloaterPreference::onAtmosShaderChange()
 {
+// <FM>: This control is not present currently after moving settings back from Advanced Graphics floater
+#if 0
     LLCheckBoxCtrl* ctrl_alm = getChild<LLCheckBoxCtrl>("UseLightShaders");
     if(ctrl_alm)
     {
@@ -2501,6 +2423,7 @@ void LLFloaterPreference::onAtmosShaderChange()
 
         ctrl_alm->setEnabled(enabled);
     }
+#endif
 }
 
 void LLFloaterPreference::onClickPermsDefault()
@@ -3891,18 +3814,6 @@ void LLPanelPreferenceControls::onCancelKeyBind()
     pControlsTable->deselectAllItems();
 }
 
-//LLFloaterPreferenceGraphicsAdvanced::LLFloaterPreferenceGraphicsAdvanced(const LLSD& key)
-//  : LLFloater(key)
-//{
-//    mCommitCallbackRegistrar.add("Pref.RenderOptionUpdate",            boost::bind(&LLFloaterPreferenceGraphicsAdvanced::onRenderOptionEnable, this));
-//  mCommitCallbackRegistrar.add("Pref.UpdateIndirectMaxNonImpostors", boost::bind(&LLFloaterPreferenceGraphicsAdvanced::updateMaxNonImpostors,this));
-//  mCommitCallbackRegistrar.add("Pref.UpdateIndirectMaxComplexity",   boost::bind(&LLFloaterPreferenceGraphicsAdvanced::updateMaxComplexity,this));
-//}
-
-//LLFloaterPreferenceGraphicsAdvanced::~LLFloaterPreferenceGraphicsAdvanced()
-//{
-//}
-
 LLFloaterPreferenceProxy::LLFloaterPreferenceProxy(const LLSD& key)
     : LLFloater(key),
       mSocksSettingsDirty(false)
@@ -3928,17 +3839,6 @@ bool LLFloaterPreference::postBuildAdvanced()
     LLCheckBoxCtrl *use_HiDPI = getChild<LLCheckBoxCtrl>("use HiDPI");
     use_HiDPI->setVisible(false);
 #endif
-
-    mComplexityChangedSignal = gSavedSettings.getControl("RenderAvatarMaxComplexity")->getCommitSignal()->connect(
-        [this](LLControlVariable* control, const LLSD& new_val, const LLSD& old_val)
-        {
-            updateComplexityText();
-        });
-    mComplexityModeChangedSignalAdvanced = gSavedSettings.getControl("RenderAvatarComplexityMode")->getSignal()->connect(
-        [this](LLControlVariable* control, const LLSD& new_val, const LLSD& old_val)
-        {
-            updateComplexityModeAdvanced(new_val);
-        });
     mLODFactorChangedSignalAdvanced = gSavedSettings.getControl("RenderVolumeLODFactor")->getCommitSignal()->connect(
         [this](LLControlVariable* control, const LLSD& new_val, const LLSD& old_val)
         {
