@@ -33,6 +33,7 @@ rápido
 	</text>
 	<check_box initial_value="true" label="Sempre renderizar amigos" name="AlwaysRenderFriends"/>
 	<button label="Exceções..." name="RenderExceptionsButton"/>
+	<button label="Exceções..." name="RenderExceptionsButtonAdvanced"/>
 	<button label="Salvar configurações como predefinição" name="PrefSaveButton" width="235" left="5"/>
 	<button label="Carregar predefinição" name="PrefLoadButton" width="130" left_pad="8"/>
 	min_val=&quot;0.125&quot;
