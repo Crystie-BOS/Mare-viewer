@@ -362,6 +362,8 @@ void LLVoiceChannel::suspend()
     {
         sSuspendedVoiceChannel = sCurrentVoiceChannel;
         sSuspended = true;
+
+        sCurrentVoiceChannelChangedSignal(sSuspendedVoiceChannel->mSessionID);
     }
 }
 
@@ -370,6 +372,7 @@ void LLVoiceChannel::resume()
 {
     if (sSuspended)
     {
+        sSuspended = false; // needs to be before activate() so that observers will be able to read state
         if (LLVoiceClient::getInstance()->voiceEnabled())
         {
             if (sSuspendedVoiceChannel)
@@ -387,7 +390,6 @@ void LLVoiceChannel::resume()
                 LLVoiceChannelProximal::getInstance()->activate();
             }
         }
-        sSuspended = false;
     }
 }
 
