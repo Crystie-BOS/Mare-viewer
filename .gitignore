@@ -34,7 +34,6 @@ cmake_install.cmake
 /debian/secondlife-appearance-utility*
 /debian/secondlife-viewer*
 /indra/.distcc
-indra/cmake/*
 indra/out/*
 /*.log
 ca*.sh

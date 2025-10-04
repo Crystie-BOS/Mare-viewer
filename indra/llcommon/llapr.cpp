@@ -769,11 +769,11 @@ namespace nd
                 return aFilename;
 
             wchar_t aShort[MAX_PATH] = { 0 };
-            DWORD nRes = ::GetShortPathNameW(utf8str_to_utf16str(aFilename).c_str(), aShort, _countof(aShort));
+            DWORD nRes = ::GetShortPathNameW(ll_convert<std::wstring>(aFilename).c_str(), aShort, _countof(aShort));
             if (nRes == 0 || nRes >= _countof(aShort))
                 return aFilename;
 
-            return utf16str_to_utf8str(aShort);
+            return ll_convert<std::string>(std::wstring(aShort));
 #else
             return aFilename;
 #endif

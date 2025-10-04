@@ -986,7 +986,7 @@ bool LLWindowMacOSX::getPosition(LLCoordScreen *position)
     }
     else if(mWindow)
     {
-        const CGPoint & pos = getContentViewBoundsPosition(mWindow);
+        CGPoint pos = getContentViewRect(mWindow).origin;
 
         position->mX = pos.x;
         position->mY = pos.y;
@@ -1013,7 +1013,7 @@ bool LLWindowMacOSX::getSize(LLCoordScreen *size)
     }
     else if(mWindow)
     {
-        const CGSize & sz = gHiDPISupport ? getDeviceContentViewSize(mWindow, mGLView) : getContentViewBoundsSize(mWindow);
+        CGSize sz = getBackingViewRect(mWindow, mGLView).size;
 
         size->mX = sz.width;
         size->mY = sz.height;
@@ -1039,7 +1039,7 @@ bool LLWindowMacOSX::getSize(LLCoordWindow *size)
     }
     else if(mWindow)
     {
-        const CGSize & sz = gHiDPISupport ? getDeviceContentViewSize(mWindow, mGLView) : getContentViewBoundsSize(mWindow);
+        CGSize sz = getBackingViewRect(mWindow, mGLView).size;
 
         size->mX = sz.width;
         size->mY = sz.height;
@@ -1225,6 +1225,12 @@ void LLWindowMacOSX::setMouseClipping( bool b )
     adjustCursorDecouple();
 }
 
+#if LL_DARWIN
+// For CGSetLocalEventsSuppressionInterval there is no replacement in modern API
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 bool LLWindowMacOSX::setCursorPosition(const LLCoordWindow position)
 {
     bool result = false;
@@ -1261,6 +1267,10 @@ bool LLWindowMacOSX::setCursorPosition(const LLCoordWindow position)
 
     return result;
 }
+
+#if LL_DARWIN
+#pragma clang diagnostic pop
+#endif
 
 bool LLWindowMacOSX::getCursorPosition(LLCoordWindow *position)
 {
@@ -1486,8 +1496,9 @@ bool LLWindowMacOSX::convertCoords(LLCoordScreen from, LLCoordWindow* to)
 
         convertScreenToWindow(mWindow, mouse_point);
 
-        to->mX = mouse_point[0];
-        to->mY = mouse_point[1];
+        float scale_factor = getSystemUISize();
+        to->mX = mouse_point[0] * scale_factor;
+        to->mY = mouse_point[1] * scale_factor;
 
         return true;
     }
@@ -1499,9 +1510,9 @@ bool LLWindowMacOSX::convertCoords(LLCoordWindow from, LLCoordScreen *to)
     if(mWindow)
     {
         float mouse_point[2];
-
-        mouse_point[0] = from.mX;
-        mouse_point[1] = from.mY;
+        float scale_factor = getSystemUISize();
+        mouse_point[0] = from.mX / scale_factor;
+        mouse_point[1] = from.mY / scale_factor;
 
         convertWindowToScreen(mWindow, mouse_point);
 
@@ -1852,6 +1863,10 @@ void LLSplashScreenMacOSX::showImpl()
 
 void LLSplashScreenMacOSX::updateImpl(const std::string& mesg)
 {
+    if(mWindow != NULL)
+    {
+        CFStringCreateWithCString(NULL, mesg.c_str(), kCFStringEncodingUTF8);
+    }
 }
 
 
@@ -1930,14 +1945,14 @@ void LLWindowMacOSX::spawnWebBrowser(const std::string& escaped_url, bool async)
 }
 void LLWindowMacOSX::openFile(const std::string& file_name )
 {
-        LL_INFOS() << "Opening file " << file_name << LL_ENDL;
-    FSRef appRef;
-    OSStatus os_result = FSPathMakeRef((UInt8*)file_name.c_str(),
-                       &appRef,NULL);
-    if(os_result >= 0)
-    {
-        os_result = LSOpenFSRef(&appRef, NULL);
-    }
+	LL_INFOS() << "Opening file " << file_name << LL_ENDL;
+
+
+    CFStringRef URL =  CFStringCreateWithCString(NULL, file_name.c_str(), kCFStringEncodingASCII);
+    CFURLRef pathRef = CFURLCreateWithString(NULL, URL, NULL);
+    if (pathRef) {
+        OSStatus status = LSOpenCFURLRef(pathRef, NULL);
+	}
 }
 
 // String should match ndof, so string mapping code was copied as is
@@ -2652,7 +2667,7 @@ MASK LLWindowMacOSX::modifiersToMask(S16 modifiers)
 
 F32 LLWindowMacOSX::getSystemUISize()
 {
-    return gHiDPISupport ? ::getDeviceUnitSize(mGLView) : LLWindow::getSystemUISize();
+    return ::getDeviceUnitSize(mGLView);
 }
 
 #if LL_OS_DRAGDROP_ENABLED

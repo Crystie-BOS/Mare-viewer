@@ -49,12 +49,15 @@
     <menu_item_separator
      layout="topleft" />
     <menu_item_call
-     label="Zoom In"
+     label="Zoom in"
      layout="topleft"
      name="zoom_in">
         <menu_item_call.on_click
-         function="ObjectIcon.Action" 
-         parameter="zoom" />
+         function="ObjectIcon.Action"
+         parameter="obj_zoom_in" />
+        <menu_item_call.on_enable
+         function="ObjectIcon.Visible"
+         parameter="obj_zoom_in" />
     </menu_item_call>
     <menu_item_call
      label="Show on Map"

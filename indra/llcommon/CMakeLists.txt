@@ -11,7 +11,7 @@ include(LLSharedLibs)
 include(Copy3rdPartyLibs)
 include(ZLIBNG)
 include(Tracy)
-
+include(SSE2NEON)
 
 set(llcommon_SOURCE_FILES
     apply.cpp
@@ -277,17 +277,11 @@ target_link_libraries(
         ll::boost
         ll::oslibraries
         ll::tracy
+        ll::sse2neon
     )
 
 target_include_directories(llcommon INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(llcommon PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-
-if (DARWIN)
-  include(CMakeFindFrameworks)
-  find_library(CARBON_LIBRARY Carbon)
-  find_library(AVFOUNDATION_LIBRARY AVFoundation)
-  target_link_libraries(llcommon ${CARBON_LIBRARY} ${AVFOUNDATION_LIBRARY})
-endif (DARWIN)
 
 add_dependencies(llcommon stage_third_party_libs)
 
@@ -342,8 +336,4 @@ if (LL_TESTS)
 ## throwing and catching exceptions.
 ##LL_ADD_INTEGRATION_TEST(llexception "" "${test_libs}")
 
-  # *TODO - reenable these once tcmalloc libs no longer break the build.
-  #ADD_BUILD_TEST(llallocator llcommon)
-  #ADD_BUILD_TEST(llallocator_heap_profile llcommon)
-  #ADD_BUILD_TEST(llmemtype llcommon)
 endif (LL_TESTS)
