@@ -685,7 +685,7 @@ bool LLCrashLogger::init()
     std::string log_file = gDirUtilp->getExpandedFilename(LL_PATH_LOGS, "crashreport.log");
 
 #if LL_WINDOWS
-    LLAPRFile::remove(old_log_file);
+    LLFile::remove(old_log_file, ENOENT);
 #endif
 
     LLFile::rename(log_file.c_str(), old_log_file.c_str());

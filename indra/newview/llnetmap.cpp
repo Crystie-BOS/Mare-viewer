@@ -320,8 +320,6 @@ void LLNetMap::draw()
         const S32 region_width = ll_round(LLWorld::getInstance()->getRegionWidthInMeters());
         const F32 scale_pixels_per_meter = mScale / region_width;
 
-        static LLCachedControl<bool> use_world_map_textures(gSavedSettings, "MiniMapWorldMapTextures", true);
-
         for (LLWorld::region_list_t::const_iterator iter = LLWorld::getInstance()->getRegionList().begin();
              iter != LLWorld::getInstance()->getRegionList().end(); ++iter)
         {
@@ -351,77 +349,29 @@ void LLNetMap::draw()
             {
                 gGL.color4f(1.f, 0.5f, 0.5f, 1.f);
             }
-            bool renderSTexture = true;
-            if (use_world_map_textures)
-            {
-                // Draw using worldmap.
-                const LLViewerRegion::tex_matrix_t& tiles(regionp->getWorldMapTiles());
-				S32 scaled_width = (S32)(regionp->getWidth() / region_width);
-				S32 square_width = (S32)(scaled_width * scaled_width);
-                for (S32 i(0); i < square_width; ++i)
-                {
-                    const F32 y((F32)(i / scaled_width));
-                    const F32 x((F32)(i - y * scaled_width));
-                    const F32 local_left(left + x * mScale);
-                    const F32 local_right(local_left + mScale);
-                    const F32 local_bottom(bottom + y * mScale);
-                    const F32 local_top(local_bottom + mScale);
-                    LLViewerTexture* pRegionImage = tiles[(U64)(x * scaled_width + y)];
-                    if (pRegionImage && pRegionImage->hasGLTexture())
-                    {
+            // Draw using texture.
 #if UseDrawTexMap
-                        drawTexMap(pRegionImage, local_left, local_top, local_right, local_bottom);
+            drawTexMap(regionp->getLand().getSTexture(), left, top, right, bottom);
 #else
-                        gGL.getTexUnit(0)->bind(pRegionImage);
-                        gGL.begin(LLRender::TRIANGLES);
-                        {
-                            gGL.texCoord2f(0.f, 1.f);
-                            gGL.vertex2f(local_left, local_top);
-                            gGL.texCoord2f(0.f, 0.f);
-                            gGL.vertex2f(local_left, local_bottom);
-                            gGL.texCoord2f(1.f, 0.f);
-                            gGL.vertex2f(local_right, local_bottom);
-
-                            gGL.texCoord2f(0.f, 1.f);
-                            gGL.vertex2f(local_left, local_top);
-                            gGL.texCoord2f(1.f, 0.f);
-                            gGL.vertex2f(local_right, local_bottom);
-                            gGL.texCoord2f(1.f, 1.f);
-                            gGL.vertex2f(local_right, local_top);
-                        }
-                        gGL.end();
-#endif
-                        pRegionImage->setBoostLevel(LLViewerTexture::BOOST_MAP_VISIBLE);
-                        renderSTexture = false;
-                    }
-                }
-            }
-            if (renderSTexture)
+            gGL.getTexUnit(0)->bind(regionp->getLand().getSTexture());
+            gGL.begin(LLRender::TRIANGLES);
             {
-                // Draw using texture.
-#if UseDrawTexMap
-                drawTexMap(regionp->getLand().getSTexture(), left, top, right, bottom);
-#else
-                gGL.getTexUnit(0)->bind(regionp->getLand().getSTexture());
-                gGL.begin(LLRender::TRIANGLES);
-                {
-                    gGL.texCoord2f(0.f, 1.f);
-                    gGL.vertex2f(left, top);
-                    gGL.texCoord2f(0.f, 0.f);
-                    gGL.vertex2f(left, bottom);
-                    gGL.texCoord2f(1.f, 0.f);
-                    gGL.vertex2f(right, bottom);
+                gGL.texCoord2f(0.f, 1.f);
+                gGL.vertex2f(left, top);
+                gGL.texCoord2f(0.f, 0.f);
+                gGL.vertex2f(left, bottom);
+                gGL.texCoord2f(1.f, 0.f);
+                gGL.vertex2f(right, bottom);
 
-                    gGL.texCoord2f(0.f, 1.f);
-                    gGL.vertex2f(left, top);
-                    gGL.texCoord2f(1.f, 0.f);
-                    gGL.vertex2f(right, bottom);
-                    gGL.texCoord2f(1.f, 1.f);
-                    gGL.vertex2f(right, top);
-                }
-                gGL.end();
-#endif
+                gGL.texCoord2f(0.f, 1.f);
+                gGL.vertex2f(left, top);
+                gGL.texCoord2f(1.f, 0.f);
+                gGL.vertex2f(right, bottom);
+                gGL.texCoord2f(1.f, 1.f);
+                gGL.vertex2f(right, top);
             }
+            gGL.end();
+#endif
             gGL.flush();
         }
 
@@ -1024,7 +974,7 @@ bool LLNetMap::handleToolTip(S32 x, S32 y, MASK mask)
 
         // Only show parcel information in the tooltip if property lines are visible. Otherwise, the parcel the tooltip is referring to is
         // ambiguous.
-        if (gSavedSettings.getBOOL("MiniMapPropertyLines"))
+        if (gSavedSettings.getBOOL("MiniMapShowPropertyLines"))
         {
             LLViewerParcelMgr::getInstance()->setHoverParcel(posGlobal);
             LLParcel *hover_parcel = LLViewerParcelMgr::getInstance()->getHoverParcel();
@@ -1440,7 +1390,7 @@ void LLNetMap::updateOverlayFlags(const std::string control, bool initialize, bo
     {
         if (value)
         {
-            updateOverlayFlags("MiniMapShowPropertyLines");
+            updateOverlayFlags("MiniMapPropertyLines");
             updateOverlayFlags("MiniMapCollisionParcels");
             updateOverlayFlags("MiniMapForSaleParcels");
             updateOverlayFlags("MiniMapLandOwners");
@@ -1457,8 +1407,10 @@ void LLNetMap::updateOverlayFlags(const std::string control, bool initialize, bo
 //        else
 //            mShowParcelInfo &= ~FLAG_COLLISION;
 //    }
-    else if (control == "MiniMapShowPropertyLines")
+    else if (control == "MiniMapPropertyLines")
     {
+        // Also copy value to the LL variant so that it works as expected
+        gSavedSettings.setBOOL("MiniMapShowPropertyLines", value);
         if (value)
             mShowParcelInfo |= FLAG_BORDER;
         else
