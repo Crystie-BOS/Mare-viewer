@@ -114,15 +114,6 @@
 			function="Minimap.AddToContactSet"/>
 	</menu_item_call>
     <menu_item_check
-      label="World Map Textures"
-      name="World Map Textures">
-        <menu_item_check.on_click
-          function="Minimap.ToggleOverlay"
-          parameter="MiniMapWorldMapTextures" />
-        <menu_item_check.on_check
-          control="MiniMapWorldMapTextures" />
-    </menu_item_check>
-    <menu_item_check
        label="Rotate Map"
        name="Rotate Map">
           <menu_item_check.on_check
@@ -145,7 +136,7 @@
       label="Show Objects"
       name="Show Objects">
         <menu_item_check.on_click
-          function="ToggleControl"
+          function="Minimap.ToggleOverlay"
           parameter="MiniMapObjects" />
         <menu_item_check.on_check
           control="MiniMapObjects" />
@@ -188,6 +179,15 @@
     </menu_item_check>
     <menu_item_separator />
     <menu_item_check
+      label="Show Parcel Info"
+      name="Show Parcel Info">
+        <menu_item_check.on_click
+          function="Minimap.ToggleOverlay"
+          parameter="MiniMapParcelInfo" />
+        <menu_item_check.on_check
+          control="MiniMapParcelInfo" />
+    </menu_item_check>
+    <menu_item_check
       label="Show Parcel Borders"
       name="Show Parcel Borders">
         <menu_item_check.on_click
@@ -195,6 +195,8 @@
           parameter="MiniMapPropertyLines" />
         <menu_item_check.on_check
           control="MiniMapPropertyLines" />
+        <menu_item_check.on_enable
+          control="MiniMapParcelInfo" />
     </menu_item_check>
     <menu_item_check
       label="Parcels For Sale"
@@ -205,7 +207,7 @@
         <menu_item_check.on_check
           control="MiniMapForSaleParcels" />
         <menu_item_check.on_enable
-          control="MiniMapPropertyLines" />
+          control="MiniMapParcelInfo" />
     </menu_item_check>
     <menu_item_check
       label="Land Owners"
@@ -216,7 +218,7 @@
         <menu_item_check.on_check
           control="MiniMapLandOwners" />
         <menu_item_check.on_enable
-          control="MiniMapPropertyLines" />
+          control="MiniMapParcelInfo" />
     </menu_item_check>
     <menu_item_separator />
     <menu

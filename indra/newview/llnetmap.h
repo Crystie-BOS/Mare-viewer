@@ -119,6 +119,7 @@ private:
     LLVector3       globalPosToView(const LLVector3d& global_pos);
     LLVector3d      viewPosToGlobal(S32 x,S32 y);
 
+    static void     drawTexMap(LLViewerTexture* pTexture, F32 left, F32 top, F32 right, F32 bottom);
     void            drawRing(const F32 radius, LLVector3 pos_map, const LLUIColor& colour);
     void            drawTracking( const LLVector3d& pos_global,
                                   const LLColor4& color,
@@ -130,16 +131,16 @@ private:
     bool            createImage(LLPointer<LLImageRaw>& rawimagep) const;
     void            createObjectImage();
     void            createParcelImage();
-    void            renderPropertyLinesForRegion(const LLViewerRegion* region);
+    void            renderParcelInfo();
+    void            updateOverlayFlags(const std::string control, bool initialize = true, bool value = false);
 
     F32             getScaleForName(std::string scale_name);
     static bool     outsideSlop(S32 x, S32 y, S32 start_x, S32 start_y, S32 slop);
 
     bool            mUpdateObjectImage;
     bool            mUpdateParcelImage;
-
-private:
-    bool            mUpdateNow;
+    bool            mShowObjects;
+    U32             mShowParcelInfo;
     LLUIColor       mBackgroundColor;
 
     F32             mScale;                 // Size of a region in pixels
@@ -158,12 +159,12 @@ private:
     LLVector3d      mObjectImageCenterGlobal;
     LLPointer<LLImageRaw> mObjectRawImagep;
     LLPointer<LLViewerTexture>  mObjectImagep;
-    LLVector3d          mParcelImageCenterGlobal;
+    LLVector3d      mParcelImageCenterGlobal;
     LLPointer<LLImageRaw>       mParcelRawImagep;
     LLPointer<LLViewerTexture>  mParcelImagep;
 
-    LLUUID              mClosestAgentToCursor;
-    LLVector3d          mClosestAgentPosition;
+    LLUUID          mClosestAgentToCursor;
+    LLVector3d      mClosestAgentPosition;
 
     std::string     mToolTipMsg;
     std::string     mParcelNameMsg;
@@ -178,7 +179,7 @@ private:
     typedef std::map<LLUUID, LLColor4> avatar_marks_map_t;
     static avatar_marks_map_t sAvatarMarksMap;
 public:
-    void            setSelected(uuid_vec_t uuids) { sSelected=uuids; };
+    void            setSelected(uuid_vec_t uuids) { gmSelected=uuids; };
 // <FS:CR> Minimap improvements
     void            handleShowProfile(const LLSD& sdParam) const;
     uuid_vec_t      mClosestAgentsToCursor;
@@ -200,8 +201,7 @@ private:
 
     void handleAddToContactSet();
     LLHandle<LLView> mPopupMenuHandle;
-    static uuid_vec_t   sSelected;
+    static uuid_vec_t gmSelected;
 };
-
 
 #endif
