@@ -8195,8 +8195,9 @@ void LLPipeline::renderFinalize()
     // MK by CA - move setsphere so it's not subject to changes around which render buffer is prime 
     if (gRRenabled && gAgent.mRRInterface.mContainsSetsphere)
     {
-        LLShaderEffectParams params(finalBuffer, finalBuffer, false);
+        LLShaderEffectParams params(sourceBuffer, targetBuffer, false);
         LLVfxManager::instance().runEffect(EVisualEffect::RlvSphere, &params);
+        std::swap(sourceBuffer, targetBuffer);
     }
     // mk by CA
 
