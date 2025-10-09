@@ -7462,6 +7462,17 @@
       <key>Value</key>
       <boolean>1</boolean>
     </map>
+    <key>MiniMapParcelInfo</key>
+    <map>
+      <key>Comment</key>
+      <string>Show parcel information on the mini-map</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <boolean>1</boolean>
+    </map>
     <key>MiniMapPrimMaxRadius</key>
     <map>
       <key>Comment</key>
@@ -7474,6 +7485,17 @@
       <real>256.0</real>
     </map>
     <key>MiniMapPropertyLines</key>
+    <map>
+      <key>Comment</key>
+      <string>Show property boundaries on the mini-map</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <boolean>1</boolean>
+    </map>
+    <key>MiniMapShowPropertyLines</key>
     <map>
       <key>Comment</key>
       <string>Show property boundaries on the mini-map</string>
