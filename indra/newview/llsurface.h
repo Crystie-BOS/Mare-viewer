@@ -39,8 +39,6 @@ class LLTimer;
 class LLUUID;
 class LLAgent;
 
-#define TIMER_TESTING 1
-
 static const U8 NO_EDGE    = 0x00;
 static const U8 EAST_EDGE  = 0x01;
 static const U8 NORTH_EDGE = 0x02;
@@ -209,9 +207,6 @@ private:
     LLViewerRegion *mRegionp;           // Patch whose coordinate system this surface is using.
     static S32  sTextureSize;           // Size of the surface texture
     LLTimer     mTimer; // timer to throttle initial requests until the mSTexture is fully fetched
-#if TIMER_TESTING
-    U32 mTimerTest; // This can be removed after testing together with the according code in llsurface.cpp
-#endif
 };
 
 extern template bool LLSurface::idleUpdate</*PBR=*/false>(F32 max_update_time);

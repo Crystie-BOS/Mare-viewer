@@ -207,17 +207,11 @@ void LLSurface::createSTexture()
     if (mSTexturep.isNull())
     {
         mTimer.setTimerExpirySec(MIN_TEXTURE_REQUEST_INTERVAL);
-#if TIMER_TESTING
-        mTimerTest = 0;
-#endif
     }
     else if (!mSTexturep->hasGLTexture())
     {
         // if we haven't gotten a valid texture yet, throttle the number of requests to avoid server flooding
         update = mTimer.checkExpirationAndReset(MIN_TEXTURE_REQUEST_INTERVAL);
-#if TIMER_TESTING
-        mTimerTest++;
-#endif
     }
     else
     {
@@ -233,17 +227,6 @@ void LLSurface::createSTexture()
         U32 grid_x, grid_y;
 
         grid_from_region_handle(handle, &grid_x, &grid_y);
-#if TIMER_TESTING
-        std::string texture = llformat("map-%d-%d-%d-objects.jpg", 1, grid_x, grid_y);
-        if (mTimerTest)
-        {
-            LL_WARNS() << "Requesting world map texture " << texture << " again, counter = " << mTimerTest << LL_ENDL;
-        }
-        else
-        {
-            LL_INFOS() << "Initial request for world map texture " << texture << LL_ENDL;
-        }
-#endif
         mSTexturep = LLWorldMipmap::loadObjectsTile(grid_x, grid_y, 1);
     }
 }
