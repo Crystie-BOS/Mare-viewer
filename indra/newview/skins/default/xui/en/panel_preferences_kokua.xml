@@ -149,12 +149,20 @@
         <check_box
          follows="left|top"
          height="16"
+         label="Use more accurate avatar positions in the World Map for nearby regions"
+         name="KokuaAccurateAvatarPositions"
+         width="270"
+         control_name="KokuaAccurateAvatarPositions"
+         tool_tip="If enabled, the avatar positions in the World Map will be more accurate but multiple avatars at the same position may not be visible as seperate dots"/>
+        <check_box
+         follows="left|top"
+         height="16"
          initial_value="true"
          label="Show typing indicator in name tag"
          name="PrefKokuaGeneralShowNearbyAvatarsTyping"
          width="270"
          control_name="ShowNearbyAvatarsTyping"
-         tool_tip="Filters duplicate Landmark entries in the Landmark list on the World Map."/>
+         tool_tip="Shows typing indication in the avatars name tag"/>
             <check_box
             control_name="NameTagShowAge"
             name="NameTagShowAge"
@@ -626,16 +634,6 @@
              control_name="FSExperimentalLostAttachmentsFix"
              tool_tip="If enabled, attachments are protected from detaching for approx 30 seconds after arriving in new region">
             </check_box>
-          <check_box
-            top_pad="5"
-            layout="topleft"
-            height="16"
-            label="Use more accurate avatar positions in the Worldmap for nearby regions"
-            left="15"
-            name="KokuaAccurateAvatarPositions"
-            width="270"
-            control_name="KokuaAccurateAvatarPositions"
-            tool_tip="If enabled, the avatar positions in the Worldmap will be more accurate but multiple avatars at the same position may not be visible as seperate dots"/>
 	        <text
 	         type="string"
 	         length="1"
