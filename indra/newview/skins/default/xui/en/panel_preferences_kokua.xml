@@ -626,6 +626,16 @@
              control_name="FSExperimentalLostAttachmentsFix"
              tool_tip="If enabled, attachments are protected from detaching for approx 30 seconds after arriving in new region">
             </check_box>
+          <check_box
+            top_pad="5"
+            layout="topleft"
+            height="16"
+            label="Use more accurate avatar positions in the Worldmap for nearby regions"
+            left="15"
+            name="KokuaAccurateAvatarPositions"
+            width="270"
+            control_name="KokuaAccurateAvatarPositions"
+            tool_tip="If enabled, the avatar positions in the Worldmap will be more accurate but multiple avatars at the same position may not be visible as seperate dots"/>
 	        <text
 	         type="string"
 	         length="1"
