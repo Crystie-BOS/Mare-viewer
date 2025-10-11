@@ -231,7 +231,7 @@
             follows="top|left|right"
             top_delta="-5"
             right="-10"
-            max_chars="4096"
+            max_length_bytes="4096"
             name="web_browser_home_page"
             width="345">
             </line_editor>
@@ -698,6 +698,51 @@
 	         type="string" >
 	         pt (Requires restart, default=0, use low values)
 	        </text>
+          <text
+           type="string"
+           length="1"
+           follows="left|top"
+           height="16"
+           layout="topleft"
+           left="20"
+           name="tooltip_textbox7"
+           top_pad="2"
+           width="120">
+             Windows Theme:
+          </text>
+          <combo_box
+           height="23"
+           layout="topleft"
+           follows="left|top"
+           control_name="KokuaWindowsDarkMode"
+           left_pad="5"
+           name="WindowsThemeMode"
+           width="160">
+           <combo_box.item
+            label="Use System"
+            name="WindowThemeMode_0"
+            value="0"/>
+           <combo_box.item
+            label="Light Mode"
+            name="WindowThemeMode_1"
+            value="1"/>
+           <combo_box.item
+            label="Dark Mode"
+            name="WindowThemeMode_2"
+            value="2"/>
+          </combo_box>
+          <text
+           name="tooltip_textbox8"
+           top_pad="-16"
+           left_pad="5"
+           height="16"
+           width="120"
+           layout="topleft"
+           follows="left|top"
+           type="string"
+           length="1">
+             (Requires restart)
+          </text>
         </panel>
         <!--Scpipting-->
         <panel
