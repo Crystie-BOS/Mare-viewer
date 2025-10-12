@@ -48,7 +48,6 @@
 #include "llagentcamera.h"
 #include "llappviewer.h" // for gDisconnected
 #include "llcallingcard.h" // LLAvatarTracker
-//#include "llfloaterland.h"
 #include "llfloaterworldmap.h"
 #include "llparcel.h"
 #include "lltracker.h"
@@ -59,7 +58,6 @@
 #include "llviewercontrol.h"
 #include "llviewerparcelmgr.h"
 #include "llviewertexture.h"
-//#include "llviewertexturelist.h"
 #include "llviewermenu.h"
 #include "llviewerobjectlist.h"
 #include "llavataractions.h"
@@ -90,12 +88,12 @@ const S32 CIRCLE_STEPS = 100;
 
 #define UseDrawTexMap 1
 
-#define SHOW_AVAIL     (1U)                                   // 1
-#define SHOW_OWNED     (1U << PARCEL_OWNED)                   // 2
-#define SHOW_GROUP     (1U << PARCEL_GROUP)                   // 4
-#define SHOW_SELF      (1U << PARCEL_SELF)                    // 8
-#define SHOW_FOR_SALE  (1U << PARCEL_FOR_SALE)                // 16
-#define SHOW_AUCTION   (1U << PARCEL_AUCTION)                 // 32
+#define SHOW_AVAIL     (1U)                                   // 0 -> 1
+#define SHOW_OWNED     (1U << PARCEL_OWNED)                   // 1 -> 2
+#define SHOW_GROUP     (1U << PARCEL_GROUP)                   // 2 -> 4
+#define SHOW_SELF      (1U << PARCEL_SELF)                    // 3 -> 8
+#define SHOW_FOR_SALE  (1U << PARCEL_FOR_SALE)                // 4 -> 16
+#define SHOW_AUCTION   (1U << PARCEL_AUCTION)                 // 5 -> 32
 #define SHOW_BORDER    (PARCEL_WEST_LINE | PARCEL_SOUTH_LINE) // 64 + 128
 #define SHOW_COLLISION (1U << 8)                              // 256
 #define FLAG_OWNER     (SHOW_AVAIL | SHOW_OWNED | SHOW_GROUP | SHOW_SELF)
@@ -422,7 +420,6 @@ void LLNetMap::draw()
 
         LLVector3 map_center_agent;
         LLVector3 camera_position = gAgentCamera.getCameraPositionAgent();
-
         F32 image_half_width = 0.5f * mObjectMapPixels;
         F32 image_half_height = 0.5f * mObjectMapPixels;
 
@@ -527,14 +524,6 @@ void LLNetMap::draw()
             if (uuid == gAgent.getID()) continue;
 
             pos_map = globalPosToView(positions[i]);
-
-            if (uuid == gAgent.getID()) {
-                //
-                //  no need to plot our own position here
-                //  as that will be taken care of later
-                //
-                continue;
-            }
 
             unknown_relative_z = false;
 
@@ -1274,7 +1263,7 @@ bool LLNetMap::handleMouseUp(S32 x, S32 y, MASK mask)
             mMouseDown.set(0, 0);
         }
         gViewerWindow->showCursor();
-        gFocusMgr.setMouseCapture(NULL);
+        gFocusMgr.setMouseCapture(nullptr);
         return true;
     }
 
@@ -1344,7 +1333,7 @@ bool LLNetMap::handleDoubleClick(S32 x, S32 y, MASK mask)
     if (double_click_teleport || double_click_show_world_map)
     {
         // If we're not tracking a beacon already, double-click will set one
-        if (!LLTracker::isTracking(NULL))
+        if (!LLTracker::isTracking(nullptr))
         {
             LLFloaterWorldMap* world_map = LLFloaterWorldMap::getInstance();
             if (world_map)
@@ -1475,6 +1464,12 @@ void LLNetMap::renderParcelInfo()
                 U8  color_idx = ownerp[parcel_idx] & PARCEL_COLOR_MASK;
                 U32 detection  = 1 << color_idx;
                 U32 this_color;
+
+                if (color_idx > PARCEL_AUCTION)
+                {
+                    LL_WARNS() << "Got unexpected value in PARCEL_COLOR_MASK " << color_idx << LL_ENDL;
+                    continue;
+                }
 
                 if ((mShowParcelInfo & FLAG_COLLISION) && collisionp && (collisionp[parcel_idx / 8] & (1 << (parcel_idx % 8))))
                 {
@@ -1721,7 +1716,7 @@ void LLNetMap::handleStopTracking (const LLSD& userdata)
         //menu->setItemEnabled ("Stop Tracking", false);
         menu->setItemVisible ("Stop Tracking", false);
         // </FS:Ansariel>
-        LLTracker::stopTracking (LLTracker::isTracking(NULL));
+        LLTracker::stopTracking (LLTracker::isTracking(nullptr));
     }
 }
 

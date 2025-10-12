@@ -58,26 +58,26 @@
 #include "llregionhandle.h"
 #include "llscrolllistctrl.h"
 #include "llslurl.h"
-#include "lltextbox.h"
+//#include "lltextbox.h"
 #include "lltoolbarview.h"
 #include "lltracker.h"
 #include "lltrans.h"
 #include "llviewerinventory.h"  // LLViewerInventoryItem
-#include "llviewermenu.h"
+//#include "llviewermenu.h"
 #include "llviewerparcelmgr.h"
 #include "llviewerregion.h"
-#include "llviewerstats.h"
-#include "llviewertexture.h"
-#include "llworld.h"
+//#include "llviewerstats.h"
+//#include "llviewertexture.h"
+//#include "llworld.h"
 #include "llviewerwindow.h"
 #include "llworldmap.h"
 #include "llworldmapmessage.h"
 #include "llworldmapview.h"
-#include "lluictrlfactory.h"
-#include "llappviewer.h"
-#include "llmapimagetype.h"
-#include "llweb.h"
-#include "llsliderctrl.h"
+//#include "lluictrlfactory.h"
+//#include "llappviewer.h"
+//#include "llmapimagetype.h"
+//#include "llweb.h"
+//#include "llsliderctrl.h"
 #include "message.h"
 #include "llwindow.h"           // copyTextToClipboard()
 #include <algorithm>
@@ -271,7 +271,7 @@ public:
 };
 LLMapTrackAvatarHandler gMapTrackAvatar;
 
-LLFloaterWorldMap* gFloaterWorldMap = NULL;
+LLFloaterWorldMap* gFloaterWorldMap = nullptr;
 
 class LLMapInventoryObserver : public LLInventoryObserver
 {
@@ -420,7 +420,7 @@ bool LLFloaterWorldMap::postBuild()
     mEventsMatureCheck = getChild<LLCheckBoxCtrl>("events_mature_chk");
     mEventsAdultCheck = getChild<LLCheckBoxCtrl>("events_adult_chk");
 
-    mAvatarIcon = getChild<LLUICtrl>("avatar_icon");
+    mAvatarIcon = getChild<LLUICtrl>("friends_icon");
     mLandmarkIcon = getChild<LLUICtrl>("landmark_icon");
     mLocationIcon = getChild<LLUICtrl>("location_icon");
 
@@ -470,16 +470,16 @@ LLFloaterWorldMap::~LLFloaterWorldMap()
     }
 
     // All cleaned up by LLView destructor
-    mMapView = NULL;
+    mMapView = nullptr;
 
     // Inventory deletes all observers on shutdown
-    mInventory = NULL;
-    mInventoryObserver = NULL;
+    mInventory = nullptr;
+    mInventoryObserver = nullptr;
 
     // avatar tracker will delete this for us.
-    mFriendObserver = NULL;
+    mFriendObserver = nullptr;
 
-    gFloaterWorldMap = NULL;
+    gFloaterWorldMap = nullptr;
 
     mTeleportFinishConnection.disconnect();
 }
@@ -595,23 +595,6 @@ void LLFloaterWorldMap::reshape( S32 width, S32 height, bool called_from_parent 
 // virtual
 void LLFloaterWorldMap::draw()
 {
-    // <FS:Ansariel> Performance improvement
-    static LLUICtrl* avatar_icon = getChild<LLUICtrl>("friends_icon");  // <FS:Ansariel> Used to be avatar_icon
-    static LLUICtrl* landmark_icon = getChild<LLUICtrl>("landmark_icon");
-    static LLUICtrl* location_icon = getChild<LLUICtrl>("location_icon");
-    static LLView* teleport_btn = getChildView("Teleport");
-    //static LLView* clear_btn = getChildView("Clear");
-    static LLView* show_destination_btn = getChildView("Show Destination");
-    static LLView* copy_slurl_btn = getChildView("copy_slurl");
-    static LLView* go_home_btn = getChildView("Go Home");
-    static LLView* people_chk = getChildView("people_chk");
-    static LLView* infohub_chk = getChildView("infohub_chk");
-    static LLView* land_for_sale_chk = getChildView("land_for_sale_chk");
-    static LLView* event_chk = getChildView("event_chk");
-    static LLView* events_mature_chk = getChildView("events_mature_chk");
-    static LLView* events_adult_chk = getChildView("events_adult_chk");
-    // </FS:Ansariel> Performance improvement
-
     static LLUIColor map_track_color = LLUIColorTable::instance().getColor("MapTrackColor", LLColor4::white);
     static LLUIColor map_track_disabled_color = LLUIColorTable::instance().getColor("MapTrackDisabledColor", LLColor4::white);
 
@@ -1091,8 +1074,8 @@ void LLFloaterWorldMap::observeInventory(LLInventoryModel* model)
     {
         mInventory->removeObserver(mInventoryObserver);
         delete mInventoryObserver;
-        mInventory = NULL;
-        mInventoryObserver = NULL;
+        mInventory = nullptr;
+        mInventoryObserver = nullptr;
     }
     if(model)
     {
@@ -1956,7 +1939,7 @@ void LLFloaterWorldMap::onFocusLost()
 }
 
 LLPanelHideBeacon::LLPanelHideBeacon() :
-    mHideButton(NULL)
+    mHideButton(nullptr)
 {
 }
 
@@ -1981,7 +1964,7 @@ bool LLPanelHideBeacon::postBuild()
 //virtual
 void LLPanelHideBeacon::draw()
 {
-    if (!LLTracker::isTracking(NULL))
+    if (!LLTracker::isTracking(nullptr))
     {
         mHideButton->setVisible(false);
         return;
@@ -2043,7 +2026,7 @@ void LLPanelHideBeacon::updatePosition()
         left_tb_width = toolbar_left->getRect().getWidth();
     }
 
-    if (gToolBarView != NULL && gToolBarView->getToolbar(LLToolBarEnums::TOOLBAR_LEFT)->hasButtons())
+    if (gToolBarView != nullptr && gToolBarView->getToolbar(LLToolBarEnums::TOOLBAR_LEFT)->hasButtons())
     {
         S32 x_pos = bottom_tb_center - getRect().getWidth() / 2 - left_tb_width;
         setOrigin( x_pos + HIDE_BEACON_PAD, 0);
