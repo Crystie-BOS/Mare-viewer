@@ -1144,11 +1144,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>a2c7779a9703234d91394f8edcfef1f83689ddb0</string>
+              <string>26fe48324a0b7a4714e0e083799640fc1ca34d27</string>
               <key>hash_algorithm</key>
               <string>sha1</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-kdu8/downloads/kdu-8.2.1.242980512-linux64-242980512.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-kdu8/downloads/kdu-8.4.1.252851354-linux64-252851354.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
