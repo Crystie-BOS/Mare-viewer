@@ -1722,13 +1722,12 @@ LLColor4 LLNetMap::getAvatarColor(const LLUUID& avatar_id, bool useContactSet)
         if (cs_instance.hasFriendColorThatShouldShow(avatar_id, LGG_CS_MINIMAP))
         {
             color = cs_instance.getFriendColor(avatar_id);
+	    }
 
-		// the contact set code is RLV aware, marking isn't though
-		if (gRRenabled && (gAgent.mRRInterface.mContainsShownames || gAgent.mRRInterface.mContainsShownametags || gAgent.mRRInterface.mContainsShowNearby))
-		{
-		    return color;
-		}
-
+	    // the contact set code is RLV aware, marking isn't though
+	    if (gRRenabled && (gAgent.mRRInterface.mContainsShownames || gAgent.mRRInterface.mContainsShownametags || gAgent.mRRInterface.mContainsShowNearby))
+	    {
+	        return color;
         }
 
         // Mark Avatars with special colors

@@ -36,6 +36,7 @@
 #include "llerror.h"
 #include "llimview.h"
 #include "llsdserialize.h"
+#include "llselectmgr.h"
 #include "llviewercontrol.h"
 #include "llworld.h"
 #include "RRInterface.h"
