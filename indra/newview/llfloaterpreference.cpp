@@ -644,6 +644,11 @@ bool LLFloaterPreference::postBuild()
         getChild<LLComboBox>("language_combobox")->add("System default", LLSD("default"), ADD_TOP, true);
     }
 
+#if !LL_WINDOWS
+    // Make the theme selection combobox invisible on non-Windows platforms
+    getChild<LLUICtrl>("WindowsThemeMode")->setVisible(false);
+#endif
+
 #ifndef LL_DISCORD
     LLPanel* panel = getChild<LLPanel>("privacy_preferences_discord");
     getChild<LLTabContainer>("privacy_tab_container")->removeTabPanel(panel);

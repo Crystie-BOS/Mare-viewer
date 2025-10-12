@@ -1177,7 +1177,7 @@
      left="1"
      right="-1"
      follows="all"
-     label="Minimap/Nearby"
+     label="Maps/Nearby"
      name="tab-minimap">
      <text
        type="string"
@@ -1189,7 +1189,7 @@
        height="15"
        name="netmap_dots_textbox"
        width="400">
-       Minimap dots (may be overriden by Contact Sets or marks):
+       Map dots (may be overriden by Contact Sets or marks):
      </text>
      <color_swatch
        color="MapAvatarSelfColor"
@@ -1285,7 +1285,6 @@
        width="95">
        Friends
      </text>
-     
      <color_swatch
        can_apply_immediately="true"
        color="MapAvatarLindenColor"
@@ -1349,7 +1348,7 @@
        width="95">
        Muted
      </text>
-    <check_box
+      <check_box
         name="show_friends_nearby"
         label="Also in Nearby list"
         control_name="KokuaNearbyShowFriends"
@@ -1359,8 +1358,28 @@
         height="16"
         width="100"
         top_pad="-20"
-				left_pad="22"
+        left_pad="22"
         tool_tip="Highlight the names of your friends in the Nearby panel" />    
+      <check_box
+        layout="topleft"
+        follows="left|top"
+        top_pad="24"
+        left="25"
+        height="20"
+        label="Show avatars in the Minimap with specific colors"
+        name="KokuaContactSetColorInMiniMap"
+        width="270"
+        control_name="KokuaContactSetColorInMiniMap"
+        tool_tip="Use the colors as defined above, or in the Contact Set or marks, to color the avatar dots in the Minimap."/>
+      <check_box
+        follows="left|top"
+        height="20"
+        label="Show avatars in the World Map with specific colors"
+        name="KokuaContactSetColorInWorldMap"
+        width="270"
+        control_name="KokuaContactSetColorInWorldMap"
+        enabled_control="KokuaAccurateAvatarPositions"
+        tool_tip="Use the colors as defined above, or in the Contact Set or marks, to color the avatar dots in the World Map. Only avaialble when accurate avatar positions in Kokua->Maps is enabled"/>
      <check_box
        control_name="MiniMapChatRing"
        name="MiniMapChatRing"

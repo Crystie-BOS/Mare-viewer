@@ -56,7 +56,7 @@ const U32 MAP_ITEM_LAND_FOR_SALE_ADULT = 0x0a;
 class LLItemInfo
 {
 public:
-    LLItemInfo(F32 global_x, F32 global_y, const std::string& name, LLUUID id);
+    LLItemInfo(U32 global_x, U32 global_y, const std::string& name, LLUUID id);
 
     // Setters
     void setTooltip(const std::string& tooltip) { mToolTip = tooltip; }

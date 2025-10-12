@@ -87,7 +87,8 @@ public:
     bool showRegionInfo();
 
     LLVector3       globalPosToView(const LLVector3d& global_pos);
-    LLVector3d      viewPosToGlobal(S32 x,S32 y);
+    LLVector3       globalPosToView(const LLVector3d& global_pos, const LLVector3d& camera_pos);
+    LLVector3d      viewPosToGlobal(S32 x, S32 y);
 
     virtual void    draw();
     void            drawGenericItems(const LLSimInfo::item_info_list_t& items, LLUIImagePtr image);
