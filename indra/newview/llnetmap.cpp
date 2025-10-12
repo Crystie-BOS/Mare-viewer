@@ -48,7 +48,6 @@
 #include "llagentcamera.h"
 #include "llappviewer.h" // for gDisconnected
 #include "llcallingcard.h" // LLAvatarTracker
-//#include "llfloaterland.h"
 #include "llfloaterworldmap.h"
 #include "llparcel.h"
 #include "lltracker.h"
@@ -59,7 +58,6 @@
 #include "llviewercontrol.h"
 #include "llviewerparcelmgr.h"
 #include "llviewertexture.h"
-//#include "llviewertexturelist.h"
 #include "llviewermenu.h"
 #include "llviewerobjectlist.h"
 #include "llavataractions.h"
@@ -90,12 +88,12 @@ const S32 CIRCLE_STEPS = 100;
 
 #define UseDrawTexMap 1
 
-#define SHOW_AVAIL     (1U)                                   // 1
-#define SHOW_OWNED     (1U << PARCEL_OWNED)                   // 2
-#define SHOW_GROUP     (1U << PARCEL_GROUP)                   // 4
-#define SHOW_SELF      (1U << PARCEL_SELF)                    // 8
-#define SHOW_FOR_SALE  (1U << PARCEL_FOR_SALE)                // 16
-#define SHOW_AUCTION   (1U << PARCEL_AUCTION)                 // 32
+#define SHOW_AVAIL     (1U)                                   // 0 -> 1
+#define SHOW_OWNED     (1U << PARCEL_OWNED)                   // 1 -> 2
+#define SHOW_GROUP     (1U << PARCEL_GROUP)                   // 2 -> 4
+#define SHOW_SELF      (1U << PARCEL_SELF)                    // 3 -> 8
+#define SHOW_FOR_SALE  (1U << PARCEL_FOR_SALE)                // 4 -> 16
+#define SHOW_AUCTION   (1U << PARCEL_AUCTION)                 // 5 -> 32
 #define SHOW_BORDER    (PARCEL_WEST_LINE | PARCEL_SOUTH_LINE) // 64 + 128
 #define SHOW_COLLISION (1U << 8)                              // 256
 #define FLAG_OWNER     (SHOW_AVAIL | SHOW_OWNED | SHOW_GROUP | SHOW_SELF)
@@ -229,10 +227,7 @@ void LLNetMap::draw()
     }
     LL_PROFILE_ZONE_SCOPED;
     static LLFrameTimer map_timer;
-    //static LLUIColor map_avatar_color = LLUIColorTable::instance().getColor("MapAvatarColor", LLColor4::white);
-    //static LLUIColor map_avatar_friend_color = LLUIColorTable::instance().getColor("MapAvatarFriendColor", LLColor4::white);
     static LLUIColor map_track_color = LLUIColorTable::instance().getColor("MapTrackColor", LLColor4::white);
-    //static LLUIColor map_track_disabled_color = LLUIColorTable::instance().getColor("MapTrackDisabledColor", LLColor4::white);
     static LLUIColor map_frustum_color = LLUIColorTable::instance().getColor("MapFrustumColor", LLColor4::white);
     static LLUIColor map_parcel_outline_color = LLUIColorTable::instance().getColor("MapParcelOutlineColor", LLColor4(LLColor3(LLColor4::yellow), 0.5f));
     static LLUIColor map_whisper_ring_color = LLUIColorTable::instance().getColor("MapWhisperRingColor", LLColor4::blue); // <FS:LO> FIRE-17460 Add Whisper Chat Ring to Minimap
@@ -425,7 +420,6 @@ void LLNetMap::draw()
 
         LLVector3 map_center_agent;
         LLVector3 camera_position = gAgentCamera.getCameraPositionAgent();
-
         F32 image_half_width = 0.5f * mObjectMapPixels;
         F32 image_half_height = 0.5f * mObjectMapPixels;
 
@@ -518,6 +512,8 @@ void LLNetMap::draw()
         std::vector<LLVector3d> positions;
         bool unknown_relative_z;
 
+        static LLCachedControl<bool> use_contact_set_colors(gSavedSettings, "KokuaContactSetColorInMiniMap");
+
         LLWorld::getInstance()->getAvatars(&avatar_ids, &positions, gAgentCamera.getCameraPositionGlobal());
 
         // Draw avatars
@@ -528,14 +524,6 @@ void LLNetMap::draw()
             if (uuid == gAgent.getID()) continue;
 
             pos_map = globalPosToView(positions[i]);
-
-            if (uuid == gAgent.getID()) {
-                //
-                //  no need to plot our own position here
-                //  as that will be taken care of later
-                //
-                continue;
-            }
 
             unknown_relative_z = false;
 
@@ -561,23 +549,14 @@ void LLNetMap::draw()
                 }
             }
             // </FS:Ansariel>
-
-            LLColor4 color = getAvatarColor(uuid);  // <FS:CR>
-
-// [RLVa:KB] - Checked: 2010-04-19 (RLVa-1.2.0f) | Modified: RLVa-1.2.0f | FS-Specific
-//          LLWorldMapView::drawAvatar(
-//              pos_map.mV[VX], pos_map.mV[VY],
-//              (RlvActions::canShowName(RlvActions::SNC_DEFAULT, uuid)) ? color : map_avatar_color.get(),
-//              pos_map.mV[VZ], mDotRadius,
-//              unknown_relative_z);
-// [/RLVa:KB]
+            LLColor4 color = getAvatarColor(uuid, use_contact_set_colors);
             LLWorldMapView::drawAvatar(
                 pos_map.mV[VX], pos_map.mV[VY],
                 color,
                 pos_map.mV[VZ], mDotRadius,
                 unknown_relative_z);
 
-            if(uuid.notNull())
+            if (uuid.notNull())
             {
                 bool selected = false;
                 uuid_vec_t::iterator sel_iter = gmSelected.begin();
@@ -589,9 +568,9 @@ void LLNetMap::draw()
                         break;
                     }
                 }
-                if(selected)
+                if (selected)
                 {
-                    if( (pos_map.mV[VX] < 0) ||
+                    if ((pos_map.mV[VX] < 0) ||
                         (pos_map.mV[VY] < 0) ||
                         (pos_map.mV[VX] >= getRect().getWidth()) ||
                         (pos_map.mV[VY] >= getRect().getHeight()) )
@@ -599,7 +578,8 @@ void LLNetMap::draw()
                         S32 x = ll_round( pos_map.mV[VX] );
                         S32 y = ll_round( pos_map.mV[VY] );
                         LLWorldMapView::drawTrackingCircle( getRect(), x, y, color, 1, 10);
-                    } else
+                    }
+                    else
                     {
                         LLWorldMapView::drawTrackingDot(pos_map.mV[VX],pos_map.mV[VY],color,0.f);
                     }
@@ -1283,7 +1263,7 @@ bool LLNetMap::handleMouseUp(S32 x, S32 y, MASK mask)
             mMouseDown.set(0, 0);
         }
         gViewerWindow->showCursor();
-        gFocusMgr.setMouseCapture(NULL);
+        gFocusMgr.setMouseCapture(nullptr);
         return true;
     }
 
@@ -1353,7 +1333,7 @@ bool LLNetMap::handleDoubleClick(S32 x, S32 y, MASK mask)
     if (double_click_teleport || double_click_show_world_map)
     {
         // If we're not tracking a beacon already, double-click will set one
-        if (!LLTracker::isTracking(NULL))
+        if (!LLTracker::isTracking(nullptr))
         {
             LLFloaterWorldMap* world_map = LLFloaterWorldMap::getInstance();
             if (world_map)
@@ -1484,6 +1464,12 @@ void LLNetMap::renderParcelInfo()
                 U8  color_idx = ownerp[parcel_idx] & PARCEL_COLOR_MASK;
                 U32 detection  = 1 << color_idx;
                 U32 this_color;
+
+                if (color_idx > PARCEL_AUCTION)
+                {
+                    LL_WARNS() << "Got unexpected value in PARCEL_COLOR_MASK " << color_idx << LL_ENDL;
+                    continue;
+                }
 
                 if ((mShowParcelInfo & FLAG_COLLISION) && collisionp && (collisionp[parcel_idx / 8] & (1 << (parcel_idx % 8))))
                 {
@@ -1691,29 +1677,31 @@ void LLNetMap::clearAvatarMarkColors()
 }
 
 // static
-LLColor4 LLNetMap::getAvatarColor(const LLUUID& avatar_id)
+LLColor4 LLNetMap::getAvatarColor(const LLUUID& avatar_id, bool useContactSet)
 {
     static LLUIColor map_avatar_color = LLUIColorTable::instance().getColor("MapAvatarColor", LLColor4::white);
     LLColor4 color = map_avatar_color;
 
-    LGGContactSets& cs_instance = LGGContactSets::instance();
-
-    // Color "special" avatars with special colors (Friends, muted, Lindens, etc)
-    color = cs_instance.colorize(avatar_id, color, LGG_CS_MINIMAP);
-
-    // Color based on contact sets prefs
-    if (cs_instance.hasFriendColorThatShouldShow(avatar_id, LGG_CS_MINIMAP))
+    if (useContactSet)
     {
-        color = cs_instance.getFriendColor(avatar_id);
-    }
+        LGGContactSets& cs_instance = LGGContactSets::instance();
 
-    // Mark Avatars with special colors
-    avatar_marks_map_t::iterator found = sAvatarMarksMap.find(avatar_id);
-    if (found != sAvatarMarksMap.end())
-    {
-        color = found->second;
-    }
+        // Color "special" avatars with special colors (Friends, muted, Lindens, etc)
+        color = cs_instance.colorize(avatar_id, color, LGG_CS_MINIMAP);
 
+        // Color based on contact sets prefs
+        if (cs_instance.hasFriendColorThatShouldShow(avatar_id, LGG_CS_MINIMAP))
+        {
+            color = cs_instance.getFriendColor(avatar_id);
+        }
+
+        // Mark Avatars with special colors
+        avatar_marks_map_t::iterator found = sAvatarMarksMap.find(avatar_id);
+        if (found != sAvatarMarksMap.end())
+        {
+            color = found->second;
+        }
+    }
     return color;
 }
 //</FS:Ansariel>
@@ -1728,7 +1716,7 @@ void LLNetMap::handleStopTracking (const LLSD& userdata)
         //menu->setItemEnabled ("Stop Tracking", false);
         menu->setItemVisible ("Stop Tracking", false);
         // </FS:Ansariel>
-        LLTracker::stopTracking (LLTracker::isTracking(NULL));
+        LLTracker::stopTracking (LLTracker::isTracking(nullptr));
     }
 }
 

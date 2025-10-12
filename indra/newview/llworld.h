@@ -41,8 +41,6 @@
 #include "llviewerpartsim.h"
 #include "llviewertexture.h"
 #include "llvowater.h"
-#include "llfloateradvancedbuildoptions.h"
-#include "llviewerobject.h"
 
 class LLViewerRegion;
 class LLVector3d;
@@ -109,7 +107,7 @@ public:
     // but it may eventually become more general.
     F32 resolveStepHeightGlobal(const LLVOAvatar* avatarp, const LLVector3d &point_a, const LLVector3d &point_b,
                             LLVector3d &intersection, LLVector3 &intersection_normal,
-                            LLViewerObject** viewerObjectPtr=NULL);
+                            LLViewerObject** viewerObjectPtr = nullptr);
 
     LLSurfacePatch *        resolveLandPatchGlobal(const LLVector3d &position);
     LLVector3               resolveLandNormalGlobal(const LLVector3d &position);        // absolute frame
@@ -170,9 +168,19 @@ public:
     // All arguments are optional. Given containers will be emptied and then filled.
     // Not supplying origin or radius input returns data on all avatars in the known regions.
     void getAvatars(
-        uuid_vec_t* avatar_ids = NULL,
-        std::vector<LLVector3d>* positions = NULL,
-        const LLVector3d& relative_to = LLVector3d(), F32 radius = FLT_MAX, EGetAvatarLimit avatar_limit = AVATAR_LIMIT_NONE) const;
+        uuid_vec_t* avatar_ids,
+        std::vector<LLVector3d>* positions,
+        const LLVector3d& relative_to = LLVector3d(),
+        F32 radius = FLT_MAX,
+        EGetAvatarLimit avatar_limit = AVATAR_LIMIT_NONE) const;
+
+    void getAvatars(
+        uuid_vec_t* avatar_ids,
+        std::vector<LLVector3d>* positions,
+        std::set<U64>* regions,
+        const LLVector3d& relative_to = LLVector3d(),
+        F32 radius = FLT_MAX,
+        EGetAvatarLimit avatar_limit = AVATAR_LIMIT_NONE) const;
 
     // Returns 'true' if the region is in mRegionList,
     // 'false' if the region has been removed due to region change
