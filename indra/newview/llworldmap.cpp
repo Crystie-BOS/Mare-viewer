@@ -45,7 +45,7 @@ const F64 BLOCK_UPDATE_TIMER = 60.0;            // <FS:Ansariel> Periodically up
 // LLItemInfo
 //---------------------------------------------------------------------------
 
-LLItemInfo::LLItemInfo(F32 global_x, F32 global_y,
+LLItemInfo::LLItemInfo(U32 global_x, U32 global_y,
                        const std::string& name,
                        LLUUID id)
 :   mName(name),
@@ -456,11 +456,10 @@ bool LLWorldMap::insertRegion(U32 x_world, U32 y_world, std::string& name, LLUUI
 bool LLWorldMap::insertItem(U32 x_world, U32 y_world, std::string& name, LLUUID& uuid, U32 type, S32 extra, S32 extra2)
 {
     // Create an item record for the received object
-    LLItemInfo new_item((F32)x_world, (F32)y_world, name, uuid);
+    LLItemInfo new_item(x_world, y_world, name, uuid);
 
     // Compute a region handle based on the objects coordinates
-    LLVector3d  pos((F32)x_world, (F32)y_world, 40.0);
-    U64 handle = to_region_handle(pos);
+    U64 handle = to_region_handle(new_item.getGlobalPosition());
 
     // Get the region record for that handle or NULL if we haven't browsed it yet
     LLSimInfo* siminfo = LLWorldMap::getInstance()->simInfoFromHandle(handle);
@@ -563,7 +562,7 @@ bool LLWorldMap::insertItem(U32 x_world, U32 y_world, std::string& name, LLUUID&
         }
         case MAP_ITEM_AGENT_LOCATIONS: // agent locations
         {
-//              LL_INFOS("WorldMap") << "New Location " << new_item.mName << LL_ENDL;
+            LL_INFOS("WorldMap") << "New Location " << name << " Pos: " << x_world << "/" << y_world << LL_ENDL;
             // <FS:Ansariel> Map fails to clear agent from a map position if it's the last one
             //if (extra > 0)
             // </FS:Ansariel>

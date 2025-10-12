@@ -1,11 +1,41 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<menu name="Popup">
-	<menu_item_call label="Zoom Nah" name="Zoom Close"/>
-	<menu_item_call label="Zoom Mittel" name="Zoom Medium"/>
-	<menu_item_call label="Zoom Weit" name="Zoom Far"/>
-	<menu_item_call label="Zoom-Standard" name="Zoom Default"/>
-	<menu_item_check label="Karte drehen" name="Rotate Map"/>
-	<menu_item_check label="Automatisch zentrieren" name="Auto Center"/>
-	<menu_item_call label="Verfolgung abschalten" name="Stop Tracking"/>
-	<menu_item_call label="Weltkarte" name="World Map"/>
+<menu name="Popup" label="Minikarte">
+  <menu_item_call label="Zeige Profiel" name="View Profile"/>
+  <menu label="Distanz-Markierungen" name="Chat Distance Rings Menu">
+    <menu_item_check label="Anzeigen" name="Chat Distance Rings"/>
+    <menu_item_check label="Flüstern anzeigen" name="Whisper Distance Ring"/>
+    <menu_item_check label="Sprechen anzeigen" name="Chat Distance Ring"/>
+    <menu_item_check label="Rufen anzeigen" name="Shout Distance Ring"/>
+  </menu>
+  <menu label="Markiere Avatar" name="Mark...">
+    <menu_item_call label="Rot" name="MarkRed"/>
+    <menu_item_call label="Grün" name="MarkGreen"/>
+    <menu_item_call label="Blau" name="MarkBlue"/>
+    <menu_item_call label="Violet" name="MarkPurple"/>
+    <menu_item_call label="Gelb" name="MarkLightYellow"/>
+    <menu_item_call label="Markierung(en) löschen" name="Clear Mark"/>
+    <menu_item_call label="Alle Markierungen löschen" name="Clear Marks"/>
+  </menu>
+  <menu_item_call label="Zu Kontakt-Set hinzufügen..." name="Add to Set Multiple"/>
+  <menu_item_check label="Karte drehen" name="Rotate Map"/>
+  <menu_item_check label="Automatisch zentrieren" name="Auto Center"/>
+  <menu_item_check label="Zeige Objekte" name="Show Objects"/>
+  <menu_item_check label="Physikalische Objekte" name="Physical Objects"/>
+  <menu_item_check label="Script Objekte" name="Scripted Objects"/>
+  <menu_item_check label="Temporäre Objekte" name="Temporary Objects"/>
+  <menu_item_check label="Zeige Parzellen Informationen" name="Show Parcel Info"/>
+  <menu_item_check label="Grundstücksgrenzen" name="Show Parcel Borders"/>
+  <menu_item_check label="Land zu verkaufen" name="Parcels For Sale"/>
+  <menu_item_check label="Land Eigentümer" name="Land Owners"/>
+  <menu label="Zoom" name="Zoom">
+    <menu_item_check label="Sehr Nah" name="Zoom very close"/>
+    <menu_item_check label="Nah" name="Zoom close"/>
+    <menu_item_check label="Mittel" name="Zoom medium"/>
+    <menu_item_check label="Weit" name="Zoom far"/>
+    <menu_item_check label="Standard" name="Zoom default"/>
+  </menu>
+  <menu_item_call label="Verfolgung abschalten" name="Stop Tracking"/>
+  <menu_item_call label="Ortsprofil anzeigen" name="Place Profile"/>
+  <menu_item_call label="Landinformation anzeigen" name="About Land"/>
+  <menu_item_call label="Weltkarte" name="Open World Map"/>
 </menu>

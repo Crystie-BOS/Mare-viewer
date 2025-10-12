@@ -16,7 +16,7 @@
  *      may be used to endorse or promote products derived from this
  *      software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY MODULAR SYSTEMS AND CONTRIBUTORS “AS IS”
+ * THIS SOFTWARE IS PROVIDED BY MODULAR SYSTEMS AND CONTRIBUTORS â€œAS ISâ€
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MODULAR SYSTEMS OR CONTRIBUTORS
@@ -42,18 +42,12 @@
 #include "llcalc.h"
 #include "llfloaterimnearbychat.h"
 #include "llfloaterreg.h"
-#include "llfloatersidepanelcontainer.h"
+#include "llselectmgr.h"
 #include "llinventorymodel.h"
-#include "llnotificationmanager.h"
-#include "llparcel.h"
 #include "llslurl.h"
 #include "lltooldraganddrop.h"
 #include "lltrans.h"
 #include "llurldispatcher.h"
-#include "llvieweraudio.h"
-#include "llviewerparcelmedia.h"
-#include "llviewerparcelmediaautoplay.h"
-#include "llviewerparcelmgr.h"
 #include "llviewerobjectlist.h"
 #include "llvolumemessage.h"
 #include "llworld.h"
@@ -156,7 +150,7 @@ public:
     }
     bool tick()
     {
-        zdrop = NULL;
+        zdrop = nullptr;
         return TRUE;
     }
 };
@@ -299,7 +293,7 @@ public:
     {
         ztake->mRunning = TRUE;
         delete ztake;
-        ztake = NULL;
+        ztake = nullptr;
         return TRUE;
     }
 };
@@ -709,7 +703,7 @@ bool cmd_line_chat(std::string revised_text, EChatType type, bool from_gesture)
                         agent_z = 0;
                     }
                     url = llformat("secondlife:///app/teleport/%s/%d/%d/%d",region_name.c_str(),agent_x,agent_y,agent_z);
-                    LLURLDispatcher::dispatch(url, "clicked", NULL, true);
+                    LLURLDispatcher::dispatch(url, "clicked", nullptr, true);
                 }
                 return false;
             }
@@ -762,7 +756,7 @@ bool cmd_line_chat(std::string revised_text, EChatType type, bool from_gesture)
                 {
                     if (setting == "on")
                     {
-                        if (zdrop != NULL)
+                        if (zdrop != nullptr)
                         {
                             report_to_nearby_chat("Zdrop is already active.");
                         }
@@ -836,7 +830,7 @@ bool cmd_line_chat(std::string revised_text, EChatType type, bool from_gesture)
                     }
                     else if (setting == "off")
                     {
-                        if (zdrop == NULL)
+                        if (zdrop == nullptr)
                         {
                             report_to_nearby_chat("Zdrop is already deactivated.");
                         }
@@ -844,7 +838,7 @@ bool cmd_line_chat(std::string revised_text, EChatType type, bool from_gesture)
                         {
                             zdrop ->mRunning = TRUE;
                             delete zdrop;
-                            zdrop = NULL;
+                            zdrop = nullptr;
                         }
                     }
                     else
@@ -866,7 +860,7 @@ bool cmd_line_chat(std::string revised_text, EChatType type, bool from_gesture)
                 {
                     if (setting == "on")
                     {
-                        if (ztake != NULL)
+                        if (ztake != nullptr)
                         {
                             report_to_nearby_chat("Ztake is already active.");
                         }
@@ -903,7 +897,7 @@ bool cmd_line_chat(std::string revised_text, EChatType type, bool from_gesture)
                     }
                     else if (setting == "off")
                     {
-                        if (ztake == NULL)
+                        if (ztake == nullptr)
                         {
                             report_to_nearby_chat("Ztake is already deactivated.");
                         }
@@ -911,7 +905,7 @@ bool cmd_line_chat(std::string revised_text, EChatType type, bool from_gesture)
                         {
                             ztake->mRunning = TRUE;
                             delete ztake;
-                            ztake = NULL;
+                            ztake = nullptr;
                         }
                     }
                     else
@@ -983,7 +977,7 @@ bool cmd_line_chat(std::string revised_text, EChatType type, bool from_gesture)
                 {
                     if (setting == "on")
                     {
-                        if (mtake != NULL)
+                        if (mtake != nullptr)
                         {
                             report_to_nearby_chat("Mtake is already active.");
                         }
@@ -1020,7 +1014,7 @@ bool cmd_line_chat(std::string revised_text, EChatType type, bool from_gesture)
                     }
                     else if (setting == "off")
                     {
-                        if (mtake == NULL)
+                        if (mtake == nullptr)
                         {
                             report_to_nearby_chat("Mtake is already deactivated.");
                         }
@@ -1028,7 +1022,7 @@ bool cmd_line_chat(std::string revised_text, EChatType type, bool from_gesture)
                         {
                             mtake->mRunning = TRUE;
                             delete mtake;
-                            mtake = NULL;
+                            mtake = nullptr;
                         }
                     }
                     else
@@ -1061,7 +1055,7 @@ LLAvatarListItem* getAvatarListItem(const LLUUID& avatar_id)
         return panel_people->getNearbyList()->getAvatarListItem(avatar_id);
     }
 
-    return NULL;
+    return nullptr;
 }
 
 //case insensitive search for avatar in draw distance
