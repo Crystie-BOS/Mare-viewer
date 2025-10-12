@@ -32,7 +32,6 @@
 #include "llui.h"
 #include "llmath.h"     // clampf()
 #include "llregionhandle.h"
-#include "lleventflags.h"
 #include "llfloaterreg.h"
 #include "llrender.h"
 #include "lltooltip.h"
@@ -42,7 +41,8 @@
 #include "llcallingcard.h"
 #include "llcommandhandler.h"
 #include "llviewercontrol.h"
-#include "llfloatermap.h"
+#include "llworld.h"
+#include "llnetmap.h" // Needed if we use contact set coloring
 #include "llfloaterworldmap.h"
 #include "llfocusmgr.h"
 #include "lllocalcliprect.h"
@@ -52,7 +52,6 @@
 #include "llviewercamera.h"
 #include "llviewernetwork.h"
 #include "llviewertexture.h"
-#include "llviewertexturelist.h"
 #include "llviewerregion.h"
 #include "llviewerwindow.h"
 #include "lltrans.h"
@@ -79,27 +78,27 @@ constexpr F32 GODLY_TELEPORT_HEIGHT = 200.f;
 constexpr F32 BIG_DOT_RADIUS = 5.f;
 bool LLWorldMapView::sHandledLastClick = false;
 
-LLUIImagePtr LLWorldMapView::sAvatarSmallImage = NULL;
-LLUIImagePtr LLWorldMapView::sAvatarYouImage = NULL;
-LLUIImagePtr LLWorldMapView::sAvatarYouLargeImage = NULL;
-LLUIImagePtr LLWorldMapView::sAvatarLevelImage = NULL;
-LLUIImagePtr LLWorldMapView::sAvatarAboveImage = NULL;
-LLUIImagePtr LLWorldMapView::sAvatarBelowImage = NULL;
-LLUIImagePtr LLWorldMapView::sAvatarUnknownImage = NULL;
+LLUIImagePtr LLWorldMapView::sAvatarSmallImage = nullptr;
+LLUIImagePtr LLWorldMapView::sAvatarYouImage = nullptr;
+LLUIImagePtr LLWorldMapView::sAvatarYouLargeImage = nullptr;
+LLUIImagePtr LLWorldMapView::sAvatarLevelImage = nullptr;
+LLUIImagePtr LLWorldMapView::sAvatarAboveImage = nullptr;
+LLUIImagePtr LLWorldMapView::sAvatarBelowImage = nullptr;
+LLUIImagePtr LLWorldMapView::sAvatarUnknownImage = nullptr;
 
-LLUIImagePtr LLWorldMapView::sTelehubImage = NULL;
-LLUIImagePtr LLWorldMapView::sInfohubImage = NULL;
-LLUIImagePtr LLWorldMapView::sHomeImage = NULL;
-LLUIImagePtr LLWorldMapView::sEventImage = NULL;
-LLUIImagePtr LLWorldMapView::sEventMatureImage = NULL;
-LLUIImagePtr LLWorldMapView::sEventAdultImage = NULL;
+LLUIImagePtr LLWorldMapView::sTelehubImage = nullptr;
+LLUIImagePtr LLWorldMapView::sInfohubImage = nullptr;
+LLUIImagePtr LLWorldMapView::sHomeImage = nullptr;
+LLUIImagePtr LLWorldMapView::sEventImage = nullptr;
+LLUIImagePtr LLWorldMapView::sEventMatureImage = nullptr;
+LLUIImagePtr LLWorldMapView::sEventAdultImage = nullptr;
 
-LLUIImagePtr LLWorldMapView::sTrackCircleImage = NULL;
-LLUIImagePtr LLWorldMapView::sTrackArrowImage = NULL;
+LLUIImagePtr LLWorldMapView::sTrackCircleImage = nullptr;
+LLUIImagePtr LLWorldMapView::sTrackArrowImage = nullptr;
 
-LLUIImagePtr LLWorldMapView::sClassifiedsImage = NULL;
-LLUIImagePtr LLWorldMapView::sForSaleImage = NULL;
-LLUIImagePtr LLWorldMapView::sForSaleAdultImage = NULL;
+LLUIImagePtr LLWorldMapView::sClassifiedsImage = nullptr;
+LLUIImagePtr LLWorldMapView::sForSaleImage = nullptr;
+LLUIImagePtr LLWorldMapView::sForSaleAdultImage = nullptr;
 
 S32 LLWorldMapView::sTrackingArrowX = 0;
 S32 LLWorldMapView::sTrackingArrowY = 0;
@@ -118,6 +117,7 @@ const S32 DRAW_LANDFORSALE_THRESHOLD = 2;   // Max level for which we load or di
 // When on, draw an outline for each mipmap tile gotten from S3
 #define DEBUG_DRAW_TILE 0
 
+//constexpr F64 COARSEUPDATE_MAX_Z = 1020.0f;
 
 void LLWorldMapView::initClass()
 {
@@ -151,26 +151,26 @@ void LLWorldMapView::initClass()
 // static
 void LLWorldMapView::cleanupClass()
 {
-    sAvatarSmallImage = NULL;
-    sAvatarYouImage = NULL;
-    sAvatarYouLargeImage = NULL;
-    sAvatarLevelImage = NULL;
-    sAvatarAboveImage = NULL;
-    sAvatarBelowImage = NULL;
-    sAvatarUnknownImage = NULL;
+    sAvatarSmallImage = nullptr;
+    sAvatarYouImage = nullptr;
+    sAvatarYouLargeImage = nullptr;
+    sAvatarLevelImage = nullptr;
+    sAvatarAboveImage = nullptr;
+    sAvatarBelowImage = nullptr;
+    sAvatarUnknownImage = nullptr;
 
-    sTelehubImage = NULL;
-    sInfohubImage = NULL;
-    sHomeImage = NULL;
-    sEventImage = NULL;
-    sEventMatureImage = NULL;
-    sEventAdultImage = NULL;
+    sTelehubImage = nullptr;
+    sInfohubImage = nullptr;
+    sHomeImage = nullptr;
+    sEventImage = nullptr;
+    sEventMatureImage = nullptr;
+    sEventAdultImage = nullptr;
 
-    sTrackCircleImage = NULL;
-    sTrackArrowImage = NULL;
-    sClassifiedsImage = NULL;
-    sForSaleImage = NULL;
-    sForSaleAdultImage = NULL;
+    sTrackCircleImage = nullptr;
+    sTrackArrowImage = nullptr;
+    sClassifiedsImage = nullptr;
+    sForSaleImage = nullptr;
+    sForSaleAdultImage = nullptr;
 }
 
 LLWorldMapView::LLWorldMapView() :
@@ -541,7 +541,7 @@ void LLWorldMapView::draw()
                     LLFontGL::LEFT, LLFontGL::BASELINE, LLFontGL::NORMAL, LLFontGL::DROP_SHADOW,
                     S32_MAX, //max_chars
                     (S32)mMapScale, //max_pixels
-                    NULL,
+                    nullptr,
                     /*use_ellipses*/true);
 
                 if (drawAdvancedRegionInfo)
@@ -577,7 +577,7 @@ void LLWorldMapView::draw()
                         LLFontGL::LEFT, LLFontGL::BASELINE, LLFontGL::NORMAL, LLFontGL::DROP_SHADOW,
                         S32_MAX, //max_chars
                         (S32)mMapScale, //max_pixels
-                        NULL,
+                        nullptr,
                         true); //use ellipses
                 }
             }
@@ -748,6 +748,7 @@ bool LLWorldMapView::drawMipmapLevel(S32 width, S32 height, S32 level, bool load
     if (level <= 0)
         return false;
 
+    LLVector3d camera_global = gAgentCamera.getCameraPositionGlobal();
     // Count tiles hit and completed
     S32 completed_tiles = 0;
     S32 total_tiles = 0;
@@ -789,13 +790,13 @@ bool LLWorldMapView::drawMipmapLevel(S32 width, S32 height, S32 level, bool load
                     pos_global[VX] = grid_x * REGION_WIDTH_METERS;
                     pos_global[VY] = grid_y * REGION_WIDTH_METERS;
                     // Now to screen coordinates for SW corner of that tile
-                    LLVector3 pos_screen = globalPosToView (pos_global);
+                    LLVector3 pos_screen = globalPosToView (pos_global, camera_global);
                     F32 left   = pos_screen[VX];
                     F32 bottom = pos_screen[VY];
                     // Compute the NE corner coordinates of the tile now
                     pos_global[VX] += tile_width;
                     pos_global[VY] += tile_width;
-                    pos_screen = globalPosToView (pos_global);
+                    pos_screen = globalPosToView(pos_global, camera_global);
                     F32 right  = pos_screen[VX];
                     F32 top    = pos_screen[VY];
 
@@ -904,10 +905,10 @@ void LLWorldMapView::drawImage(const LLVector3d& global_pos, LLUIImagePtr image,
 void LLWorldMapView::drawImageStack(const LLVector3d& global_pos, LLUIImagePtr image, U32 count, F32 offset, const LLColor4& color)
 {
     LLVector3 pos_map = globalPosToView( global_pos );
-    for(U32 i=0; i<count; i++)
+    for (U32 i = 0; i < count; i++)
     {
-        image->draw(ll_round(pos_map.mV[VX] - image->getWidth() /2.f),
-                    ll_round(pos_map.mV[VY] - image->getHeight()/2.f + i*offset),
+        image->draw(ll_round(pos_map.mV[VX] - image->getWidth() / 2.f),
+                    ll_round(pos_map.mV[VY] - image->getHeight() / 2.f + i * offset),
                     color);
     }
 }
@@ -930,7 +931,7 @@ void LLWorldMapView::drawItems()
         //LLSimInfo* info = LLWorldMap::getInstance()->simInfoFromHandle(handle);
         LLSimInfo* info = world_map->simInfoFromHandle(handle);
         // </FS:Ansariel>
-        if ((info == NULL) || (info->isDown()))
+        if ((info == nullptr) || (info->isDown()))
         {
             continue;
         }
@@ -977,36 +978,69 @@ void LLWorldMapView::drawItems()
 void LLWorldMapView::drawAgents()
 {
     static LLUIColor map_avatar_color = LLUIColorTable::instance().getColor("MapAvatarColor", LLColor4::white);
-
     // <FS:Ansariel> Performance tweak
     LLWorldMap* world_map = LLWorldMap::getInstance();
+
+    // <KKA-1154:FM>
+    std::set<U64> region_handles;
+
+    static LLCachedControl<bool> use_accurate_avatar_pos(gSavedSettings, "KokuaAccurateAvatarPositions");
+    static LLCachedControl<bool> use_contact_set_colors(gSavedSettings, "KokuaContactSetColorInWorldMap");
+    if (use_accurate_avatar_pos)
+    {
+        uuid_vec_t avatar_ids;
+        std::vector<LLVector3d> positions;
+        LLVector3d camera_global = gAgentCamera.getCameraPositionGlobal();
+        LLVector3d pos_global;
+
+        LLWorld::getInstance()->getAvatars(&avatar_ids, &positions, &region_handles, camera_global);
+
+        // Draw avatars
+        for (U32 i = 0; i < avatar_ids.size(); i++)
+        {
+            LLUUID uuid = avatar_ids[i];
+            // Skip self, we'll draw it elsewhere
+            if (uuid == gAgent.getID())
+            {
+                continue;
+            }
+            drawImage(positions[i], sAvatarSmallImage, LLNetMap::getAvatarColor(uuid, use_contact_set_colors));
+        }
+    }
+    // </KKA-1154 : FM>
 
     for (handle_list_t::iterator iter = mVisibleRegions.begin(); iter != mVisibleRegions.end(); ++iter)
     {
         U64 handle = *iter;
-        // <FS:Ansariel> Performance tweak
-        //LLSimInfo* siminfo = LLWorldMap::getInstance()->simInfoFromHandle(handle);
-        LLSimInfo* siminfo = world_map->simInfoFromHandle(handle);
-        // </FS:Ansariel>
-        if ((siminfo == NULL) || (siminfo->isDown()))
+        // <KKA-1154 : FM>
+        if (!use_accurate_avatar_pos || region_handles.find(handle) == region_handles.end())
+        // </KKA-1154 : FM>
         {
-            continue;
-        }
-        // @shownearby - skip for the agent's region
-        LLViewerRegion *region = gAgent.getRegion();
-        if (region && region->getHandle() == handle && gRRenabled && gAgent.mRRInterface.mContainsShowNearby)
-        {
-            continue;
-        }
-        LLSimInfo::item_info_list_t::const_iterator it = siminfo->getAgentLocation().begin();
-        while (it != siminfo->getAgentLocation().end())
-        {
-            // Show Individual agents (or little stacks where real agents are)
-
-            // Here's how we'd choose the color if info.mID were available but it's not being sent:
-            // LLColor4 color = (agent_count == 1 && is_agent_friend(info.mID)) ? friend_color : avatar_color;
-            drawImageStack(it->getGlobalPosition(), sAvatarSmallImage, it->getCount(), 3.f, map_avatar_color);
-            ++it;
+            // <FS:Ansariel> Performance tweak
+            // LLSimInfo* siminfo = LLWorldMap::getInstance()->simInfoFromHandle(handle);
+            LLSimInfo* siminfo = world_map->simInfoFromHandle(handle);
+            // </FS:Ansariel>
+            if ((siminfo == nullptr) || (siminfo->isDown()))
+            {
+                continue;
+            }
+	        // @shownearby - skip for the agent's region
+	        LLViewerRegion *region = gAgent.getRegion();
+	        if (region && region->getHandle() == handle && gRRenabled && gAgent.mRRInterface.mContainsShowNearby)
+	        {
+	            continue;
+	        }
+            LLSimInfo::item_info_list_t::const_iterator it = siminfo->getAgentLocation().begin();
+            while (it != siminfo->getAgentLocation().end())
+            {
+                // Show Individual agents (or little stacks where real agents are)
+                S32 agent_count = it->getCount();
+                // Here's how we'd choose the color if info.mID were available but it's not being sent:
+                // LLColor4 color = (agent_count == 1 && LLAvatarTracker::instance().isBuddy(ii->getUUID()))
+                //                                       ? map_friend_color : map_avatar_color;
+                drawImageStack(it->getGlobalPosition(), sAvatarSmallImage, agent_count, 3.f, map_avatar_color);
+                ++it;
+            }
         }
     }
 }
@@ -1074,16 +1108,18 @@ void LLWorldMapView::drawFrustum()
 }
 
 
-LLVector3 LLWorldMapView::globalPosToView( const LLVector3d& global_pos )
+LLVector3 LLWorldMapView::globalPosToView(const LLVector3d& global_pos)
 {
-    LLVector3d relative_pos_global = global_pos - gAgentCamera.getCameraPositionGlobal();
-    LLVector3 pos_local;
-    pos_local.setVec(relative_pos_global);  // convert to floats from doubles
+    return globalPosToView(global_pos, gAgentCamera.getCameraPositionGlobal());
+}
 
+LLVector3 LLWorldMapView::globalPosToView(const LLVector3d& global_pos, const LLVector3d& camera_pos)
+{
+    // convert to floats from doubles
+    LLVector3 pos_local(global_pos - camera_pos);
     pos_local.mV[VX] *= mMapRatio;
     pos_local.mV[VY] *= mMapRatio;
     // leave Z component in meters
-
 
     pos_local.mV[VX] += getRect().getWidth() / 2 + mPanX;
     pos_local.mV[VY] += getRect().getHeight() / 2 + mPanY;
@@ -1641,7 +1677,7 @@ void LLWorldMapView::handleClick(S32 x, S32 y, MASK mask,
             {
                 U64 handle = *iter;
                 LLSimInfo* siminfo = LLWorldMap::getInstance()->simInfoFromHandle(handle);
-                if ((siminfo == NULL) || (siminfo->isDown()))
+                if ((siminfo == nullptr) || (siminfo->isDown()))
                 {
                     continue;
                 }
@@ -1780,7 +1816,7 @@ bool LLWorldMapView::handleMouseUp( S32 x, S32 y, MASK mask )
             handleClick(x, y, mask, &hit_type, &id);
         }
         gViewerWindow->showCursor();
-        gFocusMgr.setMouseCapture( NULL );
+        gFocusMgr.setMouseCapture(nullptr);
         return true;
     }
     return false;
@@ -1850,7 +1886,7 @@ bool LLWorldMapView::handleHover( S32 x, S32 y, MASK mask )
     {
         // While we're waiting for data from the tracker, we're busy. JC
         LLVector3d pos_global = LLTracker::getTrackedPositionGlobal();
-        if (LLTracker::isTracking(NULL)
+        if (LLTracker::isTracking(nullptr)
             && pos_global.isExactlyZero())
         {
             gViewerWindow->setCursor( UI_CURSOR_WAIT );
@@ -1889,7 +1925,7 @@ bool LLWorldMapView::handleDoubleClick( S32 x, S32 y, MASK mask )
                 // Invoke the event details floater if someone is clicking on an event.
                 LLSD params(LLSD::emptyArray());
                 params.append(event_id);
-                LLCommandDispatcher::dispatch("event", params, LLSD(), LLGridManager::getInstance()->getGrid(), NULL, LLCommandHandler::NAV_TYPE_CLICKED, true);
+                LLCommandDispatcher::dispatch("event", params, LLSD(), LLGridManager::getInstance()->getGrid(), nullptr, LLCommandHandler::NAV_TYPE_CLICKED, true);
                 break;
             }
         case MAP_ITEM_LAND_FOR_SALE:

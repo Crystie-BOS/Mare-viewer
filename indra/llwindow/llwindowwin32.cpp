@@ -158,6 +158,9 @@ typedef enum PREFERRED_APP_MODE
 
 typedef PREFERRED_APP_MODE(WINAPI* fnSetPreferredAppMode)(PREFERRED_APP_MODE mode);
 
+#include "llcontrol.h"
+extern LLControlGroup gSavedSettings; // read only
+
 //
 // LLWindowWin32
 //
@@ -5024,14 +5027,19 @@ void LLWindowWin32::updateWindowRect()
 bool LLWindowWin32::isSystemAppDarkMode()
 {
     HKEY  hKey;
-    DWORD dwValue = 1; // Default to light theme
-    DWORD dwSize  = sizeof(DWORD);
+    // 0 = Use System, 1 = Light Mode, 2 = Dark Mode
+    DWORD dwValue = gSavedSettings.getU32("KokuaWindowsDarkMode");
+    if (dwValue)
+    {
+        return dwValue > 1;
+    }
 
     // Check registry for system theme preference
     LSTATUS ret_code =
         RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", 0, KEY_READ, &hKey);
     if (ERROR_SUCCESS == ret_code)
     {
+        DWORD dwSize = sizeof(DWORD);
         if (RegQueryValueExW(hKey, L"AppsUseLightTheme", NULL, NULL, (LPBYTE)&dwValue, &dwSize) != ERROR_SUCCESS)
         {
             // If AppsUseLightTheme is not found, check SystemUsesLightTheme

@@ -112,6 +112,39 @@
       <key>Value</key>
       <integer>0</integer>
     </map>
+    <key>KokuaAccurateAvatarPositions</key>
+    <map>
+      <key>Comment</key>
+      <string>Show more accurate avatar positions in the World map</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
+    <key>KokuaContactSetColorInWorldMap</key>
+    <map>
+      <key>Comment</key>
+      <string>Show avatars in the World Map with specific colors</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>KokuaContactSetColorInMiniMap</key>
+    <map>
+      <key>Comment</key>
+      <string>Show avatars in the Minimap with specific colors</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
     <key>KokuaIgnoreNonFriendAdHocGroupIM</key>
     <map>
       <key>Comment</key>
@@ -21907,6 +21940,17 @@
       <string>Boolean</string>
       <key>Value</key>
       <integer>0</integer>
+    </map>
+    <key>KokuaWindowsDarkMode</key>
+    <map>
+      <key>Comment</key>
+      <string>Dark Mode for window title bar. 0 = Use System, 1 = Light Mode, 2 = Dark Mode</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>U32</string>
+      <key>Value</key>
+      <integer>2</integer>
     </map>
   <key>FSAdvancedWorldmapRegionInfo</key>
   <map>

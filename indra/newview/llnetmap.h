@@ -109,7 +109,7 @@ public:
     static void     clearAvatarMarkColor(const LLUUID& avatar_id);
     static void     clearAvatarMarkColors(const uuid_vec_t& avatar_ids);
     static void     clearAvatarMarkColors();
-    static LLColor4 getAvatarColor(const LLUUID& avatar_id);
+    static LLColor4 getAvatarColor(const LLUUID& avatar_id, bool useContactSet = true);
     // </FS:Ansariel>
 private:
     const LLVector3d& getObjectImageCenterGlobal()  { return mObjectImageCenterGlobal; }

@@ -30,13 +30,13 @@
 #include "llrender.h"
 
 #include "indra_constants.h"
-#include "llstl.h"
+//#include "llstl.h"
 
 #include "llagent.h"
 #include "llagentcamera.h"
 #include "llviewercontrol.h"
-#include "lldrawpool.h"
-#include "llglheaders.h"
+//#include "lldrawpool.h"
+//#include "llglheaders.h"
 #include "llhttpnode.h"
 #include "llregionhandle.h"
 #include "llsky.h"
@@ -44,29 +44,29 @@
 #include "lltrans.h"
 #include "llviewercamera.h"
 #include "llviewertexture.h"
-#include "llviewertexturelist.h"
-#include "llviewernetwork.h"
+//#include "llviewertexturelist.h"
+//#include "llviewernetwork.h"
 #include "llviewerobjectlist.h"
 #include "llviewerparcelmgr.h" // for KKA-967 limiting to same region or same parcel
-#include "llviewerparceloverlay.h"
+//#include "llviewerparceloverlay.h"
 #include "llviewerregion.h"
 #include "llviewerstats.h"
-#include "llvlcomposition.h"
+//#include "llvlcomposition.h"
 #include "llvoavatar.h"
-#include "llvocache.h"
+//#include "llvocache.h"
 #include "llvowater.h"
 #include "message.h"
 #include "pipeline.h"
 #include "llappviewer.h"        // for do_disconnect()
 #include "llscenemonitor.h"
-#include "llfloateradvancedbuildoptions.h"
+//#include "llfloateradvancedbuildoptions.h"
 #include "llviewerobject.h"
-#include "llfloatertools.h"
-#include "llfloaterreg.h"
-#include <deque>
-#include <queue>
-#include <map>
-#include <cstring>
+//#include "llfloatertools.h"
+//#include "llfloaterreg.h"
+//#include <deque>
+//#include <queue>
+//#include <map>
+//#include <cstring>
 
 
 //
@@ -102,7 +102,7 @@ LLWorld::LLWorld() :
 {
     for (S32 i = 0; i < EDGE_WATER_OBJECTS_COUNT; i++)
     {
-        mEdgeWaterObjects[i] = NULL;
+        mEdgeWaterObjects[i] = nullptr;
     }
 
     LLPointer<LLImageRaw> raw = new LLImageRaw(1,1,4);
@@ -133,10 +133,10 @@ void LLWorld::resetClass()
 
     LLViewerPartSim::getInstance()->destroyClass();
 
-    mDefaultWaterTexturep = NULL ;
+    mDefaultWaterTexturep = nullptr ;
     for (S32 i = 0; i < EDGE_WATER_OBJECTS_COUNT; i++)
     {
-        mEdgeWaterObjects[i] = NULL;
+        mEdgeWaterObjects[i] = nullptr;
     }
 
     //make all visible drawbles invisible.
@@ -340,7 +340,7 @@ LLViewerRegion* LLWorld::getRegion(const LLHost &host)
             return regionp;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 LLViewerRegion* LLWorld::getRegionFromPosAgent(const LLVector3 &pos)
@@ -359,7 +359,7 @@ LLViewerRegion* LLWorld::getRegionFromPosGlobal(const LLVector3d &pos)
             return regionp;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 
@@ -443,7 +443,7 @@ LLViewerRegion* LLWorld::getRegionFromHandle(const U64 &handle)
             return regionp;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 LLViewerRegion* LLWorld::getRegionFromID(const LLUUID& region_id)
@@ -457,7 +457,7 @@ LLViewerRegion* LLWorld::getRegionFromID(const LLUUID& region_id)
             return regionp;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void LLWorld::updateAgentOffset(const LLVector3d &offset_global)
@@ -508,7 +508,7 @@ LLViewerRegion* LLWorld::resolveRegionGlobal(LLVector3 &pos_region, const LLVect
         return regionp;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 
@@ -523,7 +523,7 @@ LLViewerRegion* LLWorld::resolveRegionAgent(LLVector3 &pos_region, const LLVecto
         return regionp;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 
@@ -559,7 +559,7 @@ F32 LLWorld::resolveStepHeightGlobal(const LLVOAvatar* avatarp, const LLVector3d
     // initialize return value to null
     if (viewerObjectPtr)
     {
-        *viewerObjectPtr = NULL;
+        *viewerObjectPtr = nullptr;
     }
 
     LLViewerRegion *regionp = getRegionFromPosGlobal(point_a);
@@ -622,7 +622,7 @@ LLSurfacePatch * LLWorld::resolveLandPatchGlobal(const LLVector3d &pos_global)
     LLViewerRegion *regionp = getRegionFromPosGlobal(pos_global);
     if (!regionp)
     {
-        return NULL;
+        return nullptr;
     }
 
     return regionp->getLand().resolvePatchGlobal(pos_global);
@@ -847,7 +847,7 @@ void LLWorld::printPacketsLost()
     LL_INFOS() << "Simulators:" << LL_ENDL;
     LL_INFOS() << "----------" << LL_ENDL;
 
-    LLCircuitData *cdp = NULL;
+    LLCircuitData *cdp = nullptr;
     for (region_list_t::iterator iter = mActiveRegionList.begin();
          iter != mActiveRegionList.end(); ++iter)
     {
@@ -924,7 +924,7 @@ void LLWorld::clearEdgeWaterObjects()
     for (S32 i = 0; i < EDGE_WATER_OBJECTS_COUNT; i++)
     {
         gObjectList.killObject(mEdgeWaterObjects[i]);
-        mEdgeWaterObjects[i] = NULL;
+        mEdgeWaterObjects[i] = nullptr;
     }
 }
 
@@ -1338,26 +1338,43 @@ static LLVector3d unpackLocalToGlobalPosition(U32 compact_local, const LLVector3
     return region_origin + pos_local;
 }
 
-void LLWorld::getAvatars(uuid_vec_t* avatar_ids, std::vector<LLVector3d>* positions, const LLVector3d& relative_to, F32 radius, EGetAvatarLimit avatar_limit) const
+void LLWorld::getAvatars(uuid_vec_t* avatar_ids, std::vector<LLVector3d>* positions,
+                         const LLVector3d& relative_to, F32 radius,
+                         EGetAvatarLimit avatar_limit) const
+{
+    getAvatars(avatar_ids, positions, nullptr, relative_to, radius, avatar_limit);
+}
+
+void LLWorld::getAvatars(uuid_vec_t* avatar_ids, std::vector<LLVector3d>* positions,
+                         std::set<U64>* regions, const LLVector3d& relative_to,
+                         F32 radius, EGetAvatarLimit avatar_limit) const
 {
     F32 radius_squared = radius * radius;
     // KKA-967 set up for tests
     LLViewerParcelMgr& parcelmgr = LLViewerParcelMgr::instance();
     LLViewerRegion* ownRegion = gAgent.getRegion();
     LLUUID regionSelf;
+
     if (ownRegion)
     {
         regionSelf = ownRegion->getRegionID();
     }
     // /KKA-967
-    if(avatar_ids != NULL)
+    if(avatar_ids != nullptr)
     {
         avatar_ids->clear();
     }
-    if(positions != NULL)
+    if (positions != nullptr)
     {
         positions->clear();
     }
+    // KKA-1154
+    if (regions != nullptr)
+    {
+        regions->clear();
+    }
+    // /KKA-1154
+
     // get the list of avatars from the character list first, so distances are correct
     // when agent is above 1020m and other avatars are nearby
     for (LLCharacter* character : LLCharacter::sInstances)
@@ -1367,78 +1384,99 @@ void LLWorld::getAvatars(uuid_vec_t* avatar_ids, std::vector<LLVector3d>* positi
         {
             LLVector3d pos_global = avatar->getPositionGlobal();
             LLUUID uuid = avatar->getID();
-
-            // KKA-967 is this avatar one to include?
-            LLViewerRegion* region = avatar->getRegion();
-            LLUUID avRegion;
-            if (region)
+            if (!uuid.isNull() && (radius == FLT_MAX || dist_vec_squared(pos_global, relative_to) <= radius_squared))
             {
-                avRegion = region->getRegionID();
-            }
-            bool isInSameRegion = (avRegion == regionSelf);
-            bool isOnSameParcel = parcelmgr.inAgentParcel(pos_global);
+                LLViewerRegion* region = avatar->getRegion();
 
-            bool include = (avatar_limit == AVATAR_LIMIT_NONE) ||
-                (avatar_limit == AVATAR_LIMIT_REGION && isInSameRegion) ||
-                (avatar_limit == AVATAR_LIMIT_PARCEL && isOnSameParcel);
-            // /KKA-967
-
-            if (!uuid.isNull()
-                // KKA-967 include our filter
-                && include
+                // KKA-967 is this avatar one to include?
+                bool include = ((avatar_limit == AVATAR_LIMIT_NONE) ||
+                                (avatar_limit == AVATAR_LIMIT_REGION && region && region->getRegionID() == regionSelf) ||
+                                (avatar_limit == AVATAR_LIMIT_PARCEL && parcelmgr.inAgentParcel(pos_global)));
+                if (include)
                 // /KKA-967
-                && dist_vec_squared(pos_global, relative_to) <= radius_squared)
-            {
-                if (positions != NULL)
                 {
-                    positions->push_back(pos_global);
-                }
-                if (avatar_ids != NULL)
-                {
-                    avatar_ids->push_back(uuid);
+                    if (positions != nullptr)
+                    {
+                        positions->push_back(pos_global);
+                    }
+                    if (avatar_ids != nullptr)
+                    {
+                        avatar_ids->push_back(uuid);
+                    }
+                    // <KKA-1154: FM>
+                    if (regions != nullptr && region)
+                    {
+                        regions->emplace(region->getHandle());
+                    }
+                    // </KKA-1154: FM>
                 }
             }
         }
     }
 
-    // region avatars added for situations where radius is greater than RenderFarClip
-    for (const LLViewerRegion* regionp : LLWorld::getInstance()->getRegionList())
+    // We check in the most inner condition if an avatar is already present in
+    // the avatar_ids list but can only do so if the list is valid. No need to
+    // do this check on every most inner iteration
+    if (avatar_ids != nullptr)
     {
-        // KKA-967 is this avatar one to include?
-        LLUUID avRegion = regionp->getRegionID();
-        bool isInSameRegion = (avRegion == regionSelf);
-        bool isOnSameParcel = false;
-        // / KKA-967
-
-        const LLVector3d& origin_global = regionp->getOriginGlobal();
-        auto count = regionp->mMapAvatars.size();
-        for (size_t i = 0; i < count; i++)
+        // region avatars added for situations where radius is greater than RenderFarClip
+        bool region_visited = false;
+        for (const LLViewerRegion* regionp : LLWorld::getInstance()->getRegionList())
         {
-            LLVector3d pos_global = unpackLocalToGlobalPosition(regionp->mMapAvatars.at(i), origin_global);
-
             // KKA-967 is this avatar one to include?
-            if (isInSameRegion)
+            if (avatar_limit != AVATAR_LIMIT_NONE)
             {
-                isOnSameParcel = parcelmgr.inAgentParcel(pos_global);
-            }
-
-            bool include = (avatar_limit == AVATAR_LIMIT_NONE) ||
-                (avatar_limit == AVATAR_LIMIT_REGION && isInSameRegion) ||
-                (avatar_limit == AVATAR_LIMIT_PARCEL && isOnSameParcel);
-
-            // if(dist_vec_squared(pos_global, relative_to) <= radius_squared)
-            if (include && dist_vec_squared(pos_global, relative_to) <= radius_squared)
-            // /KKA-967
-            {
-                LLUUID uuid = regionp->mMapAvatarIDs.at(i);
-                // if this avatar doesn't already exist in the list, add it
-                if(uuid.notNull() && avatar_ids != NULL && std::find(avatar_ids->begin(), avatar_ids->end(), uuid) == avatar_ids->end())
+                // If we only list avatars who are either in our region or same
+                // parcel, there is no sense in executing the rest of this if this
+                // is not our current region
+                if (regionSelf != regionp->getRegionID())
                 {
-                    if (positions != NULL)
+                    if (region_visited)
+                    {
+                        // if we already visited our region, we are done
+                        return;
+                    }
+                    else
+                    {
+                        // otherwise skip to the next region
+                        continue;
+                    }
+                }
+                else
+                {
+                    // The loop is currently processing our region
+                    region_visited = true;
+                }
+            }
+            // /KKA-967
+
+            const LLVector3d& origin_global = regionp->getOriginGlobal();
+            auto count = regionp->mMapAvatars.size();
+            // CRASH_ALERT: What is the chance that mMapAvatars and mMapAvatarIDs is changing in the background while we operate on this???
+            for (size_t i = 0; i < count; i++)
+            {
+                LLVector3d pos_global = unpackLocalToGlobalPosition(regionp->mMapAvatars.at(i), origin_global);
+                LLUUID uuid = regionp->mMapAvatarIDs.at(i);
+                if (uuid.notNull() && (radius == FLT_MAX || dist_vec_squared(pos_global, relative_to) <= radius_squared) &&
+                    // KKA-967 is this avatar one to include?
+                    // if we arrived here, we only have to check if the request is for AVATAR_LIMIT_PARCEL limits
+                    (avatar_limit != AVATAR_LIMIT_PARCEL || parcelmgr.inAgentParcel(pos_global)) &&
+                    // /KKA-967
+                    // if this avatar doesn't already exist in the list, add it
+                    (std::find(avatar_ids->begin(), avatar_ids->end(), uuid) == avatar_ids->end()))
+                {
+                    if (positions != nullptr)
                     {
                         positions->push_back(pos_global);
                     }
                     avatar_ids->push_back(uuid);
+
+                    // <KKA-1154: FM>
+                    if (regions != nullptr)
+                    {
+                        regions->emplace(regionp->getHandle());
+                    }
+                    // </KKA-1154: FM>
                 }
             }
         }
