@@ -16,11 +16,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>cb537fa9ea26aacbeb0b2756bd4c3f6c82cb0b4b</string>
+              <string>35ada1add45d2a4b1d41434db153e539eb6d8f50</string>
               <key>hash_algorithm</key>
               <string>sha1</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-sdl/downloads/SDL-1.2.15-linux64-242652357.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-sdl/downloads/SDL-1.2.15-linux64-251012092810.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -680,11 +680,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>fb75f25bd75abbd4a1ecf57d219ccbcd133c4aec</string>
+              <string>7b6805d5f9672be634aa688380bd49e1cfa56870</string>
               <key>hash_algorithm</key>
               <string>sha1</string>
               <key>url</key>
-	      <string>https://bitbucket.org/kokua/3p-fontconfig/downloads/fontconfig-2.12.93-linux64-242660048.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-fontconfig/downloads/fontconfig-2.12.93-linux64-251012110805.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -1144,11 +1144,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>a2c7779a9703234d91394f8edcfef1f83689ddb0</string>
+              <string>26fe48324a0b7a4714e0e083799640fc1ca34d27</string>
               <key>hash_algorithm</key>
               <string>sha1</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-kdu8/downloads/kdu-8.2.1.242980512-linux64-242980512.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-kdu8/downloads/kdu-8.4.1.252851354-linux64-252851354.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -2381,9 +2381,11 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>92b0ae08832bd0e99c34ef8f3e6346ad</string>
+              <string>ddfb7c30d9756915e8b26f44e2ee3a69ee87fb9a</string>
+              <key>hash_algorithm</key>
+              <string>sha1</string>
               <key>url</key>
-              <string>http://automated-builds-secondlife-com.s3.amazonaws.com/ct2/613/1289/slvoice-3.2.0002.10426.500605-linux64-500605.tar.bz2</string>
+              <string>https://automated-builds-secondlife-com.s3.amazonaws.com/gh/secondlife/3p-slvoice/slvoice-4.10.0000.32327.5fc3fe7c.5942f08-windows64-5942f08.tar.zst</string>
             </map>
             <key>name</key>
             <string>linux64</string>
