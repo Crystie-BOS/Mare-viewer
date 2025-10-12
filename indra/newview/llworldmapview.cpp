@@ -973,14 +973,14 @@ void LLWorldMapView::drawItems()
 void LLWorldMapView::drawAgents()
 {
     static LLUIColor map_avatar_color = LLUIColorTable::instance().getColor("MapAvatarColor", LLColor4::white);
-    static LLUIColor map_friend_color = LLUIColorTable::instance().getColor("MapAvatarFriendColor", LLColor4::white);
     // <FS:Ansariel> Performance tweak
     LLWorldMap* world_map = LLWorldMap::getInstance();
 
     // <KKA-1154:FM>
     std::set<U64> region_handles;
 
-    static LLCachedControl<bool> use_accurate_avatar_pos(gSavedSettings, "KokuaAccurateAvatarPositions", true);
+    static LLCachedControl<bool> use_accurate_avatar_pos(gSavedSettings, "KokuaAccurateAvatarPositions");
+    static LLCachedControl<bool> use_contact_set_colors(gSavedSettings, "KokuaContactSetColorInWorldMap");
     if (use_accurate_avatar_pos)
     {
         uuid_vec_t avatar_ids;
@@ -996,32 +996,10 @@ void LLWorldMapView::drawAgents()
             LLUUID uuid = avatar_ids[i];
             // Skip self, we'll draw it elsewhere
             if (uuid == gAgent.getID())
+            {
                 continue;
-
-#if RLVa
-            // [RLVa:KB] <FM> Taken from the commented section in LLNetMap
-            if (!RlvActions::canShowName(RlvActions::SNC_DEFAULT, uuid))
-            {
-                drawImage(pos_global, sAvatarSmallImage, map_avatar_color);
             }
-            else
-#endif
-            {
-            #if PROPOSAL_USE_COLOR_SETS
-                // Do we want to adopt the colors from the minimap ?
-                // Then we can proably forget the RLV part above as
-                // the color_set manager takes care of that
-                LLColor4 color = LLNetMap::getAvatarColor(uuid);
-            #else
-                LLColor4 color = map_avatar_color;
-                // Just determine buddy status and use that color ?
-                if (LLAvatarTracker::instance().isBuddy(uuid))
-                {
-                    color = map_friend_color;
-                }
-            #endif
-                drawImage(positions[i], sAvatarSmallImage, color);
-            }
+            drawImage(positions[i], sAvatarSmallImage, LLNetMap::getAvatarColor(uuid, use_contact_set_colors));
         }
     }
     // </KKA-1154 : FM>
@@ -1047,7 +1025,8 @@ void LLWorldMapView::drawAgents()
                 // Show Individual agents (or little stacks where real agents are)
                 S32 agent_count = it->getCount();
                 // Here's how we'd choose the color if info.mID were available but it's not being sent:
-                // LLColor4 color = (agent_count == 1 && LLAvatarTracker::instance().isBuddy(ii->getUUID())) ? map_friend_color : map_avatar_color;
+                // LLColor4 color = (agent_count == 1 && LLAvatarTracker::instance().isBuddy(ii->getUUID()))
+                //                                       ? map_friend_color : map_avatar_color;
                 drawImageStack(it->getGlobalPosition(), sAvatarSmallImage, agent_count, 3.f, map_avatar_color);
                 ++it;
             }

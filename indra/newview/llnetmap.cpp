@@ -229,10 +229,7 @@ void LLNetMap::draw()
     }
     LL_PROFILE_ZONE_SCOPED;
     static LLFrameTimer map_timer;
-    //static LLUIColor map_avatar_color = LLUIColorTable::instance().getColor("MapAvatarColor", LLColor4::white);
-    //static LLUIColor map_avatar_friend_color = LLUIColorTable::instance().getColor("MapAvatarFriendColor", LLColor4::white);
     static LLUIColor map_track_color = LLUIColorTable::instance().getColor("MapTrackColor", LLColor4::white);
-    //static LLUIColor map_track_disabled_color = LLUIColorTable::instance().getColor("MapTrackDisabledColor", LLColor4::white);
     static LLUIColor map_frustum_color = LLUIColorTable::instance().getColor("MapFrustumColor", LLColor4::white);
     static LLUIColor map_parcel_outline_color = LLUIColorTable::instance().getColor("MapParcelOutlineColor", LLColor4(LLColor3(LLColor4::yellow), 0.5f));
     static LLUIColor map_whisper_ring_color = LLUIColorTable::instance().getColor("MapWhisperRingColor", LLColor4::blue); // <FS:LO> FIRE-17460 Add Whisper Chat Ring to Minimap
@@ -518,6 +515,8 @@ void LLNetMap::draw()
         std::vector<LLVector3d> positions;
         bool unknown_relative_z;
 
+        static LLCachedControl<bool> use_contact_set_colors(gSavedSettings, "KokuaContactSetColorInMiniMap");
+
         LLWorld::getInstance()->getAvatars(&avatar_ids, &positions, gAgentCamera.getCameraPositionGlobal());
 
         // Draw avatars
@@ -561,23 +560,14 @@ void LLNetMap::draw()
                 }
             }
             // </FS:Ansariel>
-
-            LLColor4 color = getAvatarColor(uuid);  // <FS:CR>
-
-// [RLVa:KB] - Checked: 2010-04-19 (RLVa-1.2.0f) | Modified: RLVa-1.2.0f | FS-Specific
-//          LLWorldMapView::drawAvatar(
-//              pos_map.mV[VX], pos_map.mV[VY],
-//              (RlvActions::canShowName(RlvActions::SNC_DEFAULT, uuid)) ? color : map_avatar_color.get(),
-//              pos_map.mV[VZ], mDotRadius,
-//              unknown_relative_z);
-// [/RLVa:KB]
+            LLColor4 color = getAvatarColor(uuid, use_contact_set_colors);
             LLWorldMapView::drawAvatar(
                 pos_map.mV[VX], pos_map.mV[VY],
                 color,
                 pos_map.mV[VZ], mDotRadius,
                 unknown_relative_z);
 
-            if(uuid.notNull())
+            if (uuid.notNull())
             {
                 bool selected = false;
                 uuid_vec_t::iterator sel_iter = gmSelected.begin();
@@ -589,9 +579,9 @@ void LLNetMap::draw()
                         break;
                     }
                 }
-                if(selected)
+                if (selected)
                 {
-                    if( (pos_map.mV[VX] < 0) ||
+                    if ((pos_map.mV[VX] < 0) ||
                         (pos_map.mV[VY] < 0) ||
                         (pos_map.mV[VX] >= getRect().getWidth()) ||
                         (pos_map.mV[VY] >= getRect().getHeight()) )
@@ -599,7 +589,8 @@ void LLNetMap::draw()
                         S32 x = ll_round( pos_map.mV[VX] );
                         S32 y = ll_round( pos_map.mV[VY] );
                         LLWorldMapView::drawTrackingCircle( getRect(), x, y, color, 1, 10);
-                    } else
+                    }
+                    else
                     {
                         LLWorldMapView::drawTrackingDot(pos_map.mV[VX],pos_map.mV[VY],color,0.f);
                     }
@@ -1691,29 +1682,31 @@ void LLNetMap::clearAvatarMarkColors()
 }
 
 // static
-LLColor4 LLNetMap::getAvatarColor(const LLUUID& avatar_id)
+LLColor4 LLNetMap::getAvatarColor(const LLUUID& avatar_id, bool useContactSet)
 {
     static LLUIColor map_avatar_color = LLUIColorTable::instance().getColor("MapAvatarColor", LLColor4::white);
     LLColor4 color = map_avatar_color;
 
-    LGGContactSets& cs_instance = LGGContactSets::instance();
-
-    // Color "special" avatars with special colors (Friends, muted, Lindens, etc)
-    color = cs_instance.colorize(avatar_id, color, LGG_CS_MINIMAP);
-
-    // Color based on contact sets prefs
-    if (cs_instance.hasFriendColorThatShouldShow(avatar_id, LGG_CS_MINIMAP))
+    if (useContactSet)
     {
-        color = cs_instance.getFriendColor(avatar_id);
-    }
+        LGGContactSets& cs_instance = LGGContactSets::instance();
 
-    // Mark Avatars with special colors
-    avatar_marks_map_t::iterator found = sAvatarMarksMap.find(avatar_id);
-    if (found != sAvatarMarksMap.end())
-    {
-        color = found->second;
-    }
+        // Color "special" avatars with special colors (Friends, muted, Lindens, etc)
+        color = cs_instance.colorize(avatar_id, color, LGG_CS_MINIMAP);
 
+        // Color based on contact sets prefs
+        if (cs_instance.hasFriendColorThatShouldShow(avatar_id, LGG_CS_MINIMAP))
+        {
+            color = cs_instance.getFriendColor(avatar_id);
+        }
+
+        // Mark Avatars with special colors
+        avatar_marks_map_t::iterator found = sAvatarMarksMap.find(avatar_id);
+        if (found != sAvatarMarksMap.end())
+        {
+            color = found->second;
+        }
+    }
     return color;
 }
 //</FS:Ansariel>
