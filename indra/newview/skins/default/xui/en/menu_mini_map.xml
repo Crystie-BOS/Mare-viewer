@@ -266,7 +266,7 @@
     </menu_item_check>
     <menu_item_check
      label="Zoom default"
-     name="Zoom far">
+     name="Zoom default">
         <menu_item_check.on_check
          function="Minimap.Zoom.Check"
          parameter="default" />
