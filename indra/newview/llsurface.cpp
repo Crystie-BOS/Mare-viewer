@@ -49,10 +49,12 @@
 extern LLPipeline gPipeline;
 extern bool gShiftFrame;
 
-#define MIN_TEXTURE_REQUEST_INTERVAL 1.f
+namespace
+{
+    static constexpr float MIN_TEXTURE_REQUEST_INTERVAL = 5.0f;
+}
 
 LLColor4U MAX_WATER_COLOR(0, 48, 96, 240);
-
 
 S32 LLSurface::sTextureSize = 256;
 
@@ -194,7 +196,7 @@ void LLSurface::create(const S32 grids_per_edge,
 
 LLViewerTexture* LLSurface::getSTexture()
 {
-    if (mSTexturep.isNull() || !mSTexturep->hasGLTexture())
+    if (mSTexturep.notNull() && !mSTexturep->hasGLTexture())
     {
         createSTexture();
     }
@@ -215,7 +217,8 @@ void LLSurface::createSTexture()
     }
     else
     {
-        // What are we doing here?
+        // Unexpected: createSTexture() called when a valid texture already exists.
+        // This may indicate a logic error in the caller, as textures should not be recreated unnecessarily.
         LL_WARNS() << "Called LLSurface::createSTexture() while we already have a valid texture!" << LL_ENDL;
         return;
     }
