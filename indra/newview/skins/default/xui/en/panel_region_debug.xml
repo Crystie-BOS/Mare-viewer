@@ -188,7 +188,7 @@
      height="20"
      decimal_digits="0"
      increment="1" 
-     initial_val="300" 
+     initial_value="300" 
      min_val="15"
      max_val="3600"
      mouse_opaque="true"

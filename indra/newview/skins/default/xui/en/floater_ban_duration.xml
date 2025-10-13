@@ -62,7 +62,7 @@
     increment="1"
     max_val="8766"
     min_val="1"
-    initial_val="1"
+    initial_value="1"
     name="ban_hours"
     top_delta="50"
     left="40"
