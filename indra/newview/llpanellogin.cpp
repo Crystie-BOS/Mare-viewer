@@ -810,9 +810,12 @@ void LLPanelLogin::onUpdateStartSLURL(const LLSLURL& new_start_slurl)
     case LLSLURL::HOME_LOCATION:
         //location_combo->setCurrentByIndex(0); // home location
         break;
+    case LLSLURL::LAST_LOCATION:
+        // location_combo->setCurrentByIndex(0); // home location
+        break;
 
     default:
-        LL_WARNS("AppInit")<<"invalid login slurl, using home"<<LL_ENDL;
+        LL_WARNS("AppInit")<<"invalid login slurl " << new_start_slurl.asString() << ", using home"<<LL_ENDL;
         //location_combo->setCurrentByIndex(0); // home location
         break;
     }
