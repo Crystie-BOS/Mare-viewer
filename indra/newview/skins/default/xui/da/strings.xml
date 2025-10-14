@@ -132,8 +132,8 @@ http://secondlife.com/viewer-access-faq
 	</string>
 	<string name="LoginFailedAuthenticationFailed">
 		Beklager! vi kunne ikke logge dig på.
-Undersøg venligst at du har indtastet det rette				
-Please check to make sure you entered the right
+ Undersøg venligst at du har indtastet det rette
+ Please check to make sure you entered the right
     * Brugernavn (like bobsmith12 or steller.sunshine)
     * Password
 Check også at Caps Lock ikke er aktiveret.
@@ -165,8 +165,8 @@ Check www.secondlife.com/status for opdateringer.
 Hvis du mener dette er en fejl, kontakt venligst support@secondlife.com.
 	</string>
 	<string name="LoginFailedAcountSuspended">
-		Din konto vil ikke være tilgængelig før 
-[TIME] Pacific Time.
+		Din konto vil ikke være tilgængelig før
+ [TIME] Pacific Time.
 	</string>
 	<string name="LoginFailedAccountDisabled">
 		Vi kan desværre ikke behandle forespøgsel lige nu.
@@ -179,8 +179,8 @@ Kontakt venligst support@secondlife.com.
 	</string>
 	<string name="LoginFailedAccountMaintenance">
 		Der foretages vedligehold på din konto lige nu.
-Din konto vil ikke være tilgængelig før 
-[TIME] Pacific Time.
+ Din konto vil ikke være tilgængelig før
+ [TIME] Pacific Time.
 Hvis du mener dette er en fejl, kontakt venligst support@secondlife.com.
 	</string>
 	<string name="LoginFailedPendingLogoutFault">
@@ -188,7 +188,7 @@ Hvis du mener dette er en fejl, kontakt venligst support@secondlife.com.
 	</string>
 	<string name="LoginFailedPendingLogout">
 		Systemet er i gang med at logge dig ud netop nu.
-Din konto vil ikke være tilgængelig før 
+ Din konto vil ikke være tilgængelig før
 [TIME] Pacific Time.
 	</string>
 	<string name="LoginFailedUnableToCreateSession">
@@ -1276,6 +1276,9 @@ Prøv venligst om lidt igen.
 	</string>
 	<string name="InvFolder favorite">
 		Mine favoritter
+	</string>
+	<string name="InvFolder Current Look">
+		Nuværende udseende
 	</string>
 	<string name="InvFolder Current Outfit">
 		Nuværende sæt
@@ -3880,7 +3883,7 @@ Læs mere på https://second.life/scripted-agents.
 	</string>
 	<string name="uploading_abuse_report">
 		Uploader...
-  
+
 Krænkelsesanmeldelse
 	</string>
 	<string name="New Shape">
@@ -4147,8 +4150,8 @@ Krænkelsesanmeldelse
 	</string>
 	<string name="ExternalEditorNotFound">
 		Kan ikke benytte deb eksterne editor der er angivet.
-Prøv at omkrandse stien til editor med anførselstegn.				
-(f.eks. "/stil til min editor" "%s")
+ Prøv at omkrandse stien til editor med anførselstegn.
+ (f.eks. "/stil til min editor" "%s")
 	</string>
 	<string name="ExternalEditorCommandParseError">
 		Fejl ved håndtering af kommando til ekstern editor.
