@@ -780,7 +780,7 @@
            control="VoiceEarLocation" />
           <menu_item_check.on_click
            function="Agent.ToggleHearVoiceFromAvatar" />
-          <menu_item_call.on_enable
+          <menu_item_check.on_enable
            control="EnableVoiceChat" />
         </menu_item_check>
         <menu_item_call
@@ -4064,12 +4064,6 @@
            name="HDRI Preview">
             <menu_item_call.on_click
              function="Advanced.ClickHDRIPreview" />
-          </menu_item_call>
-          <menu_item_call
-           label="GLTF Scene Preview"
-           name="GLTF Scene Preview">
-            <menu_item_call.on_click
-             function="Advanced.ClickGLTFScenePreview" />
           </menu_item_call>
           <menu_item_call
            label="GLTF Scene Preview"
