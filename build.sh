@@ -158,6 +158,7 @@ pre_build()
 
         if [[ "$arch" == "Darwin" ]]
         then
+            HAVOK=OFF
             SIGNING=("-DENABLE_SIGNING:BOOL=YES" \
                           "-DSIGNING_IDENTITY:STRING=Developer ID Application: Linden Research, Inc.")
         fi
@@ -261,8 +262,8 @@ build()
         done
     fi
 
-    # *TODO: Make this a build extension. disabled for now
-    # package_llphysicsextensions_tpv || fatal "failed building llphysicsextensions packages"
+    # *TODO: Make this a build extension.
+    package_llphysicsextensions_tpv || fatal "failed building llphysicsextensions packages"
     end_section "extensions $variant"
 
   else
