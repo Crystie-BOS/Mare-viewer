@@ -31,8 +31,8 @@
 		Échec d'initialisation des graphiques. Veuillez mettre votre pilote graphique à jour.
 	</string>
 	<string name="AboutHeader">
-		[CHANNEL] [VIEWER_VERSION_0].[VIEWER_VERSION_1].[VIEWER_VERSION_2].[VIEWER_VERSION_3] ([ADDRESS_SIZE]bit) 
-[[VIEWER_RELEASE_NOTES_URL] [ReleaseNotes]]
+		[CHANNEL] [VIEWER_VERSION_0].[VIEWER_VERSION_1].[VIEWER_VERSION_2].[VIEWER_VERSION_3] ([ADDRESS_SIZE]bit)
+ [[VIEWER_RELEASE_NOTES_URL] [ReleaseNotes]]
 	</string>
 	<string name="BuildConfig">
 		Configuration de la construction [BUILD_CONFIG]
@@ -71,11 +71,11 @@ Mémoire textures : [TEXTURE_MEMORY] Mo
 		Mode d'affichage HiDPI : [HIDPI]
 	</string>
 	<string name="AboutLibs">
-		J2C Decoder Version: [J2C_VERSION] 
-Audio Driver Version: [AUDIO_DRIVER_VERSION] 
-[LIBCEF_VERSION] 
-LibVLC Version: [LIBVLC_VERSION] 
-Voice Server Version: [VOICE_VERSION]
+		J2C Decoder Version: [J2C_VERSION]
+ Audio Driver Version: [AUDIO_DRIVER_VERSION]
+ [LIBCEF_VERSION]
+ LibVLC Version: [LIBVLC_VERSION]
+ Voice Server Version: [VOICE_VERSION]
 	</string>
 	<string name="AboutTraffic">
 		Paquets perdus : [PACKETS_LOST,number,0]/[PACKETS_IN,number,0] ([PACKETS_PCT,number,1]%)
@@ -255,8 +255,8 @@ l'Assistance à l'adresse suivante : support@secondlife.com.
 [TIME], heure du Pacifique.
 	</string>
 	<string name="LoginFailedAccountDisabled">
-		Impossible de traiter votre demande à l'heure actuelle. 
-Pour obtenir de l'aide, veuillez contacter l'Assistance Second Life à la page suivante : http://support.secondlife.com.
+		Impossible de traiter votre demande à l'heure actuelle.
+ Pour obtenir de l'aide, veuillez contacter l'Assistance Second Life à la page suivante : http://support.secondlife.com.
 	</string>
 	<string name="LoginFailedTransformError">
 		Incohérence des données lors de la connexion.
@@ -272,8 +272,8 @@ Si vous pensez qu'il s'agit d'une erreur, contactez l'Assistance à l'adresse su
 		Le simulateur a renvoyé une erreur en réponse à la demande de déconnexion.
 	</string>
 	<string name="LoginFailedPendingLogout">
-		Le système est en train de vous déconnecter. 
-Veuillez réessayer de vous connecter dans une minute.
+		Le système est en train de vous déconnecter.
+ Veuillez réessayer de vous connecter dans une minute.
 	</string>
 	<string name="LoginFailedUnableToCreateSession">
 		Impossible de créer de session valide.
@@ -649,13 +649,13 @@ Veuillez réessayer de vous connecter dans une minute.
 		Afficher l'aide
 	</string>
 	<string name="TooltipNotecardNotAllowedTypeDrop">
-		Les éléments de ce type ne peuvent pas être attachés 
-aux notes de cette région.
+		Les éléments de ce type ne peuvent pas être attachés
+ aux notes de cette région.
 	</string>
 	<string name="TooltipNotecardOwnerRestrictedDrop">
-		Seuls des éléments avec des autorisation 
-illimitées pour le 'prochain propriétaire' 
-peuvent être joints aux notes.
+		Seuls des éléments avec des autorisation
+ illimitées pour le 'prochain propriétaire'
+ peuvent être joints aux notes.
 	</string>
 	<string name="Searching">
 		Recherche...
@@ -730,8 +730,8 @@ peuvent être joints aux notes.
 		Services non disponible ou la durée du chargement est dépassée.
 	</string>
 	<string name="AssetUploadRequestInvalid">
-		Erreur dans la demande de chargement. Veuillez consulter le site : 
-http://secondlife.com/support pour vous aider à résoudre ce problème.
+		Erreur dans la demande de chargement. Veuillez consulter le site :
+ http://secondlife.com/support pour vous aider à résoudre ce problème.
 	</string>
 	<string name="SettingValidationError">
 		Échec de la validation pour l'importation des paramètres [NAME]
@@ -1776,6 +1776,9 @@ Si vous continuez de recevoir ce message, contactez l’assistance Second Life �
 	</string>
 	<string name="InvFolder favorites">
 		Mes favoris
+	</string>
+	<string name="InvFolder Current Look">
+		Apparence actuelle
 	</string>
 	<string name="InvFolder Current Outfit">
 		Tenue actuelle
@@ -5896,23 +5899,23 @@ Essayez avec le chemin d'accès à l'éditeur entre guillemets doubles
 		La forme physique n’a pas la version correcte. Configurez la version correcte pour le modèle physique.
 	</string>
 	<string name="couldnt_resolve_host">
-		DNS n'a pas pu résoudre le nom d'hôte([HOSTNAME]). 
-Veuillez vérifier que vous parvenez à vous connecter au site www.secondlife.com. 
-Si c'est le cas, et que vous continuez à recevoir ce message d'erreur, veuillez vous 
-rendre à la section Support et signaler ce problème
+		DNS n'a pas pu résoudre le nom d'hôte([HOSTNAME]).
+ Veuillez vérifier que vous parvenez à vous connecter au site www.secondlife.com.
+ Si c'est le cas, et que vous continuez à recevoir ce message d'erreur, veuillez vous
+ rendre à la section Support et signaler ce problème
 	</string>
 	<string name="ssl_peer_certificate">
-		Le serveur d'identification a rencontré une erreur de connexion SSL. 
-Si vous continuez à recevoir ce message d'erreur, 
-veuillez vous rendre à la section Support du site web 
-SecondLife.com et signaler ce problème
+		Le serveur d'identification a rencontré une erreur de connexion SSL.
+ Si vous continuez à recevoir ce message d'erreur,
+ veuillez vous rendre à la section Support du site web
+ SecondLife.com et signaler ce problème
 	</string>
 	<string name="ssl_connect_error">
-		Ceci est souvent dû à un mauvais réglage de l'horloge de votre ordinateur. 
-Veuillez aller à Tableaux de bord et assurez-vous que l'heure et la date sont réglés 
-correctement. Vérifiez également que votre réseau et votre pare-feu sont configurés 
-correctement. Si vous continuez à recevoir ce message d'erreur, veuillez vous rendre 
-à la section Support du site web SecondLife.com et signaler ce problème. 
+		Ceci est souvent dû à un mauvais réglage de l'horloge de votre ordinateur.
+ Veuillez aller à Tableaux de bord et assurez-vous que l'heure et la date sont réglés
+ correctement. Vérifiez également que votre réseau et votre pare-feu sont configurés
+ correctement. Si vous continuez à recevoir ce message d'erreur, veuillez vous rendre
+ à la section Support du site web SecondLife.com et signaler ce problème.
 
 [https://community.secondlife.com/knowledgebase/english/error-messages-r520/#Section__3 Base de connaissances]
 	</string>

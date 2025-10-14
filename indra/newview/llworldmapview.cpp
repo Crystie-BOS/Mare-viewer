@@ -977,7 +977,7 @@ void LLWorldMapView::drawItems()
 
 void LLWorldMapView::drawAgents()
 {
-    static LLUIColor map_avatar_color = LLUIColorTable::instance().getColor("MapAvatarColor", LLColor4::white);
+    static LLColor4 map_avatar_color = LLUIColorTable::instance().getColor("MapAvatarColor", LLColor4::white);
     // <FS:Ansariel> Performance tweak
     LLWorldMap* world_map = LLWorldMap::getInstance();
 
@@ -1004,7 +1004,8 @@ void LLWorldMapView::drawAgents()
             {
                 continue;
             }
-            drawImage(positions[i], sAvatarSmallImage, LLNetMap::getAvatarColor(uuid, use_contact_set_colors));
+            LLColor4 color = use_contact_set_colors ? LLNetMap::getAvatarColor(uuid) : map_avatar_color;
+            drawImage(positions[i], sAvatarSmallImage, color);
         }
     }
     // </KKA-1154 : FM>

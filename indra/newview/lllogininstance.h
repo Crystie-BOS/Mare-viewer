@@ -83,6 +83,7 @@ private:
     void handleLoginFailure(const LLSD& event);
     void handleLoginSuccess(const LLSD& event);
     void handleDisconnect(const LLSD& event);
+    void handleAuthentication(const LLSD& event);
     void handleIndeterminate(const LLSD& event);
     void handleLoginDisallowed(const LLSD& notification, const LLSD& response);
     void syncWithUpdater(ResponsePtr resp, const LLSD& notification, const LLSD& response);

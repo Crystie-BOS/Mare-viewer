@@ -64,6 +64,8 @@
 #include "llviewertexturelist.h"
 #include "llviewerwindow.h"
 
+#include <stack>
+
 static LLDefaultChildRegistry::Register<LLViewerTextEditor> r("text_editor");
 
 ///-----------------------------------------------------------------------

@@ -4919,6 +4919,12 @@ void FSPanelPreferenceBackup::applySelection(LLScrollListCtrl* control, bool all
 // <FS:Kadah>
 void LLFloaterPreference::loadFontPresetsFromDir(const std::string& dir, LLComboBox* font_selection_combo)
 {
+    if (!LLFile::isdir(dir))
+    {
+        LL_WARNS() << "Invalid font directory " << dir << LL_ENDL;
+        return;
+    }
+
     LLDirIterator dir_iter(dir, "*.xml");
     std::string file;
     while (dir_iter.next(file))

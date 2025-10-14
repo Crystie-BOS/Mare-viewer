@@ -92,10 +92,11 @@ LLLoginInstance::LLLoginInstance() :
         boost::bind(&LLLoginInstance::handleLoginEvent, this, _1));
     // This internal use of LLEventDispatcher doesn't really need
     // per-function descriptions.
-    mDispatcher.add("fail.login", "", boost::bind(&LLLoginInstance::handleLoginFailure, this, _1));
-    mDispatcher.add("connect",    "", boost::bind(&LLLoginInstance::handleLoginSuccess, this, _1));
-    mDispatcher.add("disconnect", "", boost::bind(&LLLoginInstance::handleDisconnect, this, _1));
-    mDispatcher.add("indeterminate", "", boost::bind(&LLLoginInstance::handleIndeterminate, this, _1));
+    mDispatcher.add("fail.login",     "", boost::bind(&LLLoginInstance::handleLoginFailure, this, _1));
+    mDispatcher.add("connect",        "", boost::bind(&LLLoginInstance::handleLoginSuccess, this, _1));
+    mDispatcher.add("disconnect",     "", boost::bind(&LLLoginInstance::handleDisconnect, this, _1));
+    mDispatcher.add("authenticating", "", boost::bind(&LLLoginInstance::handleAuthentication, this, _1));
+    mDispatcher.add("indeterminate",  "", boost::bind(&LLLoginInstance::handleIndeterminate, this, _1));
 }
 
 void LLLoginInstance::setPlatformInfo(const std::string platform,
@@ -500,8 +501,7 @@ void LLLoginInstance::handleLoginDisallowed(const LLSD& notification, const LLSD
 void LLLoginInstance::handleLoginSuccess(const LLSD& event)
 {
     LL_INFOS("LLLogin") << "LLLoginInstance::handleLoginSuccess" << LL_ENDL;
-	LL_WARNS() << "login success" << LL_ENDL;
-		LL_WARNS() << "setting complete 501" << LL_ENDL;
+
     attemptComplete();
     mRequestData.clear();
 }
@@ -511,6 +511,11 @@ void LLLoginInstance::handleDisconnect(const LLSD& event)
     // placeholder
 
     LL_INFOS("LLLogin") << "LLLoginInstance::handleDisconnect placeholder " << LL_ENDL;
+}
+
+void LLLoginInstance::handleAuthentication(const LLSD& event)
+{
+    LL_INFOS("LLLogin") << "LLLoginInstance::handleAuthentication" << LL_ENDL;
 }
 
 void LLLoginInstance::handleIndeterminate(const LLSD& event)
