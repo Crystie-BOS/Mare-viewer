@@ -552,7 +552,7 @@ void LLNetMap::draw()
                 }
             }
             // </FS:Ansariel>
-            LLColor4 color = getAvatarColor(uuid, use_contact_set_colors);
+            LLColor4 color = getAvatarColor(use_contact_set_colors ? uuid : LLUUID());
             LLWorldMapView::drawAvatar(
                 pos_map.mV[VX], pos_map.mV[VY],
                 color,
@@ -1706,12 +1706,12 @@ void LLNetMap::clearAvatarMarkColors()
 }
 
 // static
-LLColor4 LLNetMap::getAvatarColor(const LLUUID& avatar_id, bool useContactSet)
+LLColor4 LLNetMap::getAvatarColor(const LLUUID& avatar_id)
 {
     static LLUIColor map_avatar_color = LLUIColorTable::instance().getColor("MapAvatarColor", LLColor4::white);
     LLColor4 color = map_avatar_color;
 
-    if (useContactSet)
+    if (avatar_id.notNull())
     {
         LGGContactSets& cs_instance = LGGContactSets::instance();
 
