@@ -285,6 +285,13 @@ target_include_directories(llcommon PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_dependencies(llcommon stage_third_party_libs)
 
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+  set_source_files_properties(
+    llevent.cpp
+    llfasttimer.cpp
+    PROPERTIES COMPILE_FLAGS -Wno-nonnull)
+endif()
+
 if (LL_TESTS)
   include(LLAddBuildTest)
   SET(llcommon_TEST_SOURCE_FILES
