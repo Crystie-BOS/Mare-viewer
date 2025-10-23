@@ -289,7 +289,7 @@ Learn about [https://community.secondlife.com/knowledgebase/joining-and-particip
                top="4" />
            </layout_panel>
            <layout_panel
-             height="203"
+             height="242"
              layout="topleft"
              min_dim="120"
              mouse_opaque="false"
@@ -298,7 +298,7 @@ Learn about [https://community.secondlife.com/knowledgebase/joining-and-particip
              <avatar_list
                allow_select="true"
                follows="all"
-               height="211"
+               height="240"
                ignore_online_status="true"
                layout="topleft"
                left="3"
