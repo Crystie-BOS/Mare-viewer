@@ -2861,11 +2861,11 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>efc5b176d878cfc16b8f82445d82ddb96815b6ab</string>
+              <string>9610ad7c0ab0e939eaedb7dbde1a228a0d386b99</string>
               <key>hash_algorithm</key>
               <string>sha1</string>
               <key>url</key>
-              <string>https://github.com/secondlife/3p-webrtc-build/releases/download/m137.7151.04.20-universal/webrtc-m137.7151.04.20-universal.17630578914-linux64-17630578914.tar.zst</string>
+              <string>https://bitbucket.org/kokua/3p-webrtc-build/downloads/libwebrtc-linux-x64.tar.xz</string>
             </map>
             <key>name</key>
             <string>linux64</string>
