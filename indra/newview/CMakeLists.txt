@@ -2201,6 +2201,10 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     PROPERTIES COMPILE_FLAGS -Wno-unused-variable)
   set_source_files_properties(llxmlrpctransaction.cpp PROPERTIES
     COMPILE_FLAGS -Wno-int-in-bool-context)
+  set_source_files_properties(llderenderlist.cpp PROPERTIES
+    COMPILE_FLAGS -Wno-array-bounds)
+  set_source_files_properties(llinventorygallerymenu.cpp PROPERTIES
+    COMPILE_FLAGS -Wno-uninitialized)
 endif ()
 
 if (LINUX)
