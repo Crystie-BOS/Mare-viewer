@@ -53,6 +53,11 @@ elseif (DARWIN)
                                                   XCODE_ATTRIBUTE_DWARF_DSYM_FOLDER_PATH "${SYMBOLS_STAGING_DIR}/dSYMs")
     endif (USE_BUGSPLAT)
 elseif (LINUX)
+    if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+        set_source_files_properties(
+            llwebrtc.cpp
+            PROPERTIES COMPILE_FLAGS -Wno-delete-non-virtual-dtor)
+    endif()
     target_link_libraries(llwebrtc PRIVATE ll::webrtc)
 endif (WINDOWS)
     
