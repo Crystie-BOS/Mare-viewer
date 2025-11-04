@@ -253,6 +253,16 @@ class ViewerManifest(LLManifest):
             }
         return "%(channel_vendor_base)s%(channel_variant_underscores)s_%(version_underscores)s_%(arch)s" % substitution_strings
 
+    def installer_base_name_mac(self):
+        global CHANNEL_VENDOR_BASE
+        # a standard map of strings for replacing in the templates
+        substitution_strings = {
+            'channel_vendor_base' : '_'.join(CHANNEL_VENDOR_BASE.split()),
+            'channel_variant_underscores':self.channel_variant_app_suffix(),
+            'version_underscores' : '_'.join(self.args['version'])
+            }
+        return "%(channel_vendor_base)s%(channel_variant_underscores)s_%(version_underscores)s_universal" % substitution_strings
+
     def app_name(self):
         global CHANNEL_VENDOR_BASE
         channel_type=self.channel_type()
@@ -1098,7 +1108,7 @@ class DarwinManifest(ViewerManifest):
 
         volname=CHANNEL_VENDOR_BASE+" Installer"  # DO NOT CHANGE without understanding comment above
 
-        imagename = self.installer_base_name()
+        imagename = self.installer_base_name_mac()
 
         sparsename = imagename + ".sparseimage"
         finalname = imagename + ".dmg"

@@ -22,21 +22,32 @@ if (HAVOK)
    include(Havok)
    use_prebuilt_binary(llphysicsextensions_source)
    set(LLPHYSICSEXTENSIONS_SRC_DIR ${LIBS_PREBUILT_DIR}/llphysicsextensions/src)
-   target_link_libraries( llphysicsextensions_impl INTERFACE llphysicsextensions)
+   if(DARWIN)
+      set(LLPHYSICSEXTENSIONS_STUB_DIR ${LIBS_PREBUILT_DIR}/llphysicsextensions/stub)
+      # can't set these library dependencies per-arch here, need to do it using XCODE_ATTRIBUTE_OTHER_LDFLAGS[arch=*] in newview/CMakeLists.txt
+      #target_link_libraries( llphysicsextensions_impl INTERFACE llphysicsextensions)
+      #target_link_libraries( llphysicsextensions_impl INTERFACE llphysicsextensionsstub)
+   else()
+     target_link_libraries( llphysicsextensions_impl INTERFACE llphysicsextensions)
+     target_compile_definitions( llphysicsextensions_impl INTERFACE LL_HAVOK=1 )
+   endif()
+   target_include_directories( llphysicsextensions_impl INTERFACE   ${LIBS_PREBUILT_DIR}/include/llphysicsextensions)
 elseif (HAVOK_TPV)
    use_prebuilt_binary(llphysicsextensions_tpv)
-   target_link_libraries( llphysicsextensions_impl INTERFACE llphysicsextensions_tpv)
-   # <FS:ND> include paths for LLs version and ours are different.
-   set(LLPHYSICSEXTENSIONS_INCLUDE_DIRS ${LIBS_PREBUILT_DIR}/include/llphysicsextensions)
-   # </FS:ND>
+   if (NOT DARWIN)
+      if(WINDOWS)
+         target_link_libraries( llphysicsextensions_impl INTERFACE ${ARCH_PREBUILT_DIRS}/llphysicsextensions_tpv.lib)
+	 # <FS:ND> include paths for LLs version and ours are different.
+	 set(LLPHYSICSEXTENSIONS_INCLUDE_DIRS ${LIBS_PREBUILT_DIR}/include/llphysicsextensions)
+	 # </FS:ND>
 
-   # <FS:ND> havok lib get installed to packages/lib
-   link_directories( ${LIBS_PREBUILT_DIR}/lib )
-   # </FS:ND>
-else (HAVOK)
-   use_prebuilt_binary(llphysicsextensions_stub)
-   set(LLPHYSICSEXTENSIONS_SRC_DIR ${LIBS_PREBUILT_DIR}/llphysicsextensions/stub)
-   target_link_libraries( llphysicsextensions_impl INTERFACE llphysicsextensionsstub)
-endif (HAVOK)
-
-target_include_directories( llphysicsextensions_impl INTERFACE   ${LIBS_PREBUILT_DIR}/include/llphysicsextensions)
+	 # <FS:ND> havok lib get installed to packages/lib
+	 link_directories( ${LIBS_PREBUILT_DIR}/lib )
+	 # </FS:ND>
+      elseif(LINUX)
+         target_link_libraries( llphysicsextensions_impl INTERFACE ${ARCH_PREBUILT_DIRS}/libllphysicsextensions_tpv.a)
+      endif()
+      target_compile_definitions( llphysicsextensions_impl INTERFACE LL_HAVOK=1 )
+   endif()
+   target_include_directories( llphysicsextensions_impl INTERFACE   ${LIBS_PREBUILT_DIR}/include/llphysicsextensions)
+endif ()
