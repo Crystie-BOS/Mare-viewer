@@ -534,6 +534,8 @@ bool LLFloaterPreference::postBuild()
     getChild<LLUICtrl>("log_path_string")->setEnabled(false); // make it read-only but selectable
 
     getChild<LLComboBox>("language_combobox")->setCommitCallback(boost::bind(&LLFloaterPreference::onLanguageChange, this));
+    mTimeFormatCombobox = getChild<LLComboBox>("time_format_combobox");
+    mTimeFormatCombobox->setCommitCallback(boost::bind(&LLFloaterPreference::onTimeFormatChange, this));
 
     getChild<LLComboBox>("FriendIMOptions")->setCommitCallback(boost::bind(&LLFloaterPreference::onNotificationsChange, this,"FriendIMOptions"));
     getChild<LLComboBox>("NonFriendIMOptions")->setCommitCallback(boost::bind(&LLFloaterPreference::onNotificationsChange, this,"NonFriendIMOptions"));
@@ -985,6 +987,17 @@ void LLFloaterPreference::onOpen(const LLSD& key)
     // Load (double-)click to walk/teleport settings.
     updateClickActionViews();
 
+#if LL_LINUX
+    // Lixux doesn't support automatic mode
+    LLComboBox* combo = getChild<LLComboBox>("double_click_action_combo");
+    S32 mode = gSavedSettings.getS32("MouseWarpMode");
+    if (mode == 0)
+    {
+        combo->setValue("1");
+    }
+    combo->setEnabledByValue("0", false);
+#endif
+
     // Enabled/disabled popups, might have been changed by user actions
     // while preferences floater was closed.
     buildPopupLists();
@@ -1330,6 +1343,13 @@ void LLFloaterPreference::onLanguageChange()
         LLNotificationsUtil::add("ChangeLanguage");
         mLanguageChanged = true;
     }
+}
+
+void LLFloaterPreference::onTimeFormatChange()
+{
+    std::string val = mTimeFormatCombobox->getValue();
+    gSavedSettings.setBOOL("Use24HourClock", val == "1");
+    onLanguageChange();
 }
 
 void LLFloaterPreference::onNotificationsChange(const std::string& OptionName)
@@ -1844,6 +1864,8 @@ void LLFloaterPreference::refresh()
     refreshEnabledState();
     refreshAdvanced();
     updateClickActionViews();
+
+    mTimeFormatCombobox->selectByValue(gSavedSettings.getBOOL("Use24HourClock") ? "1" : "0");
 }
 
 void LLFloaterPreference::refreshAdvanced()
@@ -1901,6 +1923,7 @@ void LLFloaterPreference::onChangeQuality(const LLSD& data)
     }
     mLastQualityLevel = level;
     LLFeatureManager::getInstance()->setGraphicsLevel(level, true);
+    gSavedSettings.setU32("DebugQualityPerformance", level);
     refreshEnabledGraphics();
 // Already done in function above
 //    refresh();

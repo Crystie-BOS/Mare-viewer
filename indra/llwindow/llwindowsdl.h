@@ -72,6 +72,7 @@ public:
     void toggleVSync(bool enable_vsync) override;
     bool setCursorPosition(LLCoordWindow position) override;
     bool getCursorPosition(LLCoordWindow *position) override;
+    /*virtual*/ bool isWrapMouse() const override { return true; }
     void showCursor() override;
     void hideCursor() override;
     void showCursorFromMouseMove() override;

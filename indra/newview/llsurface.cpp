@@ -205,33 +205,29 @@ LLViewerTexture* LLSurface::getSTexture()
 
 void LLSurface::createSTexture()
 {
-    bool update = true;
     if (mSTexturep.isNull())
     {
         mTimer.setTimerExpirySec(MIN_TEXTURE_REQUEST_INTERVAL);
     }
-    else if (!mSTexturep->hasGLTexture())
-    {
-        // if we haven't gotten a valid texture yet, throttle the number of requests to avoid server flooding
-        update = mTimer.checkExpirationAndReset(MIN_TEXTURE_REQUEST_INTERVAL);
-    }
-    else
+    else if (mSTexturep->hasGLTexture())
     {
         // Unexpected: createSTexture() called when a valid texture already exists.
         // This may indicate a logic error in the caller, as textures should not be recreated unnecessarily.
         LL_WARNS() << "Called LLSurface::createSTexture() while we already have a valid texture!" << LL_ENDL;
         return;
     }
-
-    if (update)
+    else if (!mTimer.checkExpirationAndReset(MIN_TEXTURE_REQUEST_INTERVAL))
     {
-        U64 handle = mRegionp->getHandle();
-
-        U32 grid_x, grid_y;
-
-        grid_from_region_handle(handle, &grid_x, &grid_y);
-        mSTexturep = LLWorldMipmap::loadObjectsTile(grid_x, grid_y, 1);
+        // We haven't gotten a valid texture yet, but throttle the number of requests to avoid server flooding
+        return;
     }
+
+    U64 handle = mRegionp->getHandle();
+    U32 grid_x, grid_y;
+
+    grid_from_region_handle(handle, &grid_x, &grid_y);
+
+    mSTexturep = LLWorldMipmap::loadObjectsTile(grid_x, grid_y, 1);
 }
 
 void LLSurface::initTextures()

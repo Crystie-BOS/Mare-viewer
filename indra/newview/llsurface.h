@@ -59,7 +59,7 @@ class LLGroupHeader;
 class LLSurface
 {
 public:
-    LLSurface(U32 type, LLViewerRegion *regionp = NULL);
+    LLSurface(U32 type, LLViewerRegion *regionp = nullptr);
     virtual ~LLSurface();
 
     static void initClasses(); // Do class initialization for LLSurface and its child classes.
@@ -170,7 +170,6 @@ private:
     void createPatchData();     // Allocates memory for patches.
     void destroyPatchData();    // Deallocates memory for patches.
 
-//protected:
     LLVector3d  mOriginGlobal;      // In absolute frame
     LLSurfacePatch *mPatchList;     // Array of all patches
 

@@ -1723,6 +1723,11 @@ void LLFloaterIMContainer::showConversation(const LLUUID& session_id)
     if (session_floater)
     {
         session_floater->restoreFloater();
+        if (session_floater->isTornOff() && session_floater->isMinimized())
+        {
+            session_floater->setMinimized(false);
+            session_floater->setFocus(true);
+        }
     }
 }
 
