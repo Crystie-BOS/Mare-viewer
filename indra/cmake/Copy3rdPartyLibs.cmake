@@ -182,9 +182,6 @@ elseif(DARWIN)
     set(release_files
         libndofdev.dylib
        )
-    if (TARGET ll::openal)
-      list(APPEND release_files libalut.dylib libopenal.dylib)
-    endif ()
 
     if (TARGET ll::fmodstudio)
       set(debug_files ${debug_files} libfmodL.dylib)
