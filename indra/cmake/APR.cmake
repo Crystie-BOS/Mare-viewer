@@ -32,7 +32,8 @@ endif()
 
 target_include_directories(ll::apr SYSTEM INTERFACE ${LIBS_PREBUILT_DIR}/include/apr-1)
 
+# CA: Disable this fix - we don't see the errors and all it achieves is to force all APR dependencies to rebuild every time
 # Fix erroneous check for __attribute__ definition introduced with APR 1.7.5, causing lots of "this declaration may not have extern 'C' linkage" errors in VS
-file(READ ${LIBS_PREBUILT_DIR}/include/apr-1/apr.h APR_HEADER_CONTENTS)
-string(REPLACE "#if !(defined(__attribute__) || defined(__has_attribute))" "#if !defined(__attribute__)" APR_HEADER_CONTENTS "${APR_HEADER_CONTENTS}")
-file(WRITE ${LIBS_PREBUILT_DIR}/include/apr-1/apr.h "${APR_HEADER_CONTENTS}")
+#file(READ ${LIBS_PREBUILT_DIR}/include/apr-1/apr.h APR_HEADER_CONTENTS)
+#string(REPLACE "#if !(defined(__attribute__) || defined(__has_attribute))" "#if !defined(__attribute__)" APR_HEADER_CONTENTS "${APR_HEADER_CONTENTS}")
+#file(WRITE ${LIBS_PREBUILT_DIR}/include/apr-1/apr.h "${APR_HEADER_CONTENTS}")
