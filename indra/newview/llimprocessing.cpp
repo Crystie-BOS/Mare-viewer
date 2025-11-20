@@ -56,6 +56,7 @@
 #include "llviewerregion.h"
 #include "llvoavatarself.h"
 #include "llworld.h"
+#include "RRInterface.h"
 
 //MK
 #include "llagentui.h"
@@ -611,8 +612,24 @@ void LLIMProcessing::processNewMessage(LLUUID from_id,
         LLPostponedNotification::add<LLPostponedIMSystemTipNotification>(params, from_id, false);
         break;
 
-    case IM_NOTHING_SPECIAL:    // p2p IM
-        // Don't show dialog, just do IM
+   case IM_NOTHING_SPECIAL:    // p2p IM
+        // MARE: Block IMs if RLV restriction is active
+        if (gRRenabled && gAgent.mRRInterface.mContainsRecvim)
+        {
+            // Check if sender has bypass permission
+            if (!gAgent.mRRInterface.contains("recvim:" + from_id.asString()))
+            {
+                // Blocked - don't process this IM
+                LL_INFOS("MARE") << "Blocking IM from " << from_id.asString() 
+                                 << " due to @recvim restriction" << LL_ENDL;
+                return; // Exit early, don't process the IM
+            }
+            // If we get here, sender has bypass permission, continue normally
+            LL_INFOS("MARE") << "Allowing IM from " << from_id.asString() 
+                             << " (bypass permission)" << LL_ENDL;
+        }
+        
+       // Don't show dialog, just do IM
         if (!gAgent.isGodlike()
                 && gAgent.inPrelude()
             && to_id.isNull())

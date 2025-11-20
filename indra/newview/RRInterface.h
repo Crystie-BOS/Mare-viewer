@@ -276,6 +276,7 @@ public:
     bool mContainsShowfriends;   // @showfriends=n/y
     bool mContainsShowgroups;    // @showgroups=n/y  
     bool mContainsNotify;        // @notify=n/y
+    bool mContainsRecvim;        // @recvim=n/y - Block incoming IMs
     bool mContainsDetach;
     bool mContainsShowinv;
     bool mContainsUnsit;

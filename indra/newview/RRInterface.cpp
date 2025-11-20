@@ -518,7 +518,8 @@ void refreshCachedVariable (std::string var)
     gAgent.mRRInterface.mContainsShowfriends = (gAgent.mRRInterface.contains("showfriends"));
     gAgent.mRRInterface.mContainsShowgroups = (gAgent.mRRInterface.contains("showgroups"));
     gAgent.mRRInterface.mContainsNotify = (gAgent.mRRInterface.contains("notify"));
-   
+    gAgent.mRRInterface.mContainsRecvim = (gAgent.mRRInterface.contains("recvim"));   
+
     if (var == "showinv") {
         if (gAgent.mRRInterface.mContainsShowinv) {
 //          LLSideTray::getInstance()->childSetVisible("panel_main_inventory", false);
@@ -849,6 +850,7 @@ RRInterface::RRInterface():
     , mContainsShowfriends(false)
     , mContainsShowgroups(false)
     , mContainsNotify(false)
+    , mContainsRecvim(false)
     , mHandleNoStrip(true)
     , mContainsCamTextures(false)
     , mUserUpdateAttachmentsFirstCall(true)

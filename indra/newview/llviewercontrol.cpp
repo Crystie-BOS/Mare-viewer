@@ -1014,6 +1014,8 @@ void settings_setup_listeners()
     setting_setup_signal_listener(gSavedSettings, "RenderDeferredShowInvisiprims",handleRenderDeferredShowInvisiprimsChanged);
     setting_setup_signal_listener(gSavedSettings, "RestrainedLoveCamDistNbGradients",handleRestrainedLoveCamDistNbGradientsChanged);
     setting_setup_signal_listener(gSavedSettings, "RestrainedLoveHeadMouselookRenderRigged",handleRestrainedLoveHeadMouselookRenderRigged);
+/// MARE: Force FTRLV mode - RLV always enabled on startup
+gSavedSettings.setBOOL("RestrainedLove", TRUE);
 //mk
     setting_setup_signal_listener(gSavedSettings, "FirstPersonAvatarVisible", handleRenderAvatarMouselookChanged);
     setting_setup_signal_listener(gSavedSettings, "RenderFarClip", handleRenderFarClipChanged);

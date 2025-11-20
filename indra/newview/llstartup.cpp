@@ -2040,11 +2040,8 @@ bool idle_startup()
         // be flushed out by the garbage collector later, after the actual restrictions
         // have been received.
         // For this, we simulate the reception of those commands from a non-existent object.
-#if RLV_ALWAYS_ON
-        if (true)
-#else
-        if (gRRenabled && gSavedSettings.getBOOL("KokuaRLVEnableBlindStartup"))
-#endif
+        if (true) // MARE: Always apply blind startup
+
         {
             if (gAgent.mRRInterface.mRetainedCommands.empty()) // we test mRetainedCommands and not mSpecialObjectBehaviours because these commands below will be retained for a bit, they won't be executed right away.
             {
@@ -2052,21 +2049,13 @@ bool idle_startup()
                 std::string name = "Viewer Startup";
                 KokuaRLVFloaterSupport::addNameToLocalCache(id, name);
                 //KKA-810: add startim, share, shownearby, showhovertextworld and tplocal
-#if RLV_ALWAYS_ON
-                if (true)
-#else
-                if (gSavedSettings.getBOOL("RestrainedLoveUseStrictGarbageCollectionRestrictions"))
-#endif
+                if (true) // MARE: Always use strict restrictions
                 {
                     //Now that the duration of the login restricted period is configurable some protection is needed against manual intervention
                     //fly, sendchannel, interact, remoutfit, remattach, showinv, touchall and touchhud added
                     gAgent.mRRInterface.handleCommand(id, "fly=n,sendchannel=n,interact=n,remoutfit=n,remattach=n,showinv=n,touchall=n,touchhud=n,camavdist:0=n,startim=n,share=n,shownearby=n,showhovertextworld=n,tplocal=n,shownames=n,showloc=n,showworldmap=n,showminimap=n,tploc=n,tplm=n,tplure=n,camdrawmin:1=n,camdrawmax:1.1=n,camdrawalphamin:0=n,camdrawalphamax:1=n,camtextures=n");
                     gViewerWindow->setUIVisibility(false); // hide all UI elements (Ok, you can still bring up additional floaters with hot keys, but the temptation is reduced)
-#if RLV_ALWAYS_ON
-                    if (true)
-#else
-                    if (gSavedSettings.getBOOL("RestrainedLoveHideAvatarUntilGarbageCollection"))
-#endif
+                    if (true) // MARE: Always hide avatar
                     {
                         LLPipeline::setRenderType(LLPipeline::RENDER_TYPE_AVATAR, FALSE);
                     }
