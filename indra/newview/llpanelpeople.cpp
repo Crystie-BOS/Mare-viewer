@@ -40,6 +40,7 @@
 #include "lltabcontainer.h"
 #include "lltoggleablemenu.h"
 #include "lluictrlfactory.h"
+#include "RRInterface.h"
 
 #include "llpanelpeople.h"
 
@@ -664,6 +665,24 @@ bool LLPanelPeople::postBuild()
     mSavedOriginalFilters.resize(mTabContainer->getTabCount());
 
     LLPanel* friends_tab = getChild<LLPanel>(FRIENDS_TAB_NAME);
+// --- FTRLV: remember original Friends/Groups panels, indexes & titles
+mFtrlvFriendsPanel = mTabContainer->getPanelByName(FRIENDS_TAB_NAME);
+mFtrlvGroupsPanel  = mTabContainer->getPanelByName(GROUP_TAB_NAME);
+
+if (mFtrlvFriendsPanel)
+{
+    mFtrlvFriendsIndex = mTabContainer->getIndexForPanel(mFtrlvFriendsPanel);
+    if (mFtrlvFriendsIndex >= 0)
+        mFtrlvFriendsTitle = mTabContainer->getPanelTitle(mFtrlvFriendsIndex); // getPanelTitle wants an index
+}
+
+if (mFtrlvGroupsPanel)
+{
+    mFtrlvGroupsIndex = mTabContainer->getIndexForPanel(mFtrlvGroupsPanel);
+    if (mFtrlvGroupsIndex >= 0)
+        mFtrlvGroupsTitle = mTabContainer->getPanelTitle(mFtrlvGroupsIndex);   // getPanelTitle wants an index
+}
+
     // updater is active only if panel is visible to user.
     friends_tab->setVisibleCallback(boost::bind(&Updater::setActive, mFriendListUpdater, _2));
     friends_tab->setVisibleCallback(boost::bind(&LLPanelPeople::removePicker, this));
@@ -819,6 +838,12 @@ bool LLPanelPeople::postBuild()
     mOnlineFriendList->setRefreshCompleteCallback(boost::bind(&LLPanelPeople::onFriendListRefreshComplete, this, _1, _2));
     mAllFriendList->setRefreshCompleteCallback(boost::bind(&LLPanelPeople::onFriendListRefreshComplete, this, _1, _2));
 
+/// Start a very light idle poll to keep tabs synced with RLV flags
+gIdleCallbacks.addFunction(&LLPanelPeople::idleCB, this);
+// Apply once on build
+applyRLVPeopleVisibility();
+
+
     return true;
 }
 
@@ -853,11 +878,19 @@ void LLPanelPeople::updateFriendListHelpText()
         no_friends_text->setText(getString(message_name, args));
     }
 }
+void LLPanelPeople::idleCB(void* userdata)
+{
+    if (auto* self = static_cast<LLPanelPeople*>(userdata))
+        self->applyRLVPeopleVisibility();
+}
 
 void LLPanelPeople::updateFriendList()
 {
     if (!mOnlineFriendList || !mAllFriendList)
         return;
+    
+    // MARE: Just update visibility, don't mess with the lists
+    applyRLVPeopleVisibility();
 
     // get all buddies we know about
     const LLAvatarTracker& av_tracker = LLAvatarTracker::instance();
@@ -905,11 +938,47 @@ void LLPanelPeople::updateFriendList()
      */
     mOnlineFriendList->setDirty(true, !mOnlineFriendList->filterHasMatches());// do force update if list do NOT have items
     mAllFriendList->setDirty(true, !mAllFriendList->filterHasMatches());
+
     //update trash and other buttons according to a selected item
     updateButtons();
     showFriendsAccordionsIfNeeded();
 }
 
+bool LLPanelPeople::notifyChildren(const LLSD& info)
+{
+    if (info.has("task-panel-action") && info["task-panel-action"].asString() == "handle-tri-state")
+    {
+        LLSideTrayPanelContainer* container = dynamic_cast<LLSideTrayPanelContainer*>(getParent());
+        if (!container)
+        {
+            LL_WARNS() << "Cannot find People panel container" << LL_ENDL;
+            return true;
+        }
+
+        if (container->getCurrentPanelIndex() > 0)
+        {
+            container->onOpen(LLSD().with(LLSideTrayPanelContainer::PARAM_SUB_PANEL_NAME, getName()));
+        }
+        else
+            LLFloaterReg::hideInstance("people");
+
+        return true;
+    }
+
+    return LLPanel::notifyChildren(info);
+}
+
+void LLPanelPeople::showAccordion(LLAccordionCtrlTab* tab, bool show)
+{
+    tab->setVisible(show);
+    if(show)
+    {
+        if(!isAccordionCollapsedByUser(tab))
+        {
+            tab->changeOpenClose(false);
+        }
+    }
+}
 
 void LLPanelPeople::giveMessage(const LLUUID& agent_id, const LLAvatarName& av_name, const std::string& postMsg)
 {
@@ -2021,52 +2090,99 @@ void    LLPanelPeople::onOpen(const LLSD& key)
 //          if(blocked_tab)
 //          {
 //              blocked_tab->onOpen(key);
+                applyRLVPeopleVisibility();
+
 //          }
 //      }
     }
 }
 
-bool LLPanelPeople::notifyChildren(const LLSD& info)
+void LLPanelPeople::applyRLVPeopleVisibility()
 {
-    if (info.has("task-panel-action") && info["task-panel-action"].asString() == "handle-tri-state")
+    if (!mTabContainer) return;
+
+    const bool hide_friends = (gRRenabled && gAgent.mRRInterface.mContainsShowfriends);
+    const bool hide_groups  = (gRRenabled && gAgent.mRRInterface.mContainsShowgroups);
+
+    // Track previous state to avoid constantly changing visibility
+    static bool last_hide_friends = false;
+    static bool last_hide_groups = false;
+    static bool first_run = true;
+
+    // Only update if state changed or first run
+    bool state_changed = first_run || 
+                        (last_hide_friends != hide_friends) || 
+                        (last_hide_groups != hide_groups);
+
+    if (!state_changed)
     {
-        LLSideTrayPanelContainer* container = dynamic_cast<LLSideTrayPanelContainer*>(getParent());
-        if (!container)
-        {
-            LL_WARNS() << "Cannot find People panel container" << LL_ENDL;
-            return true;
-        }
-
-        if (container->getCurrentPanelIndex() > 0)
-        {
-            // if not on the default panel, switch to it
-            container->onOpen(LLSD().with(LLSideTrayPanelContainer::PARAM_SUB_PANEL_NAME, getName()));
-        }
-        else
-            LLFloaterReg::hideInstance("people");
-
-        return true; // this notification is only supposed to be handled by task panels
+        return; // Nothing changed, don't touch anything
     }
 
-    return LLPanel::notifyChildren(info);
-}
+    // State changed, update visibility
+    LLPanel* friends_panel = mTabContainer->getPanelByName(FRIENDS_TAB_NAME);
+    LLPanel* groups_panel  = mTabContainer->getPanelByName(GROUP_TAB_NAME);
+    LLPanel* contact_sets_panel = mTabContainer->getPanelByName(CONTACT_SETS_TAB_NAME);
 
-void LLPanelPeople::showAccordion(LLAccordionCtrlTab* tab, bool show)
-{
-    tab->setVisible(show);
-    if(show)
+    // If currently on a restricted tab, switch away (only on state change)
+    if (hide_friends && !last_hide_friends) // Friends JUST got hidden
     {
-        // don't expand accordion if it was collapsed by user
-        if(!isAccordionCollapsedByUser(tab))
+        const std::string active = getActiveTabName();
+        if (active == FRIENDS_TAB_NAME)
         {
-            // expand accordion
-            tab->changeOpenClose(false);
+            mTabContainer->selectTabByName(NEARBY_TAB_NAME);
         }
     }
+    
+    if (hide_groups && !last_hide_groups) // Groups JUST got hidden
+    {
+        const std::string active = getActiveTabName();
+        if (active == GROUP_TAB_NAME || active == CONTACT_SETS_TAB_NAME)
+        {
+            mTabContainer->selectTabByName(NEARBY_TAB_NAME);
+        }
+    }
+
+    // Update tab visibility (only when state changes)
+    if (friends_panel)
+    {
+        S32 friends_index = mTabContainer->getIndexForPanel(friends_panel);
+        if (friends_index >= 0)
+        {
+            mTabContainer->setTabVisibility(friends_panel, !hide_friends);
+            mTabContainer->enableTabButton(friends_index, !hide_friends);
+        }
+    }
+
+    if (groups_panel)
+    {
+        S32 groups_index = mTabContainer->getIndexForPanel(groups_panel);
+        if (groups_index >= 0)
+        {
+            mTabContainer->setTabVisibility(groups_panel, !hide_groups);
+            mTabContainer->enableTabButton(groups_index, !hide_groups);
+        }
+    }
+    
+    if (contact_sets_panel)
+    {
+        S32 contact_sets_index = mTabContainer->getIndexForPanel(contact_sets_panel);
+        if (contact_sets_index >= 0)
+        {
+            mTabContainer->setTabVisibility(contact_sets_panel, !hide_groups);
+            mTabContainer->enableTabButton(contact_sets_index, !hide_groups);
+        }
+    }
+
+    // Remember current state for next time
+    last_hide_friends = hide_friends;
+    last_hide_groups = hide_groups;
+    first_run = false;
 }
 
-void LLPanelPeople::showFriendsAccordionsIfNeeded()
+void LLPanelPeople::showFriendsAccordionsIfNeeded()    // <-- This was line 2132
 {
+
     if(FRIENDS_TAB_NAME == getActiveTabName())
     {
         // Expand and show accordions if needed, else - hide them

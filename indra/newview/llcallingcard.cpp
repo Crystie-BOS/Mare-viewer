@@ -35,6 +35,7 @@
 #include "lltimer.h"
 #include "lluuid.h"
 #include "message.h"
+#include "RRInterface.h"
 
 #include "llagent.h"
 #include "llavatarnamecache.h"
@@ -814,6 +815,12 @@ static void on_avatar_name_cache_notify(const LLUUID& agent_id,
                                         bool online,
                                         LLSD payload)
 {
+    // MARE: Block friend notifications when RLV restricted
+    if (gRRenabled && gAgent.mRRInterface.mContainsNotify)
+    {
+        return; // Don't show any friend online/offline notifications
+    }
+    
     // Popup a notify box with online status of this agent
     // Use display name only because this user is your friend
     LLSD args;

@@ -18,8 +18,8 @@ if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.31.0")
     cmake_policy(SET CMP0179 NEW)
 endif()
 
-set(ROOT_PROJECT_NAME "Kokua" CACHE STRING
-    "The root project/makefile/solution name. Defaults to Kokua.")
+set(ROOT_PROJECT_NAME "MARE" CACHE STRING
+    "The root project/makefile/solution name. Defaults to MARE.")
 project(${ROOT_PROJECT_NAME})
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake"  "${CMAKE_CURRENT_BINARY_DIR}")

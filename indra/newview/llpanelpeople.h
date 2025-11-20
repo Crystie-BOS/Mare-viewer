@@ -76,6 +76,17 @@ public:
 
 private:
 
+    // FTRLV: RLV-style toggle (hide/disable Friends & Groups tabs)
+void applyRLVPeopleVisibility();
+static void idleCB(void* userdata);
+LLPanel*     mFtrlvFriendsPanel = nullptr;
+LLPanel*     mFtrlvGroupsPanel  = nullptr;
+S32          mFtrlvFriendsIndex = -1;
+S32          mFtrlvGroupsIndex  = -1;
+std::string  mFtrlvFriendsTitle;
+std::string  mFtrlvGroupsTitle;
+
+
     typedef enum e_sort_oder {
         E_SORT_BY_NAME = 0,
         E_SORT_BY_STATUS = 1,

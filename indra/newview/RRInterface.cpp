@@ -166,6 +166,26 @@ bool RRHelper::preventFloater(std::string floaterName)
             floaterName == "env_fixed_environment_sky" || floaterName == "env_adjust_snapshot" ||
             floaterName == "env_edit_extdaycycle" || floaterName == "my_environments") return true;
     }
+    // --- FTRLV additions: keep People & IM UI gated while restricted ---
+
+    // Hide/disable People (Friends/Groups) while “hide nearby” or “hide location” style blocks are active.
+    // These are the same flags you already use to hide the avatar list rows below.
+    if (floaterName == "people")
+    {
+        if (gAgent.mRRInterface.contains("shownearby") || gAgent.mRRInterface.contains("showloc"))
+            return true;
+    }
+
+    // Silence IM & Group UI when IM/Chat receive blocks are active (@recvim / @recvchat)
+    // NOTE: we rely on the generic contains("recvim"/"recvchat") helpers already used elsewhere in RR.
+    if (floaterName == "nearby_chat"   ||   // local chat floater id
+        floaterName == "im_container"  ||   // consolidated IM container (if present in your build)
+        floaterName == "imcontrolpanel")    // IM control panel (if present)
+    {
+        if (gAgent.mRRInterface.contains("recvim") || gAgent.mRRInterface.contains("recvchat"))
+            return true;
+    }
+
     return false;
 }
 
@@ -415,6 +435,7 @@ void refreshCachedVariable (std::string var)
     if (!avatar) return;
 
     bool contained = gAgent.mRRInterface.contains (var);
+    
     if (var == "detach" || var.find ("detach:") == 0 || var.find ("addattach") == 0 || var.find ("remattach") == 0) {
         contained = gAgent.mRRInterface.contains("detach")
         || gAgent.mRRInterface.containsSubstr("detach:")
@@ -439,6 +460,17 @@ void refreshCachedVariable (std::string var)
     //else if (var == "shownames")          gAgent.mRRInterface.mContainsShownames = contained;
     else if (var == "shownametags")         gAgent.mRRInterface.mContainsShownametags = contained;
     else if (var == "shownearby")           gAgent.mRRInterface.mContainsShowNearby = contained;
+    // Immediately enforce the UI state change by closing live floaters once.
+    auto close_if = [](const std::string& name){
+        if (LLFloater* f = LLFloaterReg::findInstance(name)) f->closeFloater();
+    };
+
+    // If we just enabled “hide nearby” or “hide location”, close People now.
+    if (gAgent.mRRInterface.mContainsShowNearby || gAgent.mRRInterface.mContainsShowloc)
+    {
+        close_if("people");
+    }
+
     else if (var == "setenv")               gAgent.mRRInterface.mContainsSetenv = contained;
     else if (var == "setdebug")             gAgent.mRRInterface.mContainsSetdebug = contained;
     else if (var == "fly")                  gAgent.mRRInterface.mContainsFly = contained;
@@ -467,7 +499,7 @@ void refreshCachedVariable (std::string var)
         gAgent.mRRInterface.mContainsLockedCamera = gAgent.mRRInterface.mContainsCamunlock | gAgent.mRRInterface.mContainsSetcamUnlock;
     }
 
-
+  
     //else if (var == "moveup")                 gAgent.mRRInterface.mContainsMoveUp = contained;
     //else if (var == "movedown")               gAgent.mRRInterface.mContainsMoveDown = contained;
     //else if (var == "moveleft")           gAgent.mRRInterface.mContainsMoveStrafeLeft = contained;
@@ -482,6 +514,11 @@ void refreshCachedVariable (std::string var)
     gAgent.mRRInterface.mContainsCamTextures = (gAgent.mRRInterface.containsSubstr("camtextures") || gAgent.mRRInterface.containsSubstr("setcam_textures"));
     gAgent.mRRInterface.mContainsShownames = (gAgent.mRRInterface.containsSubstr("shownames")); // shownames, shownames_sec
 
+// MARE: Custom RLV commands - checked dynamically like shownames
+    gAgent.mRRInterface.mContainsShowfriends = (gAgent.mRRInterface.contains("showfriends"));
+    gAgent.mRRInterface.mContainsShowgroups = (gAgent.mRRInterface.contains("showgroups"));
+    gAgent.mRRInterface.mContainsNotify = (gAgent.mRRInterface.contains("notify"));
+   
     if (var == "showinv") {
         if (gAgent.mRRInterface.mContainsShowinv) {
 //          LLSideTray::getInstance()->childSetVisible("panel_main_inventory", false);
@@ -709,6 +746,7 @@ void refreshCachedVariable (std::string var)
         LLPresetsManager::getInstance()->loadPreset(PRESETS_CAMERA, PRESETS_REAR_VIEW);
         gAgentCamera.resetView(true, true);
     }
+
     //else if (var.find ("camzoommax") == 0 || var.find ("camzoommin") == 0) {
     //  LLViewerCamera::getInstance()->setDefaultFOV(gSavedSettings.getF32("CameraAngle"));
     //  gSavedSettings.setF32("CameraAngle", LLViewerCamera::getInstance()->getView()); // setView may have clamped it.
@@ -808,6 +846,9 @@ RRInterface::RRInterface():
     , mContainsAlwaysRun(false)
     , mContainsTp(false)
     , mContainsSetsphere(false)
+    , mContainsShowfriends(false)
+    , mContainsShowgroups(false)
+    , mContainsNotify(false)
     , mHandleNoStrip(true)
     , mContainsCamTextures(false)
     , mUserUpdateAttachmentsFirstCall(true)
@@ -6375,7 +6416,7 @@ bool RRInterface::updateCameraLimits ()
     mCamZoomMin = getMax("camzoommin", -EXTREMUM);
     if (mCamZoomMin == 0.f) mCamZoomMin = -EXTREMUM;
 
-    // setcam_fovmin and setcam_fovmax set the FOV, i.e. 60�/multiplier;
+    // setcam_fovmin and setcam_fovmax set the FOV, i.e. 60 /multiplier;
     // in other words, they are equivalent to camzoommin and camzoommax.
     F32 fovmin = getMax("setcam_fovmin", 0.001f);
     if (fovmin != 0.f && fovmin != 0.001f)

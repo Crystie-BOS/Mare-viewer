@@ -273,6 +273,9 @@ public:
 
     // Some cache variables to accelerate common checks
     bool mHasLockedHuds;
+    bool mContainsShowfriends;   // @showfriends=n/y
+    bool mContainsShowgroups;    // @showgroups=n/y  
+    bool mContainsNotify;        // @notify=n/y
     bool mContainsDetach;
     bool mContainsShowinv;
     bool mContainsUnsit;
