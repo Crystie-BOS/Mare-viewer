@@ -1648,6 +1648,7 @@ void LLAppearanceMgr::wearItemsOnAvatar(const uuid_vec_t& item_ids_to_wear,
 //mk
             break;
         case LLAssetType::AT_OBJECT:
+        {
 //MK
             if (gRRenabled && replace)
             {
@@ -1655,15 +1656,6 @@ void LLAppearanceMgr::wearItemsOnAvatar(const uuid_vec_t& item_ids_to_wear,
                 {
                     break;
                 }
-
-                // Note that this will replace only first attachment regardless of attachment point,
-                // so if user is wearing two items over other two on different attachment points,
-                // only one will be replaced.
-                // Unfortunately we have no way to determine attachment point from inventory item.
-                // We might want to forbid wearing multiple objects with replace option in future.
-                bool replace_item = needs_to_replace(item_to_wear, first_for_object, first_for_type, replace);
-                rez_attachment(item_to_wear, NULL, replace_item);
-
             }
 
             // If we have at least one locked object on the body, err on the safe side, don't allow to replace (especially
@@ -1674,10 +1666,19 @@ void LLAppearanceMgr::wearItemsOnAvatar(const uuid_vec_t& item_ids_to_wear,
                 replace = false;
             }
 //mk
-            rez_attachment(item_to_wear, NULL, replace);
-            break;
 
-            default: continue;
+            // Note that this will replace only first attachment regardless of attachment point,
+            // so if user is wearing two items over other two on different attachment points,
+            // only one will be replaced.
+            // Unfortunately we have no way to determine attachment point from inventory item.
+            // We might want to forbid wearing multiple objects with replace option in future.
+            bool replace_item = needs_to_replace(item_to_wear, first_for_object, first_for_type, replace);
+            rez_attachment(item_to_wear, NULL, replace_item);
+
+        }
+        break;
+
+        default: continue;
         }
     }
         // Batch up COF link creation - more efficient if using AIS.
