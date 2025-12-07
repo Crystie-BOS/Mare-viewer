@@ -414,66 +414,72 @@ Mac
 
 --------
 
-The current development environment is XCode 12.2 running on OS X 11.0.1 where the viewer is built 64-bit with OS X SDK 11.0 and Deployment Target of OS X 10.9.
+The following has been tested with MacOS 26.1 with XCode 26.1.1. The Deployment Target is OS X 11.
 
+Besides XCode you need cmake and autobuild.
 
-You can both build from the command line in terminal or build the XCode project that is generated during configuration.
+Your can get cmake from MacPorts https://www.macports.org or homebrew https://brew.sh .
 
-NOTE: On Upgrading XCode to a new version you probably should delete the Derived Data folder that is found in Development/XCode as it may contain links to old system library locations preventing your build from linking.
-	
-    -- 
-There are two programs external to MacOS that allow other programming tools installation that do not touch MacOS installer methods.
-
-These are macports https://www.macports.org and homebrew https://brew.sh . 
-
-Linden’s version of autobuild requires a different version of Python than the MacOS system installed so the best way to get it installed is to first install MacPorts or HomeBrew.
- 
 With MacPorts installed, in terminal install the following ports:
-
-• sudo port install python27
-
-• sudo port install py27-pip
 
 • sudo port install cmake
 
-When prompted by the installer run python_select to use the version you just installed. It will be installed in /opt/local/bin
-
 HomeBrew has the advantage by using similar commands for Linux and MacOS.
-
-•  brew install python27
-
-•  brew install py27-pip
 
 •  brew install cmake
 
-
 Homebrew installs packages to their own directory and the symlinks their files into /usr/local.
 
-If you have newer versions of Xcode installed then you also need to run xcode-select to make sure you use currently installed Xcode for your build.
+For installing autobuild use pip:
+
+•  pip3 install autobuild
+
+You should update your path in order to have cmake and autouild alvailable, e.g. MacPorts might have written something like this into your ~/.zprofile:
+
+export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
+
+Likewise, homebrew might have used something like this:
+
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+Depending on how you use pip, it might have created a diretory in your user directory. Then use something like:
+
+export PATH="$HOME/Library/Python/3.9/bin:$PATH"
+
+Depending on how much you have used XCode already, you might need torun the following once on your system:
+
+xcodebuild -runFirstLaunch
+
+To verify your build environment the best way forward is most likely to download the LL source by following the instructions on https://wiki.secondlife.com/wiki/Build_the_Viewer_on_macOS 
 
 --
 
-Xcode should have created the directory ~/Library/Developer during installation. If not create it (or use the location of your choice) and shortcut it to the Finder sidebar. 
+To build Kokua first download the Kokua source code with the following command in terminal:
 
-In terminal cd to the above directory and type the command:
+git clone https://bitbucket.org/kokua/kokua-release 
 
-Using Pip Install auto build python dependencies by typing:
+You also need the build variables. Get them as follows and set the environment variable to point there:
 
-sudo pip install ‘git+https://bitbucket.org/lindenlab/autobuild-1.1#egg=autobuild'
+git clone https://bitbucket.org/kokua/viewer-build-variables.git
+export AUTOBUILD_VARIABLES_FILE=/Users/<your directory>/viewer-build-variables/variables
 
-If everything goes well it should be installed in /opt/local/Library/Frameworks/Python.framework/Versions/2.7/bin/autobuild
+Then you can configure the build with:
 
-To make life easier edit your .bash_profile and add the lines
+autobuild configure -c ReleaseOS -A 64 -- -DLL_TESTS:BOOL=OFF -DPACKAGE:BOOL=FALSE -DFMODSTUDIO:BOOL=OFF -DUSE_KDU:BOOL=OFF -DHAVOK_TPV:BOOL=OFF
 
-alias autobuild="/opt/local/Library/Frameworks/Python.framework/Versions/2.7/bin/autobuild"
+or 
 
-export AUTOBUILD=/opt/local/Library/Frameworks/Python.framework/Versions/2.7/bin/autobuild
+autobuild configure -c RelWithDebInfoOS -A 64 -- -DLL_TESTS:BOOL=OFF -DPACKAGE:BOOL=FALSE -DFMODSTUDIO:BOOL=OFF -DUSE_KDU:BOOL=OFF -DHAVOK_TPV:BOOL=OFF
 
-Then source your.bash_profile
+If that succeeds you can compile with
+
+autobuild build --no-configure -A 64
+
+and if even that succeeds you can start with
+
+open build-darwin-universal-kokua-mkrlv/newview/RelWithDebInfo/Kokua\ Test.app
 
 --
-
-To verify your build environment the best way forward is most likely to download the LL source by following the instructions on http://wiki.secondlife.com/wiki/Compiling_the_viewer_(Mac_OS_X_XCode_6.1)
 
 You should be able to both use the Xcode project (easiest to verify) and the command line build. 
 
@@ -483,23 +489,6 @@ BUILD NOTE: When building in Xcode at some point the build will fail because it 
 
 The root cause of this is that it tries to run autobuild by spawning a shell from inside autobuild, but Xcode will not allow any other version than the system python to be called so autobuild will fail - it does not even find it.  For anything but a (final) release build this is not significant. This build has to be done from the command line. 
 
---
-
-To build Kokua first download the Kokua source code with the following command in terminal:
-
-For the SecondLife version:
-
-git clone https://bitbucket.org/kokua/kokua-release 
-
-You can configure the build with:
-
-autobuild configure -c ReleaseOS -A 64 -- -DCMAKE_VERBOSE_MAKEFILE:BOOL=FALSE -DLL_TESTS:BOOL=OFF -DPACKAGE:BOOL=FALSE -DOPENAL:BOOL=TRUE -DFMODSTUDIO:BOOL=OFF -DUSE_KDU:BOOL=OFF -DHAVOK_TPV:BOOL=OFF
-
-or 
-
-autobuild configure -c RelWithDebInfoOS -A 64 -- -DCMAKE_VERBOSE_MAKEFILE:BOOL=FALSE -DLL_TESTS:BOOL=OFF -DPACKAGE:BOOL=FALSE -DOPENAL:BOOL=TRUE -DFMODSTUDIO:BOOL=OFF -DUSE_KDU:BOOL=OFF -DHAVOK_TPV:BOOL=OFF
-
-When you have made sure your configuration is working (and compiles in Xcode) you can also compile on the command line by substituting configure with build in the two commands above. 
 
 Disclaimer
 
