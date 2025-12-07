@@ -262,13 +262,6 @@ bool LLFloaterModelPreview::postBuild()
     {
         validate_url = llformat("http://secondlife.%s.lindenlab.com/my/account/mesh.php",current_grid.c_str());
     }
-// <FS:CR> Show an alert dialog if Havok not included in this build as functionality will be limited
-#ifndef HAVOK_TPV
-    LLSD args;
-    args["FEATURE"] = getString("no_havok");
-    LLNotificationsUtil::add("NoHavok", args);
-#endif
-// </FS:CR>
     getChild<LLTextBox>("warning_message")->setTextArg("[VURL]", validate_url);
 
     mUploadBtn = getChild<LLButton>("ok_btn");

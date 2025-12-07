@@ -3,7 +3,7 @@ include(Prebuilt)
 
 # There are three possible solutions to provide the llphysicsextensions:
 # - The full source package, selected by -DHAVOK:BOOL=ON
-# - The stub source package, selected by -DHAVOK:BOOL=OFF 
+# - The stub source package, selected by -DHAVOK:BOOL=OFF
 # - The prebuilt package available to those with sublicenses, selected by -DHAVOK_TPV:BOOL=ON
 
 if (INSTALL_PROPRIETARY)
@@ -37,13 +37,7 @@ elseif (HAVOK_TPV)
    if (NOT DARWIN)
       if(WINDOWS)
          target_link_libraries( llphysicsextensions_impl INTERFACE ${ARCH_PREBUILT_DIRS}/llphysicsextensions_tpv.lib)
-	 # <FS:ND> include paths for LLs version and ours are different.
-	 set(LLPHYSICSEXTENSIONS_INCLUDE_DIRS ${LIBS_PREBUILT_DIR}/include/llphysicsextensions)
-	 # </FS:ND>
 
-	 # <FS:ND> havok lib get installed to packages/lib
-	 link_directories( ${LIBS_PREBUILT_DIR}/lib )
-	 # </FS:ND>
       elseif(LINUX)
          target_link_libraries( llphysicsextensions_impl INTERFACE ${ARCH_PREBUILT_DIRS}/libllphysicsextensions_tpv.a)
       endif()
