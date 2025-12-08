@@ -1539,9 +1539,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>f09066891d5a52add50bdb14efdc86f6</string>
+              <string>9520266bd701bddeaa1982c40f11220c</string>
               <key>url</key>
-              <string>https://s3-proxy.lindenlab.com/private-builds-secondlife-com/ct2/84729/788142/llphysicsextensions_tpv-1.0.561752-darwin64-561752.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/llphysicsextensions_tpv/downloads/llphysicsextensions_tpv-1.0.12401597145-darwin64-12401597145.tar.bz2</string>
             </map>
             <key>name</key>
             <string>darwin64</string>
@@ -1563,12 +1563,14 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>a43e360236e7c17b5823f91e4c349e60</string>
+              <string>ab4b9d3ff7b6b53f1ab6d9d3bef012da</string>
+              <key>hash_algorithm</key>
+              <string>md5</string>
               <key>url</key>
-              <string>https://s3-proxy.lindenlab.com/private-builds-secondlife-com/ct2/84731/788139/llphysicsextensions_tpv-1.0.561752-windows64-561752.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/llphysicsextensions_tpv/downloads/llphysicsextensions_tpv-1.0.12401597145-windows64-12401597145.tar.bz2</string>
             </map>
             <key>name</key>
-            <string>windows</string>
+            <string>windows64</string>
           </map>
         </map>
         <key>license</key>
@@ -1578,7 +1580,7 @@
         <key>copyright</key>
         <string>Copyright (c) 2010, Linden Research, Inc.</string>
         <key>version</key>
-        <string>1.0.561752</string>
+        <string>1.0.577418</string>
         <key>name</key>
         <string>llphysicsextensions_tpv</string>
       </map>
