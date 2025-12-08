@@ -37,7 +37,6 @@ elseif (HAVOK_TPV)
    if (NOT DARWIN)
       if(WINDOWS)
          target_link_libraries( llphysicsextensions_impl INTERFACE ${ARCH_PREBUILT_DIRS}/llphysicsextensions_tpv.lib)
-
       elseif(LINUX)
          target_link_libraries( llphysicsextensions_impl INTERFACE ${ARCH_PREBUILT_DIRS}/libllphysicsextensions_tpv.a)
       endif()
