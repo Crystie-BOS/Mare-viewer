@@ -3422,8 +3422,10 @@ void send_agent_update(bool force_send, bool send_reliable)
     llassert(!gCubeSnapshot);
 
     LLAgent::ETeleportState tp_state = gAgent.getTeleportState();
-    if (tp_state != LLAgent::TELEPORT_NONE
-        && tp_state != LLAgent::TELEPORT_ARRIVING)
+//CA: Back out this optimisation - it's a prime cause of zombie HUDs (symptom: can't edit them after tp or interact as normal)
+//    if (tp_state != LLAgent::TELEPORT_NONE
+//        && tp_state != LLAgent::TELEPORT_ARRIVING)
+    if (tp_state != LLAgent::TELEPORT_NONE)
     {
         // We don't care if they want to send an agent update, they're not allowed
         // until the target simulator is ready to receive them
