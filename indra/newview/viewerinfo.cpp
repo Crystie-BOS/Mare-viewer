@@ -33,7 +33,7 @@ namespace ViewerInfo
     const std::string NAME  = "MARE Viewer";
 const S32         MAJOR = 1;
 const S32         MINOR = 0;
-const S32         PATCH = 0;
+const S32         PATCH = 1;
 const S32         BUILD = 1;
 const std::string EXTRA = "";
 
