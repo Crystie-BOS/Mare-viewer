@@ -884,7 +884,7 @@ void LLDrawPoolAvatar::renderAvatars(LLVOAvatar* single_avatar, S32 pass)
         return;
     }
 
-    if ((sShaderLevel >= SHADER_LEVEL_CLOTH))
+    if (LLPipeline::RenderAvatarCloth)
     {
         LLMatrix4 rot_mat;
         LLViewerCamera::getInstance()->getMatrixToLocal(rot_mat);

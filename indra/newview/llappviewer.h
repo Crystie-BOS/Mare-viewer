@@ -77,6 +77,8 @@ typedef enum
     LAST_EXEC_BAD_ALLOC,
     LAST_EXEC_MISSING_FILES,
     LAST_EXEC_GRAPHICS_INIT,
+    LAST_EXEC_UNKNOWN,
+    LAST_EXEC_LOGOUT_UNKNOWN,
     LAST_EXEC_COUNT
 } eLastExecEvent;
 
@@ -204,25 +206,13 @@ public:
     // For thread debugging.
     // llstartup needs to control init.
     // llworld, send_agent_pause() also controls pause/resume.
-
-    // <FS:ND> Change from std::string to char const*, saving a lot of object construction/destruction per frame
-
-    // void initMainloopTimeout(const std::string& state, F32 secs = -1.0f);
-    void initMainloopTimeout( char const *state, F32 secs = -1.0f);
-
-    // </FS:ND>
-
+    void initMainloopTimeout(std::string_view state);
     void destroyMainloopTimeout();
     void pauseMainloopTimeout();
+    void resumeMainloopTimeout(std::string_view state = "");
+    void pingMainloopTimeout(std::string_view state);
 
-    // <FS:ND> Change from std::string to char const*, saving a lot of object construction/destruction per frame
-
-    // void resumeMainloopTimeout(const std::string& state = "", F32 secs = -1.0f);
-    // void pingMainloopTimeout(const std::string& state, F32 secs = -1.0f);
-    void resumeMainloopTimeout( char const *state = "", F32 secs = -1.0f);
-    void pingMainloopTimeout( char const *state, F32 secs = -1.0f);
-
-    // </FS:ND>
+    F32 getMainloopTimeoutSec() const;
 
     // Handle the 'login completed' event.
     // *NOTE:Mani Fix this for login abstraction!!
@@ -238,7 +228,7 @@ public:
         return mOnLoginCompleted.connect(cb);
     }
 
-    void addOnIdleCallback(const boost::function<void()>& cb); // add a callback to fire (once) when idle
+    void addOnIdleCallback(const std::function<void()>& cb); // add a callback to fire (once) when idle
 
     void initGeneralThread();
     void purgeUserDataOnExit() { mPurgeUserDataOnExit = true; }

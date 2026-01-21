@@ -88,6 +88,7 @@
 #include "raytrace.h"
 
 // newview includes
+#include "llaccordionctrl.h"
 #include "llbox.h"
 #include "llchicletbar.h"
 #include "llconsole.h"
@@ -1887,8 +1888,9 @@ LLViewerWindow::LLViewerWindow(const Params& p)
     // pass its value right now. Instead, pass it a nullary function that
     // will, when we later need it, return the value of gKeyboard.
     // boost::lambda::var() constructs such a functor on the fly.
-    mWindowListener.reset(new LLWindowListener(this, boost::lambda::var(gKeyboard)));
-    mViewerWindowListener.reset(new LLViewerWindowListener(this));
+    LLWindowListener::KeyboardGetter getter = [](){ return gKeyboard; };
+    mWindowListener = std::make_unique<LLWindowListener>(this, getter);
+    mViewerWindowListener = std::make_unique<LLViewerWindowListener>(this);
 
     mSystemChannel.reset(new LLNotificationChannel("System", "Visible", LLNotificationFilters::includeEverything));
     mCommunicationChannel.reset(new LLCommunicationChannel("Communication", "Visible"));
@@ -3422,6 +3424,8 @@ void LLViewerWindow::updateUI()
 
     LLConsole::updateClass();
 
+    // execute postponed arrange calls
+    LLAccordionCtrl::updateClass();
     // animate layout stacks so we have up to date rect for world view
     LLLayoutStack::updateClass();
 
@@ -6143,7 +6147,7 @@ bool LLViewerWindow::getUIVisibility()
 //
 LLPickInfo::LLPickInfo()
     : mKeyMask(MASK_NONE),
-      mPickCallback(NULL),
+      mPickCallback(nullptr),
       mPickType(PICK_INVALID),
       mWantSurfaceInfo(false),
       mObjectFace(-1),
@@ -6154,7 +6158,7 @@ LLPickInfo::LLPickInfo()
       mNormal(),
       mTangent(),
       mBinormal(),
-      mHUDIcon(NULL),
+      mHUDIcon(nullptr),
       mPickTransparent(false),
       mPickRigged(false),
       mPickParticle(false)

@@ -659,12 +659,10 @@ public:
           mRequestedBytes(requested_bytes)
         {}
 
-    virtual ~LLMeshHandlerBase()
-        {}
+    virtual ~LLMeshHandlerBase() = default;
 
-protected:
-    LLMeshHandlerBase(const LLMeshHandlerBase &);               // Not defined
-    void operator=(const LLMeshHandlerBase &);                  // Not defined
+    LLMeshHandlerBase(const LLMeshHandlerBase &) = delete;
+    LLMeshHandlerBase& operator=(const LLMeshHandlerBase&) = delete;
 
 public:
     virtual void onCompleted(LLCore::HttpHandle handle, LLCore::HttpResponse * response);
@@ -698,9 +696,8 @@ public:
     }
     virtual ~LLMeshHeaderHandler();
 
-protected:
-    LLMeshHeaderHandler(const LLMeshHeaderHandler &);           // Not defined
-    void operator=(const LLMeshHeaderHandler &);                // Not defined
+    LLMeshHeaderHandler(const LLMeshHeaderHandler&) = delete;
+    LLMeshHeaderHandler& operator=(const LLMeshHeaderHandler&) = delete;
 
 public:
     virtual void processData(LLCore::BufferArray * body, S32 body_offset, U8 * data, S32 data_size);
@@ -724,9 +721,8 @@ public:
         }
     virtual ~LLMeshLODHandler();
 
-protected:
-    LLMeshLODHandler(const LLMeshLODHandler &);                 // Not defined
-    void operator=(const LLMeshLODHandler &);                   // Not defined
+    LLMeshLODHandler(const LLMeshLODHandler&) = delete;
+    LLMeshLODHandler& operator=(const LLMeshLODHandler&) = delete;
 
 public:
     virtual void processData(LLCore::BufferArray * body, S32 body_offset, U8 * data, S32 data_size);
@@ -755,9 +751,8 @@ public:
     }
     virtual ~LLMeshSkinInfoHandler();
 
-protected:
-    LLMeshSkinInfoHandler(const LLMeshSkinInfoHandler &);       // Not defined
-    void operator=(const LLMeshSkinInfoHandler &);              // Not defined
+    LLMeshSkinInfoHandler(const LLMeshSkinInfoHandler&) = delete;
+    LLMeshSkinInfoHandler& operator=(const LLMeshSkinInfoHandler&) = delete;
 
     void processSkin(U8* data, S32 data_size);
 
@@ -783,9 +778,8 @@ public:
     {}
     virtual ~LLMeshDecompositionHandler();
 
-protected:
-    LLMeshDecompositionHandler(const LLMeshDecompositionHandler &);     // Not defined
-    void operator=(const LLMeshDecompositionHandler &);                 // Not defined
+    LLMeshDecompositionHandler(const LLMeshDecompositionHandler&) = delete;
+    LLMeshDecompositionHandler& operator=(const LLMeshDecompositionHandler&) = delete;
 
 public:
     virtual void processData(LLCore::BufferArray * body, S32 body_offset, U8 * data, S32 data_size);
@@ -809,9 +803,8 @@ public:
     {}
     virtual ~LLMeshPhysicsShapeHandler();
 
-protected:
-    LLMeshPhysicsShapeHandler(const LLMeshPhysicsShapeHandler &);   // Not defined
-    void operator=(const LLMeshPhysicsShapeHandler &);              // Not defined
+    LLMeshPhysicsShapeHandler(const LLMeshPhysicsShapeHandler&) = delete;
+    LLMeshPhysicsShapeHandler& operator=(const LLMeshPhysicsShapeHandler&) = delete;
 
 public:
     virtual void processData(LLCore::BufferArray * body, S32 body_offset, U8 * data, S32 data_size);
@@ -948,20 +941,20 @@ LLMeshRepoThread::LLMeshRepoThread()
     mSkinMapMutex = new LLMutex();
     mSignal = new LLCondition();
     mHttpRequest = new LLCore::HttpRequest;
-    mHttpOptions = LLCore::HttpOptions::ptr_t(new LLCore::HttpOptions);
+    mHttpOptions = std::make_shared<LLCore::HttpOptions>();
     mHttpOptions->setTransferTimeout(SMALL_MESH_XFER_TIMEOUT);
     mHttpOptions->setUseRetryAfter(gSavedSettings.getBOOL("MeshUseHttpRetryAfter"));
-    mHttpLargeOptions = LLCore::HttpOptions::ptr_t(new LLCore::HttpOptions);
+    mHttpLargeOptions = std::make_shared<LLCore::HttpOptions>();
     mHttpLargeOptions->setTransferTimeout(LARGE_MESH_XFER_TIMEOUT);
     mHttpLargeOptions->setUseRetryAfter(gSavedSettings.getBOOL("MeshUseHttpRetryAfter"));
-    mHttpHeaders = LLCore::HttpHeaders::ptr_t(new LLCore::HttpHeaders);
+    mHttpHeaders = std::make_shared<LLCore::HttpHeaders>();
     mHttpHeaders->append(HTTP_OUT_HEADER_ACCEPT, HTTP_CONTENT_VND_LL_MESH);
     mHttpPolicyClass = app_core_http.getPolicy(LLAppCoreHttp::AP_MESH2);
     mHttpLargePolicyClass = app_core_http.getPolicy(LLAppCoreHttp::AP_LARGE_MESH);
 
     // Lod processing is expensive due to the number of requests
     // and a need to do expensive cacheOptimize().
-    mMeshThreadPool.reset(new LL::ThreadPool("MeshLodProcessing", 2));
+    mMeshThreadPool = std::make_unique<LL::ThreadPool>("MeshLodProcessing", 2);
     mMeshThreadPool->start();
 }
 
@@ -1658,7 +1651,7 @@ bool LLMeshRepoThread::fetchMeshSkinInfo(const LLUUID& mesh_id)
 
             if (!http_url.empty())
             {
-                LLMeshHandlerBase::ptr_t handler(new LLMeshSkinInfoHandler(mesh_id, offset, size));
+                LLMeshHandlerBase::ptr_t handler = std::make_shared<LLMeshSkinInfoHandler>(mesh_id, offset, size);
                 LLCore::HttpHandle handle = getByteRange(http_url, offset, size, handler);
                 if (LLCORE_HTTP_HANDLE_INVALID == handle)
                 {
@@ -1766,7 +1759,7 @@ bool LLMeshRepoThread::fetchMeshDecomposition(const LLUUID& mesh_id)
 
             if (!http_url.empty())
             {
-                LLMeshHandlerBase::ptr_t handler(new LLMeshDecompositionHandler(mesh_id, offset, size));
+                LLMeshHandlerBase::ptr_t handler = std::make_shared<LLMeshDecompositionHandler>(mesh_id, offset, size);
                 LLCore::HttpHandle handle = getByteRange(http_url, offset, size, handler);
                 if (LLCORE_HTTP_HANDLE_INVALID == handle)
                 {
@@ -1865,7 +1858,7 @@ bool LLMeshRepoThread::fetchMeshPhysicsShape(const LLUUID& mesh_id)
 
             if (!http_url.empty())
             {
-                LLMeshHandlerBase::ptr_t handler(new LLMeshPhysicsShapeHandler(mesh_id, offset, size));
+                LLMeshHandlerBase::ptr_t handler = std::make_shared<LLMeshPhysicsShapeHandler>(mesh_id, offset, size);
                 LLCore::HttpHandle handle = getByteRange(http_url, offset, size, handler);
                 if (LLCORE_HTTP_HANDLE_INVALID == handle)
                 {
@@ -1993,7 +1986,7 @@ bool LLMeshRepoThread::fetchMeshHeader(const LLVolumeParams& mesh_params)
         //within the first 4KB
         //NOTE -- this will break of headers ever exceed 4KB
 
-        LLMeshHandlerBase::ptr_t handler(new LLMeshHeaderHandler(mesh_params, 0, MESH_HEADER_SIZE));
+        LLMeshHandlerBase::ptr_t handler = std::make_shared<LLMeshHeaderHandler>(mesh_params, 0, MESH_HEADER_SIZE);
         LLCore::HttpHandle handle = getByteRange(http_url, 0, MESH_HEADER_SIZE, handler);
         if (LLCORE_HTTP_HANDLE_INVALID == handle)
         {
@@ -2169,7 +2162,7 @@ bool LLMeshRepoThread::fetchMeshLOD(const LLVolumeParams& mesh_params, S32 lod)
             {
                 LL_DEBUGS(LOG_MESH) << "Mesh/Cache: Mesh body for ID " << mesh_id << " - was retrieved from the simulator." << LL_ENDL;
 
-                LLMeshHandlerBase::ptr_t handler(new LLMeshLODHandler(mesh_params, lod, offset, size));
+                LLMeshHandlerBase::ptr_t handler = std::make_shared<LLMeshLODHandler>(mesh_params, lod, offset, size);
                 LLCore::HttpHandle handle = getByteRange(http_url, offset, size, handler);
                 if (LLCORE_HTTP_HANDLE_INVALID == handle)
                 {
@@ -2616,11 +2609,11 @@ LLMeshUploadThread::LLMeshUploadThread(LLMeshUploadThread::instance_list_t& data
     mMeshUploadTimeOut = gSavedSettings.getS32("MeshUploadTimeOut");
 
     mHttpRequest = new LLCore::HttpRequest;
-    mHttpOptions = LLCore::HttpOptions::ptr_t(new LLCore::HttpOptions);
+    mHttpOptions = std::make_shared<LLCore::HttpOptions>();
     mHttpOptions->setTransferTimeout(mMeshUploadTimeOut);
     mHttpOptions->setUseRetryAfter(gSavedSettings.getBOOL("MeshUseHttpRetryAfter"));
     mHttpOptions->setRetries(UPLOAD_RETRY_LIMIT);
-    mHttpHeaders = LLCore::HttpHeaders::ptr_t(new LLCore::HttpHeaders);
+    mHttpHeaders = std::make_shared<LLCore::HttpHeaders>();
     mHttpHeaders->append(HTTP_OUT_HEADER_CONTENT_TYPE, HTTP_CONTENT_LLSD_XML);
     mHttpPolicyClass = LLAppViewer::instance()->getAppCoreHttp().getPolicy(LLAppCoreHttp::AP_UPLOADS);
 }
@@ -4325,7 +4318,7 @@ S32 LLMeshRepository::loadMesh(LLVOVolume* vobj, const LLVolumeParams& mesh_para
         else
         {
             //first request for this mesh
-            std::shared_ptr<PendingRequestBase> request(new PendingRequestLOD(mesh_params, new_lod));
+            std::shared_ptr<PendingRequestBase> request = std::make_shared<PendingRequestLOD>(mesh_params, new_lod);
             mPendingRequests.emplace_back(request);
             mLoadingMeshes[new_lod][mesh_id].initData(vobj, request);
             LLMeshRepository::sLODPending++;
@@ -4823,7 +4816,7 @@ const LLMeshSkinInfo* LLMeshRepository::getSkinInfo(const LLUUID& mesh_id, LLVOV
             else
             {
                 //first request for this mesh
-                std::shared_ptr<PendingRequestBase> request(new PendingRequestUUID(mesh_id, MESH_REQUEST_SKIN));
+                std::shared_ptr<PendingRequestBase> request = std::make_shared<PendingRequestUUID>(mesh_id, MESH_REQUEST_SKIN);
                 mLoadingSkins[mesh_id].initData(requesting_obj, request);
                 mPendingRequests.emplace_back(request);
             }

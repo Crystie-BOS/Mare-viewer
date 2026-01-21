@@ -873,13 +873,12 @@ class DarwinManifest(ViewerManifest):
         with self.prefix(src="", dst="Contents"):  # everything goes in Contents
             bugsplat_db = self.args.get('bugsplat')
             if bugsplat_db:
-                # Inject BugsplatServerURL into Info.plist if provided.
+                # Inject Bugsplat's db into Info.plist if provided.
                 Info_plist = self.dst_path_of("Info.plist")
                 with open(Info_plist, 'rb') as f:
                     Info = plistlib.load(f)
                     # https://www.bugsplat.com/docs/platforms/os-x#configuration
-                    Info["BugsplatServerURL"] = \
-                        "https://{}.bugsplat.com/".format(bugsplat_db)
+                    Info["BugSplatDatabase"] = bugsplat_db
                     self.put_in_file(
                         plistlib.dumps(Info),
                         os.path.basename(Info_plist),
@@ -893,6 +892,8 @@ class DarwinManifest(ViewerManifest):
 
                 if self.args.get('bugsplat'):
                     self.path2basename(relpkgdir, "BugsplatMac.framework")
+                    self.path2basename(relpkgdir, "CrashReporter.framework")
+                    self.path2basename(relpkgdir, "HockeySDK.framework")
 
                 # OpenAL dylibs
                 if self.args['openal'] == 'ON':
@@ -930,6 +931,24 @@ class DarwinManifest(ViewerManifest):
                     # stamped into the framework.
                     # Let exception, if any, propagate -- if this doesn't
                     # work, we need the build to noisily fail!
+                    oldpath = subprocess.check_output(
+                        ['objdump', '--macho', '--dylib-id', '--non-verbose',
+                         os.path.join(relpkgdir, "HockeySDK.framework", "HockeySDK")],
+                        text=True
+                        ).splitlines()[-1]  # take the last line of output
+                    self.run_command(
+                        ['install_name_tool', '-change', oldpath,
+                         '@executable_path/../Frameworks/HockeySDK.framework/HockeySDK',
+                         executable])
+                    oldpath = subprocess.check_output(
+                        ['objdump', '--macho', '--dylib-id', '--non-verbose',
+                         os.path.join(relpkgdir, "CrashReporter.framework", "CrashReporter")],
+                        text=True
+                        ).splitlines()[-1]  # take the last line of output
+                    self.run_command(
+                        ['install_name_tool', '-change', oldpath,
+                         '@executable_path/../Frameworks/CrashReporter.framework/CrashReporter',
+                         executable])
                     oldpath = subprocess.check_output(
                         ['objdump', '--macho', '--dylib-id', '--non-verbose',
                          os.path.join(relpkgdir, "BugsplatMac.framework", "BugsplatMac")]
