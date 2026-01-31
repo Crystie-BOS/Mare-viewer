@@ -28,7 +28,7 @@
     button_display_mode="icons_only">
     <command name="avatar"/>
     <command name="destinations"/>
-    <command name="legacy_search"/>
+    <command name="search_legacy"/>
     <command name="area_search" />
     <command name="web_browser"/>
     <command name="twitter"/>

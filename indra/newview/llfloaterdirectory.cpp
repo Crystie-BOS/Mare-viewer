@@ -86,6 +86,8 @@ bool LLFloaterDirectory::postBuild()
     mPanelClassifiedp = findChild<LLPanelClassifiedInfo>("panel_classified_info");
     mPanelClassifiedp->setBackgroundVisible(false);
     mPanelEventp = findChild<LLPanelEventInfo>("panel_event_info");
+    // CA: somehow this floater is setting its title to the label of panel_group_info_sidetray, so slam it back
+    setTitle(getString("legacy_search.name"));
 
     return true;
 }

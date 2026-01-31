@@ -50,7 +50,6 @@
 
 
 #include "fscommon.h"
-#include "fsfloatersearch.h"    // <FS:CR> FIRE-6310
 #include "fscorehttputil.h"
 #include "llavatarnamecache.h"
 #include "llexperiencecache.h"
@@ -3231,14 +3230,6 @@ void register_viewer_callbacks(LLMessageSystem* msg)
     msg->setHandlerFunc("PlacesReply", process_places_reply);
     msg->setHandlerFunc("GroupNoticesListReply", LLPanelGroupNotices::processGroupNoticesListReply);
 
-// <FS:CR> FIRE-6310 - Legacy search handlers
-    msg->setHandlerFunc("DirPeopleReply", FSPanelSearchPeople::processSearchReply);
-    msg->setHandlerFunc("DirPlacesReply", FSPanelSearchPlaces::processSearchReply);
-    msg->setHandlerFunc("DirGroupsReply", FSPanelSearchGroups::processSearchReply);
-    msg->setHandlerFunc("DirEventsReply", FSPanelSearchEvents::processSearchReply);
-    msg->setHandlerFunc("DirLandReply",   FSPanelSearchLand::processSearchReply);
-    msg->setHandlerFunc("DirClassifiedReply",  FSPanelSearchClassifieds::processSearchReply);
-// </FS:CR> FIRE-6310
     msg->setHandlerFunc("AvatarPickerReply", LLFloaterAvatarPicker::processAvatarPickerReply);
 
     msg->setHandlerFunc("DirPlacesReply", LLPanelDirBrowser::processDirPlacesReply);
