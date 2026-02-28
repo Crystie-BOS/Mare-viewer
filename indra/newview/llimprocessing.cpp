@@ -620,51 +620,6 @@ void LLIMProcessing::processNewMessage(LLUUID from_id,
             // do nothing -- don't distract newbies in
             // Prelude with global IMs
         }
-        else if (offline == IM_ONLINE
-            && is_do_not_disturb
-            && from_id.notNull() //not a system message
-//MK
-            ////                    && to_id.notNull()) //not global message
-            && to_id.notNull() //not global message
-            // agent is not forbidden to receive IMs or the sender is an exception => send Busy response
-            && (!KokuaRLVExtras::cannotRecvIM(session_id, from_id.asString()))
-            )
-//mk
-        {
-
-            // now store incoming IM in chat history
-
-            buffer = message;
-
-            LL_DEBUGS("Messaging") << "session_id( " << session_id << " ), from_id( " << from_id << " )" << LL_ENDL;
-
-                chat.mText = buffer;
-                bool keyword_alert_performed = false;
-
-                // add to IM panel, but do not bother the user
-                gIMMgr->addMessage(
-                    session_id,
-                    from_id,
-                    name,
-                    buffer,
-                    IM_OFFLINE == offline,
-                    LLStringUtil::null,
-                    dialog,
-                    parent_estate_id,
-                    region_id,
-                    position,
-                    false,
-                    keyword_alert_performed,
-                    timestamp);
-
-            if (!gIMMgr->isDNDMessageSend(session_id))
-            {
-                // return a standard "do not disturb" message, but only do it to online IM
-                // (i.e. not other auto responses and not store-and-forward IM)
-                send_do_not_disturb_message(gMessageSystem, from_id, session_id);
-                gIMMgr->setDNDMessageSent(session_id, true);
-            }
-        }
 //MK
         else if (!is_muted && gRRenabled && message == "@version")
         {
@@ -799,6 +754,51 @@ void LLIMProcessing::processNewMessage(LLUUID from_id,
             gIMMgr->processIMTypingStop(from_id,IM_DO_NOT_DISTURB_AUTO_RESPONSE);
         }
 //mk
+        else if (offline == IM_ONLINE
+            && is_do_not_disturb
+            && from_id.notNull() //not a system message
+//MK
+            ////                    && to_id.notNull()) //not global message
+            && to_id.notNull() //not global message
+            // agent is not forbidden to receive IMs or the sender is an exception => send Busy response
+            && (!KokuaRLVExtras::cannotRecvIM(session_id, from_id.asString()))
+            )
+//mk
+        {
+
+            // now store incoming IM in chat history
+
+            buffer = message;
+
+            LL_DEBUGS("Messaging") << "session_id( " << session_id << " ), from_id( " << from_id << " )" << LL_ENDL;
+
+                chat.mText = buffer;
+                bool keyword_alert_performed = false;
+
+                // add to IM panel, but do not bother the user
+                gIMMgr->addMessage(
+                    session_id,
+                    from_id,
+                    name,
+                    buffer,
+                    IM_OFFLINE == offline,
+                    LLStringUtil::null,
+                    dialog,
+                    parent_estate_id,
+                    region_id,
+                    position,
+                    false,
+                    keyword_alert_performed,
+                    timestamp);
+
+            if (!gIMMgr->isDNDMessageSend(session_id))
+            {
+                // return a standard "do not disturb" message, but only do it to online IM
+                // (i.e. not other auto responses and not store-and-forward IM)
+                send_do_not_disturb_message(gMessageSystem, from_id, session_id);
+                gIMMgr->setDNDMessageSent(session_id, true);
+            }
+        }
         else if (from_id.isNull())
         {
             LLSD args;
