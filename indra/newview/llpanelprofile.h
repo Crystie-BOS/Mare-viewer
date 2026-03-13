@@ -131,6 +131,8 @@ public:
     // <FS:Zi> FIRE-32184: Online/Offline status not working for non-friends
     void onAvatarProperties(const LLAvatarData* d);
 
+    void setAllowEdit(bool allow_edit) { mAllowEdit = allow_edit; }
+
 protected:
     /**
      * Process profile related data received from server.
@@ -227,11 +229,12 @@ private:
     bool                mWaitingForImageUpload;
     bool                mAllowPublish;
     bool                mHideAge;
+    bool                mAllowEdit;
     std::string         mDescriptionText;
     boost::signals2::connection mAvatarNameCacheConnection;
+    boost::signals2::connection mMenuNameCacheConnection;
     boost::signals2::connection mRlvBehaviorCallbackConnection;
     void updateRlvRestrictions(std::string behavior);
-
     // <FS:Zi> FIRE-32184: Online/Offline status not working for non-friends
     FSPanelPropertiesObserver mPropertiesObserver;
 };

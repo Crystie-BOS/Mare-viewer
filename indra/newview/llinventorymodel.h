@@ -126,9 +126,8 @@ public:
         FetchItemHttpHandler(const LLSD & request_sd);
         virtual ~FetchItemHttpHandler();
 
-    protected:
-        FetchItemHttpHandler(const FetchItemHttpHandler &);             // Not defined
-        void operator=(const FetchItemHttpHandler &);                   // Not defined
+        FetchItemHttpHandler(const FetchItemHttpHandler&) = delete;
+        FetchItemHttpHandler& operator=(const FetchItemHttpHandler&) = delete;
 
     public:
         virtual void onCompleted(LLCore::HttpHandle handle, LLCore::HttpResponse * response);
@@ -529,7 +528,7 @@ public:
     void createNewCategory(const LLUUID& parent_id,
                              LLFolderType::EType preferred_type,
                              const std::string& name,
-                             inventory_func_type callback = NULL,
+                             inventory_func_type callback = nullptr,
                              const LLUUID& thumbnail_id = LLUUID::null);
 ////protected:
 public:
