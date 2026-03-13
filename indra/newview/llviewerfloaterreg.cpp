@@ -39,7 +39,6 @@
 #include "floaterhop.h"
 #include "fsareasearch.h"
 #include "fsfloaterexport.h"
-#include "fsfloatersearch.h"
 #include "fsmoneytracker.h"
 #include "llcompilequeue.h"
 #include "llfasttimerview.h"
@@ -204,7 +203,6 @@
 #include "llsyswellwindow.h"
 
 // *NOTE: Please add files in alphabetical order to keep merges easy.
-#include "fspanelclassified.h"
 #include "fsfloateraddtocontactset.h"
 #include "fsfloatercontactsetconfiguration.h"
 #include "fsfloaterimport.h"
@@ -269,7 +267,7 @@ public:
                 "upload_script",
                 "upload_sound",
                 "bulk_upload",
-                "legacy_search"
+                "search_legacy"
             };
             return std::find(blacklist_clicked.begin(), blacklist_clicked.end(), fl_name) == blacklist_clicked.end();
         }
@@ -322,7 +320,7 @@ public:
                 "upload_sound",
                 "bulk_upload",
                 "slapp_test",
-                "legacy_search"
+                "search_legacy"
             };
             return std::find(blacklist_untrusted.begin(), blacklist_untrusted.end(), fl_name) == blacklist_untrusted.end();
         }
@@ -570,7 +568,7 @@ void LLViewerFloaterReg::registerFloaters()
     LLFloaterReg::add("snapshot", "floater_snapshot.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<LLFloaterSnapshot>);
     LLFloaterReg::add("simple_snapshot", "floater_simple_snapshot.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<LLFloaterSimpleSnapshot>);
     LLFloaterReg::add("search", "floater_search.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<LLFloaterSearch>);
-    LLFloaterReg::add("legacy_search", "floater_directory.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<LLFloaterDirectory>);
+    LLFloaterReg::add("search_legacy", "floater_directory.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<LLFloaterDirectory>);
     LLFloaterReg::add("profile", "floater_profile.xml",(LLFloaterBuildFunc)&LLFloaterReg::build<LLFloaterProfile>);
     LLFloaterReg::add("guidebook", "floater_how_to.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<LLFloaterHowTo>);
     LLFloaterReg::add("slapp_test", "floater_test_slapp.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<LLFloaterSLappTest>);
@@ -605,10 +603,8 @@ void LLViewerFloaterReg::registerFloaters()
     LLFloaterReg::add("rlv_status", "floater_rlv_status.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<KokuaFloaterRLVStatus>);
     LLFloaterReg::add("rlv_worn", "floater_rlv_worn.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<KokuaFloaterRLVWorn>);
     LLFloaterReg::add("fs_posestand", "floater_fs_posestand.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<FSFloaterPoseStand>);
-    LLFloaterReg::add("search_legacy", "floater_fs_search.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<FSFloaterSearch>);
     LLFloaterReg::add("fs_wearable_favorites", "floater_fs_wearable_favorites.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<FSFloaterWearableFavorites>);
     LLFloaterReg::add("kokua_chatbar", "floater_chatbar.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<KokuaChatBar>);
-    LLFloaterReg::add("publish_classified_fs", "floater_publish_classified.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<FSPublishClassifiedFloater>);
     LLFloaterReg::add("search_replace", "floater_search_replace.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<LLFloaterSearchReplace>);
     LLFloaterReg::registerControlVariables(); // Make sure visibility and rect controls get preserved when saving
 }

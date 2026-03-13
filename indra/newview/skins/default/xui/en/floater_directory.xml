@@ -9,7 +9,11 @@
  width="780"
  min_width="780"
  name="directory"
- title="Search">
+ title="LEGACY SEARCH">
+	<!-- Strings -->
+	<floater.string name="legacy_search.name">
+		LEGACY SEARCH
+	</floater.string>
     <tab_container
      top="0"
      left="0"

@@ -102,11 +102,9 @@ set(viewer_SOURCE_FILES
     fsfloaterexport.cpp
     fsfloaterimport.cpp
     fsfloaterposestand.cpp
-    fsfloatersearch.cpp
     fsfloaterwearablefavorites.cpp
     fskeywords.cpp
     fsmoneytracker.cpp
-    fspanelclassified.cpp
     fspose.cpp
     fsscrolllistctrl.cpp
     lggcontactsets.cpp
@@ -833,11 +831,9 @@ set(viewer_HEADER_FILES
     fsfloaterexport.h    
     fsfloaterimport.h
     fsfloaterposestand.h
-    fsfloatersearch.h
     fsfloaterwearablefavorites.h
     fskeywords.h
     fsmoneytracker.h
-    fspanelclassified.h
     fspose.h
     fsscrolllistctrl.h
     gltfscenemanager.h
