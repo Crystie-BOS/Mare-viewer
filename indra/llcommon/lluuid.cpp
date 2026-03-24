@@ -590,7 +590,9 @@ S32 LLUUID::getNodeID(unsigned char* node_id)
 #ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
 #if !LL_DARWIN
+#ifdef __linux__
 #include <linux/sockios.h>
+#endif
 #endif
 #endif
 
