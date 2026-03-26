@@ -2565,6 +2565,19 @@ void LLFloaterIMContainer::closeFloater(bool app_quitting/* = false*/)
     }
 }
 
+void LLFloaterIMContainer::closeFromCloseAll(bool app_quitting/* = false*/)
+{
+    if (app_quitting)
+    {
+        closeAllConversations(app_quitting);
+        onClickCloseBtn(app_quitting);
+    }
+    else
+    {
+        onClickCloseBtn(false);
+    }
+}
+
 void LLFloaterIMContainer::handleReshape(const LLRect& rect, bool by_user)
 {
     LLMultiFloater::handleReshape(rect, by_user);
