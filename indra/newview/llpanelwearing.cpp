@@ -176,6 +176,18 @@ protected:
         menu->setItemEnabled("edit_item",          1 == mUUIDs.size() && get_is_item_editable(mUUIDs.front()));
         menu->setItemVisible("take_off",    allow_take_off);
         menu->setItemVisible("detach",      allow_detach);
+        if (allow_detach && gRRenabled)
+        {
+            for (uuid_vec_t::const_iterator it = mUUIDs.begin(); it != mUUIDs.end(); ++it)
+            {
+                LLViewerInventoryItem* item = gInventory.getItem(*it);
+                if (item && !gAgent.mRRInterface.canDetach(item))
+                {
+                    menu->setItemEnabled("detach", false);
+                    break;
+                }
+            }
+        }
         menu->setItemVisible("edit_outfit_separator", show_touch | show_edit | allow_take_off || allow_detach);
         menu->setItemVisible("show_original", mUUIDs.size() == 1);
         menu->setItemVisible("favorites_add", can_favorite);
