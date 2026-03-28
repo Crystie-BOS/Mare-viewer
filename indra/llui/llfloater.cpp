@@ -2886,7 +2886,7 @@ void LLFloaterView::closeAllChildren(bool app_quitting)
         if (floaterp->canClose() && !floaterp->isDead() &&
             (app_quitting || floaterp->getVisible()))
         {
-            floaterp->closeFloater(app_quitting);
+            floaterp->closeFromCloseAll(app_quitting);
         }
     }
 }
