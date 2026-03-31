@@ -14,9 +14,9 @@ if [ -z "$HANDLER" ]; then
 fi
 
 # Register handler for GNOME-aware apps
-LLGCONFTOOL2=gconftool-2
+LLGCONFTOOL2=dconf
 if which ${LLGCONFTOOL2} >/dev/null; then
-    (${LLGCONFTOOL2} -s -t string /desktop/gnome/url-handlers/secondlife/command "${HANDLER} \"%s\"" && ${LLGCONFTOOL2} -s -t bool /desktop/gnome/url-handlers/secondlife/enabled true) || echo Warning: Did not register hop:// handler with GNOME: ${LLGCONFTOOL2} failed.
+    (${LLGCONFTOOL2} write /desktop/gnome/url-handlers/secondlife/command "'${HANDLER} \"%s\"'" && ${LLGCONFTOOL2} write /desktop/gnome/url-handlers/secondlife/enabled true) || echo Warning: Did not register secondlife:// handler with GNOME: ${LLGCONFTOOL2} failed.
 else
     echo Warning: Did not register hop:// handler with GNOME: ${LLGCONFTOOL2} not found.
 fi
