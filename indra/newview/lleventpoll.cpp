@@ -160,7 +160,7 @@ namespace Details
         // This is a loop with its own waitToRetry implementation,
         // so disable retries.
         LLCore::HttpOptions::ptr_t httpOpts = std::make_shared<LLCore::HttpOptions>();
-        httpOpts->setRetries(5); //CA: Reinstate original retry value to reduce TP timeouts, inventory update fails etc. https://github.com/secondlife/viewer/issues/5569
+        httpOpts->setRetries(0);
 
         LL::WorkQueue::ptr_t main_queue = nullptr;
 
