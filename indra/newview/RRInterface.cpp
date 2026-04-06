@@ -5577,6 +5577,12 @@ LLInventoryItem* RRInterface::getItemAux (LLViewerObject* attached_object, LLInv
         for(i = 0; i < count; ++i) {
             item = items->at(i);
             if (item
+				// CA: ignore links so that we only look for the real thing. This avoids getting indeterminate results in
+				// situations where an item is in one RLV folder and linked in others, eg having one KDC RLV activator in
+				// its own folder and then having links to it in each KDC restraint folder. Fixing this stops the
+				// CTS Wardrobe showing the wrong folder as worn in this scenario. The logic goes wrong here because
+				// getType() follows the link so AT_OBJECT is returned when we're actually looking at the link.
+				&& !item->getIsLinkType()
                 && (item->getType() == LLAssetType::AT_OBJECT || item->getType() == LLAssetType::AT_CLOTHING)
                 && avatar->getWornAttachment (item->getLinkedUUID()) == attached_object
                 ) {
