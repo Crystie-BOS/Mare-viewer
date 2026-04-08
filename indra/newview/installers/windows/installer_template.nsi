@@ -729,8 +729,7 @@ ClearErrors
 PREINSTALL_REMOVE:
 
 # Remove old SecondLife.exe to invalidate any old shortcuts to it that may be in non-standard locations. See MAINT-3575
-# <FS:Ansariel> Remove VMP
-#Delete "$INSTDIR\$INSTEXE"
+Delete "$INSTDIR\$INSTEXE"
 Delete "$INSTDIR\$VIEWER_EXE"
 
 # Remove old shader files first so fallbacks will work. See DEV-5663
@@ -774,15 +773,28 @@ Function un.UserSettingsFiles
 
 StrCmp $DO_UNINSTALL_V2 "true" Keep			# Don't remove user's settings files on auto upgrade
 
-# Ask if user wants to keep data files or not
-MessageBox MB_YESNO|MB_ICONQUESTION $(RemoveDataFilesMB) IDYES Remove IDNO Keep
+ClearErrors
+Push $0
+${GetParameters} $COMMANDLINE
+${GetOptionsS} $COMMANDLINE "/clrusrfiles" $0
+# GetOptionsS returns an error if option does not exist, jump past Goto.
+IfErrors +3 0
+  Pop $0
+  Goto Remove
+
+Pop $0
+ClearErrors
+
+ifSilent Keep 0
+  # Ask if user wants to keep data files or not
+  MessageBox MB_YESNO|MB_ICONQUESTION $(RemoveDataFilesMB) IDYES Remove IDNO Keep
 
 Remove:
 Push $0
 Push $1
 Push $2
 
-  DetailPrint "Deleting Kokua data files"
+  DetailPrint "Deleting Second Life data files"
 
   StrCpy $0 0	# Index number used to iterate via EnumRegKey
 
@@ -871,11 +883,25 @@ RMDir "$INSTDIR"
 IfFileExists "$INSTDIR" FOLDERFOUND NOFOLDER
 
 FOLDERFOUND:
+ifSilent NOFOLDER 0
   MessageBox MB_OK $(DeleteProgramFilesMB) /SD IDOK IDOK NOFOLDER
 
 NOFOLDER:
 
-MessageBox MB_YESNO $(DeleteRegistryKeysMB) IDYES DeleteKeys IDNO NoDelete
+ClearErrors
+Push $0
+${GetParameters} $COMMANDLINE
+${GetOptionsS} $COMMANDLINE "/clearreg" $0
+# GetOptionsS returns an error if option does not exist, jump past Goto.
+IfErrors +3 0
+  Pop $0
+  Goto DeleteKeys
+
+Pop $0
+ClearErrors
+
+ifSilent NoDelete 0
+	MessageBox MB_YESNO $(DeleteRegistryKeysMB) IDYES DeleteKeys IDNO NoDelete
 
 DeleteKeys:
   DeleteRegKey SHELL_CONTEXT "SOFTWARE\Classes\x-grid-location-info"
@@ -897,31 +923,28 @@ Function .onInstSuccess
         FileWrite $0 "$MultiUser.InstallMode"
         FileClose $0
         Pop $0
-        # <FS:Ansariel> Disable VMP
-        #Push $R0
-        #Push $0
-        #;; MAINT-7812: Only write nsis.winstall file with /marker switch
-        #${GetParameters} $R0
-        #${GetOptionsS} $R0 "/marker" $0
-        #;; If no /marker switch, skip to ClearErrors
-        #IfErrors +4 0
-        # </FS:Ansariel>
+
+        Push $R0
+        Push $0
+        ;; MAINT-7812: Only write nsis.winstall file with /marker switch
+        ${GetParameters} $R0
+        ${GetOptionsS} $R0 "/marker" $0
+        ;; If no /marker switch, skip to ClearErrors
+        IfErrors +4 0
         ;; $EXEDIR is where we find the installer file
         ;; Put a marker file there so VMP will know we're done
         ;; and it can delete the download directory next time.
         ;; http://nsis.sourceforge.net/Write_text_to_a_file
-        # <FS:Ansariel> Disable VMP
-        #FileOpen $0 "$EXEDIR\nsis.winstall" w
-        #FileWrite $0 "NSIS done$\n"
-        #FileClose $0
+        FileOpen $0 "$EXEDIR\nsis.winstall" w
+        FileWrite $0 "NSIS done$\n"
+        FileClose $0
 
-        #ClearErrors
-        #Pop $0
-        #Pop $R0
-        # </FS:Ansariel>
-        Push $R0					# Option value, unused# 
+        ClearErrors
+        Pop $0
+        Pop $R0
 
         Call CheckWindowsServPack		# Warn if not on the latest SP before asking to launch.
+        StrCmp $SKIP_AUTORUN "true" +2;
 		StrCmp $SKIP_DIALOGS "true" label_launch 
 
 		${GetOptions} $COMMANDLINE "/AUTOSTART" $R0
@@ -936,23 +959,7 @@ label_ask_launch:
 			IDYES label_launch IDNO label_no_launch
         
 label_launch:
-        # Assumes SetOutPath $INSTDIR
-        # Run INSTEXE (our updater), passing VIEWER_EXE plus the command-line
-        # arguments built into our shortcuts. This gives the updater a chance
-        # to verify that the viewer we just installed is appropriate for the
-        # running system -- or, if not, to download and install a different
-        # viewer. For instance, if a user running 32-bit Windows installs a
-        # 64-bit viewer, it cannot run on this system. But since the updater
-        # is a 32-bit executable even in the 64-bit viewer package, the
-        # updater can detect the problem and adapt accordingly.
-        # Once everything is in order, the updater will run the specified
-        # viewer with the specified params.
-        # Quote the updater executable and the viewer executable because each
-        # must be a distinct command-line token, but DO NOT quote the language
-        # string because it must decompose into separate command-line tokens.
-        # <FS:Ansariel> No updater, thanks!
-        # Exec '"$INSTDIR\$INSTEXE" precheck "$INSTDIR\$VIEWER_EXE" $SHORTCUT_LANG_PARAM'
-        Exec '"$WINDIR\explorer.exe" "$INSTDIR\$INSTSHORTCUT.lnk"'
+        Exec '"$INSTDIR\$VIEWER_EXE" $SHORTCUT_LANG_PARAM'
 label_no_launch:
 		Pop $R0
 # 

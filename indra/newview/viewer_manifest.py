@@ -427,8 +427,25 @@ class ViewerManifest(LLManifest):
 
         return os.path.relpath(abspath(path), abspath(base))
 
+    def set_github_output_path(self, variable, path):
+        self.set_github_output(variable,
+                               os.path.normpath(os.path.join(self.get_dst_prefix(), path)))
 
-class WindowsManifest(ViewerManifest):
+    def set_github_output(self, variable, *values):
+        GITHUB_OUTPUT = os.getenv('GITHUB_OUTPUT')
+        if GITHUB_OUTPUT and values:
+            with open(GITHUB_OUTPUT, 'a') as outf:
+                if len(values) == 1:
+                    print('='.join((variable, values[0])), file=outf)
+                else:
+                    delim = secrets.token_hex(8)
+                    print('<<'.join((variable, delim)), file=outf)
+                    for value in values:
+                        print(value, file=outf)
+                    print(delim, file=outf)
+
+
+class Windows_x86_64_Manifest(ViewerManifest):
     # We want the platform, per se, for every Windows build to be 'win'. The
     # VMP will concatenate that with the address_size.
     build_data_json_platform = 'win'
@@ -493,7 +510,7 @@ class WindowsManifest(ViewerManifest):
             print("Doesn't exist:", src)
 
     def construct(self):
-        super(WindowsManifest, self).construct()
+        super(Windows_x86_64_Manifest, self).construct()
 
         pkgdir = os.path.join(self.args['build'], os.pardir, 'packages')
         relpkgdir = os.path.join(pkgdir, "lib", "release")
@@ -503,19 +520,33 @@ class WindowsManifest(ViewerManifest):
             # Find kokua-bin.exe in the 'configuration' dir, then rename it to the result of final_exe.
             self.path(src='%s/kokua-bin.exe' % self.args['configuration'], dst=self.final_exe())
 
-            """
-            with self.prefix(src=os.path.join(pkgdir, "VMP")):
-                # include the compiled launcher scripts so that it gets included in the file_list
-                self.path('SLVersionChecker.exe')
-            """
-
-            with self.prefix(dst="vmp_icons"):
-                with self.prefix(src=self.icon_path()):
-                    self.path("secondlife.ico")
-                #VMP  Tkinter icons
-                with self.prefix(src="vmp_icons"):
-                    self.path("*.png")
-                    self.path("*.gif")
+            GITHUB_OUTPUT = os.getenv('GITHUB_OUTPUT')
+            if GITHUB_OUTPUT:
+                # Emit the whole app image as one of the GitHub step outputs. We
+                # want the whole app -- but NOT the extraneous build products that
+                # get tossed into the same directory, such as the installer and
+                # the symbols tarball, so add exclusions. When we feed
+                # upload-artifact multiple absolute pathnames, even just for
+                # exclusion, it ends up creating several extraneous directory
+                # levels within the artifact -- so try using only relative paths.
+                # One problem: as of right now, our current directory os.getcwd()
+                # is not the same as the initial working directory for this job
+                # step, meaning paths relative to our os.getcwd() won't work for
+                # the subsequent upload-artifact step. We're a couple directory
+                # levels down. Try adjusting for those when specifying the base
+                # for self.relpath().
+                appbase = self.relpath(
+                    self.get_dst_prefix(),
+                    base=os.path.join(os.getcwd(), os.pardir, os.pardir),
+                    symlink=True)
+                self.set_github_output('viewer_app', appbase,
+                                    # except for this stuff
+                                    *(('!' + os.path.join(appbase, pattern))
+                                        for pattern in (
+                                                'secondlife-bin.*',
+                                                '*_Setup.exe',
+                                                '*.bat',
+                                                '*.tar.xz')))
 
         # Plugin host application
         self.path2basename(os.path.join(os.pardir,
@@ -612,7 +643,6 @@ class WindowsManifest(ViewerManifest):
                 self.path("libcef.dll")
                 self.path("libEGL.dll")
                 self.path("libGLESv2.dll")
-                # self.path("widevinecdmadapter.dll")
                 self.path("v8_context_snapshot.bin")
                 self.path("vk_swiftshader.dll")
                 self.path("vk_swiftshader_icd.json")
@@ -739,6 +769,126 @@ class WindowsManifest(ViewerManifest):
         return result
 
     def package_finish(self):
+        # Check if we should use Velopack instead of NSIS
+        # Note: as of 2026.01's release, we will be building with Velopack's one click install.
+        # We maintain the legacy NSIS packaging mainly for TPVs at this point.
+        if self.args.get('velopack', 'OFF') == 'ON':
+            self.velopack_package_finish()
+            return
+
+        # NSIS packaging (legacy)
+        self.nsis_package_finish()
+
+    def velopack_package_finish(self):
+        # packId determines install folder: %LocalAppData%\{packId}
+        # Uses same naming as NSIS INSTNAME for channel separation
+        pack_id = self.app_name_oneword()  # "SecondLife", "SecondLifeBeta", etc.
+        # Velopack requires SemVer2. Use major.minor.patch-buildnumber so that
+        # Velopack can distinguish builds and order them correctly.
+        pack_version = '.'.join(self.args['version'][:3])
+        if len(self.args['version']) > 3 and self.args['version'][3]:
+            pack_version += '-' + self.args['version'][3]
+        pack_title = self.app_name()  # Display name with spaces
+        pack_dir = self.get_dst_prefix()
+        main_exe = self.final_exe()
+        installer_base = self.installer_base_name()
+        exclude_pattern = r'.*\.pdb|.*\.map|.*\.bat|.*\.exp|.*\.lib|.*\.nsi|.*\.tar\.xz|secondlife-bin\..*|.*_Setup\.exe|.*-Setup\.exe'
+
+        # Channel-specific icon for the Velopack installer.
+        # CMake copies icons/{channel}/secondlife.ico to res/ll_icon.ico at configure time.
+        # Try the CMake-generated copy first, fall back to the source icon.
+        icon_path = os.path.join(self.get_src_prefix(), 'res', 'll_icon.ico')
+        if not os.path.exists(icon_path):
+            icon_path = os.path.join(self.get_src_prefix(), self.icon_path(), 'secondlife.ico')
+
+        # In CI, defer Velopack packaging to the sign step where Azure credentials
+        # are available. Emit metadata as GitHub outputs so the sign step can run
+        # vpk pack with --signTemplate, producing a package with signed executables.
+        if os.getenv('GITHUB_ACTIONS'):
+            # Copy the icon into pack_dir so it's included in the Windows-app artifact
+            icon_filename = ''
+            if os.path.exists(icon_path):
+                icon_filename = os.path.basename(icon_path)
+                icon_dest = os.path.join(pack_dir, icon_filename)
+                shutil.copy2(icon_path, icon_dest)
+                print("Copied icon %s to %s" % (icon_path, icon_dest))
+            else:
+                print("WARNING: Icon not found at %s" % icon_path)
+
+            # Emit metadata for the sign step
+            self.set_github_output('velopack_pack_id', pack_id)
+            self.set_github_output('velopack_pack_version', pack_version)
+            self.set_github_output('velopack_pack_title', pack_title)
+            self.set_github_output('velopack_main_exe', main_exe)
+            self.set_github_output('velopack_icon', icon_filename)
+            self.set_github_output('velopack_installer_base', installer_base)
+            self.set_github_output('velopack_exclude', exclude_pattern)
+            # Set package_file so llmanifest's touched.bat logic doesn't crash
+            self.package_file = installer_base + '_Setup.exe'
+            print("CI mode: Velopack packaging deferred to sign step")
+            return
+
+        # Local builds: run vpk pack directly (unsigned)
+        vpk_args = [
+            'vpk', 'pack',
+            '--packId', pack_id,
+            '--packVersion', pack_version,
+            '--packDir', pack_dir,
+            '--mainExe', main_exe,
+            '--packTitle', pack_title,
+            '--exclude', exclude_pattern,
+            # Suppress Velopack's built-in shortcut creation; we create our own
+            # shortcuts in llvelopack.cpp on_after_install hook instead.
+            '--shortcuts', '',
+        ]
+
+        # Add icon — CMake copies the channel-appropriate secondlife.ico to res/ll_icon.ico
+        if os.path.exists(icon_path):
+            print("Using icon: %s" % icon_path)
+            vpk_args.extend(['--icon', icon_path])
+        else:
+            print("WARNING: Icon not found at %s — Setup.exe will have no icon" % icon_path)
+
+        print("Running Velopack packaging: %s" % ' '.join(vpk_args))
+
+        # Run vpk command
+        import subprocess
+        result = subprocess.run(vpk_args, cwd=os.path.dirname(pack_dir), capture_output=True, text=True)
+        if result.stdout:
+            print("vpk stdout: %s" % result.stdout)
+        if result.stderr:
+            print("vpk stderr: %s" % result.stderr)
+        if result.returncode != 0:
+            raise ManifestError("Velopack packaging failed with code %d" % result.returncode)
+
+        # Velopack outputs to a Releases directory
+        releases_dir = os.path.join(os.path.dirname(pack_dir), 'Releases')
+
+        # Move the setup exe INTO pack_dir so it's included in the Windows-app artifact
+        # IMPORTANT: Use hyphen format (-Setup.exe) to avoid the *_Setup.exe exclusion pattern
+        # in viewer_app output (line ~538). The underscore pattern excludes NSIS installers
+        # which are rebuilt during signing, but Velopack installers are created here.
+        # Velopack creates: {packId}-win-Setup.exe
+        velopack_setup = os.path.join(releases_dir, '%s-win-Setup.exe' % pack_id)
+        self.package_file = installer_base + '_Setup.exe'
+        our_setup = os.path.join(pack_dir, self.package_file)
+        if os.path.exists(velopack_setup):
+            shutil.move(velopack_setup, our_setup)
+            print("Moved %s to %s" % (velopack_setup, our_setup))
+
+        # Rename the portable zip to include the version number
+        # Velopack creates: {packId}-win-Portable.zip
+        velopack_portable = os.path.join(releases_dir, '%s-win-Portable.zip' % pack_id)
+        if os.path.exists(velopack_portable):
+            our_portable = os.path.join(releases_dir, installer_base + '_Portable.zip')
+            shutil.move(velopack_portable, our_portable)
+            print("Moved %s to %s" % (velopack_portable, our_portable))
+
+        # Output the Releases directory path for artifact upload (contains nupkg, RELEASES for updates)
+        self.set_github_output('velopack_releases', releases_dir)
+
+    def nsis_package_finish(self):
+        """Package the viewer using NSIS installer (legacy)"""
         # a standard map of strings for replacing in the templates
         substitution_strings = {
             'version' : '.'.join(self.args['version']),
@@ -777,19 +927,26 @@ class WindowsManifest(ViewerManifest):
             Caption "%(caption)s"
             """
 
-        if(self.address_size == 64):
-            engage_registry="SetRegView 64"
-            program_files="!define MULTIUSER_USE_PROGRAMFILES64"
-        else:
-            engage_registry="SetRegView 32"
-            program_files=""
+        engage_registry="SetRegView 64"
+        program_files="!define MULTIUSER_USE_PROGRAMFILES64"
+
+        # Dump the installers/windows directory into the raw app image tree
+        # because NSIS needs those files. But don't use path() because we
+        # don't want them installed with the viewer - they're only for use by
+        # the installer itself.
+        shutil.copytree(os.path.join(self.get_src_prefix(), 'installers', 'windows'),
+                        os.path.join(self.get_dst_prefix(), 'installers', 'windows'),
+                        dirs_exist_ok=True)
 
         tempfile = "kokua_setup_tmp.nsi"
         # the following replaces strings in the nsi template
         # it also does python-style % substitution
         self.replace_in("installers/windows/installer_template.nsi", tempfile, {
                 "%%VERSION%%":version_vars,
-                "%%SOURCE%%":self.get_src_prefix(),
+                # The template references "%%SOURCE%%\installers\windows\...".
+                # Now that we've copied that directory into the app image
+                # tree, we can just replace %%SOURCE%% with '.'.
+                "%%SOURCE%%":'.',
                 "%%INST_VARS%%":inst_vars_template % substitution_strings,
                 "%%INSTALL_FILES%%":self.nsi_file_commands(True),
                 "%%PROGRAMFILES%%":program_files,
@@ -798,13 +955,12 @@ class WindowsManifest(ViewerManifest):
 
         # If we're on a build machine, sign the code using our Authenticode certificate. JC
         # note that the enclosing setup exe is signed later, after the makensis makes it.
-        # Unlike the viewer binary, the VMP filenames are invariant with respect to version, os, etc.
-        for exe in (
-            self.final_exe(),
+        # for exe in (
+        #     self.final_exe(),
 
-            "llplugin/dullahan_host.exe",
-            ):
-            self.sign(exe)
+        #     "llplugin/dullahan_host.exe",
+        #     ):
+        #     self.sign(exe)
 
         # Check two paths, one for Program Files, and one for Program Files (x86).
         # Yay 64bit windows.
@@ -818,33 +974,13 @@ class WindowsManifest(ViewerManifest):
 
         self.run_command([possible_path, '/V2', self.dst_path_of(tempfile)])
 
-        self.sign(installer_file)
+        # self.sign(installer_file)
         self.created_path(self.dst_path_of(installer_file))
+
         self.package_file = installer_file
 
-    def sign(self, exe):
-        sign_py = os.environ.get('SIGN', r'C:\buildscripts\code-signing\sign.py')
-        python  = os.environ.get('PYTHON', sys.executable)
-        if os.path.exists(sign_py):
-            dst_path = self.dst_path_of(exe)
-            print("about to run signing of: ", dst_path)
-            self.run_command([python, sign_py, dst_path])
-        else:
-            print("Skipping code signing of %s %s: %s not found" % (self.dst_path_of(exe), exe, sign_py))
 
-    def escape_slashes(self, path):
-        return path.replace('\\', '\\\\\\\\')
-
-class Windows_i686_Manifest(WindowsManifest):
-    # Although we aren't literally passed ADDRESS_SIZE, we can infer it from
-    # the passed 'arch', which is used to select the specific subclass.
-    address_size = 32
-
-class Windows_x86_64_Manifest(WindowsManifest):
-    address_size = 64
-
-
-class DarwinManifest(ViewerManifest):
+class Darwin_x86_64_Manifest(ViewerManifest):
     build_data_json_platform = 'mac'
     address_size = 64
 
@@ -863,8 +999,9 @@ class DarwinManifest(ViewerManifest):
         return bool(set(["package", "unpacked"]).intersection(self.args['actions']))
 
     def construct(self):
-        # copy over the build result (this is a no-op if run within the xcode script)
-        self.path(os.path.join(self.args['configuration'], self.channel()+".app"), dst="")
+        # copy over the build result (this is a no-op if run within the xcode
+        # script)
+        self.path(os.path.join(self.args['configuration'], self.channel() + ".app"), dst="")
 
         pkgdir = os.path.join(self.args['build'], os.pardir, 'packages')
         relpkgdir = os.path.join(pkgdir, "lib", "release")
@@ -951,7 +1088,8 @@ class DarwinManifest(ViewerManifest):
                          executable])
                     oldpath = subprocess.check_output(
                         ['objdump', '--macho', '--dylib-id', '--non-verbose',
-                         os.path.join(relpkgdir, "BugsplatMac.framework", "BugsplatMac")]
+                         os.path.join(relpkgdir, "BugsplatMac.framework", "BugsplatMac")],
+                        text=True
                         ).splitlines()[-1]  # take the last line of output
                     self.run_command(
                         ['install_name_tool', '-change', oldpath,
@@ -972,20 +1110,11 @@ class DarwinManifest(ViewerManifest):
             with self.prefix(dst="Resources"):
                 # defer cross-platform file copies until we're in the
                 # nested Resources directory
-                super(DarwinManifest, self).construct()
+                super().construct()
 
                 # need .icns file referenced by Info.plist
                 with self.prefix(src=self.icon_path(), dst="") :
                     self.path("kokua_icon.icns")
-
-                # Copy in the updater script and helper modules
-                self.path(src=os.path.join(pkgdir, 'VMP'), dst="updater")
-
-                with self.prefix(src="", dst=os.path.join("updater", "icons")):
-                    self.path2basename(self.icon_path(), "kokua_icon.ico")
-                    with self.prefix(src="vmp_icons", dst=""):
-                        self.path("*.png")
-                        self.path("*.gif")
 
                 with self.prefix(src_dst="cursors_mac"):
                     self.path("*.tif")
@@ -1121,194 +1250,152 @@ class DarwinManifest(ViewerManifest):
 
 
     def package_finish(self):
-        global CHANNEL_VENDOR_BASE
-        # MBW -- If the mounted volume name changes, it breaks the .DS_Store's background image and icon positioning.
-        #  If we really need differently named volumes, we'll need to create multiple DS_Store file images, or use some other trick.
-
-        volname=CHANNEL_VENDOR_BASE+" Installer"  # DO NOT CHANGE without understanding comment above
-
         imagename = self.installer_base_name_mac()
-
-        sparsename = imagename + ".sparseimage"
+        self.set_github_output('imagename', imagename)
         finalname = imagename + ".dmg"
-        # make sure we don't have stale files laying about
-        self.remove(sparsename, finalname)
-
-        self.run_command(['hdiutil', 'create', sparsename,
-                          '-volname', volname, '-fs', 'HFS+',
-                          '-type', 'SPARSE', '-megabytes', '1300',
-                          '-layout', 'SPUD'])
-
-        # mount the image and get the name of the mount point and device node
-        try:
-            hdi_output = subprocess.check_output(['hdiutil', 'attach', '-private', sparsename], text=True)
-        except subprocess.CalledProcessError as err:
-            sys.exit("failed to mount image at '%s'" % sparsename)
-
-        try:
-            devfile = re.search("/dev/disk([0-9]+)[^s]", hdi_output).group(0).strip()
-            volpath = re.search(r"HFS\s+(.+)", hdi_output).group(1).strip()
-
-            # Copy everything in to the mounted .dmg
-
-            app_name = self.app_name()
-
-            # Hack:
-            # Because there is no easy way to coerce the Finder into positioning
-            # the app bundle in the same place with different app names, we are
-            # adding multiple .DS_Store files to svn. There is one for release,
-            # one for release candidate and one for first look. Any other channels
-            # will use the release .DS_Store, and will look broken.
-            # - Ambroff 2008-08-20
-            dmg_template = os.path.join(
-                'installers', 'darwin', '%s-dmg' % self.channel_type())
-
-            if not os.path.exists (self.src_path_of(dmg_template)):
-                dmg_template = os.path.join ('installers', 'darwin', 'release-dmg')
-
-            for s,d in list({self.get_dst_prefix():app_name + ".app",
-                        os.path.join(dmg_template, "_VolumeIcon.icns"): ".VolumeIcon.icns",
-                        os.path.join(dmg_template, "background.jpg"): "background.jpg",
-                        os.path.join(dmg_template, "_DS_Store"): ".DS_Store"}.items()):
-                print("Copying to dmg", s, d)
-                self.copy_action(self.src_path_of(s), os.path.join(volpath, d))
-
-            # Hide the background image, DS_Store file, and volume icon file (set their "visible" bit)
-            for f in ".VolumeIcon.icns", "background.jpg", ".DS_Store":
-                pathname = os.path.join(volpath, f)
-                self.run_command(['SetFile', '-a', 'V', pathname])
-
-            # Create the alias file (which is a resource file) from the .r
-            self.run_command(
-                ['Rez', self.src_path_of("installers/darwin/release-dmg/Applications-alias.r"),
-                 '-o', os.path.join(volpath, "Applications")])
-
-            # Set the alias file's alias and custom icon bits
-            self.run_command(['SetFile', '-a', 'AC', os.path.join(volpath, "Applications")])
-
-            # Set the disk image root's custom icon bit
-            self.run_command(['SetFile', '-a', 'C', volpath])
-
-            # Sign the app if requested;
-            # do this in the copy that's in the .dmg so that the extended attributes used by
-            # the signature are preserved; moving the files using python will leave them behind
-            # and invalidate the signatures.
-            if 'signature' in self.args:
-                app_in_dmg=os.path.join(volpath,self.app_name()+".app")
-                print("Attempting to sign '%s'" % app_in_dmg)
-                identity = self.args['signature']
-                if identity == '':
-                    identity = 'Developer ID Application'
-
-                # Look for an environment variable set via build.sh when running in Team City.
-                try:
-                    build_secrets_checkout = os.environ['build_secrets_checkout']
-                except KeyError:
-                    pass
-                else:
-                    # variable found so use it to unlock keychain followed by codesign
-                    home_path = os.environ['HOME']
-                    keychain_pwd_path = os.path.join(build_secrets_checkout,'code-signing-osx','password.txt')
-                    keychain_pwd = open(keychain_pwd_path).read().rstrip()
-
-                    # Note: As of macOS Sierra, keychains are created with
-                    #       names postfixed with '-db' so for example, the SL
-                    #       Viewer keychain would by default be found in
-                    #       ~/Library/Keychains/viewer.keychain-db instead of
-                    #       just ~/Library/Keychains/viewer.keychain in
-                    #       earlier versions.
-                    #
-                    #       Because we have old OS files from previous
-                    #       versions of macOS on the build hosts, the
-                    #       configurations are different on each host. Some
-                    #       have viewer.keychain, some have viewer.keychain-db
-                    #       and some have both. As you can see in the line
-                    #       below, this script expects the Linden Developer
-                    #       cert/keys to be in viewer.keychain.
-                    #
-                    #       To correctly sign builds you need to make sure
-                    #       ~/Library/Keychains/viewer.keychain exists on the
-                    #       host and that it contains the correct cert/key. If
-                    #       a build host is set up with a clean version of
-                    #       macOS Sierra (or later) then you will need to
-                    #       change this line (and the one for 'codesign'
-                    #       command below) to point to right place or else
-                    #       pull in the cert/key into the default viewer
-                    #       keychain 'viewer.keychain-db' and export it to
-                    #       'viewer.keychain'
-                    viewer_keychain = os.path.join(home_path, 'Library',
-                                                   'Keychains', 'viewer.keychain')
-                    self.run_command(['security', 'unlock-keychain',
-                                      '-p', keychain_pwd, viewer_keychain])
-                    sign_retry_wait=15
-                    resources = app_in_dmg + "/Contents/Resources/"
-                    plain_sign = glob.glob(resources + "llplugin/*.dylib")
-                    deep_sign = [
-                        resources + "updater/SLVersionChecker",
-                        resources + "SLPlugin.app/Contents/MacOS/SLPlugin",
-                        app_in_dmg,
-                        ]
-                    for attempt in range(3):
-                        if attempt: # second or subsequent iteration
-                            print("codesign failed, waiting {:d} seconds before retrying".format(sign_retry_wait),
-                                  file=sys.stderr)
-                            time.sleep(sign_retry_wait)
-                            sign_retry_wait*=2
-
-                        try:
-                            # Note: See blurb above about names of keychains
-                            for signee in plain_sign:
-                                self.run_command(
-                                    ['codesign',
-                                     '--force',
-                                     '--timestamp',
-                                     '--keychain', viewer_keychain,
-                                     '--sign', identity,
-                                     signee])
-                            for signee in deep_sign:
-                                self.run_command(
-                                    ['codesign',
-                                     '--verbose',
-                                     '--deep',
-                                     '--force',
-                                     '--entitlements', self.src_path_of("slplugin.entitlements"),
-                                     '--options', 'runtime',
-                                     '--keychain', viewer_keychain,
-                                     '--sign', identity,
-                                     signee])
-                            break # if no exception was raised, the codesign worked
-                        except ManifestError as err:
-                            # 'err' goes out of scope
-                            sign_failed = err
-                    else:
-                        print("Maximum codesign attempts exceeded; giving up", file=sys.stderr)
-                        raise sign_failed
-                    self.run_command(['spctl', '-a', '-texec', '-vvvv', app_in_dmg])
-                    self.run_command([self.src_path_of("installers/darwin/apple-notarize.sh"), app_in_dmg])
-
-        finally:
-            # Unmount the image even if exceptions from any of the above
-            self.run_command(['hdiutil', 'detach', '-force', devfile])
-
-        print("Converting temp disk image to final disk image")
-        self.run_command(['hdiutil', 'convert', sparsename, '-format', 'UDZO',
-                          '-imagekey', 'zlib-level=9', '-o', finalname])
-        # get rid of the temp file
         self.package_file = finalname
-        self.remove(sparsename)
 
+        RUNNER_TEMP = os.getenv('RUNNER_TEMP')
+        # When running as a GitHub Action job, RUNNER_TEMP is the recommended
+        # temp directory. If we're not running on GitHub, don't create this
+        # temp directory or this tarball: we don't clean them up, trusting
+        # that the runner is itself transient. On a dev machine, that would
+        # result in temp-directory clutter.
+        if RUNNER_TEMP:
+            # Per GitHub's actions/upload-artifact documentation
+            # https://github.com/actions/upload-artifact#maintaining-file-permissions-and-case-sensitive-files
+            # we must package the app bundle with tar before posting as an
+            # artifact. Posting individual files follows symlinks, which
+            # causes problems, especially with frameworks: a framework's top
+            # level must contain symlinks into its Versions/Current, which
+            # must itself be a symlink to some specific Versions subdir.
+            tarpath = os.path.join(RUNNER_TEMP, "viewer.tar.xz")
+            print(f'Creating {tarpath} from {self.get_dst_prefix()}')
+            with tarfile.open(tarpath, mode="w:xz") as tarball:
+                # Store in the tarball as just 'Second Life Mumble.app'
+                # instead of 'Users/someone/.../newview/Release/Second...'
+                # It's at this point that we rename 'Second Life Release.app'
+                # to 'Second Life Viewer.app'.
+                tarball.add(self.get_dst_prefix(),
+                            arcname=self.app_name() + ".app")
+            self.set_github_output_path('viewer_app', tarpath)
 
-class Darwin_i386_Manifest(DarwinManifest):
-    address_size = 32
+        # Generate Velopack update packages if enabled
+        # This creates the nupkg and RELEASES files needed for auto-updates
+        # Distribution is still via DMG, but updates use Velopack
+        if self.args.get('velopack', 'OFF') == 'ON':
+            self.velopack_package_finish()
 
+    def velopack_package_finish(self):
+        """Generate Velopack update packages for macOS.
 
-class Darwin_i686_Manifest(DarwinManifest):
-    """alias in case arch is passed as i686 instead of i386"""
-    pass
+        This creates the nupkg and releases.json files needed for auto-updates.
+        Distribution is still via DMG - Velopack only handles the update infrastructure.
+        """
+        # packId determines install identification - same as Windows for consistency
+        pack_id = self.app_name_oneword()  # "SecondLife", "SecondLifeBeta", etc.
+        # Velopack requires SemVer2. Use major.minor.patch-buildnumber so that
+        # Velopack can distinguish builds and order them correctly.
+        pack_version = '.'.join(self.args['version'][:3])
+        if len(self.args['version']) > 3 and self.args['version'][3]:
+            pack_version += '-' + self.args['version'][3]
+        pack_title = self.app_name()  # Display name with spaces
 
+        # The .app bundle path (e.g., "/path/to/Second Life Release.app")
+        app_bundle = self.get_dst_prefix()
+        # Bundle ID from args (e.g., "com.secondlife.viewer")
+        bundle_id = self.args.get('bundleid', 'com.secondlife.indra.viewer')
 
-class Darwin_x86_64_Manifest(DarwinManifest):
-    address_size = 64
+        # Icon path for macOS
+        icon_path = os.path.join(self.get_src_prefix(), self.icon_path(), 'secondlife.icns')
+
+        # The main executable inside Contents/MacOS/ is named after the channel
+        main_exe = self.channel()
+
+        # In CI, defer Velopack packaging to the sign step where code signing
+        # credentials are available. Emit metadata as GitHub outputs so the
+        # sign step can run vpk pack after signing the app bundle.
+        if os.getenv('GITHUB_ACTIONS'):
+            self.set_github_output('velopack_mac_pack_id', pack_id)
+            self.set_github_output('velopack_mac_pack_version', pack_version)
+            self.set_github_output('velopack_mac_pack_title', pack_title)
+            self.set_github_output('velopack_mac_main_exe', main_exe)
+            self.set_github_output('velopack_mac_bundle_id', bundle_id)
+            print("CI mode: macOS Velopack packaging deferred to sign step")
+            return
+
+        # Local builds: run vpk pack directly (unsigned)
+
+        # Parent directory containing the .app bundle - this is where we run vpk from
+        # and where the Releases directory will be created
+        work_dir = os.path.dirname(app_bundle)
+
+        # Output directory for releases - clean it first to avoid version conflicts
+        releases_dir = os.path.join(work_dir, 'Releases')
+        if os.path.exists(releases_dir):
+            print("Cleaning existing Releases directory: %s" % releases_dir)
+            shutil.rmtree(releases_dir)
+
+        # Build vpk command for macOS
+        # See: https://docs.velopack.io/reference/cli/content/vpk-osx
+        vpk_args = [
+            'vpk', 'pack',
+            '--packId', pack_id,
+            '--packVersion', pack_version,
+            '--packDir', app_bundle,
+            '--packTitle', pack_title,
+            '--mainExe', main_exe,  # Executable name inside Contents/MacOS/
+            '--bundleId', bundle_id,
+            '--outputDir', releases_dir,
+            '--noInst',  # Don't generate .pkg installer - we use DMG for distribution
+            '--verbose',  # Show detailed output
+        ]
+
+        # Add icon if exists
+        if os.path.exists(icon_path):
+            vpk_args.extend(['--icon', icon_path])
+
+        print("Running Velopack packaging for macOS:")
+        print("  Command: %s" % ' '.join(vpk_args))
+        print("  Working directory: %s" % work_dir)
+        print("  App bundle: %s" % app_bundle)
+        print("  Main executable: %s" % main_exe)
+
+        # Run vpk command
+        result = subprocess.run(vpk_args, cwd=work_dir, capture_output=True, text=True)
+
+        # Always print output for debugging
+        if result.stdout:
+            print("vpk stdout:\n%s" % result.stdout)
+        if result.stderr:
+            print("vpk stderr:\n%s" % result.stderr)
+
+        if result.returncode != 0:
+            raise ManifestError("Velopack packaging failed with code %d" % result.returncode)
+
+        # Verify the Releases directory was created and contains expected files
+        if not os.path.exists(releases_dir):
+            raise ManifestError("Velopack releases directory not found: %s" % releases_dir)
+
+        # List what was created
+        releases_contents = os.listdir(releases_dir)
+        print("Velopack releases directory contents: %s" % releases_contents)
+
+        # Verify we have the expected files (nupkg and releases JSON)
+        nupkg_files = [f for f in releases_contents if f.endswith('.nupkg')]
+        json_files = [f for f in releases_contents if f.endswith('.json')]
+
+        if not nupkg_files:
+            raise ManifestError("No .nupkg files found in releases directory")
+        if not json_files:
+            raise ManifestError("No releases JSON files found in releases directory")
+
+        print("Generated %d nupkg file(s): %s" % (len(nupkg_files), nupkg_files))
+        print("Generated %d JSON file(s): %s" % (len(json_files), json_files))
+
+        # Output the Releases directory path for artifact upload
+        self.set_github_output('velopack_releases', releases_dir)
+        print("Velopack releases directory: %s" % releases_dir)
 
 
 class LinuxManifest(ViewerManifest):
@@ -1656,6 +1743,7 @@ if __name__ == "__main__":
         dict(name='fmodstudio', description="""Indication if fmod studio libraries are needed""", default='OFF'),
         dict(name='openal', description="""Indication openal libraries are needed""", default='OFF'),
         dict(name='tracy', description="""Indication tracy profiler is enabled""", default='OFF'),
+        dict(name='velopack', description="""Use Velopack installer instead of NSIS""", default='OFF'),
         ]
     try:
         main(extra=extra_arguments)
