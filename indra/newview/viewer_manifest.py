@@ -543,7 +543,7 @@ class Windows_x86_64_Manifest(ViewerManifest):
                                     # except for this stuff
                                     *(('!' + os.path.join(appbase, pattern))
                                         for pattern in (
-                                                'secondlife-bin.*',
+                                                'kokua-bin.*',
                                                 '*_Setup.exe',
                                                 '*.bat',
                                                 '*.tar.xz')))
@@ -955,12 +955,12 @@ class Windows_x86_64_Manifest(ViewerManifest):
 
         # If we're on a build machine, sign the code using our Authenticode certificate. JC
         # note that the enclosing setup exe is signed later, after the makensis makes it.
-        # for exe in (
-        #     self.final_exe(),
+        for exe in (
+            self.final_exe(),
 
-        #     "llplugin/dullahan_host.exe",
-        #     ):
-        #     self.sign(exe)
+            "llplugin/dullahan_host.exe",
+            ):
+            self.sign(exe)
 
         # Check two paths, one for Program Files, and one for Program Files (x86).
         # Yay 64bit windows.
@@ -974,11 +974,20 @@ class Windows_x86_64_Manifest(ViewerManifest):
 
         self.run_command([possible_path, '/V2', self.dst_path_of(tempfile)])
 
-        # self.sign(installer_file)
+        self.sign(installer_file)
         self.created_path(self.dst_path_of(installer_file))
 
         self.package_file = installer_file
 
+    def sign(self, exe):
+        sign_py = os.environ.get('SIGN', r'C:\buildscripts\code-signing\sign.py')
+        python  = os.environ.get('PYTHON', sys.executable)
+        if os.path.exists(sign_py):
+            dst_path = self.dst_path_of(exe)
+            print("about to run signing of: ", dst_path)
+            self.run_command([python, sign_py, dst_path])
+        else:
+            print("Skipping code signing of %s %s: %s not found" % (self.dst_path_of(exe), exe, sign_py))
 
 class Darwin_x86_64_Manifest(ViewerManifest):
     build_data_json_platform = 'mac'
