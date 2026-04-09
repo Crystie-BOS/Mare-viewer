@@ -943,6 +943,7 @@ Function .onInstSuccess
         Pop $0
         Pop $R0
 
+        Push $R0
         Call CheckWindowsServPack		# Warn if not on the latest SP before asking to launch.
         StrCmp $SKIP_AUTORUN "true" +2;
 		StrCmp $SKIP_DIALOGS "true" label_launch 
@@ -959,7 +960,7 @@ label_ask_launch:
 			IDYES label_launch IDNO label_no_launch
         
 label_launch:
-        Exec '"$INSTDIR\$VIEWER_EXE" $SHORTCUT_LANG_PARAM'
+        Exec '"$WINDIR\explorer.exe" "$INSTDIR\$INSTSHORTCUT.lnk"'
 label_no_launch:
 		Pop $R0
 # 
