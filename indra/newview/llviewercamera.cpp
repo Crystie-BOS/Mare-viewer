@@ -30,6 +30,8 @@
 #include "llviewercamera.h"
 
 // Viewer includes
+#include "pipeline.h"           // gPipeline — for mRT screen dimensions (FSR 2 jitter)
+#include "marefsr2upscaler.h"   // MAREFSR2Upscaler::computeJitter (Phase 3 Step 3)
 #include "llagent.h"
 #include "llagentcamera.h"
 #include "llmatrix4a.h"
@@ -72,6 +74,11 @@ LLViewerCamera::LLViewerCamera() : LLCamera()
     mZoomSubregion = 1;
     mAverageSpeed = 0.f;
     mAverageAngularSpeed = 0.f;
+    // MARE: TAA / upscaler infrastructure (Phase 1)
+    mJitterFrame = 0;
+    mJitterX = 0.f;
+    mJitterY = 0.f;
+    mPrevViewProjMatrix = glm::mat4(1.f);
 
     LLPointer<LLControlVariable> cntrl_ptr = gSavedSettings.getControl("CameraAngle");
     if (cntrl_ptr.notNull())
@@ -80,6 +87,132 @@ LLViewerCamera::LLViewerCamera() : LLCamera()
         {
             LLViewerCamera::getInstance()->setDefaultFOV((F32)value.asReal());
         });
+    }
+}
+
+// MARE: Halton low-discrepancy sequence used for TAA sub-pixel jitter (Phase 1).
+// Returns a value in (0, 1) for the given index and base.
+static F32 halton(U32 index, U32 base)
+{
+    F32 result = 0.f;
+    F32 f = 1.f / (F32)base;
+    U32 i = index;
+    while (i > 0)
+    {
+        result += f * (F32)(i % base);
+        i     /= base;
+        f     /= (F32)base;
+    }
+    return result;
+}
+
+// MARE: Called once per frame before setup3DRender() / setPerspective().
+// Captures the previous frame's view-projection matrix, then either advances
+// the Halton jitter sequence (upscaler on) or zeroes it (upscaler off, no-op).
+void LLViewerCamera::beginFrame()
+{
+    // MARE: Detect camera movement (position + rotation) for TAA camera-cut.
+    // Both mPrevViewProjMatrix and currVP use the SAME old projection matrix
+    // (new jitter has not been applied yet), so the jitter contribution cancels
+    // in the difference and the result is pure camera-motion delta.
+    // Walking at 4 m/s @20 fps gives max element diff >> 0.001;
+    // a truly static camera gives diff ≈ 0 (float precision only).
+    {
+        glm::mat4 currVP = get_current_projection() * get_current_modelview();
+        F32 maxDiff = 0.f;
+        for (int col = 0; col < 4; ++col)
+            for (int row = 0; row < 4; ++row)
+                maxDiff = llmax(maxDiff,
+                                std::abs(currVP[col][row] - mPrevViewProjMatrix[col][row]));
+        mCameraMoved = (maxDiff > 0.001f);
+    }
+
+    // Snapshot VP from the frame that just finished rendering.
+    mPrevViewProjMatrix = get_current_projection() * get_current_modelview();
+
+    // MARE: Phase 2 Step 5 — detect camera jumps (teleports, sim crossings).
+    // Any per-frame displacement > 5 m is treated as a cut; all velocity passes are
+    // skipped and the buffer is cleared to zero so the upscaler sees no motion.
+    // On the very first frame mPrevCamOrigin is (0,0,0), which also triggers the guard —
+    // correct behaviour since no previous-frame data exists yet.
+    {
+        static const F32 kJumpThreshSq = 25.f; // 5 metres per frame
+        LLVector3 curr = getOrigin();
+        mCameraJumped = ((curr - mPrevCamOrigin).lengthSquared() > kJumpThreshSq);
+        mPrevCamOrigin = curr;
+    }
+
+    static LLCachedControl<bool> upscalerEnabled(gSavedSettings, "RenderUpscalerEnabled", false);
+    if (upscalerEnabled)
+    {
+        ++mJitterFrame;
+        F32 display_w = (F32)llmax(1, gViewerWindow->getWorldViewWidthRaw());
+        F32 display_h = (F32)llmax(1, gViewerWindow->getWorldViewHeightRaw());
+
+        static LLCachedControl<U32> upscalerMode(gSavedSettings, "RenderUpscalerMode", 0u);
+        if ((U32)upscalerMode == 3)
+        {
+            // MARE: Phase 3 Step 3 — FSR 2 uses its own Halton sequence scaled
+            // to the render/display ratio.  mRT->width/height hold the render res.
+            // The pipeline posts the render-res buffers at the pre-jitter stage, so
+            // we compute the FSR 2 jitter here before the projection is built.
+            U32 renderW = llmax(1u, (U32)gPipeline.mRT->width);
+            U32 renderH = llmax(1u, (U32)gPipeline.mRT->height);
+
+            // mRT->width/height are set to the display res; the actual scene buffer
+            // may be lower due to the preset scale.  Use mRT->screen dimensions if
+            // available, otherwise fall back to display res.
+            if (gPipeline.mRT->screen.isComplete())
+            {
+                renderW = gPipeline.mRT->screen.getWidth();
+                renderH = gPipeline.mRT->screen.getHeight();
+            }
+
+            MAREFSR2Upscaler::computeJitter(
+                mJitterFrame,
+                renderW, (U32)display_w,
+                renderH, (U32)display_h,
+                mJitterX, mJitterY);
+
+            // Convert UV-space jitter to NDC jitter expected by setPerspective().
+            // setPerspective() applies jitter as NDC offset: jitterX * 2 / renderW.
+            // computeJitter() already returns UV-space (1/renderW per pixel),
+            // so multiply by 2 to get NDC space.
+            mJitterX *= 2.0f;
+            mJitterY *= 2.0f;
+        }
+        else if ((U32)upscalerMode != 1)
+        {
+            // Modes 0 (TAA) and 2 (TAA+NIS) need jitter for sub-pixel temporal accumulation.
+            // Scale factor 1.0 (not 2.0) → ±0.25 px per frame instead of ±0.5 px.
+            // Smaller offsets reduce inter-frame shimmer while still providing sub-pixel sampling.
+            mJitterX = (halton(mJitterFrame, 2) - 0.5f) * (1.0f / display_w);
+            mJitterY = (halton(mJitterFrame, 3) - 0.5f) * (1.0f / display_h);
+        }
+        else
+        {
+            // MARE: Mode 1 (NIS) is a spatial-only sharpening pass with no temporal
+            // accumulation.  Jitter without TAA makes every frame visibly offset by a
+            // different sub-pixel amount — the opposite of what we want.  Zero it out.
+            mJitterX = 0.f;
+            mJitterY = 0.f;
+        }
+
+        // MARE: Suppress jitter while the camera is moving.
+        // TAA will use cameraCut=true for moving frames (pipeline.cpp), outputting
+        // the raw current frame with no history blend.  Applying jitter to these
+        // bypass frames would make them slightly shifted each frame (visible shimmer
+        // during pans/walks).  Zero it so moving frames are pixel-perfect.
+        if (mCameraMoved)
+        {
+            mJitterX = 0.f;
+            mJitterY = 0.f;
+        }
+    }
+    else
+    {
+        mJitterX = 0.f;
+        mJitterY = 0.f;
     }
 }
 
@@ -367,6 +500,16 @@ void LLViewerCamera::setPerspective(bool for_selection,
     calcProjection(z_far); // Update the projection matrix cache
 
     proj_mat *= glm::perspective(fov_y, aspect, z_near, z_far);
+
+    // MARE: apply TAA sub-pixel jitter to the main world camera (Phase 1).
+    // mJitterX/Y are 0 when no upscaler is active, making this a perfect no-op.
+    // The translate shifts x_ndc by +mJitterX and y_ndc by +mJitterY for all
+    // fragments, giving the upscaler the sub-pixel variation it needs each frame.
+    if (!for_selection && sCurCameraID == CAMERA_WORLD && (mJitterX != 0.f || mJitterY != 0.f))
+    {
+        glm::mat4 jitter = glm::translate(glm::mat4(1.f), glm::vec3(mJitterX, mJitterY, 0.f));
+        proj_mat = jitter * proj_mat;
+    }
 
     gGL.loadMatrix(glm::value_ptr(proj_mat));
 

@@ -846,6 +846,11 @@ public:
         // Float array ready to be sent to GL
         std::vector<F32> mGLMp;
 
+        // MARE: Phase 2 Step 4 — previous-frame GL matrix array for skinned velocity pass.
+        // Populated at the start of the first updateSkinInfoMatrixPalette() call each frame,
+        // before mGLMp is overwritten with the new frame's data.
+        std::vector<F32> mPrevGLMp;
+
         MatrixPaletteCache() :
             mFrame(gFrameCount - 1)
         {

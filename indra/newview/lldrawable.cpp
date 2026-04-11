@@ -110,6 +110,7 @@ void LLDrawable::init(bool new_entry)
     mCurrentScale = LLVector3(1,1,1);
     mDistanceWRTCamera = 0.0f;
     mState     = 0;
+    mPrevRenderMatrix.setIdentity(); // MARE: Phase 2 Step 3 — will hold last frame's world matrix
 
     // mFaces
     mRadius = 0.f;
@@ -726,6 +727,10 @@ F32 LLDrawable::updateXform(bool undamped)
     {
         movePartition();
     }
+
+    // MARE: Phase 2 Step 3 — snapshot world matrix BEFORE it is overwritten.
+    // mPrevRenderMatrix then holds frame N-1's matrix throughout the current frame N.
+    mPrevRenderMatrix = mXform.getWorldMatrix();
 
     // Update
     mXform.setPosition(target_pos);

@@ -235,6 +235,12 @@ extern LLGLSLShader         gDeferredSunProbeProgram;
 extern LLGLSLShader         gHazeProgram;
 extern LLGLSLShader         gHazeWaterProgram;
 extern LLGLSLShader         gDeferredBlurLightProgram;
+extern LLGLSLShader         gDeferredVelocityProgram;          // MARE: Phase 2 Step 2 — static velocity
+extern LLGLSLShader         gDeferredDynamicVelocityProgram;   // MARE: Phase 2 Step 3 — per-object velocity
+extern LLGLSLShader         gDeferredAvatarVelocityProgram;    // MARE: Phase 2 Step 4 — skinned/avatar velocity
+extern LLGLSLShader         gDeferredTAAProgram;               // MARE: Phase 3 Step 1 — TAA accumulation
+extern LLGLSLShader         gDeferredTAACopyProgram;           // MARE: Phase 3 Step 1 — TAA copy-back
+extern LLGLSLShader         gDeferredNISProgram;               // MARE: Phase 3 Step 2 — NIS sharpening
 extern LLGLSLShader         gDeferredAvatarProgram;
 extern LLGLSLShader         gDeferredSoftenProgram;
 extern LLGLSLShader         gDeferredShadowProgram;
