@@ -379,24 +379,24 @@ void LLFloaterMove::initModeTooltips()
     // MARE: two joystick widgets now cover what used to be 6 separate buttons.
     // Each mode gets tooltips for: orbit joystick, strafe joystick, up, down.
     control_tooltip_map_t walkTipMap;
-    walkTipMap.insert(std::make_pair(mForwardButton,  getString("walk_forward_tooltip")));
-    walkTipMap.insert(std::make_pair(mSlideLeftButton, getString("walk_left_tooltip")));
-    walkTipMap.insert(std::make_pair(mMoveUpButton,   getString("jump_tooltip")));
-    walkTipMap.insert(std::make_pair(mMoveDownButton, getString("crouch_tooltip")));
+    walkTipMap[mForwardButton]   = getString("walk_forward_tooltip");
+    walkTipMap[mSlideLeftButton] = getString("walk_left_tooltip");
+    walkTipMap[mMoveUpButton]    = getString("jump_tooltip");
+    walkTipMap[mMoveDownButton]  = getString("crouch_tooltip");
     mModeControlTooltipsMap[MM_WALK] = walkTipMap;
 
     control_tooltip_map_t runTipMap;
-    runTipMap.insert(std::make_pair(mForwardButton,  getString("run_forward_tooltip")));
-    runTipMap.insert(std::make_pair(mSlideLeftButton, getString("run_left_tooltip")));
-    runTipMap.insert(std::make_pair(mMoveUpButton,   getString("jump_tooltip")));
-    runTipMap.insert(std::make_pair(mMoveDownButton, getString("crouch_tooltip")));
+    runTipMap[mForwardButton]   = getString("run_forward_tooltip");
+    runTipMap[mSlideLeftButton] = getString("run_left_tooltip");
+    runTipMap[mMoveUpButton]    = getString("jump_tooltip");
+    runTipMap[mMoveDownButton]  = getString("crouch_tooltip");
     mModeControlTooltipsMap[MM_RUN] = runTipMap;
 
     control_tooltip_map_t flyTipMap;
-    flyTipMap.insert(std::make_pair(mForwardButton,  getString("fly_forward_tooltip")));
-    flyTipMap.insert(std::make_pair(mSlideLeftButton, getString("fly_left_tooltip")));
-    flyTipMap.insert(std::make_pair(mMoveUpButton,   getString("fly_up_tooltip")));
-    flyTipMap.insert(std::make_pair(mMoveDownButton, getString("fly_down_tooltip")));
+    flyTipMap[mForwardButton]   = getString("fly_forward_tooltip");
+    flyTipMap[mSlideLeftButton] = getString("fly_left_tooltip");
+    flyTipMap[mMoveUpButton]    = getString("fly_up_tooltip");
+    flyTipMap[mMoveDownButton]  = getString("fly_down_tooltip");
     mModeControlTooltipsMap[MM_FLY] = flyTipMap;
 
     setModeTooltip(MM_WALK);
