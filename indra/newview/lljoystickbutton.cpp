@@ -50,6 +50,9 @@ static LLDefaultChildRegistry::Register<LLJoystickAgentTurn> r2("joystick_turn")
 static LLDefaultChildRegistry::Register<LLJoystickCameraRotate> r3("joystick_rotate");
 static LLDefaultChildRegistry::Register<LLJoystickCameraTrack> r5("joystick_track");
 static LLDefaultChildRegistry::Register<LLJoystickQuaternion> r6("joystick_quat");
+// MARE movement joysticks (oval + crosshair visuals wired to avatar movement)
+static LLDefaultChildRegistry::Register<LLJoystickMoveForwardBack> r7("joystick_move_fwd");
+static LLDefaultChildRegistry::Register<LLJoystickMoveStrafe>      r8("joystick_move_strafe");
 
 
 const F32 NUDGE_TIME = 0.25f;       // in seconds
@@ -580,7 +583,9 @@ void LLJoystickCameraRotate::draw()
 {
     LLGLSUIDefault gls_ui;
 
-    getImageUnselected()->draw( 0, 0 );
+    // MARE v1.1.0: scale background to fill the widget rect so the joystick
+    // grows with the floater instead of always rendering at native image size.
+    getImageUnselected()->draw( 0, 0, getRect().getWidth(), getRect().getHeight() );
     LLPointer<LLUIImage> image = getImageSelected();
 
     if (mInCenter)
@@ -611,26 +616,33 @@ void LLJoystickCameraRotate::draw()
     }
 }
 
-// Draws image rotated by multiples of 90 degrees
+// Draws image rotated by multiples of 90 degrees, scaled to fill the widget rect.
+// MARE v1.1.0: vertex positions use the widget rect (draw_w/draw_h) so pressed-
+// arrow overlays scale with the joystick. UV coords still use the image's own
+// pixel dimensions (img_w/img_h) relative to the underlying texture to keep
+// correct texture mapping after rotation (see EXT-2023).
 void LLJoystickCameraRotate::drawRotatedImage( LLPointer<LLUIImage> image, S32 rotations )
 {
-    S32 width = image->getWidth();
-    S32 height = image->getHeight();
+    // Vertex extent: fill the widget rect
+    S32 draw_w = getRect().getWidth();
+    S32 draw_h = getRect().getHeight();
+
+    // UV extent: image pixels within the atlas/texture
+    S32 img_w = image->getWidth();
+    S32 img_h = image->getHeight();
     LLTexture* texture = image->getImage();
 
     /*
-     * Scale  texture coordinate system
-     * to handle the different between image size and size of texture.
-     * If we will use default matrix,
-     * it may break texture mapping after rotation.
+     * Scale texture coordinate system to handle the difference between
+     * image size and the underlying texture size (power-of-2 atlas).
      * see EXT-2023 Camera floater: arrows became shifted when pressed.
      */
     F32 uv[][2] =
     {
-        { (F32)width/texture->getWidth(), (F32)height/texture->getHeight() },
-        { 0.f, (F32)height/texture->getHeight() },
-        { 0.f, 0.f },
-        { (F32)width/texture->getWidth(), 0.f }
+        { (F32)img_w/texture->getWidth(), (F32)img_h/texture->getHeight() },
+        { 0.f,                            (F32)img_h/texture->getHeight() },
+        { 0.f,                            0.f },
+        { (F32)img_w/texture->getWidth(), 0.f }
     };
 
     gGL.getTexUnit(0)->bind(texture);
@@ -640,22 +652,22 @@ void LLJoystickCameraRotate::drawRotatedImage( LLPointer<LLUIImage> image, S32 r
     gGL.begin(LLRender::TRIANGLES);
     {
         gGL.texCoord2fv(uv[(rotations + 0) % 4]);
-        gGL.vertex2i(width, height);
+        gGL.vertex2i(draw_w, draw_h);
 
         gGL.texCoord2fv(uv[(rotations + 1) % 4]);
-        gGL.vertex2i(0, height);
+        gGL.vertex2i(0, draw_h);
 
         gGL.texCoord2fv(uv[(rotations + 2) % 4]);
         gGL.vertex2i(0, 0);
 
         gGL.texCoord2fv(uv[(rotations + 0) % 4]);
-        gGL.vertex2i(width, height);
+        gGL.vertex2i(draw_w, draw_h);
 
         gGL.texCoord2fv(uv[(rotations + 2) % 4]);
         gGL.vertex2i(0, 0);
 
         gGL.texCoord2fv(uv[(rotations + 3) % 4]);
-        gGL.vertex2i(width, 0);
+        gGL.vertex2i(draw_w, 0);
     }
     gGL.end();
 }
@@ -712,6 +724,168 @@ void LLJoystickCameraTrack::onHeldDown()
 void LLJoystickCameraTrack::resetJoystickCamera()
 {
     gAgentCamera.resetCameraPan();
+}
+
+//-------------------------------------------------------------------------------
+// LLJoystickMoveForwardBack — oval movement joystick (forward/back + turn)
+//-------------------------------------------------------------------------------
+
+// Identical quadrant-detection logic to LLJoystickCameraRotate::handleMouseDown
+// but without gAgent.setMovementLocked() — that lock is camera-only.
+bool LLJoystickMoveForwardBack::handleMouseDown(S32 x, S32 y, MASK mask)
+{
+    updateSlop();
+
+    S32 horiz_center = getRect().getWidth()  / 2;
+    S32 vert_center  = getRect().getHeight() / 2;
+    S32 dx = x - horiz_center;
+    S32 dy = y - vert_center;
+
+    if (pointInCenterDot(x, y, CENTER_DOT_RADIUS))
+    {
+        mInitialOffset.mX = 0;
+        mInitialOffset.mY = 0;
+        mInitialQuadrant  = JQ_ORIGIN;
+        mInCenter         = true;
+    }
+    else if (dy > dx && dy > -dx)       // top
+    {
+        mInitialOffset.mX = 0;
+        mInitialOffset.mY = (mVertSlopNear  + mVertSlopFar)  / 2;
+        mInitialQuadrant  = JQ_UP;
+    }
+    else if (dy > dx && dy <= -dx)      // left
+    {
+        mInitialOffset.mX = -(mHorizSlopNear + mHorizSlopFar) / 2;
+        mInitialOffset.mY = 0;
+        mInitialQuadrant  = JQ_LEFT;
+    }
+    else if (dy <= dx && dy <= -dx)     // bottom
+    {
+        mInitialOffset.mX = 0;
+        mInitialOffset.mY = -(mVertSlopNear  + mVertSlopFar)  / 2;
+        mInitialQuadrant  = JQ_DOWN;
+    }
+    else                                // right
+    {
+        mInitialOffset.mX = (mHorizSlopNear + mHorizSlopFar) / 2;
+        mInitialOffset.mY = 0;
+        mInitialQuadrant  = JQ_RIGHT;
+    }
+
+    return LLJoystick::handleMouseDown(x, y, mask);
+}
+
+bool LLJoystickMoveForwardBack::handleMouseUp(S32 x, S32 y, MASK mask)
+{
+    mInCenter = false;
+    return LLJoystick::handleMouseUp(x, y, mask);
+}
+
+void LLJoystickMoveForwardBack::onHeldDown()
+{
+    F32 time = getElapsedHeldDownTime();
+    updateSlop();
+
+    S32 dx = mLastMouse.mX - mFirstMouse.mX + mInitialOffset.mX;
+    S32 dy = mLastMouse.mY - mFirstMouse.mY + mInitialOffset.mY;
+
+    // Horizontal offset → yaw (turn).  Blend ratio same as LLJoystickAgentTurn.
+    F32 m = (F32)dx / (F32)llmax(1, llabs(dy));
+    m = llclamp(m, -1.f, 1.f);
+    gAgent.moveYaw(-LLFloaterMove::getYawRate(time) * m);
+
+    // Vertical offset → forward / backward
+    if      (dy >  mVertSlopFar)   gAgent.moveAt(1);
+    else if (dy >  mVertSlopNear)  { if (time < NUDGE_TIME) gAgent.moveAtNudge(1);  else gAgent.moveAt(1);  }
+    else if (dy < -mVertSlopFar)   gAgent.moveAt(-1);
+    else if (dy < -mVertSlopNear)  { if (time < NUDGE_TIME) gAgent.moveAtNudge(-1); else gAgent.moveAt(-1); }
+}
+
+//-------------------------------------------------------------------------------
+// LLJoystickMoveStrafe — crosshair movement joystick (slide left/right + fwd/back)
+//-------------------------------------------------------------------------------
+
+bool LLJoystickMoveStrafe::handleMouseDown(S32 x, S32 y, MASK mask)
+{
+    updateSlop();
+
+    S32 horiz_center = getRect().getWidth()  / 2;
+    S32 vert_center  = getRect().getHeight() / 2;
+    S32 dx = x - horiz_center;
+    S32 dy = y - vert_center;
+
+    if (pointInCenterDot(x, y, CENTER_DOT_RADIUS))
+    {
+        mInitialOffset.mX = 0;
+        mInitialOffset.mY = 0;
+        mInitialQuadrant  = JQ_ORIGIN;
+        mInCenter         = true;
+    }
+    else if (dy > dx && dy > -dx)
+    {
+        mInitialOffset.mX = 0;
+        mInitialOffset.mY = (mVertSlopNear  + mVertSlopFar)  / 2;
+        mInitialQuadrant  = JQ_UP;
+    }
+    else if (dy > dx && dy <= -dx)
+    {
+        mInitialOffset.mX = -(mHorizSlopNear + mHorizSlopFar) / 2;
+        mInitialOffset.mY = 0;
+        mInitialQuadrant  = JQ_LEFT;
+    }
+    else if (dy <= dx && dy <= -dx)
+    {
+        mInitialOffset.mX = 0;
+        mInitialOffset.mY = -(mVertSlopNear  + mVertSlopFar)  / 2;
+        mInitialQuadrant  = JQ_DOWN;
+    }
+    else
+    {
+        mInitialOffset.mX = (mHorizSlopNear + mHorizSlopFar) / 2;
+        mInitialOffset.mY = 0;
+        mInitialQuadrant  = JQ_RIGHT;
+    }
+
+    return LLJoystick::handleMouseDown(x, y, mask);
+}
+
+bool LLJoystickMoveStrafe::handleMouseUp(S32 x, S32 y, MASK mask)
+{
+    mInCenter = false;
+    return LLJoystick::handleMouseUp(x, y, mask);
+}
+
+void LLJoystickMoveStrafe::onMouseUp()
+{
+    F32 time = getElapsedHeldDownTime();
+    if (time < NUDGE_TIME)
+    {
+        switch (mInitialQuadrant)
+        {
+        case JQ_LEFT:  gAgent.moveLeftNudge(1);  break;
+        case JQ_RIGHT: gAgent.moveLeftNudge(-1); break;
+        default:       break;
+        }
+    }
+}
+
+void LLJoystickMoveStrafe::onHeldDown()
+{
+    updateSlop();
+
+    S32 dx = mLastMouse.mX - mFirstMouse.mX + mInitialOffset.mX;
+    S32 dy = mLastMouse.mY - mFirstMouse.mY + mInitialOffset.mY;
+
+    // Horizontal → strafe left/right
+    if      (dx >  mHorizSlopNear) gAgent.moveLeft(-1);
+    else if (dx < -mHorizSlopNear) gAgent.moveLeft(1);
+
+    // Vertical → forward/backward
+    if      (dy >  mVertSlopFar)   gAgent.moveAt(1);
+    else if (dy >  mVertSlopNear)  gAgent.moveAtNudge(1);
+    else if (dy < -mVertSlopFar)   gAgent.moveAt(-1);
+    else if (dy < -mVertSlopNear)  gAgent.moveAtNudge(-1);
 }
 
 //-------------------------------------------------------------------------------
