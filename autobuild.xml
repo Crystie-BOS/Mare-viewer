@@ -3987,7 +3987,7 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
                 <array>
                   <string>-DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo</string>
                   <string>-DADDRESS_SIZE:STRING=$AUTOBUILD_ADDRSIZE</string>
-                  <string>-DROOT_PROJECT_NAME:STRING=Kokua</string>
+                  <string>-DROOT_PROJECT_NAME:STRING=Mare</string>
                   <string>-DINSTALL_PROPRIETARY=TRUE</string>
                   <string>-URLV_ALWAYS_ON</string>
                 </array>
@@ -4008,7 +4008,7 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
                 <array>
                   <string>-DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo</string>
                   <string>-DADDRESS_SIZE:STRING=$AUTOBUILD_ADDRSIZE</string>
-                  <string>-DROOT_PROJECT_NAME:STRING=Kokua</string>
+                  <string>-DROOT_PROJECT_NAME:STRING=Mare</string>
                   <string>-DINSTALL_PROPRIETARY=FALSE</string>
                   <string>-URLV_ALWAYS_ON</string>
                 </array>
@@ -4030,7 +4030,7 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
                 <array>
                   <string>-DCMAKE_BUILD_TYPE:STRING=Release</string>
                   <string>-DADDRESS_SIZE:STRING=$AUTOBUILD_ADDRSIZE</string>
-                  <string>-DROOT_PROJECT_NAME:STRING=Kokua</string>
+                  <string>-DROOT_PROJECT_NAME:STRING=Mare</string>
                   <string>-DINSTALL_PROPRIETARY=TRUE</string>
                   <string>-URLV_ALWAYS_ON</string>
                 </array>
@@ -4051,7 +4051,7 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
                 <array>
                   <string>-DCMAKE_BUILD_TYPE:STRING=Release</string>
                   <string>-DADDRESS_SIZE:STRING=$AUTOBUILD_ADDRSIZE</string>
-                  <string>-DROOT_PROJECT_NAME:STRING=Kokua</string>
+                  <string>-DROOT_PROJECT_NAME:STRING=Mare</string>
                   <string>-DINSTALL_PROPRIETARY=FALSE</string>
                   <string>-URLV_ALWAYS_ON</string>
                 </array>
@@ -4288,7 +4288,7 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
                 </array>
                 <key>arguments</key>
                 <array>
-                  <string>Kokua.sln</string>
+                  <string>Mare.sln</string>
                 </array>
               </map>
               <key>default</key>
@@ -4329,7 +4329,7 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
                 </array>
                 <key>arguments</key>
                 <array>
-                  <string>Kokua.sln</string>
+                  <string>Mare.sln</string>
                 </array>
               </map>
               <key>name</key>
@@ -4362,7 +4362,7 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
                 </array>
                 <key>arguments</key>
                 <array>
-                  <string>Kokua.sln</string>
+                  <string>Mare.sln</string>
                 </array>
               </map>
               <key>name</key>
@@ -4402,7 +4402,7 @@ Copyright (c) 2012, 2014, 2015, 2016 nghttp2 contributors</string>
                 </array>
                 <key>arguments</key>
                 <array>
-                  <string>Kokua.sln</string>
+                  <string>Mare.sln</string>
                 </array>
               </map>
               <key>name</key>
