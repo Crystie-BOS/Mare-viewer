@@ -48,6 +48,10 @@
 #include "llstartup.h"
 #include "llwindow.h"   // swapBuffers()
 
+// MARE: Phase 3 — upscaler interface + default TAA backend
+#include "mareupscaler.h"
+#include "maretaaupscaler.h"
+
 // newview includes
 #include "llagent.h"
 #include "llagentcamera.h"
@@ -146,6 +150,7 @@ bool LLPipeline::RenderDeferred;
 F32 LLPipeline::RenderDeferredSunWash;
 U32 LLPipeline::RenderFSAAType;
 U32 LLPipeline::RenderResolutionDivisor;
+U32 LLPipeline::RenderResolutionPreset;  // MARE: FSR 2 render-resolution preset
 bool LLPipeline::RenderUIBuffer;
 S32 LLPipeline::RenderShadowDetail;
 S32 LLPipeline::RenderShadowSplits;
@@ -536,6 +541,7 @@ void LLPipeline::init()
     connectRefreshCachedSettingsSafe("RenderDeferredSunWash");
     connectRefreshCachedSettingsSafe("RenderFSAAType");
     connectRefreshCachedSettingsSafe("RenderResolutionDivisor");
+    connectRefreshCachedSettingsSafe("RenderResolutionPreset"); // MARE: FSR 2 render-resolution preset
     connectRefreshCachedSettingsSafe("RenderUIBuffer");
     connectRefreshCachedSettingsSafe("RenderShadowDetail");
     connectRefreshCachedSettingsSafe("RenderShadowSplits");
@@ -850,9 +856,13 @@ bool LLPipeline::allocateScreenBufferInternal(U32 resX, U32 resY)
         gCubeSnapshot = false;
     }
 
-    // remember these dimensions
+    // remember these dimensions (full display resolution — before any scaling)
     mRT->width = resX;
     mRT->height = resY;
+
+    // MARE: save display res for FSR 2 output target and post-processing buffers
+    const U32 displayX = resX;
+    const U32 displayY = resY;
 
     U32 res_mod = RenderResolutionDivisor;
 
@@ -860,6 +870,21 @@ bool LLPipeline::allocateScreenBufferInternal(U32 resX, U32 resY)
     {
         resX /= res_mod;
         resY /= res_mod;
+    }
+
+    // MARE: Phase 3 Step 3 — FSR 2 render-resolution preset scaling.
+    // Applied on top of the integer divisor so both work independently.
+    // Only active when upscaler is enabled and mode is FSR 2 (mode 3).
+    {
+        static LLCachedControl<bool> upscalerEnabled(gSavedSettings, "RenderUpscalerEnabled", false);
+        static LLCachedControl<U32>  upscalerMode   (gSavedSettings, "RenderUpscalerMode",    0u);
+        if (upscalerEnabled && (U32)upscalerMode == 3 && RenderResolutionPreset > 0)
+        {
+            static const F32 presetScales[] = { 1.0f, 0.77f, 0.67f, 0.59f, 0.50f };
+            U32 preset = llmin(RenderResolutionPreset, 4u);
+            resX = llmax(16u, (U32)llround((F32)resX * presetScales[preset]));
+            resY = llmax(16u, (U32)llround((F32)resY * presetScales[preset]));
+        }
     }
 
     S32 shadow_detail = RenderShadowDetail;
@@ -922,8 +947,16 @@ bool LLPipeline::allocateScreenBufferInternal(U32 resX, U32 resY)
             mSceneMap.release();
         }
 
-        mPostPingMap.allocate(resX, resY, GL_RGBA);
-        mPostPongMap.allocate(resX, resY, GL_RGBA);
+        // MARE: post-processing buffers run at display resolution when FSR 2 is active
+        // so that tonemapping and bloom are sharp on the upscaled image.
+        {
+            static LLCachedControl<bool> upscalerEnabled(gSavedSettings, "RenderUpscalerEnabled", false);
+            static LLCachedControl<U32>  upscalerMode   (gSavedSettings, "RenderUpscalerMode",    0u);
+            U32 postX = (upscalerEnabled && (U32)upscalerMode == 3) ? displayX : resX;
+            U32 postY = (upscalerEnabled && (U32)upscalerMode == 3) ? displayY : resY;
+            mPostPingMap.allocate(postX, postY, GL_RGBA);
+            mPostPongMap.allocate(postX, postY, GL_RGBA);
+        }
 
         // The water exclusion mask needs its own depth buffer so we can take care of the problem of multiple water planes.
         // Should we ever make water not just a plane, it also aids with that as well as the water planes will be rendered into the mask.
@@ -939,6 +972,47 @@ bool LLPipeline::allocateScreenBufferInternal(U32 resX, U32 resY)
         mDownResMap.allocate(1024, 1024, GL_RGBA);
 
         mBakeMap.allocate(LLAvatarAppearanceDefines::SCRATCH_TEX_WIDTH, LLAvatarAppearanceDefines::SCRATCH_TEX_HEIGHT, GL_RGBA);
+
+        // MARE: Phase 2/3 — velocity buffer + TAA upscaler GPU resources.
+        // All allocated together so they share the same enable/disable lifecycle.
+        // Released when upscaler is disabled so non-upscaler users pay zero cost.
+        {
+            static LLCachedControl<bool> upscalerEnabled(gSavedSettings, "RenderUpscalerEnabled", false);
+            static LLCachedControl<U32>  upscalerMode   (gSavedSettings, "RenderUpscalerMode",    0u);
+            if (upscalerEnabled)
+            {
+                // Phase 2: motion-vector buffer (RG16F, render res).
+                if (!mVelocityBuffer.allocate(resX, resY, GL_RG16F)) return false;
+
+                // Phase 3 Step 3: FSR 2 display-resolution output target.
+                // Allocated only for mode 3; released for all other modes.
+                if ((U32)upscalerMode == 3)
+                {
+                    if (!mDisplayScreen.allocate(displayX, displayY, GL_RGBA16F)) return false;
+                }
+                else
+                {
+                    mDisplayScreen.release();
+                }
+
+                // Phase 3: TAA backend — lazy-create, then (re-)initialize at
+                // the current render resolution.  destroy()+initialize() is cheap
+                // because this function is only called on window resize or setting
+                // change, not every frame.
+                if (!mUpscaler) mUpscaler = IUpscaler::create();
+                if (mUpscaler)
+                {
+                    if (!mUpscaler->resize(resX, resY)) return false;
+                }
+            }
+            else
+            {
+                mVelocityBuffer.release();
+                mDisplayScreen.release(); // MARE: no upscaler — release FSR 2 target too
+                // Phase 3: release upscaler GPU resources and destroy the object.
+                if (mUpscaler) { mUpscaler->destroy(); mUpscaler.reset(); }
+            }
+        }
     }
     //HACK make screenbuffer allocations start failing after 30 seconds
     if (gSavedSettings.getBOOL("SimulateFBOFailure"))
@@ -1071,6 +1145,7 @@ void LLPipeline::refreshCachedSettings()
     RenderDeferredSunWash = gSavedSettings.getF32("RenderDeferredSunWash");
     RenderFSAAType = gSavedSettings.getU32("RenderFSAAType");
     RenderResolutionDivisor = gSavedSettings.getU32("RenderResolutionDivisor");
+    RenderResolutionPreset  = gSavedSettings.getU32("RenderResolutionPreset"); // MARE: FSR 2 preset
     RenderUIBuffer = gSavedSettings.getBOOL("RenderUIBuffer");
     RenderShadowDetail = gSavedSettings.getS32("RenderShadowDetail");
     RenderShadowSplits = gSavedSettings.getS32("RenderShadowSplits");
@@ -1257,6 +1332,9 @@ void LLPipeline::releaseScreenBuffers()
     mHeroProbeRT.screen.release();
     mHeroProbeRT.deferredScreen.release();
     mHeroProbeRT.deferredLight.release();
+
+    mVelocityBuffer.release();  // MARE: Phase 2 — safe no-op if upscaler was disabled
+    mDisplayScreen.release();   // MARE: Phase 3 Step 3 — safe no-op if FSR 2 was not active
 }
 
 void LLPipeline::releaseSunShadowTarget(U32 index)
@@ -2095,6 +2173,22 @@ void LLPipeline::updateMovedList(LLDrawable::drawable_vector_t& moved_list)
         if (!drawablep->isDead() && (!drawablep->isState(LLDrawable::EARLY_MOVE)))
         {
             done = drawablep->updateMove();
+
+            // MARE: Phase 2 Step 3/4 — queue drawable for the velocity passes.
+            // updateMove() → updateXform() has already snapshotted mPrevRenderMatrix
+            // and written the new world matrix, so both frames' data are consistent here.
+            // Avatar drawables are included: the dynamic pass skips their skinned faces
+            // (face->mSkinInfo != nullptr), and the skinned pass (Phase 2 Step 4) handles them.
+            // Particles and HUD attachments are excluded — they have no meaningful world velocity.
+            static LLCachedControl<bool> upscalerEnabled(gSavedSettings, "RenderUpscalerEnabled", false);
+            if (upscalerEnabled
+                && drawablep->getNumFaces() > 0
+                && drawablep->getVObj()
+                && !drawablep->getVObj()->isParticleSource()
+                && !drawablep->getVObj()->isHUDAttachment())
+            {
+                mVelocityDrawList.push_back(drawablep);
+            }
         }
         drawablep->clearState(LLDrawable::EARLY_MOVE | LLDrawable::MOVE_UNDAMPED);
         if (done)
@@ -2133,6 +2227,9 @@ void LLPipeline::updateMove()
     {
         return;
     }
+
+    // MARE: Phase 2 Step 3 — reset drawable velocity queue each frame
+    mVelocityDrawList.clear();
 
     assertInitialized();
 
@@ -8101,6 +8198,13 @@ void LLPipeline::renderFinalize()
 
     static LLCachedControl<bool> has_hdr(gSavedSettings, "RenderHDREnabled", true);
     bool hdr = gGLManager.mGLVersion > 4.05f && has_hdr();
+
+    // MARE: Phase 3 Step 3 — when FSR 2 is active mDisplayScreen holds the
+    // full-display-resolution upscaled output.  Tonemapping and gamma correction
+    // should read from there so post-processing runs at display resolution.
+    // SSR and luminance metering keep reading from mRT->screen (render res).
+    LLRenderTarget* scene_src = mDisplayScreen.isComplete() ? &mDisplayScreen : &mRT->screen;
+
     if (hdr)
     {
         copyScreenSpaceReflections(&mRT->screen, &mSceneMap);
@@ -8112,7 +8216,7 @@ void LLPipeline::renderFinalize()
         static LLCachedControl<F32> cas_sharpness(gSavedSettings, "RenderCASSharpness", 0.4f);
         bool apply_cas = cas_sharpness != 0.0f && gCASProgram.isComplete() && gCASLegacyGammaProgram.isComplete();
 
-        tonemap(&mRT->screen, apply_cas ? &mRT->deferredLight : &mPostPingMap, !apply_cas);
+        tonemap(scene_src, apply_cas ? &mRT->deferredLight : &mPostPingMap, !apply_cas);
 
         if (apply_cas)
         {
@@ -8122,7 +8226,7 @@ void LLPipeline::renderFinalize()
     }
     else
     {
-        gammaCorrect(&mRT->screen, &mPostPingMap);
+        gammaCorrect(scene_src, &mPostPingMap);
     }
 
     LLVertexBuffer::unbind();
@@ -8555,6 +8659,10 @@ void LLPipeline::renderDeferredLighting()
     LLRenderTarget *screen_target         = &mRT->screen;
     LLRenderTarget* deferred_light_target = &mRT->deferredLight;
 
+    // MARE: Phase 2 Step 5 — declared here so it is in scope for the TAA
+    // upscale pass that runs after the deferred block closes (~line 9368).
+    bool mare_velocity_valid = true;
+
     {
         LL_PROFILE_ZONE_NAMED_CATEGORY_PIPELINE("deferred");
         LLViewerCamera *camera = LLViewerCamera::getInstance();
@@ -8673,6 +8781,233 @@ void LLPipeline::renderDeferredLighting()
             }
             deferred_light_target->flush();
             unbindDeferredShader(gDeferredBlurLightProgram);
+        }
+
+        // MARE: Phase 2 Step 5 — camera jump / teleport guard.
+        // If the camera advanced more than 5 metres in one frame (teleport, sim crossing)
+        // the previous-frame VP matrix is stale.  Clear the velocity buffer to zero and
+        // skip all three velocity passes; the upscaler will see zero motion (no-history
+        // blend) rather than flickering garbage reprojection.
+        // (mare_velocity_valid declared above deferred block — needed in TAA pass at ~9384)
+        {
+            static LLCachedControl<bool> upscalerEnabled(gSavedSettings, "RenderUpscalerEnabled", false);
+            if (upscalerEnabled && !gCubeSnapshot && mVelocityBuffer.isComplete()
+                && LLViewerCamera::getInstance()->hadCameraJump())
+            {
+                mare_velocity_valid = false;
+                mVelocityBuffer.bindTarget();
+                glClearColor(0.f, 0.f, 0.f, 0.f);
+                glClear(GL_COLOR_BUFFER_BIT);
+                mVelocityBuffer.flush();
+            }
+        }
+
+        // MARE: velocity / motion-vector pass (Phase 2) — static world reprojection
+        // Writes per-pixel NDC velocity delta into mVelocityBuffer (GL_RG16F).
+        // Dynamic objects (LLDrawable) and avatar bones (LLJoint) will be layered on top
+        // in Phase 2 Steps 3 & 4.  Skipped for cube-map snapshots and when upscaler is off.
+        {
+            static LLCachedControl<bool> upscalerEnabled(gSavedSettings, "RenderUpscalerEnabled", false);
+            if (mare_velocity_valid && upscalerEnabled && !gCubeSnapshot
+                && mVelocityBuffer.isComplete()
+                && gDeferredVelocityProgram.isComplete()) // MARE: skip if shader failed to load
+            {
+                LL_PROFILE_ZONE_NAMED_CATEGORY_PIPELINE("renderDeferredLighting - velocity");
+                LL_PROFILE_GPU_ZONE("velocity buffer");
+
+                mVelocityBuffer.bindTarget();
+                bindDeferredShader(gDeferredVelocityProgram);
+
+                // Upload previous-frame view-projection matrix captured in LLViewerCamera::beginFrame()
+                static LLStaticHashedString sPrevVP("prev_vp");
+                gDeferredVelocityProgram.uniformMatrix4fv(sPrevVP, 1, GL_FALSE,
+                    glm::value_ptr(LLViewerCamera::getInstance()->getPrevViewProj()));
+
+                {
+                    LLGLDisable   blend(GL_BLEND);
+                    LLGLDepthTest depth(GL_TRUE, GL_FALSE, GL_ALWAYS);
+                    mScreenTriangleVB->setBuffer();
+                    mScreenTriangleVB->drawArrays(LLRender::TRIANGLES, 0, 3);
+                }
+
+                mVelocityBuffer.flush();
+                unbindDeferredShader(gDeferredVelocityProgram);
+            }
+        }
+
+        // MARE: dynamic velocity pass (Phase 2 Step 3) — per-object geometry re-draw.
+        // Overwrites the camera-reprojection velocity with object-motion velocity for all
+        // drawable faces that actually moved this frame (queued in mVelocityDrawList by
+        // updateMovedList()).  Depth test GL_LEQUAL / no writes ensures only visible pixels
+        // of each drawable are updated.  Avatar drawables are excluded here; bone-transform
+        // velocity is handled in Phase 2 Step 4.
+        {
+            static LLCachedControl<bool> upscalerEnabled(gSavedSettings, "RenderUpscalerEnabled", false);
+            if (mare_velocity_valid && upscalerEnabled && !gCubeSnapshot
+                && mVelocityBuffer.isComplete()
+                && !mVelocityDrawList.empty()
+                && gDeferredDynamicVelocityProgram.isComplete()) // MARE: skip if shader failed to load
+            {
+                LL_PROFILE_ZONE_NAMED_CATEGORY_PIPELINE("renderDeferredLighting - dynamic velocity");
+                LL_PROFILE_GPU_ZONE("dynamic velocity");
+
+                mVelocityBuffer.bindTarget();
+                gDeferredDynamicVelocityProgram.bind();
+
+                static LLStaticHashedString sPrevMVP("prev_mvp");
+
+                {
+                    LLGLDisable   blend(GL_BLEND);
+                    LLGLDepthTest depth(GL_TRUE, GL_FALSE, GL_LEQUAL);
+
+                    for (LLPointer<LLDrawable>& drawptr : mVelocityDrawList)
+                    {
+                        LLDrawable* drawablep = drawptr.get();
+                        if (!drawablep || drawablep->isDead()) continue;
+
+                        // Pre-multiply previous-frame MVP on the CPU to keep the vertex shader cheap.
+                        // LLMatrix4::mMatrix is row-major in C++; glm::make_mat4 reads column-major
+                        // → consistent with how gGL.multMatrix interprets the same pointer.
+                        glm::mat4 prev_model = glm::make_mat4((F32*)drawablep->getPrevRenderMatrix().mMatrix);
+                        glm::mat4 prev_mvp   = LLViewerCamera::getInstance()->getPrevViewProj() * prev_model;
+                        gDeferredDynamicVelocityProgram.uniformMatrix4fv(sPrevMVP, 1, GL_FALSE,
+                            glm::value_ptr(prev_mvp));
+
+                        // Push current model transform onto the view matrix so that
+                        // syncMatrices() uploads the correct modelview_matrix uniform.
+                        gGL.matrixMode(LLRender::MM_MODELVIEW);
+                        gGL.pushMatrix();
+                        gGL.multMatrix((F32*)drawablep->getRenderMatrix().mMatrix);
+
+                        for (S32 i = 0; i < drawablep->getNumFaces(); ++i)
+                        {
+                            LLFace* face = drawablep->getFace(i);
+                            if (!face) continue;
+                            // MARE: skip skinned (rigged mesh) faces — handled by the
+                            // skinned velocity pass below (Phase 2 Step 4).
+                            if (face->mSkinInfo) continue;
+                            // MARE: Phase 2 Step 5 — skip transparent / non-depth-writing faces.
+                            // Alpha-blended geometry is absent from the GBuffer depth buffer, so
+                            // GL_LEQUAL would let their fragments pass using the opaque surface's
+                            // depth behind them, producing incorrect velocity overwrites.
+                            {
+                                U32 pt = face->getPoolType();
+                                if (pt == LLDrawPool::POOL_ALPHA           ||
+                                    pt == LLDrawPool::POOL_ALPHA_PRE_WATER ||
+                                    pt == LLDrawPool::POOL_ALPHA_POST_WATER||
+                                    pt == LLDrawPool::POOL_WATER           ||
+                                    pt == LLDrawPool::POOL_VOIDWATER       ||
+                                    pt == LLDrawPool::POOL_GLOW) continue;
+                            }
+                            LLVertexBuffer* vb = face->getVertexBuffer();
+                            if (!vb || !face->getIndicesCount()) continue;
+
+                            vb->setBuffer();
+                            vb->drawRange(LLRender::TRIANGLES,
+                                          face->getGeomIndex(),
+                                          face->getGeomIndex() + face->getGeomCount() - 1,
+                                          face->getIndicesCount(),
+                                          face->getIndicesStart());
+                        }
+
+                        gGL.popMatrix();
+                    }
+                } // end depth/blend scope
+
+                mVelocityBuffer.flush();
+                gDeferredDynamicVelocityProgram.unbind();
+            }
+        }
+
+        // MARE: skinned velocity pass (Phase 2 Step 4) — avatar body + rigged-mesh attachments.
+        // Re-draws the same mVelocityDrawList but processes only faces that have mSkinInfo set.
+        // Both the current-frame palette (matrixPalette) and the previous-frame palette
+        // (prevMatrixPalette, snapshotted in updateSkinInfoMatrixPalette() during the GBuffer pass)
+        // are uploaded per face batch.  Depth test GL_LEQUAL / no writes ensures only visible
+        // pixels overwrite the camera-reprojection velocity.
+        {
+            static LLCachedControl<bool> upscalerEnabled(gSavedSettings, "RenderUpscalerEnabled", false);
+            if (mare_velocity_valid && upscalerEnabled && !gCubeSnapshot
+                && mVelocityBuffer.isComplete()
+                && !mVelocityDrawList.empty()
+                && gDeferredAvatarVelocityProgram.isComplete()) // MARE: skip if shader failed to load
+            {
+                LL_PROFILE_ZONE_NAMED_CATEGORY_PIPELINE("renderDeferredLighting - avatar velocity");
+                LL_PROFILE_GPU_ZONE("avatar velocity");
+
+                mVelocityBuffer.bindTarget();
+                gDeferredAvatarVelocityProgram.bind();
+
+                static LLStaticHashedString sPrevVP("prev_vp");
+                static LLStaticHashedString sPrevPalette("prevMatrixPalette");
+
+                // prev_vp is the same for every skinned draw call this frame.
+                gDeferredAvatarVelocityProgram.uniformMatrix4fv(sPrevVP, 1, GL_FALSE,
+                    glm::value_ptr(LLViewerCamera::getInstance()->getPrevViewProj()));
+
+                {
+                    LLGLDisable   blend(GL_BLEND);
+                    LLGLDepthTest depth(GL_TRUE, GL_FALSE, GL_LEQUAL);
+
+                    for (LLPointer<LLDrawable>& drawptr : mVelocityDrawList)
+                    {
+                        LLDrawable* drawablep = drawptr.get();
+                        if (!drawablep || drawablep->isDead()) continue;
+
+                        for (S32 i = 0; i < drawablep->getNumFaces(); ++i)
+                        {
+                            LLFace* face = drawablep->getFace(i);
+                            if (!face || !face->mSkinInfo || !face->mAvatar) continue;
+
+                            LLVertexBuffer* vb = face->getVertexBuffer();
+                            if (!vb || !face->getIndicesCount()) continue;
+                            // MARE: Phase 2 Step 5 — skip transparent / non-depth-writing faces (defensive).
+                            {
+                                U32 pt = face->getPoolType();
+                                if (pt == LLDrawPool::POOL_ALPHA           ||
+                                    pt == LLDrawPool::POOL_ALPHA_PRE_WATER ||
+                                    pt == LLDrawPool::POOL_ALPHA_POST_WATER||
+                                    pt == LLDrawPool::POOL_WATER           ||
+                                    pt == LLDrawPool::POOL_VOIDWATER       ||
+                                    pt == LLDrawPool::POOL_GLOW) continue;
+                            }
+
+                            // Retrieve (or reuse) the matrix palette cache for this skin+avatar pair.
+                            // On the second call per frame the snapshot was already taken during the
+                            // GBuffer pass, so this is a fast cache hit with no allocation.
+                            const LLVOAvatar::MatrixPaletteCache& mpc =
+                                face->mAvatar->updateSkinInfoMatrixPalette(face->mSkinInfo);
+
+                            // 12 floats per mat3x4 (3 columns × 4 rows).
+                            S32 count = (S32)(mpc.mGLMp.size() / 12);
+                            if (count <= 0 || mpc.mPrevGLMp.size() < mpc.mGLMp.size()) continue;
+
+                            // Current-frame palette — uses the standard AVATAR_MATRIX slot.
+                            gDeferredAvatarVelocityProgram.uniformMatrix3x4fv(
+                                LLShaderMgr::AVATAR_MATRIX, count, GL_FALSE, mpc.mGLMp.data());
+
+                            // Previous-frame palette — no enum slot exists, so upload via raw GL.
+                            GLint prevPalLoc =
+                                gDeferredAvatarVelocityProgram.getUniformLocation(sPrevPalette);
+                            if (prevPalLoc >= 0)
+                            {
+                                glUniformMatrix3x4fv(prevPalLoc, (GLsizei)count,
+                                    GL_FALSE, mpc.mPrevGLMp.data());
+                            }
+
+                            vb->setBuffer();
+                            vb->drawRange(LLRender::TRIANGLES,
+                                          face->getGeomIndex(),
+                                          face->getGeomIndex() + face->getGeomCount() - 1,
+                                          face->getIndicesCount(),
+                                          face->getIndicesStart());
+                        }
+                    }
+                } // end depth/blend scope
+
+                mVelocityBuffer.flush();
+                gDeferredAvatarVelocityProgram.unbind();
+            }
         }
 
         screen_target->bindTarget();
@@ -9015,6 +9350,43 @@ void LLPipeline::renderDeferredLighting()
 
     if (!gCubeSnapshot)
     {
+        // MARE: Phase 3 Step 1 — TAA / upscale pass.
+        // Runs after screen_target has been flushed (above), so its texture is
+        // readable.  MARETAAUpscaler::apply() reads the current frame + history,
+        // writes the accumulated result into its ping-pong buffer, then copies
+        // it back into screen_target so the downstream post-processing chain
+        // (tonemapping, bloom, FXAA/SMAA) sees the temporally-resolved image.
+        //
+        // cameraCut flag from Phase 2 Step 5: when a teleport was detected the
+        // velocity buffer was already cleared to zero; we also signal the upscaler
+        // to skip the history blend so it seeds a clean first accumulated frame.
+        if (mUpscaler && mUpscaler->isReady() && mare_velocity_valid)
+        {
+            LL_PROFILE_ZONE_NAMED_CATEGORY_PIPELINE("renderDeferredLighting - TAA");
+            LL_PROFILE_GPU_ZONE("TAA upscale");
+
+            // outputDst: FSR 2 writes to mDisplayScreen (display res); TAA/NIS write
+            // back to screen_target (render res).  renderFinalize() routes accordingly.
+            LLRenderTarget* upscale_dst = mDisplayScreen.isComplete()
+                                        ? &mDisplayScreen
+                                        : screen_target;
+
+            // MARE: cameraCut = true when the camera moved (pan/walk) or jumped (teleport).
+            // TAA bypasses the history accumulation and outputs the raw current frame,
+            // which is jitter-free (beginFrame() zeroed jitter when mCameraMoved).
+            // Accumulation resumes cleanly from the first static frame after movement.
+            bool taa_cut = LLViewerCamera::getInstance()->getCameraMoved()
+                        || LLViewerCamera::getInstance()->hadCameraJump();
+            mUpscaler->apply(
+                screen_target,
+                &mRT->deferredScreen,   // depthSrc: FSR 2 needs depth; TAA/NIS ignore it
+                &mVelocityBuffer,
+                upscale_dst,
+                LLViewerCamera::getInstance()->getJitterX(),
+                LLViewerCamera::getInstance()->getJitterY(),
+                taa_cut);
+        }
+
         // this is the end of the 3D scene render, grab a copy of the modelview and projection
         // matrix for use in off-by-one-frame effects in the next frame
         for (U32 i = 0; i < 16; i++)

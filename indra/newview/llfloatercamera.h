@@ -88,6 +88,11 @@ public:
 
     virtual void onOpen(const LLSD& key);
     virtual void onClose(bool app_quitting);
+    virtual void reshape(S32 width, S32 height, bool called_from_parent = true);
+
+    // MARE: idle callback polls mouse position to fade non-joystick panels.
+    // Does NOT touch draw() or handleHover() so joystick input is untouched.
+    static void idleCB(void* user_data);
 
     void onSavePreset();
     void onCustomPresetSelected();
@@ -145,11 +150,18 @@ private:
     ECameraControlMode mCurrMode;
     std::map<ECameraControlMode, LLButton*> mMode2Button;
 
-    LLPanel* mControls { nullptr };
     LLPanel* mViewerCameraInfo { nullptr };
     LLPanel* mAgentCameraInfo { nullptr };
     LLComboBox* mPresetCombo { nullptr };
     LLTextBox* mPreciseCtrls { nullptr };
+
+    // MARE: idle-callback fade. Mouse position polled each frame outside draw()
+    // so joystick input is never touched.
+    static const F32 COLLAPSE_DELAY;   // seconds after unhover before fading out
+    static const F32 FADE_SPEED;       // alpha units per second for the transition
+
+    F32          mFadeAlpha  { 0.f   }; // 0=faded, 1=full
+    LLFrameTimer mUnhoverTimer;         // time since mouse left the floater
 };
 
 /**

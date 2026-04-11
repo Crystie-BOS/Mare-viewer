@@ -785,6 +785,9 @@ set(viewer_SOURCE_FILES
     llworldmapview.cpp
     llxmlrpclistener.cpp
     llxmlrpctransaction.cpp
+    maretaaupscaler.cpp
+    marenisupscaler.cpp
+    marefsr2upscaler.cpp
     noise.cpp
     qtoolalign.cpp
     piemenu.cpp
@@ -804,7 +807,7 @@ set(viewer_SOURCE_FILES
     rlveffects.cpp
     )
 
-set(VIEWER_BINARY_NAME "kokua-bin" CACHE STRING
+set(VIEWER_BINARY_NAME "mare-viewer" CACHE STRING
     "The name of the viewer executable to create.")
 
 set(viewer_HEADER_FILES
@@ -1899,7 +1902,7 @@ if (WINDOWS)
         # *TODO -reenable this once we get server usage sorted out
         LINK_FLAGS "/debug /NODEFAULTLIB:LIBCMT /SUBSYSTEM:WINDOWS /LARGEADDRESSAWARE"
         LINK_FLAGS_DEBUG "/NODEFAULTLIB:\"LIBCMT;LIBCMTD;MSVCRT\" /INCREMENTAL:NO /LARGEADDRESSAWARE"
-        LINK_FLAGS_RELEASE "/FORCE:MULTIPLE /MAP\"kokua-bin.MAP\" /OPT:REF /LARGEADDRESSAWARE"
+        LINK_FLAGS_RELEASE "/FORCE:MULTIPLE /MAP\"mare-viewer.MAP\" /OPT:REF /LARGEADDRESSAWARE"
         )
     target_compile_options(${VIEWER_BINARY_NAME} PRIVATE /bigobj)
 

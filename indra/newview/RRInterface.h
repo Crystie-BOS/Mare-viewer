@@ -207,6 +207,8 @@ public:
     std::string stringReplaceWholeWord(std::string s, std::string what, std::string by, bool caseSensitive = false); // same as stringReplace, but checks for neighbors of the occurrences of "what", and replace only if these neighbors are NOT alphanum characters
     // KKA-630 this is now calls getCensoredMessage to get exceptions dealt with
     std::string getDummyName (std::string name, EChatAudible audible = CHAT_AUDIBLE_FULLY); // return "someone", "unknown" etc according to the length of the name (when shownames is on)
+    // MARE: UUID-stable version - returns consistent dummy name per avatar across sim crossings
+    std::string getDummyName (const LLUUID& id, const std::string& name, EChatAudible audible = CHAT_AUDIBLE_FULLY);
     std::string getCensoredMessage (std::string str); // replace names by dummy names
 
     LLUUID getSitTargetId () { return mSitTargetId; }
@@ -282,6 +284,10 @@ public:
     bool mContainsShowminimap;
     bool mContainsShowloc;
     bool mContainsShownames;
+    bool mContainsShowfriends;
+    bool mContainsShowgroups;
+    bool mContainsShownotify;
+    bool mContainsShowfavorites;
     bool mContainsSetenv;
     bool mContainsSetdebug;
     bool mContainsFly;
@@ -412,6 +418,7 @@ private:
     LLUUID mSitTargetId;
     std::string mLastLoadedPreset; // contains the name of the latest loaded Windlight preset
     int mLaunchTimestamp; // timestamp of the beginning of this session
+    std::map<LLUUID, std::string> mDummyNameCache; // MARE: UUID→dummy name, stable across sim crossings
     bool reallyHandleCommand (LLUUID uuid, std::string command);    // CA: the public handleCommand is now a veneer so that we can do debug output cleanly for all callers, not just chat handling
     void doRefreshEnabledState(); // gather three identical bits of code into one
 };

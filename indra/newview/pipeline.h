@@ -41,7 +41,10 @@
 #include "llreflectionmapmanager.h"
 #include "llheroprobemanager.h"
 
+#include <memory>
 #include <stack>
+
+class IUpscaler; // MARE: Phase 3 — forward-declared to avoid pulling in mareupscaler.h
 
 class LLViewerTexture;
 class LLFace;
@@ -742,6 +745,23 @@ public:
     LLRenderTarget          mFXAAMap;
     LLRenderTarget          mSMAABlendBuffer;
 
+    // MARE: RG16F screen-space velocity buffer for TAA upscaler motion vectors (Phase 2)
+    // Only allocated when RenderUpscalerEnabled is true. Two channels: velocity X, velocity Y
+    // in NDC space per fragment. Zero GPU cost when upscaler is disabled.
+    LLRenderTarget          mVelocityBuffer;
+
+    // MARE: Phase 3 — TAA / upscaler backend.
+    // Allocated/destroyed inside allocateScreenBufferInternal() alongside mVelocityBuffer.
+    // Null when upscaler is disabled.  Owned exclusively by LLPipeline.
+    std::unique_ptr<IUpscaler> mUpscaler;
+
+    // MARE: Phase 3 Step 3 — FSR 2 full-display-resolution output target.
+    // Allocated at the native window resolution when RenderUpscalerMode == 3 (FSR 2).
+    // FSR 2 writes its upscaled result here; renderFinalize() reads from it instead of
+    // mRT->screen so that tonemapping and bloom run at display resolution.
+    // Released (zero size) when FSR 2 is not the active upscaler mode.
+    LLRenderTarget          mDisplayScreen;
+
     // render ui to buffer target
     LLRenderTarget          mUIScreen;
 
@@ -833,6 +853,8 @@ protected:
     LLDrawable::drawable_vector_t   mMovedList;
     LLDrawable::drawable_vector_t mMovedBridge;
     LLDrawable::drawable_vector_t   mShiftList;
+    // MARE: Phase 2 Step 3 — drawables that moved this frame, queued for the dynamic velocity pass
+    LLDrawable::drawable_vector_t   mVelocityDrawList;
 
     /////////////////////////////////////////////
     //
@@ -1018,6 +1040,7 @@ public:
     static F32 RenderDeferredSunWash;
     static U32 RenderFSAAType;
     static U32 RenderResolutionDivisor;
+    static U32 RenderResolutionPreset;  // MARE: FSR 2 render-resolution preset (0=Native … 4=Performance)
     static bool RenderUIBuffer;
     static S32 RenderShadowDetail;
     static S32 RenderShadowSplits;

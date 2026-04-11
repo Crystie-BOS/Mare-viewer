@@ -1,4 +1,23 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<!--
+  CAMERA CONTROLS floater — MARE v1.1.0
+  Firestorm-style 3-panel layout (no expand/contract complexity):
+
+    [buttons_panel]        follows="top|left|right"    — camera mode icons (always visible)
+    [zoom]                 follows="all"               — joystick area (fills middle, resizable)
+    [preset_buttons_panel] follows="bottom|left|right" — combo + save (scales via reshape())
+
+  LLFloaterCamera::reshape() scales preset_buttons_panel height between
+  PRESET_MIN (28px, combo+gear only) and PRESET_MAX (64px, two rows) based
+  on how much vertical space is available.  The "Save as preset…" button is
+  hidden automatically when the panel is too short to display it.
+
+  Joystick widgets use follows="top|left" so the per-frame LLLayoutStack
+  updateLayout() pass does not override the square rect set by
+  LLPanelCameraZoom::reshape().
+
+  save_rect="false": prevents old oversized saved rects from overriding layout.
+-->
 <floater
  positioning="specified"
  right="-460"
@@ -7,7 +26,10 @@
  legacy_header_height="18"
  can_minimize="true"
  can_close="true"
- height="135"
+ can_resize="true"
+ min_width="140"
+ min_height="60"
+ height="230"
  layout="topleft"
  name="camera_floater"
  help_topic="camera_floater"
@@ -15,289 +37,376 @@
  single_instance="true"
  title="CAMERA CONTROLS"
  chrome="true"
- save_rect="true"
- width="400">
-    <floater.string
-     name="rotate_tooltip">
+ save_rect="false"
+ width="230">
+    <floater.string name="rotate_tooltip">
         Rotate Camera Around Focus
     </floater.string>
-    <floater.string
-     name="zoom_tooltip">
+    <floater.string name="zoom_tooltip">
         Zoom Camera Towards Focus
     </floater.string>
-    <floater.string
-     name="move_tooltip">
+    <floater.string name="move_tooltip">
         Move Camera Up and Down, Left and Right
     </floater.string>
-    <floater.string
-     name="free_mode_title">
+    <floater.string name="free_mode_title">
         View Object
     </floater.string>
     <string name="inactive_combo_text">Use preset</string>
+
+    <!--
+      TOP PANEL: five camera-mode preset icons.
+      Anchored to the top of the floater. Always visible.
+      Height set proportionally by LLFloaterCamera::reshape() (~17% of content).
+    -->
     <panel
-     border="false"
-     height="123"
-     layout="topleft"
-     left="2"
-     top="0"
-     mouse_opaque="false"
-     name="controls"
-     width="220">
-         <!--TODO: replace + - images -->
-         <panel
-            border="false"
-            class="camera_zoom_panel"
-            height="123"
-            layout="topleft"
-            left="0"
-            mouse_opaque="false"
-            name="zoom"
-            top="0"
-            width="220">
-           <joystick_rotate
-              follows="top|left"
-              height="78"
-              layout="topleft"
-              left="7"
-              name="cam_rotate_stick"
-              quadrant="left"
-              sound_flags="3"
-              visible="true"
-              tool_tip="Orbit camera around focus"
-              top="25"
-              width="78" />
-           <button
-              follows="top|left"
-              height="18"
-              image_disabled="AddItem_Disabled"
-              image_selected="AddItem_Press"
-              image_unselected="AddItem_Off"
-              layout="topleft"
-              left_pad="14" 
-              name="zoom_plus_btn"
-              width="18"
-              top="23">
-             <commit_callback
-                function="Zoom.plus" />
-             <mouse_held_callback
-                function="Zoom.plus" />
-           </button>
-           <slider_bar
-              height="50"
-              layout="topleft"
-              name="zoom_slider"
-              orientation="vertical"
-              tool_tip="Zoom camera toward focus"
-              top_pad="0"
-              min_val="0"
-              max_val="1" 
-              width="18">
-             <commit_callback function="Slider.value_changed"/>
-           </slider_bar>
-           <button
-              follows="top|left"
-              height="18"
-              image_disabled="MinusItem_Disabled"
-              image_selected="MinusItem_Press"
-              image_unselected="MinusItem_Off"
-              layout="topleft"
-              name="zoom_minus_btn"
-              top_pad="0"
-              width="18">
-             <commit_callback
-                function="Zoom.minus" />
-             <mouse_held_callback
-                function="Zoom.minus" />
-           </button>
-         <joystick_track
-         follows="top|left"
-         height="78"
-         image_selected="Cam_Tracking_In"
-         image_unselected="Cam_Tracking_Out"
-         layout="topleft"
-         left="133"
-         name="cam_track_stick"
-         quadrant="left"
-         scale_image="false"
-         sound_flags="3"
-         tool_tip="Move camera up and down, left and right"
-         top="25"
-         width="78"/>
-         <text
-          type="string"
-          length="1"
-          follows="left|top"
-          height="15"
-          layout="topleft"
-          left="41"
-          top_pad="9"
-          name="precise_ctrs_label"
-          width="200">
-            Use precise controls
-        </text>
-   <button
-     follows="left|top"
-     visible="false"
-     height="20"
-     image_overlay="ForwardArrow_Off"
-     top_pad="-20"
-     left="200"
-     layout="topleft"
-     name="expand_btn"
-     tool_tip="Select previous linked part or face"
-     width="12">
-	  <button.commit_callback
-	     function="CameraPresets.Resize"
-	     parameter="expand" />
-    </button>
-        </panel>
-    </panel>
-    <panel
-     follows="left|top"
-     height="102"
-     layout="topleft"
-     left_pad="2"
-     right="-2"
-     name="buttons_panel"
-     top="22">
-    <panel_camera_item
-      name="front_view"
-      tool_tip="Front View"
-      width="30">
-      <panel_camera_item.mousedown_callback
-        function="CameraPresets.ChangeView"
-        parameter="Front View" />
-      <panel_camera_item.picture
-        image_name="Cam_Preset_Front_Off" />
-      <panel_camera_item.selected_picture
-        image_name="Cam_Preset_Front_On" />
-    </panel_camera_item>
-    <panel_camera_item
-      name="group_view"
-      tool_tip="Side View"
-      width="30"
-      left_pad="4">
-      <panel_camera_item.mousedown_callback
-        function="CameraPresets.ChangeView"
-        parameter="Side View" />
-      <panel_camera_item.picture
-        image_name="Cam_Preset_Side_Off" />
-      <panel_camera_item.selected_picture
-        image_name="Cam_Preset_Side_On" />
-    </panel_camera_item>
-    <panel_camera_item
-      name="rear_view"
-      tool_tip="Rear View"
-      width="30"
-      left_pad="4">
-      <panel_camera_item.mousedown_callback
-        function="CameraPresets.ChangeView"
+      border="false"
+      follows="top|left|right"
+      height="36"
+      layout="topleft"
+      left="0"
+      top="0"
+      mouse_opaque="false"
+      name="buttons_panel"
+      width="230">
+      <panel_camera_item
+        name="front_view"
+        tool_tip="Front View"
+        left="2"
+        top="3"
+        width="30"
+        height="30">
+        <panel_camera_item.mousedown_callback
+          function="CameraPresets.ChangeView"
+          parameter="Front View" />
+        <panel_camera_item.picture image_name="Cam_Preset_Front_Off" />
+        <panel_camera_item.selected_picture image_name="Cam_Preset_Front_On" />
+      </panel_camera_item>
+      <panel_camera_item
+        name="group_view"
+        tool_tip="Side View"
+        width="30"
+        height="30"
+        left_pad="4">
+        <panel_camera_item.mousedown_callback
+          function="CameraPresets.ChangeView"
+          parameter="Side View" />
+        <panel_camera_item.picture image_name="Cam_Preset_Side_Off" />
+        <panel_camera_item.selected_picture image_name="Cam_Preset_Side_On" />
+      </panel_camera_item>
+      <panel_camera_item
+        name="rear_view"
         tool_tip="Rear View"
-        parameter="Rear View" />
-      <panel_camera_item.picture
-        image_name="Cam_Preset_Back_Off" />
-      <panel_camera_item.selected_picture
-        image_name="Cam_Preset_Back_On" />
-    </panel_camera_item>
-    <panel_camera_item
+        width="30"
+        height="30"
+        left_pad="4">
+        <panel_camera_item.mousedown_callback
+          function="CameraPresets.ChangeView"
+          parameter="Rear View" />
+        <panel_camera_item.picture image_name="Cam_Preset_Back_Off" />
+        <panel_camera_item.selected_picture image_name="Cam_Preset_Back_On" />
+      </panel_camera_item>
+      <panel_camera_item
         name="object_view"
         tool_tip="Object View"
         width="30"
+        height="30"
         left_pad="4">
         <panel_camera_item.mousedown_callback
           function="CameraPresets.ChangeView"
           parameter="object_view" />
-        <panel_camera_item.picture
-          image_name="Object_View_Off" />
-        <panel_camera_item.selected_picture
-          image_name="Object_View_On" />
+        <panel_camera_item.picture image_name="Object_View_Off" />
+        <panel_camera_item.selected_picture image_name="Object_View_On" />
       </panel_camera_item>
       <panel_camera_item
         name="mouselook_view"
         tool_tip="Mouselook View"
         width="30"
+        height="30"
         left_pad="4">
         <panel_camera_item.mousedown_callback
           function="CameraPresets.ChangeView"
           parameter="mouselook_view" />
-        <panel_camera_item.picture
-          image_name="MouseLook_View_Off" />
-        <panel_camera_item.selected_picture
-          image_name="MouseLook_View_On" />
+        <panel_camera_item.picture image_name="MouseLook_View_Off" />
+        <panel_camera_item.selected_picture image_name="MouseLook_View_On" />
       </panel_camera_item>
-      <combo_box
-        height="23"
+    </panel>
+
+    <!--
+      MIDDLE PANEL: joystick + zoom controls (LLPanelCameraZoom).
+      follows="all": fills all space between buttons_panel (top=36) and
+      preset_buttons_panel (bottom). Grows/shrinks as floater is resized.
+
+      Content area = 230-18 = 212px.
+      Initial: top=36, height=212-36-64=112px, width=226 (2px margins).
+      Bottom margin preserved = 64px (height of preset_buttons_panel).
+    -->
+    <panel
+      border="false"
+      class="camera_zoom_panel"
+      follows="all"
+      layout="topleft"
+      left="2"
+      top="36"
+      height="112"
+      width="226"
+      mouse_opaque="false"
+      name="zoom">
+
+      <!--
+        Horizontal layout_stack: [orbit joystick | zoom col | track joystick]
+        follows="all" with 20px bottom gap for the "precise controls" text.
+        Initial: width=226, height=92 (112-20).
+      -->
+      <layout_stack
+        animate="false"
+        follows="all"
+        height="92"
+        layout="topleft"
         left="0"
+        name="joystick_stack"
+        orientation="horizontal"
+        top="0"
+        width="226">
+
+        <!--
+          Orbit / rotate joystick (auto-resize width).
+          Panel auto-resizes with the floater; joystick widget rect is set
+          to the largest square that fits by LLPanelCameraZoom::reshape().
+          follows="top|left" stops the per-frame LLLayoutStack::updateLayout()
+          from overriding that square rect. scale_image="true" + draw(0,0,w,h)
+          renders the image scaled to the widget rect.
+        -->
+        <layout_panel
+          auto_resize="true"
+          min_dim="50"
+          name="rotate_panel"
+          user_resize="false"
+          width="102"
+          height="92">
+          <!-- follows="top|left": prevents LLLayoutStack::updateLayout() from
+               overriding the square rect set by LLPanelCameraZoom::reshape().
+               LLLayoutStack propagates reshape to auto-resize panels every
+               draw frame; with follows="all" this would reset the widget to
+               a non-square "fill panel" rect on every frame draw.
+               Our LLPanelCameraZoom::reshape() override handles the rect. -->
+          <joystick_rotate
+            follows="top|left"
+            height="92"
+            image_selected="Cam_Rotate_In"
+            image_unselected="Cam_Rotate_Out"
+            layout="topleft"
+            left="0"
+            name="cam_rotate_stick"
+            quadrant="left"
+            scale_image="true"
+            sound_flags="3"
+            tool_tip="Orbit camera around focus"
+            top="0"
+            width="102" />
+        </layout_panel>
+
+        <!-- Zoom column: fixed width, +btn / slider / -btn -->
+        <layout_panel
+          auto_resize="false"
+          min_dim="22"
+          name="zoom_col"
+          user_resize="false"
+          width="22"
+          height="92">
+          <button
+            follows="top"
+            height="18"
+            image_disabled="AddItem_Disabled"
+            image_selected="AddItem_Press"
+            image_unselected="AddItem_Off"
+            layout="topleft"
+            left="2"
+            name="zoom_plus_btn"
+            top="4"
+            width="18">
+            <commit_callback function="Zoom.plus" />
+            <mouse_held_callback function="Zoom.plus" />
+          </button>
+          <!--
+            Slider fills between +btn bottom and -btn top.
+            follows="top|bottom" stretches it as the zoom column grows.
+            Initial height = 92-24-22 = 46px.
+          -->
+          <slider_bar
+            follows="top|bottom"
+            height="46"
+            layout="topleft"
+            left="2"
+            name="zoom_slider"
+            orientation="vertical"
+            tool_tip="Zoom camera toward focus"
+            top="24"
+            min_val="0"
+            max_val="1"
+            width="18">
+            <commit_callback function="Slider.value_changed"/>
+          </slider_bar>
+          <!--
+            Minus button anchored to bottom of zoom column.
+            follows="bottom": stays 2px from column bottom edge.
+            Initial top = 92-2-18 = 72px.
+          -->
+          <button
+            follows="bottom"
+            height="18"
+            image_disabled="MinusItem_Disabled"
+            image_selected="MinusItem_Press"
+            image_unselected="MinusItem_Off"
+            layout="topleft"
+            left="2"
+            name="zoom_minus_btn"
+            top="72"
+            width="18">
+            <commit_callback function="Zoom.minus" />
+            <mouse_held_callback function="Zoom.minus" />
+          </button>
+        </layout_panel>
+
+        <!--
+          Track / pan joystick (auto-resize width).
+          Same reasoning as rotate_panel above.
+        -->
+        <layout_panel
+          auto_resize="true"
+          min_dim="50"
+          name="track_panel"
+          user_resize="false"
+          width="102"
+          height="92">
+          <!-- follows="top|left": same reasoning as joystick_rotate above.
+               LLPanelCameraZoom::reshape() sets the square rect explicitly. -->
+          <joystick_track
+            follows="top|left"
+            height="92"
+            image_selected="Cam_Tracking_In"
+            image_unselected="Cam_Tracking_Out"
+            layout="topleft"
+            left="0"
+            name="cam_track_stick"
+            quadrant="left"
+            scale_image="true"
+            sound_flags="3"
+            tool_tip="Move camera up and down, left and right"
+            top="0"
+            width="102"/>
+        </layout_panel>
+
+      </layout_stack>
+
+      <!--
+        "Use precise controls" link — anchored to bottom-left of zoom panel.
+        follows="bottom|left": moves down with panel bottom as floater grows.
+        Initial top = 112-3-15 = 94px in 112px panel.
+      -->
+      <!-- "Use precise controls" link hidden — Firestorm-style layout has no room.
+           Widget still exists so C++ postBuild() can bind its click callback. -->
+      <text
+        type="string"
+        length="1"
+        follows="bottom|left"
+        height="15"
+        layout="topleft"
+        left="4"
+        name="precise_ctrs_label"
+        top="94"
+        visible="false"
+        width="180">
+        Use precise controls
+      </text>
+
+    </panel>
+
+    <!--
+      BOTTOM PANEL: preset combo + gear button + save preset button.
+      follows="bottom|left|right": anchored to floater bottom, stretches full width.
+      Height scales via LLFloaterCamera::reshape() between 28 and 64 px.
+
+      Inner controls use follows to stay in-bounds at any floater width:
+        combo   follows="left|right"  — right_margin 36 px (leaves room for gear)
+        gear    follows="right"       — right_margin 10 px (22 px wide, 4 px gap to combo)
+        save    follows="top|left|right" — right_margin 10 px (scales with width)
+
+      Gap proof at any width W:
+        combo_right = W - 36
+        gear_left   = W - 10 - 22 = W - 32
+        gap         = (W-32) - (W-36) = 4 px (constant) ✓
+    -->
+    <panel
+      border="false"
+      follows="bottom|left|right"
+      height="64"
+      layout="topleft"
+      left="0"
+      top="148"
+      mouse_opaque="false"
+      name="preset_buttons_panel"
+      width="230">
+
+      <!-- Row 1: preset combo (scales width) + gear (anchored to right edge) -->
+      <combo_box
+        follows="left|right"
+        height="22"
+        left="2"
         mouse_opaque="true"
         name="preset_combo"
-        top_pad="10"
-        width="136">
-        <combo_list
-        mouse_wheel_opaque="true"/>
-        <combo_box.item
-         label="Use preset"
-         name="Use preset"
-         value="default" />
+        top="4"
+        width="192">
+        <combo_list mouse_wheel_opaque="true"/>
+        <combo_box.item label="Use preset" name="Use preset" value="default" />
       </combo_box>
       <button
-        height="16"
-        width="16"  
+        follows="right"
+        height="22"
+        width="22"
         layout="topleft"
         mouse_opaque="true"
         name="gear_btn"
         tool_tip="My Camera Presets"
-        top_delta="3"
-        left_pad="10" 
+        top="4"
+        left_pad="4"
         image_selected="Icon_Gear"
         image_pressed="Icon_Gear"
         image_unselected="Icon_Gear"
         is_toggle="true">
-        <button.commit_callback
-          function="CameraPresets.ShowPresetsList"/>
+        <button.commit_callback function="CameraPresets.ShowPresetsList"/>
       </button>
+
+      <!-- Row 2: save preset button (scales width, hidden when panel is short) -->
       <button
-        follows="top|left"
-        height="25"
+        follows="top|left|right"
+        height="24"
         label="Save as preset..."
         layout="topleft"
-        left="0"
+        left="2"
         name="save_preset_btn"
-        top_pad="18"
-        width="150">
-        <button.commit_callback
-          function="CameraPresets.Save"/>
+        top="32"
+        width="218">
+        <button.commit_callback function="CameraPresets.Save"/>
       </button>
-   <button
-     follows="left|top"
-     height="20"
-     image_overlay="BackArrow_Off"
-     top_pad="-21"
-     left="157"
-     layout="topleft"
-     name="contract_btn"
-     tool_tip="Select previous linked part or face"
-     width="12">
-	  <button.commit_callback
-	     function="CameraPresets.Resize"
-	     parameter="contract" />
-    </button>
-  </panel>
-  <panel
-    name="viewer_camera_info"
-    left="0"
-    top="135"
-    width="400"
-    height="150"
-    border="true"
-    visible="false"
-    background_visible="true"/>
-  <panel
-    name="agent_camera_info"
-    left="0"
-    top="285"
-    width="400"
-    height="150"
-    border="true"
-    visible="false"
-    background_visible="true"/>
+    </panel>
+
+    <!-- Debug camera info panels (hidden; shown by Advanced > Debug Camera) -->
+    <panel
+      name="viewer_camera_info"
+      left="0"
+      top="230"
+      width="230"
+      height="150"
+      border="true"
+      visible="false"
+      background_visible="true"/>
+    <panel
+      name="agent_camera_info"
+      left="0"
+      top="380"
+      width="230"
+      height="150"
+      border="true"
+      visible="false"
+      background_visible="true"/>
 </floater>
