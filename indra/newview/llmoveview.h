@@ -31,8 +31,8 @@
 #include "llfloater.h"
 
 class LLButton;
-class LLJoystickMoveForwardBack;    // MARE: oval movement joystick
-class LLJoystickMoveStrafe;         // MARE: crosshair strafe joystick
+class LLJoystickAgentTurn;
+class LLJoystickAgentSlide;
 
 //
 // Classes
@@ -50,7 +50,6 @@ public:
 
     /*virtual*/ bool    postBuild();
     /*virtual*/ void    setVisible(bool visible);
-    /*virtual*/ void    reshape(S32 width, S32 height, bool called_from_parent = true) override; // MARE: scale controls with floater
     static F32  getYawRate(F32 time);
     static void setFlyingMode(bool fly);
     void setFlyingModeImpl(bool fly);
@@ -91,13 +90,14 @@ private:
 
 public:
 
-    // MARE: two combined joystick widgets replace the old 6-button D-pad.
-    // mForwardButton  = oval orbit widget  (forward/back + turn)
-    // mSlideLeftButton = crosshair widget  (strafe left/right + optional fwd/back)
-    LLJoystickMoveForwardBack*  mForwardButton;
-    LLJoystickMoveStrafe*       mSlideLeftButton;
-    LLButton*                   mMoveUpButton;
-    LLButton*                   mMoveDownButton;
+    LLJoystickAgentTurn*    mForwardButton;
+    LLJoystickAgentTurn*    mBackwardButton;
+    LLJoystickAgentSlide*   mSlideLeftButton;
+    LLJoystickAgentSlide*   mSlideRightButton;
+    LLButton*               mTurnLeftButton;
+    LLButton*               mTurnRightButton;
+    LLButton*               mMoveUpButton;
+    LLButton*               mMoveDownButton;
 private:
     LLPanel*                mModeActionsPanel;
 

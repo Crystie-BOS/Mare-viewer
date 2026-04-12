@@ -2369,22 +2369,14 @@ void LLAgent::propagate(const F32 dt)
     LLFloaterMove *floater_move = LLFloaterReg::findTypedInstance<LLFloaterMove>("moveview");
     if (floater_move)
     {
-        // MARE: orbit joystick highlights the active movement direction(s)
-        floater_move->mForwardButton->setToggleState(
-            gAgentCamera.getYawKey() > 0.f,                                          // left  = turn left
-            gAgentCamera.getAtKey()  > 0   || gAgentCamera.getWalkKey() > 0,         // top   = forward
-            gAgentCamera.getYawKey() < 0.f,                                          // right = turn right
-            gAgentCamera.getAtKey()  < 0   || gAgentCamera.getWalkKey() < 0          // bottom= backward
-        );
-        // MARE: strafe joystick highlights left/right slide
-        floater_move->mSlideLeftButton->setToggleState(
-            gAgentCamera.getLeftKey() > 0.f,    // left  = slide left
-            false,                               // top   = (unused)
-            gAgentCamera.getLeftKey() < 0.f,    // right = slide right
-            false                                // bottom= (unused)
-        );
-        floater_move->mMoveUpButton  ->setToggleState( gAgentCamera.getUpKey() > 0 );
-        floater_move->mMoveDownButton->setToggleState( gAgentCamera.getUpKey() < 0 );
+        floater_move->mForwardButton   ->setToggleState( gAgentCamera.getAtKey() > 0 || gAgentCamera.getWalkKey() > 0 );
+        floater_move->mBackwardButton  ->setToggleState( gAgentCamera.getAtKey() < 0 || gAgentCamera.getWalkKey() < 0 );
+        floater_move->mTurnLeftButton  ->setToggleState( gAgentCamera.getYawKey() > 0.f );
+        floater_move->mTurnRightButton ->setToggleState( gAgentCamera.getYawKey() < 0.f );
+        floater_move->mSlideLeftButton  ->setToggleState( gAgentCamera.getLeftKey() > 0.f );
+        floater_move->mSlideRightButton ->setToggleState( gAgentCamera.getLeftKey() < 0.f );
+        floater_move->mMoveUpButton    ->setToggleState( gAgentCamera.getUpKey() > 0 );
+        floater_move->mMoveDownButton  ->setToggleState( gAgentCamera.getUpKey() < 0 );
     }
 
     // handle rotation based on keyboard levels

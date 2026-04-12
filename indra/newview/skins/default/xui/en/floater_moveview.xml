@@ -1,13 +1,4 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<!-- MARE v1.1.0: Firestorm-style compact movement controls.
-     Layout mirrors the Firestorm camera floater:
-       - Top strip  (36px, fixed)   : Walk / Run / Fly mode buttons
-       - Left panel (auto)          : joystick_move_fwd  — oval widget,  forward/back + turn
-       - Centre col (22px, fixed)   : Up / Down buttons  — fly up / crouch / jump
-       - Right panel (auto)         : joystick_move_strafe — crosshair,  slide left/right
-     reshape() in llmoveview.cpp keeps the mode strip at 36px and lets the
-     joystick area fill the remaining content height.  The layout_stack
-     divides the joystick area into the three columns automatically.        -->
 <floater
  positioning="specified"
  right="-905"
@@ -18,202 +9,257 @@
  can_dock="false"
  can_minimize="true"
  can_close="true"
- can_resize="true"
- min_height="185"
- min_width="185"
  follows="bottom"
- height="270"
+ height="110"
  layout="topleft"
  name="move_floater"
  help_topic="move_floater"
  save_rect="true"
  save_visibility="true"
  save_dock_state="true"
- width="230">
-
-    <!-- ── Tooltip strings (used by initModeTooltips) ── -->
-    <string name="walk_forward_tooltip">Walk or turn (drag to move)</string>
-    <string name="walk_back_tooltip">Walk Backwards (press Down Arrow or S)</string>
-    <string name="walk_left_tooltip">Slide left/right (drag to strafe)</string>
-    <string name="walk_right_tooltip">Walk right (press Shift + Right Arrow or D)</string>
-    <string name="run_forward_tooltip">Run or turn (drag to move)</string>
-    <string name="run_back_tooltip">Run Backwards (press Down Arrow or S)</string>
-    <string name="run_left_tooltip">Run left/right (drag to strafe)</string>
-    <string name="run_right_tooltip">Run right (press Shift + Right Arrow or D)</string>
-    <string name="fly_forward_tooltip">Fly forward/back or turn (drag)</string>
-    <string name="fly_back_tooltip">Fly Backwards (press Down Arrow or S)</string>
-    <string name="fly_left_tooltip">Fly sideways (drag to strafe)</string>
-    <string name="fly_right_tooltip">Fly right (press Shift + Right Arrow or D)</string>
-    <string name="fly_up_tooltip">Fly up (press E)</string>
-    <string name="fly_down_tooltip">Fly down (press C)</string>
-    <string name="jump_tooltip">Jump (press E)</string>
-    <string name="crouch_tooltip">Crouch (press C)</string>
-    <string name="walk_title">Walk</string>
-    <string name="run_title">Run</string>
-    <string name="fly_title">Fly</string>
-
-    <!-- ══════════════════════════════════════════════════════════
-         TOP STRIP — Walk / Run / Fly mode toggle buttons (fixed 36px)
-         Mirrors Firestorm's camera view-preset row.
-         reshape() positions this panel; initial XML coords used for first frame.
-         ══════════════════════════════════════════════════════════ -->
+ width="133">
+    <string
+     name="walk_forward_tooltip">
+        Walk Forward (press Up Arrow or W)
+    </string>
+    <string
+     name="walk_back_tooltip">
+        Walk Backwards (press Down Arrow or S)
+    </string>
+    <string
+     name="walk_left_tooltip">
+        Walk left (press Shift + Left Arrow or A)
+    </string>
+    <string
+     name="walk_right_tooltip">
+        Walk right (press Shift + Right Arrow or D)
+    </string>
+    <string
+     name="run_forward_tooltip">
+        Run Forward (press Up Arrow or W)
+    </string>
+    <string
+     name="run_back_tooltip">
+        Run Backwards (press Down Arrow or S)
+    </string>
+    <string
+     name="run_left_tooltip">
+        Run left (press Shift + Left Arrow or A)
+    </string>
+    <string
+     name="run_right_tooltip">
+        Run right (press Shift + Right Arrow or D)
+    </string>
+    <string
+     name="fly_forward_tooltip">
+        Fly Forward (press Up Arrow or W)
+    </string>
+    <string
+     name="fly_back_tooltip">
+        Fly Backwards (press Down Arrow or S)
+    </string>
+    <string
+     name="fly_left_tooltip">
+        Fly left (press Shift + Left Arrow or A)
+    </string>
+    <string
+     name="fly_right_tooltip">
+        Fly right (press Shift + Right Arrow or D)
+    </string>
+    <string
+     name="fly_up_tooltip">
+        Fly up (press E)
+    </string>
+    <string
+     name="fly_down_tooltip">
+        Fly down (press C)
+    </string>
+    <string
+     name="jump_tooltip">
+        Jump (press E)
+    </string>
+    <string
+     name="crouch_tooltip">
+        Crouch (press C)
+    </string>
+    <string
+     name="walk_title">
+        Walk
+    </string>
+    <string
+     name="run_title">
+        Run
+    </string>
+    <string
+     name="fly_title">
+        Fly
+    </string>
     <panel
      border="false"
-     height="36"
+     height="85"
      layout="topleft"
-     left="0"
+     left="2"
      name="panel_modes"
      top="18"
-     width="230">
+     width="133">
         <button
-         follows="left|top"
-         height="28"
+         follows="left|bottom"
+         height="18"
          image_overlay="Move_Walk_Off"
          image_selected="PushButton_Selected_Press"
-         label=""
+	 label=""
          layout="topleft"
-         left="4"
          name="mode_walk_btn"
+         left="2"
          pad_right="0"
          tool_tip="Walking mode"
-         top="4"
-         width="28" />
+         top="2"
+         width="18" />
         <button
-         follows="left|top"
-         height="28"
+         follows="left|bottom"
+         height="18"
          image_overlay="Move_Run_Off"
          image_selected="PushButton_Selected_Press"
-         label=""
+	 label=""
          layout="topleft"
-         left_delta="30"
+         top="21"
          name="mode_run_btn"
-         pad_right="0"
          tool_tip="Running mode"
-         top="4"
-         width="28" />
+         left="2"
+         width="18" />
         <button
-         follows="left|top"
-         height="28"
+         follows="left|bottom"
+         height="18"
          image_overlay="Move_Fly_Off"
          image_selected="PushButton_Selected_Press"
-         label=""
+	 label=""
          layout="topleft"
-         left_delta="30"
+         left="2"
          name="mode_fly_btn"
-         pad_right="0"
          tool_tip="Flying mode (press [Home] or F)"
-         top="4"
-         width="28" />
+         top="40"
+         width="18" />
     </panel>
-
-    <!-- ══════════════════════════════════════════════════════════
-         JOYSTICK AREA — fills all space below the mode strip.
-         reshape() positions this panel to content_h - 36px tall.
-         The internal layout_stack divides it into three columns:
-           left  = oval movement joystick  (forward/back/turn)
-           centre= Up / Down buttons
-           right = crosshair strafe joystick
-         ══════════════════════════════════════════════════════════ -->
     <panel
      border="false"
-     height="216"
-     follows="all"
+     height="83"
+     follows="left|top"
      layout="topleft"
      left="0"
      mouse_opaque="false"
      name="panel_actions"
-     top="54"
-     width="230">
-
-        <layout_stack
-         name="joystick_stack"
-         orientation="horizontal"
-         follows="all"
-         left="4"
-         top="4"
-         width="222"
-         height="208"
-         border_size="0"
-         bg_alpha_color="0 0 0 0">
-
-            <!-- Left: oval orbit widget — forward / backward / turn -->
-            <layout_panel
-             name="move_orbit_panel"
-             auto_resize="true"
-             min_dim="60"
-             width="99">
-                <joystick_move_fwd
-                 name="forward btn"
-                 image_selected="Cam_Rotate_In"
-                 image_unselected="Cam_Rotate_Out"
-                 quadrant="origin"
-                 scale_image="true"
-                 follows="all"
-                 layout="topleft"
-                 label=""
-                 left="0"
-                 top="0"
-                 width="99"
-                 height="208"
-                 tool_tip="Drag to walk forward/back, or turn" />
-            </layout_panel>
-
-            <!-- Centre: Up / Down buttons (like camera zoom +/-) -->
-            <layout_panel
-             name="updown_col"
-             auto_resize="false"
-             width="22"
-             height="208">
-                <button
-                 name="move up btn"
-                 follows="left|top"
-                 layout="topleft"
-                 label=""
-                 left="2"
-                 top="4"
-                 width="18"
-                 height="18"
-                 image_unselected="AddItem_Off"
-                 image_selected="AddItem_Press"
-                 image_pressed_selected="AddItem_Press"
-                 tool_tip="Fly up (press E)" />
-                <button
-                 name="move down btn"
-                 follows="left|top"
-                 layout="topleft"
-                 label=""
-                 left="2"
-                 top_pad="8"
-                 width="18"
-                 height="18"
-                 image_unselected="MinusItem_Off"
-                 image_selected="MinusItem_Press"
-                 image_pressed_selected="MinusItem_Press"
-                 tool_tip="Fly down (press C)" />
-            </layout_panel>
-
-            <!-- Right: crosshair strafe widget — slide left/right (+ fwd/back) -->
-            <layout_panel
-             name="move_strafe_panel"
-             auto_resize="true"
-             min_dim="60"
-             width="99">
-                <joystick_move_strafe
-                 name="move left btn"
-                 image_selected="Cam_Tracking_In"
-                 image_unselected="Cam_Tracking_Out"
-                 quadrant="origin"
-                 scale_image="true"
-                 follows="all"
-                 layout="topleft"
-                 label=""
-                 left="0"
-                 top="0"
-                 width="99"
-                 height="208"
-                 tool_tip="Drag to slide / strafe in any direction" />
-            </layout_panel>
-
-        </layout_stack>
+     top="0"
+     width="133">
+        <!-- Buttons in panel are organized in 3 columns to enable their easy vertical adjustment via top_pad-->
+        <!-- Left column -->
+        <button
+         follows="left|bottom"
+         height="24"
+         image_selected="Movement_TurnLeft_On"
+         image_pressed_selected="Movement_TurnLeft_On"
+         image_unselected="Movement_TurnLeft_Off"
+         layout="topleft"
+         left="30"
+         name="turn left btn"
+         scale_image="false"
+         tool_tip="Turn left (press Left Arrow or A)"
+         top="34"
+         width="24" />
+        <joystick_slide
+         follows="left|bottom"
+         height="10"
+         image_selected="Movement_Left_On"
+         image_pressed_selected="Movement_Left_On"
+         image_unselected="Movement_Left_Off"
+         layout="topleft"
+         left_delta="4"
+         name="move left btn"
+         quadrant="left"
+         scale_image="false"
+         tool_tip="Walk left (press Shift + Left Arrow or A)"
+         top_pad="4"
+         width="19" />
+        <!-- Right column -->
+        <button
+         follows="left|bottom"
+         height="24"
+         image_selected="Movement_TurnRight_On"
+         image_pressed_selected="Movement_TurnRight_On"
+         image_unselected="Movement_TurnRight_Off"
+         layout="topleft"
+         right="-30"
+         name="turn right btn"
+         scale_image="false"
+         tool_tip="Turn right (press Right Arrow or D)"
+         top="34"
+         width="24" />
+        <joystick_slide
+         follows="left|bottom"
+         height="10"
+         image_selected="Movement_Right_On"
+         image_pressed_selected="Movement_Right_On"
+         image_unselected="Movement_Right_Off"
+         layout="topleft"
+         name="move right btn"
+         quadrant="right"
+         scale_image="false"
+         tool_tip="Walk right (press Shift + Right Arrow or D)"
+         top_pad="4"
+         width="19" />
+        <!-- Middle column -->
+        <joystick_turn
+         follows="left|bottom"
+         height="24"
+         image_selected="Movement_Forward_On"
+         image_pressed_selected="Movement_Forward_On"
+         image_unselected="Movement_Forward_Off"
+         layout="topleft"
+         left="54"
+         name="forward btn"
+         quadrant="up"
+         scale_image="false"
+         tool_tip="Walk forward (press up arrow or W)"
+         top="20"
+         width="24" />
+        <joystick_turn
+         follows="left|bottom"
+         height="24"
+         image_selected="Movement_Backward_On"
+         image_pressed_selected="Movement_Backward_On"
+         image_unselected="Movement_Backward_Off"
+         layout="topleft"
+         left_delta="0"
+         name="backward btn"
+         quadrant="down"
+         scale_image="false"
+         tool_tip="Walk backward (press down arrow or S)"
+         top_pad="5"
+         width="24" />
+        <!-- Fly up/down (jump/crouch) buttons -->
+        <button
+         follows="left|bottom"
+         height="19"
+         image_selected="Movement_Up_On"
+         image_pressed_selected="Movement_Up_On"
+         image_unselected="Movement_Up_Off"
+         layout="topleft"
+         right="-11"
+         name="move up btn"
+         scale_image="false"
+         tool_tip="Fly up (press E)"
+         top="22"
+         width="10" />
+        <button
+         follows="left|bottom"
+         height="19"
+         image_selected="Movement_Down_On"
+         image_pressed_selected="Movement_Down_On"
+         image_unselected="Movement_Down_Off"
+         layout="topleft"
+         name="move down btn"
+         scale_image="false"
+         tool_tip="Fly down (press C)"
+         top_pad="10"
+         width="10" />
     </panel>
 </floater>
