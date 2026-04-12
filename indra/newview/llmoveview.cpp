@@ -67,9 +67,7 @@ const F32 NUDGE_TIME = 0.25f;       // in seconds
 LLFloaterMove::LLFloaterMove(const LLSD& key)
 :   LLFloater(key),
     mForwardButton(NULL),
-    mBackwardButton(NULL),
-    mTurnLeftButton(NULL),
-    mTurnRightButton(NULL),
+    mSlideLeftButton(NULL),
     mMoveUpButton(NULL),
     mMoveDownButton(NULL),
     mModeActionsPanel(NULL),
@@ -92,26 +90,15 @@ bool LLFloaterMove::postBuild()
 {
     updateTransparency(TT_ACTIVE); // force using active floater transparency (STORM-730)
 
-    // Code that implements floater buttons toggling when user moves via keyboard is located in LLAgent::propagate()
+    // MARE: two combined joystick widgets replace the old 6-button D-pad.
+    // Keyboard-press toggle state is driven by LLAgent::propagate() via
+    // the 4-arg setToggleState(left,top,right,bottom) on each joystick.
 
-    mForwardButton = getChild<LLJoystickAgentTurn>("forward btn");
+    mForwardButton = getChild<LLJoystickMoveForwardBack>("forward btn");
     mForwardButton->setHeldDownDelay(MOVE_BUTTON_DELAY);
 
-    mBackwardButton = getChild<LLJoystickAgentTurn>("backward btn");
-    mBackwardButton->setHeldDownDelay(MOVE_BUTTON_DELAY);
-
-    mSlideLeftButton = getChild<LLJoystickAgentSlide>("move left btn");
+    mSlideLeftButton = getChild<LLJoystickMoveStrafe>("move left btn");
     mSlideLeftButton->setHeldDownDelay(MOVE_BUTTON_DELAY);
-
-    mSlideRightButton = getChild<LLJoystickAgentSlide>("move right btn");
-    mSlideRightButton->setHeldDownDelay(MOVE_BUTTON_DELAY);
-
-    mTurnLeftButton = getChild<LLButton>("turn left btn");
-    mTurnLeftButton->setHeldDownDelay(MOVE_BUTTON_DELAY);
-    mTurnLeftButton->setHeldDownCallback(boost::bind(&LLFloaterMove::turnLeft, this));
-    mTurnRightButton = getChild<LLButton>("turn right btn");
-    mTurnRightButton->setHeldDownDelay(MOVE_BUTTON_DELAY);
-    mTurnRightButton->setHeldDownCallback(boost::bind(&LLFloaterMove::turnRight, this));
 
     mMoveUpButton = getChild<LLButton>("move up btn");
     mMoveUpButton->setHeldDownDelay(MOVE_BUTTON_DELAY);
@@ -143,6 +130,28 @@ bool LLFloaterMove::postBuild()
     gAgent.addParcelChangedCallback(LLFloaterMove::sUpdateFlyingStatus);
 
     return true;
+}
+
+// MARE: Firestorm-style layout — mode strip at top (fixed 36px), joystick
+// area fills the rest.  The layout_stack inside panel_actions handles internal
+// proportional scaling via follows="all" on its children.
+// virtual
+void LLFloaterMove::reshape(S32 width, S32 height, bool called_from_parent)
+{
+    LLFloater::reshape(width, height, called_from_parent);
+
+    if (!mModeActionsPanel) return; // postBuild not yet complete
+
+    S32 content_h = height - getHeaderHeight();
+    const S32 MODE_H = 36; // fixed height for walk/run/fly button row
+
+    // Mode panel: fixed-height strip at top of content area
+    mModeActionsPanel->setShape(LLRect(0, content_h, width, content_h - MODE_H));
+
+    // Joystick panel: fills everything below the mode strip
+    LLPanel* panel_actions = getChild<LLPanel>("panel_actions");
+    if (panel_actions)
+        panel_actions->setShape(LLRect(0, content_h - MODE_H, width, 0));
 }
 
 // *NOTE: we assume that setVisible() is called on floater close.
@@ -256,18 +265,10 @@ void LLFloaterMove::setSittingMode(bool bSitting)
 }
 
 // protected
-void LLFloaterMove::turnLeft()
-{
-    F32 time = mTurnLeftButton->getHeldDownTime();
-    gAgent.moveYaw( getYawRate( time ) );
-}
-
-// protected
-void LLFloaterMove::turnRight()
-{
-    F32 time = mTurnRightButton->getHeldDownTime();
-    gAgent.moveYaw( -getYawRate( time ) );
-}
+// MARE: turning is now handled inside LLJoystickMoveForwardBack::onHeldDown()
+// via the orbit joystick widget.  These stubs are retained for vtable compat.
+void LLFloaterMove::turnLeft()  {}
+void LLFloaterMove::turnRight() {}
 
 // protected
 void LLFloaterMove::moveUp()
@@ -375,31 +376,27 @@ void LLFloaterMove::updateButtonsWithMovementMode(const EMovementMode newMode)
 
 void LLFloaterMove::initModeTooltips()
 {
+    // MARE: two joystick widgets now cover what used to be 6 separate buttons.
+    // Each mode gets tooltips for: orbit joystick, strafe joystick, up, down.
     control_tooltip_map_t walkTipMap;
-    walkTipMap.insert(std::make_pair(mForwardButton, getString("walk_forward_tooltip")));
-    walkTipMap.insert(std::make_pair(mBackwardButton, getString("walk_back_tooltip")));
-    walkTipMap.insert(std::make_pair(mSlideLeftButton, getString("walk_left_tooltip")));
-    walkTipMap.insert(std::make_pair(mSlideRightButton, getString("walk_right_tooltip")));
-    walkTipMap.insert(std::make_pair(mMoveUpButton, getString("jump_tooltip")));
-    walkTipMap.insert(std::make_pair(mMoveDownButton, getString("crouch_tooltip")));
+    walkTipMap[mForwardButton]   = getString("walk_forward_tooltip");
+    walkTipMap[mSlideLeftButton] = getString("walk_left_tooltip");
+    walkTipMap[mMoveUpButton]    = getString("jump_tooltip");
+    walkTipMap[mMoveDownButton]  = getString("crouch_tooltip");
     mModeControlTooltipsMap[MM_WALK] = walkTipMap;
 
     control_tooltip_map_t runTipMap;
-    runTipMap.insert(std::make_pair(mForwardButton, getString("run_forward_tooltip")));
-    runTipMap.insert(std::make_pair(mBackwardButton, getString("run_back_tooltip")));
-    runTipMap.insert(std::make_pair(mSlideLeftButton, getString("run_left_tooltip")));
-    runTipMap.insert(std::make_pair(mSlideRightButton, getString("run_right_tooltip")));
-    runTipMap.insert(std::make_pair(mMoveUpButton, getString("jump_tooltip")));
-    runTipMap.insert(std::make_pair(mMoveDownButton, getString("crouch_tooltip")));
+    runTipMap[mForwardButton]   = getString("run_forward_tooltip");
+    runTipMap[mSlideLeftButton] = getString("run_left_tooltip");
+    runTipMap[mMoveUpButton]    = getString("jump_tooltip");
+    runTipMap[mMoveDownButton]  = getString("crouch_tooltip");
     mModeControlTooltipsMap[MM_RUN] = runTipMap;
 
     control_tooltip_map_t flyTipMap;
-    flyTipMap.insert(std::make_pair(mForwardButton, getString("fly_forward_tooltip")));
-    flyTipMap.insert(std::make_pair(mBackwardButton, getString("fly_back_tooltip")));
-    flyTipMap.insert(std::make_pair(mSlideLeftButton, getString("fly_left_tooltip")));
-    flyTipMap.insert(std::make_pair(mSlideRightButton, getString("fly_right_tooltip")));
-    flyTipMap.insert(std::make_pair(mMoveUpButton, getString("fly_up_tooltip")));
-    flyTipMap.insert(std::make_pair(mMoveDownButton, getString("fly_down_tooltip")));
+    flyTipMap[mForwardButton]   = getString("fly_forward_tooltip");
+    flyTipMap[mSlideLeftButton] = getString("fly_left_tooltip");
+    flyTipMap[mMoveUpButton]    = getString("fly_up_tooltip");
+    flyTipMap[mMoveDownButton]  = getString("fly_down_tooltip");
     mModeControlTooltipsMap[MM_FLY] = flyTipMap;
 
     setModeTooltip(MM_WALK);
