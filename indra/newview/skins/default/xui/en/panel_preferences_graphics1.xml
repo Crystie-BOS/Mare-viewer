@@ -1662,6 +1662,120 @@
   </slider>
   <!-- End of Tone Mapping Settings-->
 
+  <!-- MARE Upscaler Settings -->
+  <check_box
+    control_name="RenderUpscalerEnabled"
+    height="16"
+    label="Enable Upscaler (TAA / NIS / FSR 2)"
+    layout="topleft"
+    left="12"
+    name="upscaler_enabled"
+    tool_tip="Enables temporal anti-aliasing and/or upscaling. Disable to use standard rendering only."
+    top_delta="24"
+    width="300" />
+  <text
+    type="string"
+    length="1"
+    follows="left|top"
+    height="16"
+    layout="topleft"
+    left="12"
+    name="UpscalerModeText"
+    text_readonly_color="LabelDisabledColor"
+    top_delta="22"
+    width="128">
+    Upscaler Mode:
+  </text>
+  <combo_box
+    control_name="RenderUpscalerMode"
+    height="18"
+    layout="topleft"
+    left_delta="130"
+    top_delta="0"
+    name="UpscalerMode"
+    tool_tip="TAA: temporal anti-aliasing.  NIS: spatial sharpen only.  TAA+NIS: anti-aliasing then sharpen.  FSR 2: AMD FidelityFX Super Resolution 2."
+    width="150">
+    <combo_box.item
+      label="TAA only"
+      name="0"
+      value="0"/>
+    <combo_box.item
+      label="NIS sharpen"
+      name="1"
+      value="1"/>
+    <combo_box.item
+      label="TAA + NIS"
+      name="2"
+      value="2"/>
+    <combo_box.item
+      label="FSR 2"
+      name="3"
+      value="3"/>
+  </combo_box>
+  <text
+    type="string"
+    length="1"
+    follows="left|top"
+    height="16"
+    layout="topleft"
+    left="12"
+    name="ResolutionPresetText"
+    text_readonly_color="LabelDisabledColor"
+    top_delta="22"
+    width="128">
+    Resolution Preset:
+  </text>
+  <combo_box
+    control_name="RenderResolutionPreset"
+    height="18"
+    layout="topleft"
+    left_delta="130"
+    top_delta="0"
+    name="ResolutionPreset"
+    tool_tip="Internal render resolution as a fraction of display resolution (FSR 2 mode only). Lower = higher performance but softer before upscale."
+    width="150">
+    <combo_box.item
+      label="100% (native)"
+      name="0"
+      value="0"/>
+    <combo_box.item
+      label="77% (Quality)"
+      name="1"
+      value="1"/>
+    <combo_box.item
+      label="67% (Balanced)"
+      name="2"
+      value="2"/>
+    <combo_box.item
+      label="59% (Performance)"
+      name="3"
+      value="3"/>
+    <combo_box.item
+      label="50% (Ultra Perf.)"
+      name="4"
+      value="4"/>
+  </combo_box>
+  <slider
+    control_name="RenderNISSharpenStrength"
+    decimal_digits="2"
+    follows="left|top"
+    height="16"
+    increment="0.05"
+    initial_value="0.5"
+    label="NIS Sharpen:"
+    label_width="145"
+    layout="topleft"
+    left="12"
+    min_val="0.0"
+    max_val="1.0"
+    name="NISSharpenStrength"
+    show_text="true"
+    tool_tip="Sharpening strength for NIS and TAA+NIS modes (0 = off, 1 = maximum)."
+    top_delta="22"
+    width="260">
+  </slider>
+  <!-- End of MARE Upscaler Settings -->
+
 
     </panel>
 </tab_container>
