@@ -33,6 +33,7 @@
 
 #include "llagent.h"
 #include "llagentwearables.h"
+#include "llstartup.h"
 #include "llappearancemgr.h"
 #include "llinventoryicon.h"
 #include "llgesturemgr.h"
@@ -1062,15 +1063,22 @@ void LLWearableItemsList::ContextMenu::updateItemsVisibility(LLContextMenu* menu
     setMenuItemVisible(menu, "favorites_remove",    can_unfavorite);
     setMenuItemVisible(menu, "take_off",            mask == MASK_CLOTHING && n_worn == n_items);
     setMenuItemVisible(menu, "detach",              mask == MASK_ATTACHMENT && n_worn == n_items);
-    if (mask == MASK_ATTACHMENT && n_worn == n_items && gRRenabled)
+    if (mask == MASK_ATTACHMENT && n_worn == n_items)
     {
-        for (uuid_vec_t::const_iterator it = ids.begin(); it != ids.end(); ++it)
+        if (LLStartUp::getStartupState() < STATE_CLEANUP)
         {
-            LLViewerInventoryItem* item = gInventory.getItem(*it);
-            if (item && !gAgent.mRRInterface.canDetach(item))
+            setMenuItemEnabled(menu, "detach", false);
+        }
+        else if (gRRenabled)
+        {
+            for (uuid_vec_t::const_iterator it = ids.begin(); it != ids.end(); ++it)
             {
-                setMenuItemEnabled(menu, "detach", false);
-                break;
+                LLViewerInventoryItem* item = gInventory.getItem(*it);
+                if (item && !gAgent.mRRInterface.canDetach(item))
+                {
+                    setMenuItemEnabled(menu, "detach", false);
+                    break;
+                }
             }
         }
     }
