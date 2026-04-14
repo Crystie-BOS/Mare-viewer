@@ -198,12 +198,11 @@ void LLViewerCamera::beginFrame()
             mJitterY = 0.f;
         }
 
-        // MARE: Suppress jitter while the camera is moving.
-        // TAA will use cameraCut=true for moving frames (pipeline.cpp), outputting
-        // the raw current frame with no history blend.  Applying jitter to these
-        // bypass frames would make them slightly shifted each frame (visible shimmer
-        // during pans/walks).  Zero it so moving frames are pixel-perfect.
-        if (mCameraMoved)
+        // MARE: Do NOT suppress jitter on camera movement.
+        // The velocity buffer (Phase 2) compensates for camera motion, so TAA can
+        // accumulate even during walks/pans.  Jitter is only zeroed on a camera
+        // jump (teleport/sim-crossing) where history is discarded anyway.
+        if (mCameraJumped)
         {
             mJitterX = 0.f;
             mJitterY = 0.f;

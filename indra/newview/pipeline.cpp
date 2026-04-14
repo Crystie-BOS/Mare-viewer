@@ -9371,12 +9371,12 @@ void LLPipeline::renderDeferredLighting()
                                         ? &mDisplayScreen
                                         : screen_target;
 
-            // MARE: cameraCut = true when the camera moved (pan/walk) or jumped (teleport).
-            // TAA bypasses the history accumulation and outputs the raw current frame,
-            // which is jitter-free (beginFrame() zeroed jitter when mCameraMoved).
-            // Accumulation resumes cleanly from the first static frame after movement.
-            bool taa_cut = LLViewerCamera::getInstance()->getCameraMoved()
-                        || LLViewerCamera::getInstance()->hadCameraJump();
+            // MARE: cameraCut = true only on teleport / sim-crossing (hadCameraJump).
+            // Normal camera movement (pan/walk) is handled by the velocity buffer —
+            // motion vectors reproject history correctly, so TAA accumulates even while
+            // moving.  Cutting on every getCameraMoved() frame (the old behaviour) meant
+            // jitter was suppressed and TAA bypassed for virtually all of gameplay.
+            bool taa_cut = LLViewerCamera::getInstance()->hadCameraJump();
             mUpscaler->apply(
                 screen_target,
                 &mRT->deferredScreen,   // depthSrc: FSR 2 needs depth; TAA/NIS ignore it
