@@ -1667,7 +1667,11 @@ if (WINDOWS)
     set(ICON_PATH "test")
     set(VIEWER_MACOSX_PHASE "d")
     string(TOLOWER ${VIEWER_CHANNEL} channel_lower)
-    if(channel_lower MATCHES "^kokua release")
+    if(channel_lower MATCHES "^mare")
+    # MARE Viewer — use the clean Kokua key-logo icon set
+        set(ICON_PATH "kokua")
+        set(VIEWER_MACOSX_PHASE "f")
+    elseif(channel_lower MATCHES "^kokua release")
     # Use original kokua icons. Can be changed to "release" if desired
         set(ICON_PATH "kokua")
         set(VIEWER_MACOSX_PHASE "f")
