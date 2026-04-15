@@ -16,7 +16,7 @@
   updateLayout() pass does not override the square rect set by
   LLPanelCameraZoom::reshape().
 
-  save_rect="false": prevents old oversized saved rects from overriding layout.
+  save_rect="true": position is saved per account so the floater stays where the user placed it.
 -->
 <floater
  positioning="specified"
@@ -37,7 +37,7 @@
  single_instance="true"
  title="CAMERA CONTROLS"
  chrome="true"
- save_rect="false"
+ save_rect="true"
  width="230">
     <floater.string name="rotate_tooltip">
         Rotate Camera Around Focus

@@ -167,6 +167,8 @@ void LLFloaterMove::setVisible(bool visible)
     }
     else
     {
+        // Save position before hiding so it persists across sessions.
+        storeRectControl();
         // Detach the Stand/Stop Flying panel.
         LLPanelStandStopFlying::getInstance()->reparent(NULL);
     }

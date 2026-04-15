@@ -10,9 +10,9 @@
  can_minimize="false"
  can_close="false"
  can_resize="true"
- height="78"
+ height="90"
  layout="topleft"
- min_height="82"
+ min_height="90"
  min_width="86"
  name="move_floater"
  help_topic=""
@@ -97,7 +97,7 @@
     </string>
     <panel
      border="false"
-     top="4"
+     top="16"
      follows="all"
      layout="topleft"
      left="3"
