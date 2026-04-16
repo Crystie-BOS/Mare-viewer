@@ -70,12 +70,12 @@
          bg_opaque_color="PanelDark"
          background_opaque="true">
           <icon
-           height="77"
-           width="160"
+           height="80"
+           width="80"
            image_name="login_kokua_logo"
            layout="topleft"
            follows="left|top"
-           left="70"
+           left="110"
            top="39"
            name="kokua_logo_small" />
           <icon
