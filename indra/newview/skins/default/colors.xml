@@ -17,10 +17,10 @@
 	 reference="Kokua_42" />
     <color
      name="SelectionColor"
-     value="0.706 0.851 1 1" />
+     value="0.75 0.45 0.81 1" />
     <color
      name="ScrollHoveredColor"
-     value="0.18 0.26 0.33 1" />
+     value="0.375 0.225 0.405 1" />
 	<color
 	 name="BeaconColor"
     value="0.749 0.298 0 1" />	 
@@ -927,7 +927,7 @@
      reference="EmphasisColor" />
     <color
      name="WornOutfitTextColor"
-     value="0.54 0.73 0.87 1" />
+     reference = "Kokua" />
     <color
      name="SearchableControlHighlightFontColor"
      value="1 0 0 1" />
@@ -966,7 +966,7 @@
      reference="LtGray" />
     <color
      name="SelectedBgReadOnlyColor"
-     value="0.15 0.21 0.27 1" />
+     value="0.375 0.233 0.404 1" />
     <color
      name="TextBgFocusColor"
      reference="White" />
