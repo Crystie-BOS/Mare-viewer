@@ -95,7 +95,8 @@ public:
     void setIsTyping(bool is_typing); //KKA-779 Add a FS-style "is typing" indication in Conversations floater
 
     LLFloater* getSessionFloater();
-    bool isInActiveVoiceChannel() { return mIsInActiveVoiceChannel; }
+    bool isInActiveVoiceChannel();
+    void updateConversationIndicators();
 
     bool highlightFriendTitle(LLConversationItem* vmi, std::string overrideTitle=""); //KKA-849 extended to pass in an alternative title to use (eg <name> is typing)
 

@@ -1058,6 +1058,15 @@ void LLOutfitListBase::refreshList(const LLUUID& category_id)
     }
 }
 
+void LLOutfitListBase::startIdleLoop(const LLUUID cat_id)
+{
+    if (mRefreshListState.CategoryUUID.isNull())
+    {
+        mRefreshListState.CategoryUUID = cat_id;
+        gIdleCallbacks.addFunction(onIdle, this);
+    }
+}
+
 // static
 void LLOutfitListBase::onIdle(void* userdata)
 {
@@ -1127,6 +1136,14 @@ void LLOutfitListBase::onIdleRefreshList()
             updateChangedCategoryName(cat, name);
         }
 
+        curent_time = LLTimer::getTotalSeconds();
+        if (curent_time >= end_time)
+            return;
+    }
+
+    // Let derived classes process their own updates.
+    while (updateOneOutfit())
+    {
         curent_time = LLTimer::getTotalSeconds();
         if (curent_time >= end_time)
             return;

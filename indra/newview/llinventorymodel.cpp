@@ -1017,6 +1017,15 @@ LLUUID LLInventoryModel::findCategoryByName(std::string name)
     return LLUUID::null;
 }
 
+const LLUUID LLInventoryModel::getMarketplaceListingsUUID()
+{
+    if (mMarketplaceListingsUUID.isNull())
+    {
+        mMarketplaceListingsUUID = findCategoryUUIDForType(LLFolderType::FT_MARKETPLACE_LISTINGS);
+    }
+    return mMarketplaceListingsUUID;
+}
+
 // Convenience function to create a new category. You could call
 // updateCategory() with a newly generated UUID category, but this
 // version will take care of details like what the name should be
@@ -1739,7 +1748,7 @@ void LLInventoryModel::updateCategory(const LLViewerInventoryCategory* cat, U32 
             mask |= LLInventoryObserver::LABEL;
         }
         // Under marketplace, category labels are quite complex and need extra upate
-        const LLUUID marketplace_id = findCategoryUUIDForType(LLFolderType::FT_MARKETPLACE_LISTINGS);
+        const LLUUID marketplace_id = getMarketplaceListingsUUID();
         if (marketplace_id.notNull() && isObjectDescendentOf(cat->getUUID(), marketplace_id))
         {
             mask |= LLInventoryObserver::LABEL;
@@ -3491,6 +3500,7 @@ bool LLInventoryModel::loadFromFile(const std::string& filename,
     LLSD inventory;
     if (!is_cache_obsolete)
     {
+        LL_PROFILE_ZONE_NAMED("inventory load from file - llsd parse");
         LLPointer<LLSDParser> parser = new LLSDBinaryParser();
 
         if (parser->parse(file, inventory, LLSDSerialize::SIZE_UNLIMITED) == LLSDParser::PARSE_FAILURE)
@@ -3502,56 +3512,61 @@ bool LLInventoryModel::loadFromFile(const std::string& filename,
 
     if (!is_cache_obsolete)
     {
-        const LLSD& llsd_cats = inventory["categories"];
-        if (llsd_cats.isArray())
         {
-            LLSD::array_const_iterator iter = llsd_cats.beginArray();
-            LLSD::array_const_iterator end = llsd_cats.endArray();
-            for (; iter != end; ++iter)
+            LL_PROFILE_ZONE_NAMED("inventory load from file - categories");
+            const LLSD& llsd_cats = inventory["categories"];
+            if (llsd_cats.isArray())
             {
-                LLPointer<LLViewerInventoryCategory> inv_cat = new LLViewerInventoryCategory(LLUUID::null);
-                if (inv_cat->importLLSDMap(*iter))
+                LLSD::array_const_iterator iter = llsd_cats.beginArray();
+                LLSD::array_const_iterator end  = llsd_cats.endArray();
+                for (; iter != end; ++iter)
                 {
-                    categories.push_back(inv_cat);
+                    LLPointer<LLViewerInventoryCategory> inv_cat = new LLViewerInventoryCategory(LLUUID::null);
+                    if (inv_cat->importLLSDMap(*iter))
+                    {
+                        categories.push_back(inv_cat);
+                    }
                 }
             }
         }
 
-        const LLSD& llsd_items = inventory["items"];
-        if (llsd_items.isArray())
         {
-            LLSD::array_const_iterator iter = llsd_items.beginArray();
-            LLSD::array_const_iterator end = llsd_items.endArray();
-            for (; iter != end; ++iter)
+            LL_PROFILE_ZONE_NAMED("inventory load from file - items");
+            const LLSD& llsd_items = inventory["items"];
+            if (llsd_items.isArray())
             {
-                LLPointer<LLViewerInventoryItem> inv_item = new LLViewerInventoryItem;
-                if (inv_item->fromLLSD(*iter))
+                LLSD::array_const_iterator iter = llsd_items.beginArray();
+                LLSD::array_const_iterator end  = llsd_items.endArray();
+                for (; iter != end; ++iter)
                 {
-                    if (inv_item->getUUID().isNull())
+                    LLPointer<LLViewerInventoryItem> inv_item = new LLViewerInventoryItem;
+                    if (inv_item->fromLLSD(*iter))
                     {
-                        LL_DEBUGS(LOG_INV) << "Ignoring inventory with null item id: "
-                            << inv_item->getName() << LL_ENDL;
-                    }
-                    else
-                    {
-                        if (inv_item->getType() == LLAssetType::AT_UNKNOWN)
+                        if (inv_item->getUUID().isNull())
                         {
-                            cats_to_update.insert(inv_item->getParentUUID());
+                            LL_DEBUGS(LOG_INV) << "Ignoring inventory with null item id: " << inv_item->getName() << LL_ENDL;
                         }
                         else
                         {
-                            items.push_back(inv_item);
+                            if (inv_item->getType() == LLAssetType::AT_UNKNOWN)
+                            {
+                                cats_to_update.insert(inv_item->getParentUUID());
+                            }
+                            else
+                            {
+                                items.push_back(inv_item);
+                            }
                         }
                     }
-                }
 
-                //      TODO(brad) - figure out how to reenable this without breaking everything else
-                //      static constexpr U64 BATCH_SIZE = 512U;
-                //      if ((++lines_count % BATCH_SIZE) == 0)
-                //      {
-                //          // SL-19968 - make sure message system code gets a chance to run every so often
-                //          pump_idle_startup_network();
-                //      }
+                    //      TODO(brad) - figure out how to reenable this without breaking everything else
+                    //      static constexpr U64 BATCH_SIZE = 512U;
+                    //      if ((++lines_count % BATCH_SIZE) == 0)
+                    //      {
+                    //          // SL-19968 - make sure message system code gets a chance to run every so often
+                    //          pump_idle_startup_network();
+                    //      }
+                }
             }
         }
     }

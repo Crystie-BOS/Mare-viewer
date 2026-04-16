@@ -1701,11 +1701,14 @@ void LLPluginClassMedia::initializeUrlHistory(const LLSD& url_history)
     LL_DEBUGS("Plugin") << "Sending history" << LL_ENDL;
 }
 
-//DKO
-//void LLPluginClassMedia::setFlipY( bool enabled )
-//{
-//  LLPluginMessage message(LLPLUGIN_MESSAGE_CLASS_MEDIA_BROWSER, "cef_flipy");
-//  message.setValueBoolean("enable", enabled);
-//  sendMessage(message);
-//}
-//DKO
+void LLPluginClassMedia::forceRenderRefresh()
+{
+    // Force layout recalculation by briefly hiding/showing the web content
+    // Used to clear black screen issues after resize, see #5607
+    const std::string refresh_script =
+        "document.documentElement.style.visibility='hidden';"
+        "document.documentElement.offsetHeight;"
+        "document.documentElement.style.visibility='';";
+
+    executeJavaScript(refresh_script);
+}

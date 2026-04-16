@@ -429,6 +429,7 @@
     width="130"
     name="media_first_interact_combo"
     tool_tip="This setting controls which media (once loaded) does not require a first click to focus before interaction can begin. This allows clicks to be passed directly to media bypassing the focus click requirement. Each option also inherits the previous ones.">
+        <combo_box.drop_down_button pad_right="19" />
         <item
             label="Disabled"
             name="media_first_click_none"
