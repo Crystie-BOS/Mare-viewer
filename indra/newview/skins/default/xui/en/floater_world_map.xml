@@ -86,7 +86,7 @@
       name="controls_lp">
      <panel
       name="layout_panel_1"
-      height="22"
+      height="18"
       width="238"
       follows="right|top"
       top="6"     
@@ -109,7 +109,7 @@
     </panel>
     <panel
      follows="right|top"
-     height="150"
+     height="190"
      top_pad="4"
      width="238"
      left="1"
@@ -286,29 +286,39 @@
     </text>
 
     <check_box
-     name="grid_coords_chk"
-     control_name="MapShowGridCoords"
-     layout="topleft"
-     follows="top|right"
-     top_pad="5"
-     left="3"
-     height="16"
-     width="22"
+        name="grid_coords_chk"
+        control_name="MapShowGridCoords"
+        layout="topleft"
+        follows="top|right"
+        top_pad="5"
+        left="3"
+        height="20"
+        width="140"
+        label = "Show grid map coordinates"
     />
-    <text
-     name="grid_coords_label"
-     type="string"
+      <check_box
      layout="topleft"
      follows="top|right"
-     top_delta="-2"
-     left_pad="2"
-     height="16"
-     width="220"
-     halign="left"
-     length="1" >
-       Show grid map coordinates
-     </text>
-
+     top_pad="2"
+     left="3"
+     height="20"
+        initial_value="false"
+        label="Show avatar count + maturity"
+        name="FSAdvancedWorldmapRegionInfo"
+        width="120"
+        control_name="FSAdvancedWorldmapRegionInfo"
+        tool_tip="Shows additional region information on the World Map (avatar count and maturity level)."/>
+     <check_box
+        layout="topleft"
+        follows="top|right"
+        top_pad="2"
+        left="3"
+        height="20"
+        width="120"
+        label="Do not close after teleport"
+        name="FSDoNotHideMapOnTeleport"
+        control_name="FSDoNotHideMapOnTeleport"
+        tool_tip="Disables the automatic closing of the map when teleporting."/>
     <button
      follows="top|right"
      height="22"
@@ -455,7 +465,7 @@
 
   <panel
    follows="right|top"
-  height="22"
+  height="18"
   top_pad="5"
   width="238"
   background_visible="true"
@@ -480,7 +490,7 @@
 
     <panel
      follows="right|top|bottom"
-	 height="220"
+	 height="190"
 	 top_pad="0"
 	 width="238"
 	 name="layout_panel_4">
@@ -552,7 +562,7 @@
      layout="topleft"
      left="27"
      name="favorite_only_chk"
-     top_pad="4"
+     top_pad="6"
      width="22" />
        <icon
      color="0.5 0 0 1"
@@ -595,7 +605,7 @@
      draw_stripes="false"
      bg_writeable_color="MouseGray"
      follows="all"
-     height="127"
+     height="80"
      layout="topleft"
      left="28"
      name="search_results"
@@ -734,7 +744,7 @@
     </panel>
       <panel
     follows="right|bottom"
-  height="22"
+  height="18"
   top_pad="5"
   width="238"
   background_visible="true"
@@ -751,15 +761,15 @@
      layout="topleft"
      left="15"
      name="zoom_label"
-     top="3"
+     top="0"
      width="210">
         Zoom
     </text>
   </panel>
     <panel
  follows="right|bottom"
-  height="30"
-  min_height="30"
+  height="28"
+  min_height="28"
   top_pad="0"
   width="238"
   name="layout_panel_6">

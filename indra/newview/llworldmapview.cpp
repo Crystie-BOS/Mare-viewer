@@ -544,15 +544,15 @@ void LLWorldMapView::draw()
 
             if (print_coords)
             {
-                print(grid_name, 3, 14, true);
+                print(grid_name, 3, drawAdvancedRegionInfo ? (F32)26.0 : (F32)14.0, true);
                 // Obtain and print the grid map coordinates
                 LLVector3d region_pos = info->getGlobalOrigin();
                 std::string grid_coords = llformat("[%.0f, %.0f]", region_pos[VX] / 256, region_pos[VY] / 256);
-                print(grid_coords, 3, 2, false);
+                print(grid_coords, 3, drawAdvancedRegionInfo ? (F32)14.0 : (F32)2.0, false);
             }
             else
             {
-                print(grid_name, 3, 2, true);
+                print(grid_name, 3, drawAdvancedRegionInfo ? (F32)14.0 : (F32)2.0, true);
             }
 
 
@@ -578,15 +578,7 @@ void LLWorldMapView::draw()
 
                 advanced_info += llformat("%s)", info->getAccessString().c_str());
 
-                font->renderUTF8(
-                    advanced_info, 0,
-                    (F32)llfloor(left + 3.f), (F32)llfloor(bottom + 2.f),
-                    LLColor4::white,
-                    LLFontGL::LEFT, LLFontGL::BASELINE, LLFontGL::NORMAL, LLFontGL::DROP_SHADOW,
-                    S32_MAX, //max_chars
-                    (S32)mMapScale, //max_pixels
-                    nullptr,
-                    true); //use ellipses
+                print (advanced_info, 3, 2, true);
             }
         }
     }
