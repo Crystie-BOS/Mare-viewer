@@ -4584,9 +4584,10 @@ and report the problem.
   <string name="sky">Sky</string>
   <string name="water">Water</string>
   <string name="font_unknown">Unknown Font</string>
-  <string name="fonts.xml">Deja Vu</string>
+  <string name="fonts.xml">Inter</string>
   <string name="fonts_amaranth.xml">Amaranth</string>
   <string name="fonts_cascadia.xml">Cascadia</string>
+  <string name="fonts_deja_vu.xml">Deja Vu</string>
   <string name="fonts_deja_vu_all_caps.xml">Deja Vu All Caps</string>
   <string name="fonts_elainesans.xml">Elaine Sans</string>
   <string name="fonts_ezarion.xml">Ezarion</string>
