@@ -55,17 +55,17 @@ LLToolSelect::LLToolSelect( LLToolComposite* composite )
 :   LLTool( std::string("Select"), composite ),
     mIgnoreGroup( false )
 {
- }
+}
 
 // True if you selected an object.
 bool LLToolSelect::handleMouseDown(S32 x, S32 y, MASK mask)
 {
     // do immediate pick query
     bool pick_rigged = false; //gSavedSettings.getBOOL("AnimatedObjectsAllowLeftClick");
-    bool pick_transparent = gSavedSettings.getBOOL("SelectInvisibleObjects");
-    bool pick_reflection_probe = gSavedSettings.getBOOL("SelectReflectionProbes");
+    static LLCachedControl<bool> select_invisible_objects(gSavedSettings, "SelectInvisibleObjects");
+    static LLCachedControl<bool> select_reflection_probes(gSavedSettings, "SelectReflectionProbes");
 
-    mPick = gViewerWindow->pickImmediate(x, y, pick_transparent, pick_rigged, false, true, pick_reflection_probe);
+    mPick = gViewerWindow->pickImmediate(x, y, select_invisible_objects, pick_rigged, false, true, select_reflection_probes);
 //MK
     LLViewerObject* object = mPick.getObject();
     if (object)
@@ -85,7 +85,6 @@ bool LLToolSelect::handleMouseDown(S32 x, S32 y, MASK mask)
 
     return mPick.getObject().notNull();
 }
-
 
 // static
 LLObjectSelectionHandle LLToolSelect::handleObjectSelection(const LLPickInfo& pick, bool ignore_group, bool temp_select, bool select_root)

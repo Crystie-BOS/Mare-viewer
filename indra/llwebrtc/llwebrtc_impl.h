@@ -346,6 +346,7 @@ public:
                 inner_->InitRecording();
                 inner_->StartRecording();
             }
+            inner_->InitPlayout();
             inner_->StartPlayout();
         }
     }
@@ -658,6 +659,8 @@ class LLWebRTCPeerConnectionImpl : public LLWebRTCPeerConnectionInterface,
     void resetMute();
     void enableSenderTracks(bool enable);
     void enableReceiverTracks(bool enable);
+
+    void gatherConnectionStats() override;
 
   protected:
 

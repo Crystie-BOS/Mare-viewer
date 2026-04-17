@@ -86,7 +86,7 @@
       name="controls_lp">
      <panel
       name="layout_panel_1"
-      height="22"
+      height="18"
       width="238"
       follows="right|top"
       top="6"     
@@ -109,7 +109,7 @@
     </panel>
     <panel
      follows="right|top"
-     height="126"
+     height="190"
      top_pad="4"
      width="238"
      left="1"
@@ -167,7 +167,7 @@
      follows="top|right"
      halign="left"
      height="16"
-     top_delta="-2"
+     top_delta="-5"
      left_pad="7"
      layout="topleft"
      name="person_label"
@@ -181,9 +181,9 @@
      layout="topleft"
      left="3"
      name="infohub_chk"
-     top_pad="3"
+     top_pad="7"
      width="22" />
-         <icon
+    <icon
      follows="top|right"
      height="16"
      image_name="map_infohub.tga"
@@ -191,7 +191,7 @@
      left_pad="0"
      mouse_opaque="true"
      name="infohub"
-     top_delta="0"
+     top_delta="-3"
      width="16" />
  <text
      type="string"
@@ -199,7 +199,7 @@
      follows="top|right"
      halign="left"
      height="16"
-     top_delta="2"
+     top_delta="0"
      left_pad="3"
      layout="topleft"
      name="infohub_label"
@@ -213,7 +213,7 @@
      layout="topleft"
      left="3"
      name="land_for_sale_chk"
-     top_pad="2"
+     top_pad="8"
      width="22" />
     <icon
      follows="top|right"
@@ -222,16 +222,16 @@
      layout="topleft"
      mouse_opaque="true"
      name="landforsale"
-     top_delta="0"
+     top_delta="-3"
      left_pad="0"
      width="16" />
-         <text
+    <text
      type="string"
      length="1"
      follows="top|right"
      halign="left"
      height="16"
-     top_delta="2"
+     top_delta="1"
      left_pad="3"
      layout="topleft"
      name="land_sale_label"
@@ -257,7 +257,7 @@
      layout="topleft"
      left_pad="0"
      name="auction_label"
-     top_delta="3"
+     top_delta="1"
      width="170">
         land auction
     </text>
@@ -270,7 +270,7 @@
      mouse_opaque="true"
      name="square2_owner"
      left="20"
-     top_pad="-5"
+     top_pad="-2"
      width="16" />
     <text
      type="string"
@@ -280,11 +280,45 @@
      layout="topleft"
      left_pad="0"
      name="by_owner_label"
-     top_delta="3"
+     top_delta="0"
      width="100">
        by owner
     </text>
 
+    <check_box
+        name="grid_coords_chk"
+        control_name="MapShowGridCoords"
+        layout="topleft"
+        follows="top|right"
+        top_pad="5"
+        left="3"
+        height="20"
+        width="140"
+        label = "Show grid map coordinates"
+    />
+      <check_box
+     layout="topleft"
+     follows="top|right"
+     top_pad="2"
+     left="3"
+     height="20"
+        initial_value="false"
+        label="Show avatar count + maturity"
+        name="FSAdvancedWorldmapRegionInfo"
+        width="120"
+        control_name="FSAdvancedWorldmapRegionInfo"
+        tool_tip="Shows additional region information on the World Map (avatar count and maturity level)."/>
+     <check_box
+        layout="topleft"
+        follows="top|right"
+        top_pad="2"
+        left="3"
+        height="20"
+        width="120"
+        label="Do not close after teleport"
+        name="FSDoNotHideMapOnTeleport"
+        control_name="FSDoNotHideMapOnTeleport"
+        tool_tip="Disables the automatic closing of the map when teleporting."/>
     <button
      follows="top|right"
      height="22"
@@ -333,7 +367,7 @@
      height="16"
      layout="topleft"
      left="135"
-     top_pad="1"
+     top_pad="5"
      name="event_chk"
      width="22" />
          <icon
@@ -343,6 +377,7 @@
      layout="topleft"
      mouse_opaque="true"
      name="event"
+     top_delta="-2"
      left_pad="0"
      width="18" />
       <text
@@ -351,7 +386,7 @@
      follows="top|right"
      halign="left"
      height="16"
-     top_delta="2"
+     top_delta="0"
      left_pad="3"
      layout="topleft"
      name="pg_label"
@@ -367,7 +402,7 @@
      layout="topleft"
      left="135"
      name="events_mature_chk"
-     top_pad="3"
+     top_pad="7"
      width="22" />
     <icon
      follows="top|right"
@@ -376,16 +411,16 @@
      layout="topleft"
      mouse_opaque="true"
      name="events_mature_icon"
-     top_delta="0"
+     top_delta="-2"
      left_pad="0"
      width="18" />
-           <text
+    <text
      type="string"
      length="1"
      follows="top|right"
      halign="left"
      height="16"
-     top_delta="2"
+     top_delta="0"
      left_pad="3"
      layout="topleft"
      name="events_mature_label"
@@ -400,7 +435,7 @@
      layout="topleft"
      left="135"
      name="events_adult_chk"
-     top_pad="3"
+     top_pad="7"
      width="22" />
     <icon
      follows="top|right"
@@ -410,15 +445,15 @@
      left_pad="0"
      mouse_opaque="true"
      name="events_adult_icon"
-     top_delta="0"
+     top_delta="-2"
      width="18" />
-                <text
+    <text
      type="string"
      length="1"
      follows="top|right"
      halign="left"
      height="16"
-     top_delta="2"
+     top_delta="0"
      left_pad="3"
      layout="topleft"
      name="events_adult_label"
@@ -430,7 +465,7 @@
 
   <panel
    follows="right|top"
-  height="22"
+  height="18"
   top_pad="5"
   width="238"
   background_visible="true"
@@ -455,7 +490,7 @@
 
     <panel
      follows="right|top|bottom"
-	 height="235"
+	 height="190"
 	 top_pad="0"
 	 width="238"
 	 name="layout_panel_4">
@@ -527,7 +562,7 @@
      layout="topleft"
      left="27"
      name="favorite_only_chk"
-     top_pad="4"
+     top_pad="6"
      width="22" />
        <icon
      color="0.5 0 0 1"
@@ -570,7 +605,7 @@
      draw_stripes="false"
      bg_writeable_color="MouseGray"
      follows="all"
-     height="127"
+     height="80"
      layout="topleft"
      left="28"
      name="search_results"
@@ -709,7 +744,7 @@
     </panel>
       <panel
     follows="right|bottom"
-  height="22"
+  height="18"
   top_pad="5"
   width="238"
   background_visible="true"
@@ -726,15 +761,15 @@
      layout="topleft"
      left="15"
      name="zoom_label"
-     top="3"
+     top="0"
      width="210">
         Zoom
     </text>
   </panel>
     <panel
  follows="right|bottom"
-  height="30"
-  min_height="30"
+  height="28"
+  min_height="28"
   top_pad="0"
   width="238"
   name="layout_panel_6">

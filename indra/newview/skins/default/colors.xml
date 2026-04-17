@@ -15,6 +15,12 @@
 	<color
      name="EmphasisColor_35"
 	 reference="Kokua_42" />
+    <color
+     name="SelectionColor"
+     value="0.75 0.45 0.81 1" />
+    <color
+     name="ScrollHoveredColor"
+     value="0.375 0.225 0.405 1" />
 	<color
 	 name="BeaconColor"
     value="0.749 0.298 0 1" />	 
@@ -66,6 +72,9 @@
 	<color
 	 name="DkGray2"
 	 value="0.169 0.169 0.169 1" />
+    <color
+	 name="DkGrayLogin"
+	 value="0.129 0.133 0.137 1" />
 	<color
 	 name="MouseGray"
 	 value="0.191 0.191 0.191 1" />
@@ -405,7 +414,7 @@
      reference="EmphasisColor" />
     <color
      name="ConversationFriendColor"
-     value="0.42 0.85 0.71 1" />
+     reference="EmphasisColor" />
     <color
      name="DefaultHighlightDark"
      reference="White_10" />
@@ -711,7 +720,7 @@
      reference="Orange1" />
     <color
      name="NameTagFriend"
-     value="0.447 0.784 0.663 1" />
+     reference="EmphasisColor" />
     <color
      name="NameTagLegacy"
      reference="White" />
@@ -899,9 +908,6 @@
      name="ScrollHighlightedColor"
      reference="Unused?" />
     <color
-     name="ScrollHoveredColor"
-     reference="EmphasisColor_35" />
-    <color
      name="ScrollSelectedBGColor"
      reference="EmphasisColor_35" />
     <color
@@ -919,6 +925,9 @@
     <color
      name="SelectedOutfitTextColor"
      reference="EmphasisColor" />
+    <color
+     name="WornOutfitTextColor"
+     reference = "Kokua" />
     <color
      name="SearchableControlHighlightFontColor"
      value="1 0 0 1" />
@@ -955,6 +964,9 @@
     <color
      name="SystemChatColor"
      reference="LtGray" />
+    <color
+     name="SelectedBgReadOnlyColor"
+     value="0.375 0.233 0.404 1" />
     <color
      name="TextBgFocusColor"
      reference="White" />
@@ -1039,18 +1051,24 @@
     name="ColorSwatchBorderColor"
     value="0.45098 0.517647 0.607843 1"/>
     <color
+    name="ColorSwatchBorderColorGray"
+    value="0.329 0.329 0.329 1"/>
+    <color
      name="ChatTeleportSeparatorColor"
      reference="Black" />
     <color
      name="ChatTimestampColor"
      reference="White" />
     <color
+      name="MenuBarStreamingBgColor"
+      reference="DkGray" />
+    <color
       name="MenuBarBetaBgColor"
       reference="DkBlue" />
-  <color
-     name="MenuBarProjectBgColor"
-     reference="MdBlue" />
-  <color
+    <color
+      name="MenuBarProjectBgColor"
+      reference="MdBlue" />
+    <color
       name="MenuBarTestBgColor"
       reference="DkRed" />
     <color
@@ -1173,6 +1191,9 @@
   <color
       name="MoneyTrackerIncrease"
       reference="Green" />
+  <color
+    name="PanelDark"
+    value="0.078 0.078 0.078 1" />
   <color
       name="MoneyTrackerDecrease"
       reference="Red" />

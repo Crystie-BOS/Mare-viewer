@@ -82,6 +82,7 @@ LLPreviewNotecard::LLPreviewNotecard(const LLSD& key) //const LLUUID& item_id,
 LLPreviewNotecard::~LLPreviewNotecard()
 {
     delete mLiveFile;
+    mEditor = nullptr;
 }
 
 bool LLPreviewNotecard::postBuild()
@@ -192,7 +193,7 @@ bool LLPreviewNotecard::handleKeyHere(KEY key, MASK mask)
 // virtual
 bool LLPreviewNotecard::canClose()
 {
-    if(mForceClose || mEditor->isPristine())
+    if(mForceClose || !mEditor || mEditor->isPristine())
     {
         return true;
     }

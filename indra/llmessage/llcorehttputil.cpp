@@ -37,6 +37,7 @@
 #include "llsdserialize.h"
 #include "boost/json.hpp" // Boost.Json
 #include "llfilesystem.h"
+#include "workqueue.h"
 
 #include "message.h" // for getting the port
 
@@ -305,57 +306,73 @@ void HttpCoroHandler::onCompleted(LLCore::HttpHandle handle, LLCore::HttpRespons
     }
     else
     {
-        try
+        constexpr size_t MAX_BODY_SIZE_THRESHOLD = 65536;
+        bool posted = false;
+        // Some messsages (ex: AISAPI) can return large bodies.
+        // If the body is larger than our threshold, post the
+        // parsing to the general queue to avoid stalling the
+        // main thread.
+        if (response->getBodySize() > MAX_BODY_SIZE_THRESHOLD)
         {
-            result = this->handleSuccess(response, status);
+            response->addRef();
+
+            LL::WorkQueue::ptr_t main_queue = LL::WorkQueue::getInstance("mainloop");
+            LL::WorkQueue::ptr_t general_queue = LL::WorkQueue::getInstance("General");
+            posted  = main_queue->postTo(
+                general_queue,
+                [handler = shared_from_this(), response, status]() // Work done on general queue
+                {
+                    std::pair<LLSD, LLCore::HttpStatus> result;
+                    result.second = status;
+                    try
+                    {
+                        result.first = handler->handleSuccess(response, result.second);
+                    }
+                    catch (std::bad_alloc&)
+                    {
+                        LLError::LLUserWarningMsg::showOutOfMemory();
+                        LL_ERRS("CoreHTTP") << "Failed to allocate memory for response handling (threaded)." << LL_ENDL;
+                    }
+                    // LLSD is not thread safe! Be carefull with moving the result around.
+                    return result;
+                },
+                [handler = shared_from_this(), response](std::pair<LLSD, LLCore::HttpStatus> result) mutable // Callback to main thread
+                {
+                    handler->replyPost(response, result.second, result.first);
+                    response->release();
+                });
+
+            if (posted)
+            {
+                // Thread will do the cleanup and notify the pump. Done.
+                return;
+            }
+            else
+            {
+                // For whatever reason, failed to post, clean up and
+                // do the work on the main thread.
+                response->release();
+            }
         }
-        catch (std::bad_alloc&)
+
+        if (!posted)
         {
-            LLError::LLUserWarningMsg::showOutOfMemory();
-            LL_ERRS("CoreHTTP") << "Failed to allocate memory for response handling." << LL_ENDL;
+            try
+            {
+                result = this->handleSuccess(response, status);
+            }
+            catch (std::bad_alloc&)
+            {
+                LLError::LLUserWarningMsg::showOutOfMemory();
+                LL_ERRS("CoreHTTP") << "Failed to allocate memory for response handling." << LL_ENDL;
+            }
         }
     }
 
-    buildStatusEntry(response, status, result);
-
-    if (!status)
-    {
-        // updated from HB's version that includes parsing
-        LLSD &httpStatus = result[HttpCoroutineAdapter::HTTP_RESULTS];
-        bool parseSuccess(false);
-        LLSD error_body = parseBody(response, parseSuccess);
-        if (parseSuccess)
-        {
-          httpStatus["error_body"] = error_body;
-                LL_DEBUGS("CoreHttp") << "Returned body (parsed):\n";
-                std::stringstream str;
-                LLSDSerialize::toPrettyXML(error_body, str);
-                LL_CONT << str.str() << LL_ENDL;
-        }
-        else
-        {
-          LLCore::BufferArray *body = response->getBody();
-          LLCore::BufferArrayStream bas(body);
-          LLSD::String bodyData;
-          bodyData.reserve(response->getBodySize());
-          bas >> std::noskipws;
-          bodyData.assign(std::istream_iterator<U8>(bas), std::istream_iterator<U8>());
-          httpStatus["error_body"] = LLSD(bodyData);
-                LL_DEBUGS("CoreHttp") << "Returned body (unparsed):" << std::endl
-                                  << httpStatus["error_body"].asString()
-                                  << LL_ENDL;
-        }
-        if (getBoolSetting(HTTP_LOGBODY_KEY))
-        {
-            // commenting out, but keeping since this can be useful for debugging
-            LL_WARNS("CoreHTTP") << "Returned body=" << std::endl << httpStatus["error_body"].asString() << LL_ENDL;
-        }
-    }
-
-    mReplyPump.post(result);
+    replyPost(response, status, result);
 }
 
-void HttpCoroHandler::buildStatusEntry(LLCore::HttpResponse *response, LLCore::HttpStatus status, LLSD &result)
+void HttpCoroHandler::buildStatusEntry(LLCore::HttpResponse *response, LLCore::HttpStatus status, LLSD &result) const
 {
     LLSD httpresults = LLSD::emptyMap();
 
@@ -381,6 +398,31 @@ void HttpCoroHandler::buildStatusEntry(LLCore::HttpResponse *response, LLCore::H
 
     httpresults[HttpCoroutineAdapter::HTTP_RESULTS_HEADERS] = httpHeaders;
     result[HttpCoroutineAdapter::HTTP_RESULTS] = httpresults;
+}
+
+void HttpCoroHandler::replyPost(LLCore::HttpResponse* response, LLCore::HttpStatus &status, LLSD& result)
+{
+    buildStatusEntry(response, status, result);
+
+    if (!status)
+    {
+        LLSD& httpStatus = result[HttpCoroutineAdapter::HTTP_RESULTS];
+
+        LLCore::BufferArray* body = response->getBody();
+        LLCore::BufferArrayStream bas(body);
+        LLSD::String bodyData;
+        bodyData.reserve(response->getBodySize());
+        bas >> std::noskipws;
+        bodyData.assign(std::istream_iterator<U8>(bas), std::istream_iterator<U8>());
+        httpStatus["error_body"] = LLSD(bodyData);
+        if (getBoolSetting(HTTP_LOGBODY_KEY))
+        {
+            // commenting out, but keeping since this can be useful for debugging
+            LL_WARNS("CoreHTTP") << "Returned body=" << std::endl << httpStatus["error_body"].asString() << LL_ENDL;
+        }
+    }
+
+    mReplyPump.post(result);
 }
 
 void HttpCoroHandler::writeStatusCodes(LLCore::HttpStatus status, const std::string &url, LLSD &result)
@@ -415,8 +457,8 @@ public:
     HttpCoroLLSDHandler(LLEventStream &reply);
 
 protected:
-    virtual LLSD handleSuccess(LLCore::HttpResponse * response, LLCore::HttpStatus &status);
-    virtual LLSD parseBody(LLCore::HttpResponse *response, bool &success);
+    virtual LLSD handleSuccess(LLCore::HttpResponse * response, LLCore::HttpStatus &status) const;
+    virtual LLSD parseBody(LLCore::HttpResponse *response, bool &success) const;
 };
 
 //-------------------------------------------------------------------------
@@ -426,7 +468,7 @@ HttpCoroLLSDHandler::HttpCoroLLSDHandler(LLEventStream &reply):
 }
 
 
-LLSD HttpCoroLLSDHandler::handleSuccess(LLCore::HttpResponse * response, LLCore::HttpStatus &status)
+LLSD HttpCoroLLSDHandler::handleSuccess(LLCore::HttpResponse * response, LLCore::HttpStatus &status) const
 {
     LLSD result;
 
@@ -491,7 +533,7 @@ LLSD HttpCoroLLSDHandler::handleSuccess(LLCore::HttpResponse * response, LLCore:
     return result;
 }
 
-LLSD HttpCoroLLSDHandler::parseBody(LLCore::HttpResponse *response, bool &success)
+LLSD HttpCoroLLSDHandler::parseBody(LLCore::HttpResponse *response, bool &success) const
 {
     success = true;
     if (response->getBodySize() == 0)
@@ -522,8 +564,8 @@ class HttpCoroRawHandler : public HttpCoroHandler
 public:
     HttpCoroRawHandler(LLEventStream &reply);
 
-    virtual LLSD handleSuccess(LLCore::HttpResponse * response, LLCore::HttpStatus &status);
-    virtual LLSD parseBody(LLCore::HttpResponse *response, bool &success);
+    virtual LLSD handleSuccess(LLCore::HttpResponse * response, LLCore::HttpStatus &status) const;
+    virtual LLSD parseBody(LLCore::HttpResponse *response, bool &success) const;
 };
 
 //-------------------------------------------------------------------------
@@ -532,7 +574,7 @@ HttpCoroRawHandler::HttpCoroRawHandler(LLEventStream &reply):
 {
 }
 
-LLSD HttpCoroRawHandler::handleSuccess(LLCore::HttpResponse * response, LLCore::HttpStatus &status)
+LLSD HttpCoroRawHandler::handleSuccess(LLCore::HttpResponse * response, LLCore::HttpStatus &status) const
 {
     LLSD result = LLSD::emptyMap();
 
@@ -578,7 +620,7 @@ LLSD HttpCoroRawHandler::handleSuccess(LLCore::HttpResponse * response, LLCore::
     return result;
 }
 
-LLSD HttpCoroRawHandler::parseBody(LLCore::HttpResponse *response, bool &success)
+LLSD HttpCoroRawHandler::parseBody(LLCore::HttpResponse *response, bool &success) const
 {
     success = true;
     return LLSD();
@@ -597,8 +639,8 @@ class HttpCoroJSONHandler : public HttpCoroHandler
 public:
     HttpCoroJSONHandler(LLEventStream &reply);
 
-    virtual LLSD handleSuccess(LLCore::HttpResponse * response, LLCore::HttpStatus &status);
-    virtual LLSD parseBody(LLCore::HttpResponse *response, bool &success);
+    virtual LLSD handleSuccess(LLCore::HttpResponse * response, LLCore::HttpStatus &status) const;
+    virtual LLSD parseBody(LLCore::HttpResponse *response, bool &success) const;
 };
 
 //-------------------------------------------------------------------------
@@ -607,7 +649,7 @@ HttpCoroJSONHandler::HttpCoroJSONHandler(LLEventStream &reply) :
 {
 }
 
-LLSD HttpCoroJSONHandler::handleSuccess(LLCore::HttpResponse * response, LLCore::HttpStatus &status)
+LLSD HttpCoroJSONHandler::handleSuccess(LLCore::HttpResponse * response, LLCore::HttpStatus &status) const
 {
     LLSD result = LLSD::emptyMap();
 
@@ -633,7 +675,7 @@ LLSD HttpCoroJSONHandler::handleSuccess(LLCore::HttpResponse * response, LLCore:
     return result;
 }
 
-LLSD HttpCoroJSONHandler::parseBody(LLCore::HttpResponse *response, bool &success)
+LLSD HttpCoroJSONHandler::parseBody(LLCore::HttpResponse *response, bool &success) const
 {
     success = true;
     BufferArray * body(response->getBody());
