@@ -156,7 +156,8 @@ bool RRHelper::preventFloater(std::string floaterName)
     else if (floaterName == "worldmap" && gAgent.mRRInterface.mContainsShowworldmap) return true;
     else if (floaterName == "Destinations" && gAgent.mRRInterface.mContainsTp) return true;
     else if (floaterName == "floater_my_inventory" && gAgent.mRRInterface.mContainsShowinv) return true;
-    else if (floaterName == "floater_fs_wearable_favorites" && gAgent.mRRInterface.mContainsShowinv) return true; // KKA-991
+    // floater_fs_wearable_favorites is intentionally exempt from @showinv — it is a quick-access
+    // panel for pre-approved outfit pieces, not a general inventory browser.
     else if (floaterName == "rlv_console" && gAgent.mRRInterface.mContainsViewScript) return true;
     else if (floaterName == "360capture" && gAgent.mRRInterface.mHasLockedHuds) return true; // KKA-1027
 
@@ -490,7 +491,6 @@ void refreshCachedVariable (std::string var)
         if (gAgent.mRRInterface.mContainsShowinv) {
 //          LLSideTray::getInstance()->childSetVisible("panel_main_inventory", false);
             LLFloaterReg::hideInstance("panel_main_inventory", LLSD());
-            LLFloaterReg::hideInstance("fs_wearable_favorites", LLSD()); // KKA-991
             setVisibleAll("inventory", false);
             LLPanelOutfitEdit* panel_outfit_edit = dynamic_cast<LLPanelOutfitEdit*>(LLFloaterSidePanelContainer::getPanel("appearance", "panel_outfit_edit"));
             if (NULL != panel_outfit_edit) {
