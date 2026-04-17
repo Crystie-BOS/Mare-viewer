@@ -1332,7 +1332,7 @@
             </menu_item_check>
             <menu_item_check
              label="Use Shared Environment"
-             name="Use Shared Environment">
+             name="Use Shared Environment"
              shortcut="control|shift|X">
              		<menu_item_check.on_enable
              			function="World.AllowEnvSettings" />
