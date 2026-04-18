@@ -222,7 +222,7 @@
      image_unselected="Audio_Off"
      is_toggle="true"
      layout="topleft"
-	   left_pad="5"
+	   left_pad="4"
      name="mute_audio_music"
      tab_stop="false"
 	 width="16" />
@@ -242,7 +242,7 @@
 		control_name="AudioLevelMedia"
 		disabled_control="MuteAudio"
 		follows="left|top"
-		height="16"
+		height="15"
 		increment="0.025"
 		initial_value="0.5"
 		label="Media"
@@ -290,7 +290,7 @@
 		control_name="AudioLevelVoice"
 		disabled_control="MuteAudio"
 		follows="left|top"
-		height="16"
+		height="15"
 		increment="0.025"
 		initial_value="0.5"
 		label="Voice Chat"
@@ -351,8 +351,7 @@
    top_delta="22"
    name="Listen media from"
    height="15"
-   word_wrap="true"
-   width="160">
+   width="180">
       Hear media and sounds from:
   </text>
   <combo_box
@@ -380,7 +379,7 @@
    height="15"
    left="30"
    top_pad="8"
-   width="160"
+   width="180"
    name="media_autoplay_label">
     Auto-play media
   </text>
@@ -413,7 +412,7 @@
         top_pad="8"
         height="15"
         left="30"
-        width="160"
+        width="180"
         name="media_firstinteract_label"
         halign="left">
             Media first-interact
