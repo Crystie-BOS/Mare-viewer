@@ -33,8 +33,8 @@
         follows="top|right"
         layout="topleft"
         top="0"
-        left="-750"
-        width="745"
+        left="-760"
+        width="755"
         height="19"
         orientation="horizontal">
 			  <layout_panel
@@ -79,7 +79,7 @@
 			  </layout_panel>	
         <layout_panel
     height="18"
-    width="170"
+    width="190"
     top="1"
     follows="right|top" 
     name="balance_bg">
@@ -95,7 +95,7 @@
      top="0"
      wrap="false" 
      value="L$ --" 
-     width="40" />
+     width="58" />
     <button
      halign="center"
      font="SansSerifSmall"

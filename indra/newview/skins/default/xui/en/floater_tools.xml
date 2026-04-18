@@ -309,7 +309,7 @@
      label="Edit linked"
      layout="topleft"
      name="checkbox edit linked parts"
-     top_pad="-18"
+     top_pad="-10"
      font="DejaVu"
      font.size="LSmall">
 		  <check_box.commit_callback
@@ -322,7 +322,7 @@
      image_overlay="BackArrow_Off"
      top_pad="0"
      top="114"
-     left="132"
+     left="90"
      layout="topleft"
      name="prev_part_btn"
      tool_tip="Select previous linked part or face"
