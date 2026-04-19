@@ -104,23 +104,93 @@
     <panel
      top="65"
      follows="right|top"
-     height="486"
+     height="456"
      left="345"
      visible="false"
      name="panel_profile_secondlife"
      class="panel_profile_secondlife"
      filename="panel_profile_secondlife.xml"
      width="425" />
+    <!-- People action buttons (shown when an avatar result is selected) -->
+    <panel
+     top="521"
+     left="345"
+     width="425"
+     height="28"
+     layout="topleft"
+     follows="bottom|left"
+     visible="false"
+     name="people_action_panel">
+        <button
+         layout="topleft"
+         name="people_profile_btn"
+         label="Open Profile"
+         left="3"
+         top="3"
+         width="130"
+         height="23" />
+        <button
+         layout="topleft"
+         name="people_message_btn"
+         label="Send Message"
+         left_pad="3"
+         top="3"
+         width="130"
+         height="23" />
+        <button
+         layout="topleft"
+         name="people_friend_btn"
+         label="Add Friend"
+         left_pad="3"
+         top="3"
+         width="130"
+         height="23" />
+    </panel>
     <panel
      top="70"
      follows="bottom|right|top"
-     height="482"
+     height="452"
      left="345"
      visible="false"
      name="panel_group_info_sidetray"
      class="panel_group_info_sidetray"
      filename="panel_group_info_sidetray.xml"
      width="425" />
+    <!-- Group action buttons (shown when a group result is selected) -->
+    <panel
+     top="522"
+     left="345"
+     width="425"
+     height="28"
+     layout="topleft"
+     follows="bottom|left"
+     visible="false"
+     name="group_action_panel">
+        <button
+         layout="topleft"
+         name="group_profile_btn"
+         label="Open Profile"
+         left="3"
+         top="3"
+         width="130"
+         height="23" />
+        <button
+         layout="topleft"
+         name="group_chat_btn"
+         label="Join Chat"
+         left_pad="3"
+         top="3"
+         width="130"
+         height="23" />
+        <button
+         layout="topleft"
+         name="group_join_btn"
+         label="Join Group"
+         left_pad="3"
+         top="3"
+         width="130"
+         height="23" />
+    </panel>
     <panel
      top="70"
      follows="bottom|right|top"
