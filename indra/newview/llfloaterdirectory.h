@@ -29,6 +29,7 @@
 
 #include "llfloater.h"
 #include "lltabcontainer.h"
+#include "lluuid.h"
 
 #include "llpaneldirevents.h"
 #include "llpaneldirland.h"
@@ -37,6 +38,8 @@
 #include "llpaneldirplaces.h"
 #include "llpaneldirclassified.h"
 
+class LLButton;
+class LLPanel;
 class LLDirectoryCore;
 class LLPanelDirBrowser;
 
@@ -63,6 +66,11 @@ public:
 
     void hideAllDetailPanels();
 
+    // Show/hide the action button strips in the right pane
+    void showPeopleButtons(const LLUUID& avatar_id);
+    void showGroupButtons(const LLUUID& group_id);
+    void hideActionButtons();
+
     bool postBuild() override;
 
 public:
@@ -73,6 +81,31 @@ public:
     LLPanelClassifiedInfo* mPanelClassifiedp;
 
 private:
+    // Action button panels
+    LLPanel*  mPeopleActionPanel;
+    LLPanel*  mGroupActionPanel;
+
+    // Buttons – People
+    LLButton* mPeopleProfileBtn;
+    LLButton* mPeopleMessageBtn;
+    LLButton* mPeopleFriendBtn;
+
+    // Buttons – Group
+    LLButton* mGroupProfileBtn;
+    LLButton* mGroupChatBtn;
+    LLButton* mGroupJoinBtn;
+
+    // ID of the currently selected result
+    LLUUID mSelectedID;
+
+    // Button click handlers
+    void onClickPeopleProfile();
+    void onClickPeopleMessage();
+    void onClickPeopleFriend();
+    void onClickGroupProfile();
+    void onClickGroupChat();
+    void onClickGroupJoin();
+
     static LLFloaterDirectory *sInstance;
 };
 
