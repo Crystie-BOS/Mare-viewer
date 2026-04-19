@@ -178,7 +178,8 @@ void LLConsole::draw()
 
     // draw remaining lines
     F32 y_pos = 0.f;
-
+	
+    // CA: if this succeeds it then breaks the dynamic opacity adjustmnent feature - the texture is commented in textures.xml now
     LLUIImagePtr imagep = LLUI::getUIImage("transparent");
 
     static LLCachedControl<F32> console_bg_opacity(*LLUI::getInstance()->mSettingGroups["config"], "ConsoleBackgroundOpacity", 0.7f);
