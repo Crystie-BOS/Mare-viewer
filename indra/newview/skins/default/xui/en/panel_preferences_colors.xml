@@ -664,7 +664,20 @@
        height="12"
        name="KokuaColorFriendNamesInConversationsFloaterAsNameTags"
        width="450"
-       label="Use name tag colors (inc. Contact Sets and Minimap markers) instead of single color above" />
+       label="Color Friend names using name tag colors (inc. Contact Sets and Minimap markers)" />
+       <text
+         type="string"
+         length="1"
+         follows="left|top"
+         height="10"
+         layout="topleft"
+         left="40"
+         mouse_opaque="false"
+         name="friends_color_label"
+         top_pad="0"
+         width="200">
+          instead of the single color above
+       </text>
    </panel>
 	 <panel
 	  top_pad="5"

@@ -607,10 +607,12 @@ bool LLConversationViewSession::highlightFriendTitle(LLConversationItem* vmi, st
             LLStyle::Params title_style;
             if (colorFriendsAsNameTag)
             {
-                LLColor4 color = LLUIColorTable::instance().getColor("ConversationFriendColor"); //KKA-848 start with LL default
-                color = LGGContactSets::getInstance()->colorize(session->mOtherParticipantID, color, LGG_CS_TAG);
-                LGGContactSets::getInstance()->hasFriendColorThatShouldShow(session->mOtherParticipantID, LGG_CS_TAG, color);
-                LLNetMap::getAvatarMarkColor(session->mOtherParticipantID, color);
+                //LLColor4 color = LLUIColorTable::instance().getColor("ConversationFriendColor"); //KKA-848 start with LL default#
+				// CA: this behaves more logically if we start from default name tag friend colour instead
+				LLColor4 color = LLUIColorTable::instance().getColor("NameTagFriend", LLColor4::white).get();
+                //color = LGGContactSets::getInstance()->colorize(session->mOtherParticipantID, color, LGG_CS_TAG);
+                //LGGContactSets::getInstance()->hasFriendColorThatShouldShow(session->mOtherParticipantID, LGG_CS_TAG, color);
+                //LLNetMap::getAvatarMarkColor(session->mOtherParticipantID, color);
                 title_style.color = color;
             }
             else
@@ -716,8 +718,10 @@ void LLConversationViewParticipant::draw()
     static LLUIColor sFocusOutlineColor = LLUIColorTable::instance().getColor("InventoryFocusOutlineColor", DEFAULT_WHITE);
     static LLUIColor sMouseOverColor = LLUIColorTable::instance().getColor("InventoryMouseOverColor", DEFAULT_WHITE);
     static LLUIColor sFriendColor = LLUIColorTable::instance().getColor("ConversationFriendColor");
-        static LLCachedControl<bool> colorFriends(gSavedSettings, "KokuaColorFriendNamesInConversationsFloater");
-        static LLCachedControl<bool> colorFriendsAsNameTag(gSavedSettings, "KokuaColorFriendNamesInConversationsFloaterAsNameTags");
+	static LLUIColor sNameTagFriendColor = LLUIColorTable::instance().getColor("NameTagFriend", DEFAULT_WHITE);
+    static LLCachedControl<bool> colorFriends(gSavedSettings, "KokuaColorFriendNamesInConversationsFloater");
+    static LLCachedControl<bool> colorFriendsAsNameTag(gSavedSettings, "KokuaColorFriendNamesInConversationsFloaterAsNameTags");
+    static LLCachedControl<bool> showFriendsNameTag(gSavedSettings, "NameTagShowFriends");
 
     const bool show_context = (getRoot() ? getRoot()->getShowSelectionContext() : false);
 
@@ -730,6 +734,11 @@ void LLConversationViewParticipant::draw()
     LLUIColor* color;
 	// LGGContacts really needs converting to use LLUIColor too, but that's a task for another time
 	LLColor4 lgg_color = sFriendColor; //KKA-848 start with LL default
+	if (showFriendsNameTag && colorFriendsAsNameTag)
+	{
+		// in this case we start from the defined name tag friend colour as our base instead of the chat friend colour
+		lgg_color = sNameTagFriendColor;
+	}
 	LLUIColor lgg_uicolor;
 
     LLLocalSpeakerMgr *speakerMgr = LLLocalSpeakerMgr::getInstance();
