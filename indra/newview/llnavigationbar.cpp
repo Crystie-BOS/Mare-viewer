@@ -407,7 +407,7 @@ void LLNavigationBar::onHomeButtonClicked()
 void LLNavigationBar::onLandmarksButtonClicked()
 {
     LLFloaterReg::toggleInstanceOrBringToFront("places");
-    LLFloaterSidePanelContainer::showPanel("places", LLSD().with("type", "open_landmark_tab"));
+    LLFloaterSidePanelContainer::showPanel("places", LLSD().with("type", "open_favorites_tab"));
 }
 
 void LLNavigationBar::onTeleportHistoryMenuItemClicked(const LLSD& userdata)
