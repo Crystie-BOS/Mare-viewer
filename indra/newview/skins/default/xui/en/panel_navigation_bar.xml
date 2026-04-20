@@ -220,6 +220,18 @@
              width="290">
               Places you save to your favorites bar will appear here.
             </label>
+              <!-- Subfolder filter button — hidden when no subfolders exist -->
+              <subfolder_button
+                follows="left|bottom"
+                name="subfolder_filter"
+                tab_stop="false"
+                tool_tip="Filter favorites by subfolder"
+                top="13"
+                width="60"
+                bottom="0"
+                valign="bottom">
+                &#9660; All
+                </subfolder_button>
               <!-- More button actually is a text box. -->
               <more_button
                 follows="left|bottom"

@@ -46,6 +46,7 @@ public:
     {
         Optional<LLUIImage*> image_drag_indication;
         Optional<LLTextBox::Params> more_button;
+        Optional<LLTextBox::Params> subfolder_button;
         Optional<LLTextBox::Params> label;
         Params();
     };
@@ -98,8 +99,15 @@ protected:
 
     void onMoreTextBoxClicked();
 
+    void getDirectSubfolders(LLInventoryModel::cat_array_t& cats);
+    void updateSubfolderFilter();
+    void onSubfolderFilterClicked();
+    void onSubfolderSelected(const LLUUID& folder_id);
+    void createSubfolderMenu(const LLInventoryModel::cat_array_t& subfolders);
+
     LLHandle<LLView> mOverflowMenuHandle;
     LLHandle<LLView> mContextMenuHandle;
+    LLHandle<LLView> mSubfolderMenuHandle;
 
     LLUUID mFavoriteFolderId;
     const LLFontGL *mFont;
@@ -160,6 +168,9 @@ private:
     LLUICtrl* mLastTab;
     LLTextBox* mMoreTextBox;
     LLTextBox* mBarLabel;
+    LLTextBox* mSubfolderFilterBtn;
+    LLUUID      mFilterFolderID;
+    bool        mSubfolderBtnWasVisible;
 
     LLUUID mDragItemId;
     bool mStartDrag;

@@ -415,10 +415,13 @@ LLFavoritesBarCtrl::LLFavoritesBarCtrl(const LLFavoritesBarCtrl::Params& p)
     mFont(p.font.isProvided() ? p.font() : LLFontGL::getFontSansSerifSmall()),
     mOverflowMenuHandle(),
     mContextMenuHandle(),
+    mSubfolderMenuHandle(),
     mImageDragIndication(p.image_drag_indication),
     mShowDragMarker(false),
     mLandingTab(NULL),
     mLastTab(NULL),
+    mSubfolderFilterBtn(NULL),
+    mSubfolderBtnWasVisible(false),
     mItemsListDirty(false),
     mUpdateDropDownItems(true),
     mRestoreOverflowMenu(false),
@@ -445,6 +448,13 @@ LLFavoritesBarCtrl::LLFavoritesBarCtrl(const LLFavoritesBarCtrl::Params& p)
     addChild(mMoreTextBox);
     LLRect rect = mMoreTextBox->getRect();
     mMoreTextBox->setRect(LLRect(rect.mLeft - rect.getWidth(), rect.mTop, rect.mRight, rect.mBottom));
+
+    // make subfolder filter button (hidden until subfolders are detected)
+    LLTextBox::Params sf_btn_params(p.subfolder_button);
+    mSubfolderFilterBtn = LLUICtrlFactory::create<LLTextBox>(sf_btn_params);
+    mSubfolderFilterBtn->setClickedCallback(boost::bind(&LLFavoritesBarCtrl::onSubfolderFilterClicked, this));
+    mSubfolderFilterBtn->setVisible(false);
+    addChild(mSubfolderFilterBtn);
 
     mDropDownItemsCount = 0;
 
@@ -907,6 +917,16 @@ void LLFavoritesBarCtrl::updateButtons(bool force_update)
     mItemsListDirty = false;
     mItems.clear();
 
+    // Update subfolder filter button visibility/label before collecting items.
+    // If filter visibility changes, force a full button rebuild.
+    bool subfolder_btn_visible_before = mSubfolderFilterBtn && mSubfolderFilterBtn->getVisible();
+    updateSubfolderFilter();
+    bool subfolder_btn_visible_after = mSubfolderFilterBtn && mSubfolderFilterBtn->getVisible();
+    if (subfolder_btn_visible_before != subfolder_btn_visible_after)
+    {
+        force_update = true;
+    }
+
     if (!collectFavoriteItems(mItems))
     {
         return;
@@ -1010,6 +1030,13 @@ void LLFavoritesBarCtrl::updateButtons(bool force_update)
             {
                 last_right_edge = (*last_visible_it)->getRect().mRight;
             }
+        }
+        // If the subfolder filter button is visible, items must start after it
+        if (mSubfolderFilterBtn && mSubfolderFilterBtn->getVisible())
+        {
+            S32 filter_right = mSubfolderFilterBtn->getRect().mRight;
+            if (last_right_edge < filter_right)
+                last_right_edge = filter_right;
         }
         //last_right_edge is saving coordinates
         LLButton* last_new_button = NULL;
@@ -1132,6 +1159,118 @@ bool LLFavoritesBarCtrl::postBuild()
     return true;
 }
 
+void LLFavoritesBarCtrl::getDirectSubfolders(LLInventoryModel::cat_array_t& cats)
+{
+    LLInventoryModel::cat_array_t*  direct_cats = nullptr;
+    LLInventoryModel::item_array_t* direct_items = nullptr;
+    gInventory.getDirectDescendentsOf(mFavoriteFolderId, direct_cats, direct_items);
+    if (direct_cats)
+        cats = *direct_cats;
+}
+
+void LLFavoritesBarCtrl::updateSubfolderFilter()
+{
+    if (mFavoriteFolderId.isNull()) return;
+
+    LLInventoryModel::cat_array_t subfolders;
+    getDirectSubfolders(subfolders);
+
+    if (subfolders.empty())
+    {
+        mFilterFolderID.setNull();
+        if (mSubfolderFilterBtn) mSubfolderFilterBtn->setVisible(false);
+        return;
+    }
+
+    // Reset filter if the selected subfolder was deleted
+    if (mFilterFolderID.notNull())
+    {
+        bool still_valid = false;
+        for (auto& cat : subfolders)
+        {
+            if (cat->getUUID() == mFilterFolderID) { still_valid = true; break; }
+        }
+        if (!still_valid) mFilterFolderID.setNull();
+    }
+
+    // Update button label and position
+    std::string label = "\xe2\x96\xbe All";  // ▾ All
+    if (mFilterFolderID.notNull())
+    {
+        LLViewerInventoryCategory* cat = gInventory.getCategory(mFilterFolderID);
+        if (cat) label = "\xe2\x96\xbe " + cat->getName();
+    }
+    if (mSubfolderFilterBtn)
+    {
+        mSubfolderFilterBtn->setText(label);
+        S32 btn_width = llmin(100, (S32)mFont->getWidth(label) + 16);
+        LLRect r(0, getRect().getHeight(), btn_width, 0);
+        mSubfolderFilterBtn->setRect(r);
+        mSubfolderFilterBtn->setVisible(true);
+    }
+}
+
+void LLFavoritesBarCtrl::onSubfolderFilterClicked()
+{
+    LLInventoryModel::cat_array_t subfolders;
+    getDirectSubfolders(subfolders);
+    createSubfolderMenu(subfolders);
+
+    LLToggleableMenu* menu = dynamic_cast<LLToggleableMenu*>(mSubfolderMenuHandle.get());
+    if (menu && mSubfolderFilterBtn)
+    {
+        S32 menu_x = mSubfolderFilterBtn->getRect().mLeft;
+        S32 menu_y = getParent()->getRect().mBottom - DROP_DOWN_MENU_TOP_PAD;
+        menu->updateParent(LLMenuGL::sMenuContainer);
+        LLMenuGL::showPopup(this, menu, menu_x, menu_y);
+    }
+}
+
+void LLFavoritesBarCtrl::onSubfolderSelected(const LLUUID& folder_id)
+{
+    mFilterFolderID = folder_id;
+    updateButtons(true);
+}
+
+void LLFavoritesBarCtrl::createSubfolderMenu(const LLInventoryModel::cat_array_t& subfolders)
+{
+    LLView* old = mSubfolderMenuHandle.get();
+    if (old) old->die();
+
+    LLToggleableMenu::Params mp;
+    mp.name("subfolder_filter_menu");
+    mp.can_tear_off(false);
+    mp.visible(false);
+    mp.scrollable(true);
+    mp.max_scrollable_items = 10;
+    LLToggleableMenu* menu = LLUICtrlFactory::create<LLToggleableMenu>(mp);
+    mSubfolderMenuHandle = menu->getHandle();
+
+    // "Show All" entry
+    LLMenuItemCallGL::Params show_all;
+    show_all.name("show_all");
+    show_all.label(std::string("Show All"));
+    show_all.on_click.function(
+        boost::bind(&LLFavoritesBarCtrl::onSubfolderSelected, this, LLUUID::null));
+    menu->addChild(LLUICtrlFactory::create<LLMenuItemCallGL>(show_all));
+
+    menu->addSeparator();
+
+    for (const auto& cat : subfolders)
+    {
+        LLMenuItemCallGL::Params item;
+        item.name(cat->getUUID().asString());
+        item.label(cat->getName());
+        LLUUID id = cat->getUUID();
+        item.on_click.function(
+            boost::bind(&LLFavoritesBarCtrl::onSubfolderSelected, this, id));
+        menu->addChild(LLUICtrlFactory::create<LLMenuItemCallGL>(item));
+    }
+
+    menu->buildDrawLabels();
+    menu->updateParent(LLMenuGL::sMenuContainer);
+}
+
 bool LLFavoritesBarCtrl::collectFavoriteItems(LLInventoryModel::item_array_t &items)
 {
 
@@ -1142,7 +1281,8 @@ bool LLFavoritesBarCtrl::collectFavoriteItems(LLInventoryModel::item_array_t &it
     LLInventoryModel::cat_array_t cats;
 
     LLIsType is_type(LLAssetType::AT_LANDMARK);
-    gInventory.collectDescendentsIf(mFavoriteFolderId, cats, items, LLInventoryModel::EXCLUDE_TRASH, is_type);
+    LLUUID search_root = mFilterFolderID.notNull() ? mFilterFolderID : mFavoriteFolderId;
+    gInventory.collectDescendentsIf(search_root, cats, items, LLInventoryModel::EXCLUDE_TRASH, is_type);
 
     std::sort(items.begin(), items.end(), LLFavoritesSort());
 
