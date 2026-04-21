@@ -1194,11 +1194,11 @@ void LLFavoritesBarCtrl::updateSubfolderFilter()
     }
 
     // Update button label and position
-    std::string label = "\xe2\x96\xbe All";  // ▾ All
+    std::string label = "All \xe2\x96\xbe";  // All ▾
     if (mFilterFolderID.notNull())
     {
         LLViewerInventoryCategory* cat = gInventory.getCategory(mFilterFolderID);
-        if (cat) label = "\xe2\x96\xbe " + cat->getName();
+        if (cat) label = cat->getName() + " \xe2\x96\xbe";
     }
     if (mSubfolderFilterBtn)
     {

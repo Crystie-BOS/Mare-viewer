@@ -230,7 +230,7 @@
                 width="60"
                 bottom="0"
                 valign="bottom">
-                &#9660; All
+                All &#9660;
                 </subfolder_button>
               <!-- More button actually is a text box. -->
               <more_button
