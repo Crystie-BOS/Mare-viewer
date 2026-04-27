@@ -126,6 +126,7 @@ bool LLFloaterCreateLandmark::postBuild()
     getChild<LLTextBox>("new_folder_textbox")->setURLClickedCallback(boost::bind(&LLFloaterCreateLandmark::onCreateFolderClicked, this));
     getChild<LLButton>("ok_btn")->setClickedCallback(boost::bind(&LLFloaterCreateLandmark::onSaveClicked, this));
     getChild<LLButton>("cancel_btn")->setClickedCallback(boost::bind(&LLFloaterCreateLandmark::onCancelClicked, this));
+    setDefaultBtn("ok_btn");
 
     mLandmarkTitleEditor->setCommitCallback([this](LLUICtrl* ctrl, const LLSD& param) { onCommitTextChanges(); });
     mNotesEditor->setCommitCallback([this](LLUICtrl* ctrl, const LLSD& param) { onCommitTextChanges(); });
