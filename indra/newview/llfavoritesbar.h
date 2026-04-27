@@ -100,10 +100,12 @@ protected:
     void onMoreTextBoxClicked();
 
     void getDirectSubfolders(LLInventoryModel::cat_array_t& cats);
+    void collectAllSubfoldersRecursive(const LLUUID& parent_id, int depth,
+        std::vector<std::pair<LLPointer<LLViewerInventoryCategory>, int>>& result);
     void updateSubfolderFilter();
     void onSubfolderFilterClicked();
     void onSubfolderSelected(const LLUUID& folder_id);
-    void createSubfolderMenu(const LLInventoryModel::cat_array_t& subfolders);
+    void createSubfolderMenu();
 
     LLHandle<LLView> mOverflowMenuHandle;
     LLHandle<LLView> mContextMenuHandle;
