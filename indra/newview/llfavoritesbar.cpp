@@ -1168,6 +1168,22 @@ void LLFavoritesBarCtrl::getDirectSubfolders(LLInventoryModel::cat_array_t& cats
         cats = *direct_cats;
 }
 
+void LLFavoritesBarCtrl::collectAllSubfoldersRecursive(
+    const LLUUID& parent_id,
+    int depth,
+    std::vector<std::pair<LLPointer<LLViewerInventoryCategory>, int>>& result)
+{
+    LLInventoryModel::cat_array_t*  direct_cats = nullptr;
+    LLInventoryModel::item_array_t* direct_items = nullptr;
+    gInventory.getDirectDescendentsOf(parent_id, direct_cats, direct_items);
+    if (!direct_cats) return;
+    for (const auto& cat : *direct_cats)
+    {
+        result.push_back({cat, depth});
+        collectAllSubfoldersRecursive(cat->getUUID(), depth + 1, result);
+    }
+}
+
 void LLFavoritesBarCtrl::updateSubfolderFilter()
 {
     if (mFavoriteFolderId.isNull()) return;
@@ -1182,15 +1198,15 @@ void LLFavoritesBarCtrl::updateSubfolderFilter()
         return;
     }
 
-    // Reset filter if the selected subfolder was deleted
+    // Reset filter if the selected subfolder was deleted or is no longer under Favorites
     if (mFilterFolderID.notNull())
     {
-        bool still_valid = false;
-        for (auto& cat : subfolders)
+        LLViewerInventoryCategory* filtered_cat = gInventory.getCategory(mFilterFolderID);
+        if (!filtered_cat ||
+            !gInventory.isObjectDescendentOf(mFilterFolderID, mFavoriteFolderId))
         {
-            if (cat->getUUID() == mFilterFolderID) { still_valid = true; break; }
+            mFilterFolderID.setNull();
         }
-        if (!still_valid) mFilterFolderID.setNull();
     }
 
     // Update button label and position
@@ -1212,9 +1228,7 @@ void LLFavoritesBarCtrl::updateSubfolderFilter()
 
 void LLFavoritesBarCtrl::onSubfolderFilterClicked()
 {
-    LLInventoryModel::cat_array_t subfolders;
-    getDirectSubfolders(subfolders);
-    createSubfolderMenu(subfolders);
+    createSubfolderMenu();
 
     LLToggleableMenu* menu = dynamic_cast<LLToggleableMenu*>(mSubfolderMenuHandle.get());
     if (menu && mSubfolderFilterBtn)
@@ -1232,7 +1246,7 @@ void LLFavoritesBarCtrl::onSubfolderSelected(const LLUUID& folder_id)
     updateButtons(true);
 }
 
-void LLFavoritesBarCtrl::createSubfolderMenu(const LLInventoryModel::cat_array_t& subfolders)
+void LLFavoritesBarCtrl::createSubfolderMenu()
 {
     LLView* old = mSubfolderMenuHandle.get();
     if (old) old->die();
@@ -1256,11 +1270,19 @@ void LLFavoritesBarCtrl::createSubfolderMenu(const LLInventoryModel::cat_array_t
 
     menu->addSeparator();
 
-    for (const auto& cat : subfolders)
+    // Collect all subfolders at any depth with their depth level for indentation
+    std::vector<std::pair<LLPointer<LLViewerInventoryCategory>, int>> all_subfolders;
+    collectAllSubfoldersRecursive(mFavoriteFolderId, 0, all_subfolders);
+
+    for (const auto& entry : all_subfolders)
     {
+        const LLPointer<LLViewerInventoryCategory>& cat = entry.first;
+        int depth = entry.second;
+        // Indent sub-subfolders with two spaces per depth level
+        std::string indent(depth * 2, ' ');
         LLMenuItemCallGL::Params item;
         item.name(cat->getUUID().asString());
-        item.label(cat->getName());
+        item.label(indent + cat->getName());
         LLUUID id = cat->getUUID();
         item.on_click.function(
             boost::bind(&LLFavoritesBarCtrl::onSubfolderSelected, this, id));
