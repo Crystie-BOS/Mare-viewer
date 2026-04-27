@@ -1359,6 +1359,17 @@
       <key>Value</key>
       <integer>1</integer>
     </map>
+    <key>RestrainedLoveGetPathLinksAsObjects</key>
+    <map>
+      <key>Comment</key>
+    <string>Prior to viewer 26.1.0 getpath(new) would return linked items under #RLV as if they were actual objects since it didn't check for an item being a link. This caused incorrect folders to be returned in scenarios where both links and the actual item were inside #RLV. However, introducing this fix means that the flawed use case where a link in #RLV pointed to a location outside #RLV stopped returning the link's location which some users relied on. Setting this variable to TRUE restores the old behaviour.</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
     <key>RestrainedLoveUseStrictGarbageCollectionRestrictions</key>
     <map>
       <key>Comment</key>

@@ -5560,6 +5560,8 @@ std::string RRInterface::getFullPath (LLInventoryItem* item, std::string option,
 
 LLInventoryItem* RRInterface::getItemAux (LLViewerObject* attached_object, LLInventoryCategory* root)
 {
+    static LLCachedControl<bool> doNotCheckLinks(gSavedSettings, "RestrainedLoveGetPathLinksAsObjects", FALSE);
+
     // auxiliary function for getItem()
     if (!attached_object) return NULL;
     LLVOAvatarSelf* avatar = gAgentAvatarp;
@@ -5582,7 +5584,12 @@ LLInventoryItem* RRInterface::getItemAux (LLViewerObject* attached_object, LLInv
 				// its own folder and then having links to it in each KDC restraint folder. Fixing this stops the
 				// CTS Wardrobe showing the wrong folder as worn in this scenario. The logic goes wrong here because
 				// getType() follows the link so AT_OBJECT is returned when we're actually looking at the link.
-				&& !item->getIsLinkType()
+				//
+				// CA: However, there are of course situations where people have relied on the buggy behaviour with
+				// getpath returning the link location within RLV whilst the parent outside of #RLV gets culled from the
+				// results
+				//
+				&& (doNotCheckLinks || !item->getIsLinkType())
                 && (item->getType() == LLAssetType::AT_OBJECT || item->getType() == LLAssetType::AT_CLOTHING)
                 && avatar->getWornAttachment (item->getLinkedUUID()) == attached_object
                 ) {
