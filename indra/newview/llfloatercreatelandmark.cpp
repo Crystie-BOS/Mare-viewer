@@ -202,10 +202,23 @@ void LLFloaterCreateLandmark::populateFoldersList(const LLUUID &folder_id)
     LLInventoryModel::cat_array_t cats;
     LLPanelLandmarkInfo::collectLandmarkFolders(cats);
 
+    // Also collect subfolders of the Favorites Bar so they appear as save targets.
+    LLUUID favorites_id = gInventory.findCategoryUUIDForType(LLFolderType::FT_FAVORITE);
+    if (favorites_id.notNull())
+    {
+        LLInventoryModel::item_array_t fav_items;
+        LLIsType is_category(LLAssetType::AT_CATEGORY);
+        gInventory.collectDescendentsIf(
+            favorites_id,
+            cats,
+            fav_items,
+            LLInventoryModel::EXCLUDE_TRASH,
+            is_category);
+    }
+
     mFolderCombo->removeall();
 
     // Put the "My Favorites" folder first in list.
-    LLUUID favorites_id = gInventory.findCategoryUUIDForType(LLFolderType::FT_FAVORITE);
     LLViewerInventoryCategory* favorites_cat = gInventory.getCategory(favorites_id);
     if (!favorites_cat)
     {
@@ -288,7 +301,8 @@ void LLFloaterCreateLandmark::onCreateFolderClicked()
             if (!folder_name.empty())
             {
                 inventory_func_type func = boost::bind(&LLFloaterCreateLandmark::folderCreatedCallback, this, _1);
-                gInventory.createNewCategory(mLandmarksID, LLFolderType::FT_NONE, folder_name, func);
+                LLUUID selected_folder_id = mFolderCombo->getValue().asUUID();
+                gInventory.createNewCategory(selected_folder_id, LLFolderType::FT_NONE, folder_name, func);
                 gInventory.notifyObservers();
             }
         }
