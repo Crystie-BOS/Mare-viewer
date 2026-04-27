@@ -51,6 +51,7 @@
 // Implementation of conversations list session widgets
 //
 static LLDefaultChildRegistry::Register<LLConversationViewSession> r_conversation_view_session("conversation_view_session");
+static LLUIColor sFlashConvBgColor;
 
 const LLColor4U DEFAULT_WHITE(255, 255, 255);
 
@@ -103,6 +104,7 @@ LLConversationViewSession::LLConversationViewSession(const LLConversationViewSes
 {
     mFlashTimer = new LLFlashTimer();
     mAreChildrenInited = true; // inventory only
+    sFlashConvBgColor = LLUIColorTable::instance().getColor("ConversationTabFlashBgColor", DEFAULT_WHITE);
 }
 
 LLConversationViewSession::~LLConversationViewSession()
@@ -324,7 +326,7 @@ void LLConversationViewSession::draw()
 
     // draw highlight for selected items
     static LLUIColor alt_color = LLUIColorTable::instance().getColor("MentionFlashBgColor", DEFAULT_WHITE);
-    drawHighlight(show_context, true, sHighlightBgColor, mIsAltFlashColor ? alt_color : sFlashBgColor, sFocusOutlineColor, sMouseOverColor);
+    drawHighlight(show_context, true, sHighlightBgColor, mIsAltFlashColor ? alt_color : sFlashConvBgColor, sFocusOutlineColor, sMouseOverColor);
 
     // Draw children if root folder, or any other folder that is open. Do not draw children when animating to closed state or you get rendering overlap.
     bool draw_children = getRoot() == static_cast<LLFolderViewFolder*>(this) || isOpen();
@@ -714,7 +716,8 @@ void LLConversationViewParticipant::draw()
     static LLUIColor sFgDisabledColor = LLUIColorTable::instance().getColor("MenuItemDisabledColor", DEFAULT_WHITE);
     static LLUIColor sHighlightFgColor = LLUIColorTable::instance().getColor("MenuItemHighlightFgColor", DEFAULT_WHITE);
     static LLUIColor sHighlightBgColor = LLUIColorTable::instance().getColor("MenuItemHighlightBgColor", DEFAULT_WHITE);
-    static LLUIColor sFlashBgColor = LLUIColorTable::instance().getColor("MenuItemFlashBgColor", DEFAULT_WHITE);
+   	// CA: this used to to be MenuItemFlashBgColor, which was set to beaconcolor. Now separated since bright orange doesn't work with purples
+    static LLUIColor sFlashConvBgColor = LLUIColorTable::instance().getColor("ConversationTabFlashBgColor", DEFAULT_WHITE);
     static LLUIColor sFocusOutlineColor = LLUIColorTable::instance().getColor("InventoryFocusOutlineColor", DEFAULT_WHITE);
     static LLUIColor sMouseOverColor = LLUIColorTable::instance().getColor("InventoryMouseOverColor", DEFAULT_WHITE);
     static LLUIColor sFriendColor = LLUIColorTable::instance().getColor("ConversationFriendColor");
@@ -777,7 +780,7 @@ void LLConversationViewParticipant::draw()
         mSpeakingIndicator->setIsModeratorMuted(participant_model->isModeratorMuted());
     }
 
-    drawHighlight(show_context, mIsSelected, sHighlightBgColor, sFlashBgColor, sFocusOutlineColor, sMouseOverColor);
+    drawHighlight(show_context, mIsSelected, sHighlightBgColor, sFlashConvBgColor, sFocusOutlineColor, sMouseOverColor);
     drawLabel(font, text_left, y, color->get(), right_x);
 
     LLView::draw();
