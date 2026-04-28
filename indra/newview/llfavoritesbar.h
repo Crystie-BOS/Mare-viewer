@@ -110,6 +110,7 @@ protected:
 
     void onMoreTextBoxClicked();
 
+    LLUUID getBarRootFolderID() const;
     void getDirectSubfolders(LLInventoryModel::cat_array_t& cats);
     void collectAllSubfoldersRecursive(const LLUUID& parent_id, int depth,
         std::vector<std::pair<LLPointer<LLViewerInventoryCategory>, int>>& result);
