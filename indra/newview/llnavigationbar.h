@@ -129,6 +129,7 @@ private:
     void onLandmarksButtonClicked();
     void onLandmarksButtonRightClick(LLUICtrl* ctrl, S32 x, S32 y, MASK mask);
     void onOpenPlacesTab(const LLSD& param);
+    bool isPlacesTabActive(const LLSD& param) const;
     void onLocationSelection();
     void onLocationPrearrange(const LLSD& data);
     void onTeleportFinished(const LLVector3d& global_agent_pos);
