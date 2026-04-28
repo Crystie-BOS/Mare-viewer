@@ -38,6 +38,7 @@
 #include "lltooltip.h"
 
 #include "llagent.h"
+#include "llteleporthistorystorage.h"
 #include "llagentpicksinfo.h"
 #include "llavatarnamecache.h"
 #include "llclipboard.h"
@@ -422,6 +423,7 @@ LLFavoritesBarCtrl::LLFavoritesBarCtrl(const LLFavoritesBarCtrl::Params& p)
     mLastTab(NULL),
     mSubfolderFilterBtn(NULL),
     mSubfolderBtnWasVisible(false),
+    mBarMode(BAR_MODE_FAVORITES),
     mItemsListDirty(false),
     mUpdateDropDownItems(true),
     mRestoreOverflowMenu(false),
@@ -937,7 +939,7 @@ void LLFavoritesBarCtrl::updateButtons(bool force_update)
         return;
     }
 
-    if(mGetPrevItems && gInventory.isCategoryComplete(mFavoriteFolderId))
+    if(mBarMode == BAR_MODE_FAVORITES && mGetPrevItems && gInventory.isCategoryComplete(mFavoriteFolderId))
     {
         for (LLInventoryModel::item_array_t::iterator it = mItems.begin(); it != mItems.end(); it++)
         {
@@ -1206,6 +1208,14 @@ void LLFavoritesBarCtrl::collectAllSubfoldersRecursive(
 
 void LLFavoritesBarCtrl::updateSubfolderFilter()
 {
+    // Subfolder filter only applies to Favorites mode for now
+    if (mBarMode != BAR_MODE_FAVORITES)
+    {
+        mFilterFolderID.setNull();
+        if (mSubfolderFilterBtn) mSubfolderFilterBtn->setVisible(false);
+        return;
+    }
+
     if (mFavoriteFolderId.isNull()) return;
 
     LLInventoryModel::cat_array_t subfolders;
@@ -1315,20 +1325,35 @@ void LLFavoritesBarCtrl::createSubfolderMenu()
 
 bool LLFavoritesBarCtrl::collectFavoriteItems(LLInventoryModel::item_array_t &items)
 {
+    mVisitedPositions.clear();
 
-    if (mFavoriteFolderId.isNull())
+    if (mBarMode == BAR_MODE_VISITED)
+    {
+        return collectVisitedItems(items);
+    }
+
+    LLUUID search_root;
+    if (mBarMode == BAR_MODE_LANDMARKS)
+    {
+        search_root = gInventory.findCategoryUUIDForType(LLFolderType::FT_LANDMARK);
+    }
+    else // BAR_MODE_FAVORITES
+    {
+        if (mFavoriteFolderId.isNull())
+            return false;
+        search_root = mFilterFolderID.notNull() ? mFilterFolderID : mFavoriteFolderId;
+    }
+
+    if (search_root.isNull())
         return false;
 
-
     LLInventoryModel::cat_array_t cats;
-
     LLIsType is_type(LLAssetType::AT_LANDMARK);
-    LLUUID search_root = mFilterFolderID.notNull() ? mFilterFolderID : mFavoriteFolderId;
     gInventory.collectDescendentsIf(search_root, cats, items, LLInventoryModel::EXCLUDE_TRASH, is_type);
 
     std::sort(items.begin(), items.end(), LLFavoritesSort());
 
-    if (needToSaveItemsOrder(items))
+    if (mBarMode == BAR_MODE_FAVORITES && needToSaveItemsOrder(items))
     {
         S32 sortField = 0;
         for (LLInventoryModel::item_array_t::iterator i = items.begin(); i != items.end(); ++i)
@@ -1339,6 +1364,38 @@ bool LLFavoritesBarCtrl::collectFavoriteItems(LLInventoryModel::item_array_t &it
     }
 
     return true;
+}
+
+bool LLFavoritesBarCtrl::collectVisitedItems(LLInventoryModel::item_array_t &items)
+{
+    LLTeleportHistoryStorage* hist = LLTeleportHistoryStorage::getInstance();
+    if (!hist) return false;
+
+    const LLTeleportHistoryStorage::slurl_list_t& hist_items = hist->getItems();
+    if (hist_items.empty()) return false;
+
+    // Newest first
+    for (auto it = hist_items.rbegin(); it != hist_items.rend(); ++it)
+    {
+        LLUUID fake_id;
+        fake_id.generate();
+        mVisitedPositions[fake_id] = it->mGlobalPos;
+
+        LLPointer<LLViewerInventoryItem> item = new LLViewerInventoryItem();
+        item->setUUID(fake_id);
+        item->rename(it->mTitle);
+        items.push_back(item);
+    }
+    return true;
+}
+
+void LLFavoritesBarCtrl::setBarMode(EBarMode mode)
+{
+    if (mBarMode != mode)
+    {
+        mBarMode = mode;
+        updateButtons(true);
+    }
 }
 
 void LLFavoritesBarCtrl::onMoreTextBoxClicked()
@@ -1514,6 +1571,15 @@ void LLFavoritesBarCtrl::positionAndShowOverflowMenu()
 
 void LLFavoritesBarCtrl::onButtonClick(LLUUID item_id)
 {
+    if (mBarMode == BAR_MODE_VISITED)
+    {
+        auto it = mVisitedPositions.find(item_id);
+        if (it != mVisitedPositions.end())
+        {
+            gAgent.teleportViaLocation(it->second);
+        }
+        return;
+    }
     // We only have one Inventory, gInventory. Some day this should be better abstracted.
     LLInvFVBridgeAction::doAction(item_id,&gInventory);
 }

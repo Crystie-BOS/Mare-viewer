@@ -42,6 +42,16 @@ class LLToggleableMenu;
 class LLFavoritesBarCtrl : public LLUICtrl, public LLInventoryObserver
 {
 public:
+    enum EBarMode
+    {
+        BAR_MODE_FAVORITES = 0,
+        BAR_MODE_LANDMARKS,
+        BAR_MODE_VISITED
+    };
+
+    void        setBarMode(EBarMode mode);
+    EBarMode    getBarMode() const { return mBarMode; }
+
     struct Params : public LLInitParam::Block<Params, LLUICtrl::Params>
     {
         Optional<LLUIImage*> image_drag_indication;
@@ -80,6 +90,7 @@ protected:
     LLButton* createButton(const LLPointer<LLViewerInventoryItem> item, const LLButton::Params& button_params, S32 x_offset );
     const LLButton::Params& getButtonParams();
     bool collectFavoriteItems(LLInventoryModel::item_array_t &items);
+    bool collectVisitedItems(LLInventoryModel::item_array_t &items);
 
     void onButtonClick(LLUUID id);
     void onButtonRightClick(LLUUID id,LLView* button,S32 x,S32 y,MASK mask);
@@ -173,6 +184,9 @@ private:
     LLTextBox* mSubfolderFilterBtn;
     LLUUID      mFilterFolderID;
     bool        mSubfolderBtnWasVisible;
+
+    EBarMode    mBarMode;
+    std::map<LLUUID, LLVector3d> mVisitedPositions;
 
     LLUUID mDragItemId;
     bool mStartDrag;
