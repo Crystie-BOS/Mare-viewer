@@ -439,6 +439,18 @@ void LLNavigationBar::onOpenPlacesTab(const LLSD& param)
     mLastPlacesTabType = param.asString();
     LLFloaterReg::showInstance("places");
     LLFloaterSidePanelContainer::showPanel("places", LLSD().with("type", mLastPlacesTabType));
+
+    // Mirror the selection in the favorites bar
+    LLFavoritesBarCtrl* fav_bar = findChild<LLFavoritesBarCtrl>("favorite");
+    if (fav_bar)
+    {
+        LLFavoritesBarCtrl::EBarMode mode = LLFavoritesBarCtrl::BAR_MODE_FAVORITES;
+        if (mLastPlacesTabType == "open_landmark_tab")
+            mode = LLFavoritesBarCtrl::BAR_MODE_LANDMARKS;
+        else if (mLastPlacesTabType == "open_visited_tab")
+            mode = LLFavoritesBarCtrl::BAR_MODE_VISITED;
+        fav_bar->setBarMode(mode);
+    }
 }
 
 void LLNavigationBar::onTeleportHistoryMenuItemClicked(const LLSD& userdata)
