@@ -310,10 +310,13 @@ bool LLNavigationBar::postBuild()
 
     mBtnLandmarks->setClickedCallback(boost::bind(&LLNavigationBar::onLandmarksButtonClicked, this));
 
-    // Register right-click context menu callback and load the menu
+    // Register right-click context menu callbacks and load the menu
     LLUICtrl::CommitCallbackRegistry::currentRegistrar().add(
         "NavBar.OpenPlacesTab",
         boost::bind(&LLNavigationBar::onOpenPlacesTab, this, _2));
+    LLUICtrl::EnableCallbackRegistry::currentRegistrar().add(
+        "NavBar.CheckPlacesTab",
+        boost::bind(&LLNavigationBar::isPlacesTabActive, this, _2));
     LLMenuGL* lm_menu = LLUICtrlFactory::getInstance()->createFromFile<LLMenuGL>(
         "menu_landmarks_btn.xml", gMenuHolder,
         LLViewerMenuHolderGL::child_registry_t::instance());
@@ -451,6 +454,11 @@ void LLNavigationBar::onOpenPlacesTab(const LLSD& param)
             mode = LLFavoritesBarCtrl::BAR_MODE_VISITED;
         fav_bar->setBarMode(mode);
     }
+}
+
+bool LLNavigationBar::isPlacesTabActive(const LLSD& param) const
+{
+    return mLastPlacesTabType == param.asString();
 }
 
 void LLNavigationBar::onTeleportHistoryMenuItemClicked(const LLSD& userdata)
