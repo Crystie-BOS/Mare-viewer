@@ -1161,11 +1161,18 @@ bool LLFavoritesBarCtrl::postBuild()
     return true;
 }
 
+LLUUID LLFavoritesBarCtrl::getBarRootFolderID() const
+{
+    if (mBarMode == BAR_MODE_LANDMARKS)
+        return gInventory.findCategoryUUIDForType(LLFolderType::FT_LANDMARK);
+    return mFavoriteFolderId;
+}
+
 void LLFavoritesBarCtrl::getDirectSubfolders(LLInventoryModel::cat_array_t& cats)
 {
     LLInventoryModel::cat_array_t*  direct_cats = nullptr;
     LLInventoryModel::item_array_t* direct_items = nullptr;
-    gInventory.getDirectDescendentsOf(mFavoriteFolderId, direct_cats, direct_items);
+    gInventory.getDirectDescendentsOf(getBarRootFolderID(), direct_cats, direct_items);
     if (direct_cats)
         cats = *direct_cats;
 }
@@ -1188,15 +1195,16 @@ void LLFavoritesBarCtrl::collectAllSubfoldersRecursive(
 
 void LLFavoritesBarCtrl::updateSubfolderFilter()
 {
-    // Subfolder filter only applies to Favorites mode for now
-    if (mBarMode != BAR_MODE_FAVORITES)
+    // Subfolder filter applies to Favorites and Landmarks modes; not Visited
+    if (mBarMode == BAR_MODE_VISITED)
     {
         mFilterFolderID.setNull();
         if (mSubfolderFilterBtn) mSubfolderFilterBtn->setVisible(false);
         return;
     }
 
-    if (mFavoriteFolderId.isNull()) return;
+    LLUUID root_id = getBarRootFolderID();
+    if (root_id.isNull()) return;
 
     LLInventoryModel::cat_array_t subfolders;
     getDirectSubfolders(subfolders);
@@ -1208,12 +1216,12 @@ void LLFavoritesBarCtrl::updateSubfolderFilter()
         return;
     }
 
-    // Reset filter if the selected subfolder was deleted or is no longer under Favorites
+    // Reset filter if the selected subfolder was deleted or is no longer under the bar root
     if (mFilterFolderID.notNull())
     {
         LLViewerInventoryCategory* filtered_cat = gInventory.getCategory(mFilterFolderID);
         if (!filtered_cat ||
-            !gInventory.isObjectDescendentOf(mFilterFolderID, mFavoriteFolderId))
+            !gInventory.isObjectDescendentOf(mFilterFolderID, root_id))
         {
             mFilterFolderID.setNull();
         }
@@ -1282,7 +1290,7 @@ void LLFavoritesBarCtrl::createSubfolderMenu()
 
     // Collect all subfolders at any depth with their depth level for indentation
     std::vector<std::pair<LLPointer<LLViewerInventoryCategory>, int>> all_subfolders;
-    collectAllSubfoldersRecursive(mFavoriteFolderId, 0, all_subfolders);
+    collectAllSubfoldersRecursive(getBarRootFolderID(), 0, all_subfolders);
 
     for (const auto& entry : all_subfolders)
     {
@@ -1315,7 +1323,8 @@ bool LLFavoritesBarCtrl::collectFavoriteItems(LLInventoryModel::item_array_t &it
     LLUUID search_root;
     if (mBarMode == BAR_MODE_LANDMARKS)
     {
-        search_root = gInventory.findCategoryUUIDForType(LLFolderType::FT_LANDMARK);
+        LLUUID landmarks_root = gInventory.findCategoryUUIDForType(LLFolderType::FT_LANDMARK);
+        search_root = mFilterFolderID.notNull() ? mFilterFolderID : landmarks_root;
     }
     else // BAR_MODE_FAVORITES
     {
