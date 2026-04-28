@@ -85,6 +85,7 @@ static const std::string REMOTE_PLACE_INFO_TYPE     = "remote_place";
 static const std::string TELEPORT_HISTORY_INFO_TYPE = "teleport_history";
 static const std::string LANDMARK_TAB_INFO_TYPE     = "open_landmark_tab";
 static const std::string FAVORITES_TAB_INFO_TYPE    = "open_favorites_tab";
+static const std::string VISITED_TAB_INFO_TYPE      = "open_visited_tab";
 
 // Support for secondlife:///app/parcel/{UUID}/about SLapps
 class LLParcelHandler : public LLCommandHandler
@@ -417,6 +418,15 @@ void LLPanelPlaces::onOpen(const LLSD& key)
             togglePlaceInfoPanel(false);
             mPlaceInfoType = key_type;
             togglePlaceInfoPanel(false);
+            onTabSelected();
+            updateVerbs();
+        }
+        else if (key_type == VISITED_TAB_INFO_TYPE)
+        {
+            togglePlaceInfoPanel(false);
+            LLPanel* visited_panel = mTabContainer->getPanelByName("Teleport History");
+            if (visited_panel)
+                mTabContainer->selectTabPanel(visited_panel);
             onTabSelected();
             updateVerbs();
         }

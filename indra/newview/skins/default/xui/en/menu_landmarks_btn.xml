@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<menu
+ height="101"
+ layout="topleft"
+ mouse_opaque="false"
+ name="landmarks_btn_menu"
+ visible="false"
+ width="150">
+  <menu_item_call
+   label="Favorites Bar"
+   name="open_favorites_bar">
+    <menu_item_call.on_click
+     function="NavBar.OpenPlacesTab"
+     parameter="open_favorites_tab" />
+  </menu_item_call>
+  <menu_item_call
+   label="Landmarks"
+   name="open_landmarks">
+    <menu_item_call.on_click
+     function="NavBar.OpenPlacesTab"
+     parameter="open_landmark_tab" />
+  </menu_item_call>
+  <menu_item_call
+   label="Visited"
+   name="open_visited">
+    <menu_item_call.on_click
+     function="NavBar.OpenPlacesTab"
+     parameter="open_visited_tab" />
+  </menu_item_call>
+</menu>

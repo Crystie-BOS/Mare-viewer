@@ -127,6 +127,8 @@ private:
     void onForwardButtonClicked();
     void onHomeButtonClicked();
     void onLandmarksButtonClicked();
+    void onLandmarksButtonRightClick(LLUICtrl* ctrl, S32 x, S32 y, MASK mask);
+    void onOpenPlacesTab(const LLSD& param);
     void onLocationSelection();
     void onLocationPrearrange(const LLSD& data);
     void onTeleportFinished(const LLVector3d& global_agent_pos);
@@ -149,6 +151,7 @@ private:
 
     S32                         mNavPanWidth;
     LLMenuGL*                   mTeleportHistoryMenu;
+    LLHandle<LLView>            mLandmarksBtnMenuHandle;
     LLPullButton*               mBtnBack;
     LLPullButton*               mBtnForward;
     LLButton*                   mBtnHome;
