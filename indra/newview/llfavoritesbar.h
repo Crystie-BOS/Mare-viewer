@@ -173,8 +173,6 @@ private:
     // Fits menu item label width with favorites menu width
     void fitLabelWidth(LLMenuItemCallGL* menu_item);
 
-    void addOpenLandmarksMenuItem(LLToggleableMenu* menu);
-
     void positionAndShowOverflowMenu();
 
     bool mShowDragMarker;
