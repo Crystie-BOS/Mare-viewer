@@ -859,6 +859,11 @@ bool LLLandmarksPanel::isActionEnabled(const LLSD& userdata) const
         }
         return false;
     }
+    else if ("new_folder_from_selected" == command_name)
+    {
+        if (!root_folder_view) return false;
+        return !root_folder_view->getSelectionList().empty();
+    }
     else
     {
         LL_WARNS() << "Unprocessed command has come: " << command_name << LL_ENDL;
