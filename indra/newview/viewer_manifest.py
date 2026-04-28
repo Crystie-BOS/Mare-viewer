@@ -1204,7 +1204,7 @@ class Darwin_x86_64_Manifest(ViewerManifest):
                 if self.args['fmodstudio'] == 'ON':
                     if self.args['buildtype'].lower() == 'debug':
                         for libfile in (
-                                    "libfmodL.dylib",
+                                    "libfmod.dylib",
                                     ):
                             dylibs += path_optional(os.path.join(debpkgdir, libfile), libfile)
                     else:
