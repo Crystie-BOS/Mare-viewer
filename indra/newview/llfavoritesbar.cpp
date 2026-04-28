@@ -1466,7 +1466,6 @@ void LLFavoritesBarCtrl::updateOverflowMenuItems()
 
     menu->buildDrawLabels();
     mDropDownItemsCount = menu->getItemCount();
-    addOpenLandmarksMenuItem(menu);
     mUpdateDropDownItems = false;
 }
 
@@ -1495,32 +1494,6 @@ void LLFavoritesBarCtrl::fitLabelWidth(LLMenuItemCallGL* menu_item)
     }
 }
 
-void LLFavoritesBarCtrl::addOpenLandmarksMenuItem(LLToggleableMenu* menu)
-{
-    std::string label_untrans = "Open landmarks";
-    std::string label_transl;
-    bool translated = LLTrans::findString(label_transl, label_untrans);
-
-    LLMenuItemCallGL::Params item_params;
-    item_params.name("open_my_landmarks");
-    item_params.label(translated ? label_transl: label_untrans);
-    LLSD key;
-    key["type"] = "open_landmark_tab";
-    item_params.on_click.function(boost::bind(&LLFloaterSidePanelContainer::showPanel, "places", key));
-    LLMenuItemCallGL* menu_item = LLUICtrlFactory::create<LLMenuItemCallGL>(item_params);
-
-    fitLabelWidth(menu_item);
-
-    LLMenuItemSeparatorGL::Params sep_params;
-    sep_params.enabled_color=LLUIColorTable::instance().getColor("MenuItemEnabledColor");
-    sep_params.disabled_color=LLUIColorTable::instance().getColor("MenuItemDisabledColor");
-    sep_params.highlight_bg_color=LLUIColorTable::instance().getColor("MenuItemHighlightBgColor");
-    sep_params.highlight_fg_color=LLUIColorTable::instance().getColor("MenuItemHighlightFgColor");
-    LLMenuItemSeparatorGL* separator = LLUICtrlFactory::create<LLMenuItemSeparatorGL>(sep_params);
-
-    menu->addChild(separator);
-    menu->addChild(menu_item);
-}
 
 void LLFavoritesBarCtrl::positionAndShowOverflowMenu()
 {
