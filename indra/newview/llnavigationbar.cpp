@@ -272,7 +272,8 @@ LLNavigationBar::LLNavigationBar()
     mSaveToLocationHistory(false),
     mNavigationPanel(NULL),
     mFavoritePanel(NULL),
-    mNavPanWidth(0)
+    mNavPanWidth(0),
+    mLastPlacesTabType("open_favorites_tab")
 {
     buildFromFile( "panel_navigation_bar.xml");
 
@@ -419,7 +420,7 @@ void LLNavigationBar::onHomeButtonClicked()
 void LLNavigationBar::onLandmarksButtonClicked()
 {
     LLFloaterReg::toggleInstanceOrBringToFront("places");
-    LLFloaterSidePanelContainer::showPanel("places", LLSD().with("type", "open_favorites_tab"));
+    LLFloaterSidePanelContainer::showPanel("places", LLSD().with("type", mLastPlacesTabType));
 }
 
 void LLNavigationBar::onLandmarksButtonRightClick(LLUICtrl* ctrl, S32 x, S32 y, MASK mask)
@@ -435,8 +436,9 @@ void LLNavigationBar::onLandmarksButtonRightClick(LLUICtrl* ctrl, S32 x, S32 y, 
 
 void LLNavigationBar::onOpenPlacesTab(const LLSD& param)
 {
+    mLastPlacesTabType = param.asString();
     LLFloaterReg::showInstance("places");
-    LLFloaterSidePanelContainer::showPanel("places", LLSD().with("type", param.asString()));
+    LLFloaterSidePanelContainer::showPanel("places", LLSD().with("type", mLastPlacesTabType));
 }
 
 void LLNavigationBar::onTeleportHistoryMenuItemClicked(const LLSD& userdata)
