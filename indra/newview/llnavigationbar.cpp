@@ -309,6 +309,18 @@ bool LLNavigationBar::postBuild()
 
     mBtnLandmarks->setClickedCallback(boost::bind(&LLNavigationBar::onLandmarksButtonClicked, this));
 
+    // Register right-click context menu callback and load the menu
+    LLUICtrl::CommitCallbackRegistry::currentRegistrar().add(
+        "NavBar.OpenPlacesTab",
+        boost::bind(&LLNavigationBar::onOpenPlacesTab, this, _2));
+    LLMenuGL* lm_menu = LLUICtrlFactory::getInstance()->createFromFile<LLMenuGL>(
+        "menu_landmarks_btn.xml", gMenuHolder,
+        LLViewerMenuHolderGL::child_registry_t::instance());
+    if (lm_menu)
+        mLandmarksBtnMenuHandle = lm_menu->getHandle();
+    mBtnLandmarks->setRightMouseDownCallback(
+        boost::bind(&LLNavigationBar::onLandmarksButtonRightClick, this, _1, _2, _3, _4));
+
     mCmbLocation->setCommitCallback(boost::bind(&LLNavigationBar::onLocationSelection, this));
 
     mTeleportFinishConnection = LLViewerParcelMgr::getInstance()->
@@ -408,6 +420,23 @@ void LLNavigationBar::onLandmarksButtonClicked()
 {
     LLFloaterReg::toggleInstanceOrBringToFront("places");
     LLFloaterSidePanelContainer::showPanel("places", LLSD().with("type", "open_favorites_tab"));
+}
+
+void LLNavigationBar::onLandmarksButtonRightClick(LLUICtrl* ctrl, S32 x, S32 y, MASK mask)
+{
+    LLMenuGL* menu = static_cast<LLMenuGL*>(mLandmarksBtnMenuHandle.get());
+    if (menu)
+    {
+        menu->buildDrawLabels();
+        menu->updateParent(LLMenuGL::sMenuContainer);
+        LLMenuGL::showPopup(ctrl, menu, x, y);
+    }
+}
+
+void LLNavigationBar::onOpenPlacesTab(const LLSD& param)
+{
+    LLFloaterReg::showInstance("places");
+    LLFloaterSidePanelContainer::showPanel("places", LLSD().with("type", param.asString()));
 }
 
 void LLNavigationBar::onTeleportHistoryMenuItemClicked(const LLSD& userdata)
