@@ -152,6 +152,7 @@ private:
     S32                         mNavPanWidth;
     LLMenuGL*                   mTeleportHistoryMenu;
     LLHandle<LLView>            mLandmarksBtnMenuHandle;
+    std::string                 mLastPlacesTabType;
     LLPullButton*               mBtnBack;
     LLPullButton*               mBtnForward;
     LLButton*                   mBtnHome;
