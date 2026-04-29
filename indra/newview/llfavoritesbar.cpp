@@ -1186,7 +1186,13 @@ void LLFavoritesBarCtrl::collectAllSubfoldersRecursive(
     LLInventoryModel::item_array_t* direct_items = nullptr;
     gInventory.getDirectDescendentsOf(parent_id, direct_cats, direct_items);
     if (!direct_cats) return;
-    for (const auto& cat : *direct_cats)
+    LLInventoryModel::cat_array_t sorted_cats = *direct_cats;
+    std::sort(sorted_cats.begin(), sorted_cats.end(),
+        [](const LLPointer<LLViewerInventoryCategory>& a, const LLPointer<LLViewerInventoryCategory>& b)
+        {
+            return LLStringUtil::compareDict(a->getName(), b->getName()) < 0;
+        });
+    for (const auto& cat : sorted_cats)
     {
         result.push_back({cat, depth});
         collectAllSubfoldersRecursive(cat->getUUID(), depth + 1, result);
