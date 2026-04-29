@@ -6148,6 +6148,21 @@ bool LLFolderBridge::dragItemIntoFolder(LLInventoryItem* inv_item,
                 }
             }
 
+            // FAVORITES subfolder → root
+            // (move the item instead of copying)
+            else if (move_is_into_favorites && model->isObjectDescendentOf(inv_item->getUUID(), favorites_id))
+            {
+                LLInvFVBridge::changeItemParent(model, (LLViewerInventoryItem*)inv_item, mUUID, false);
+
+                LLFolderViewItem* itemp = destination_panel ? destination_panel->getRootFolder()->getDraggingOverItem() : nullptr;
+                if (itemp)
+                {
+                    LLUUID destItemId = static_cast<LLFolderViewModelItemInventory*>(itemp->getViewModelItem())->getUUID();
+                    LLFavoritesOrderStorage::instance().rearrangeFavoriteLandmarks(inv_item->getUUID(), destItemId);
+                }
+                if (cb) cb->fire(inv_item->getUUID());
+            }
+
             // FAVORITES folder
             // (copy the item)
             else if (move_is_into_favorites)
