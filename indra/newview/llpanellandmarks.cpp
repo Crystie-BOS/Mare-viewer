@@ -1520,5 +1520,6 @@ void LLFavoritesPanel::initFavoritesInventoryPanel()
     mCurrentSelectedList = getChild<LLPlacesInventoryPanel>("favorites_list");
 
     LLLandmarksPanel::initLandmarksPanel(mCurrentSelectedList);
+    mCurrentSelectedList->setShowFolderState(LLInventoryFilter::SHOW_ALL_FOLDERS);
     mCurrentSelectedList->getFilter().setEmptyLookupMessage("FavoritesNoMatchingItems");
 }
