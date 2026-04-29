@@ -440,8 +440,6 @@ void LLNavigationBar::onLandmarksButtonRightClick(LLUICtrl* ctrl, S32 x, S32 y, 
 void LLNavigationBar::onOpenPlacesTab(const LLSD& param)
 {
     mLastPlacesTabType = param.asString();
-    LLFloaterReg::showInstance("places");
-    LLFloaterSidePanelContainer::showPanel("places", LLSD().with("type", mLastPlacesTabType));
 
     // Mirror the selection in the favorites bar
     LLFavoritesBarCtrl* fav_bar = findChild<LLFavoritesBarCtrl>("favorite");
