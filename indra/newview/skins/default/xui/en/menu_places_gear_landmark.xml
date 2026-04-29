@@ -102,6 +102,17 @@
          function="Places.LandmarksGear.Custom.Action"
          parameter="restore" />
     </menu_item_call>
+    <menu_item_call
+     label="Create folder from selected"
+     layout="topleft"
+     name="new_folder_from_selected">
+        <on_click
+         function="Places.LandmarksGear.CopyPaste.Action"
+         parameter="new_folder_from_selected" />
+        <on_enable
+         function="Places.LandmarksGear.Enable"
+         parameter="new_folder_from_selected" />
+    </menu_item_call>
     <menu_item_separator
      layout="topleft" />
     <menu_item_call
