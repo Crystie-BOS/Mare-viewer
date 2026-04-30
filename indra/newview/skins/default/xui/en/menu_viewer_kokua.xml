@@ -2248,19 +2248,19 @@
 	           enabled="true"
 			   visibility_control="FSCmdLine">
 		   <menu_item_call.on_click
-             function="" />
+             function="Advanced.CmdLineTeleportToCam" />
             <menu_item_call.on_enable
-             function="" />			   
-        </menu_item_call>		
+             function="" />
+        </menu_item_call>
 		<menu_item_call
           	   label="Teleport Home tph"
                name="Teleport Home"
 	           enabled="true"
 			   visibility_control="FSCmdLine">
 		   <menu_item_call.on_click
-             function="" />
+             function="Advanced.CmdLineTeleportHome" />
             <menu_item_call.on_enable
-             function="" />			   
+             function="" />
         </menu_item_call>
 		<menu_item_call
       		   label="Teleport Altitude gth x"
@@ -2268,9 +2268,9 @@
 			   enabled="true"
 			   visibility_control="FSCmdLine">
             <menu_item_call.on_click
-             function="" />
+             function="Advanced.CmdLineTeleportHeight" />
             <menu_item_call.on_enable
-             function="" />				   
+             function="" />
         </menu_item_call>
 		<menu_item_call
       		   label="Teleport Ground flr"
@@ -2278,9 +2278,9 @@
 			   enabled="true"
 			   visibility_control="FSCmdLine">
             <menu_item_call.on_click
-             function="" />
+             function="Advanced.TPToGround" />
             <menu_item_call.on_enable
-             function="" />				   
+             function="" />
         </menu_item_call>
 		<menu_item_call
       		   label="Teleport In Sim gtp x y z"
@@ -2288,9 +2288,9 @@
 			   enabled="true"
 			   visibility_control="FSCmdLine">
             <menu_item_call.on_click
-             function="" />
+             function="Advanced.CmdLineTeleportPos" />
             <menu_item_call.on_enable
-             function="" />				   
+             function="" />
         </menu_item_call>
 		<menu_item_call
       		   label="Teleport To Sim mapto name"
@@ -2298,9 +2298,9 @@
 			   enabled="true"
 			   visibility_control="FSCmdLine">
             <menu_item_call.on_click
-             function="" />
+             function="Advanced.CmdLineMapTo" />
             <menu_item_call.on_enable
-             function="" />				   
+             function="" />
         </menu_item_call>
 		<menu_item_call
       		   label="Rez A Platform rezplat 0-30"
@@ -2308,9 +2308,9 @@
 			   enabled="true"
 			   visibility_control="FSCmdLine">
             <menu_item_call.on_click
-             function="" />
+             function="Advanced.CmdLineRezPlat" />
             <menu_item_call.on_enable
-             function="" />				   
+             function="" />
         </menu_item_call>		 		
 		<menu_item_call
       		   label="Draw Distance dd meters"
@@ -2318,9 +2318,9 @@
 			   enabled="true"
 			   visibility_control="FSCmdLine">
             <menu_item_call.on_click
-             function="" />
+             function="Advanced.CmdLineDrawDistance" />
             <menu_item_call.on_enable
-             function="" />				   
+             function="" />
         </menu_item_call>
 <!-- will not implement at this time firestorm implementation touches a lot of the viewer.
 		<menu_item_call
@@ -2340,7 +2340,7 @@
 			   enabled="true"
 			   visibility_control="FSCmdLine">
             <menu_item_call.on_click
-             function="" />
+             function="Advanced.CmdLineAOToggle" />
             <menu_item_call.on_enable
              function="" />
         </menu_item_call>			 
@@ -2350,9 +2350,9 @@
 			   enabled="true"
 			   visibility_control="FSCmdLine">
             <menu_item_call.on_click
-             function="" />
+             function="Advanced.CmdLineCalc" />
             <menu_item_call.on_enable
-             function="" />				 
+             function="" />
         </menu_item_call>
 
 		<menu_item_separator/>		
@@ -3000,6 +3000,12 @@
              function="Advanced.RefreshAttachments" />
         </menu_item_call>
 <!-- mk from kb -->
+        <menu_item_call
+         label="Teleport to Ground"
+         name="Teleport to Ground">
+            <menu_item_call.on_click
+             function="Advanced.TPToGround" />
+        </menu_item_call>
         <menu_item_call
          label="Refresh Scene"
          name="Refresh Scene"

@@ -131,6 +131,10 @@
 #include "lltoolselectland.h"
 #include "lltrans.h"
 #include "llurlentry.h"
+#include "llurldispatcher.h"
+#include "chatbar_as_cmdline.h"
+#include "llcalc.h"
+#include "fscommon.h"
 #include "llviewerdisplay.h" //for gWindowResized
 #include "llviewergenericmessage.h"
 #include "llviewerhelp.h"
@@ -2292,6 +2296,270 @@ class LLAdvancedRebakeTextures : public view_listener_t
     bool handleEvent(const LLSD& userdata)
     {
         handle_rebake_textures();
+        return true;
+    }
+};
+
+///////////////////////////
+// TELEPORT TO GROUND    //
+///////////////////////////
+
+class LLAdvancedTPToGround : public view_listener_t
+{
+    bool handleEvent(const LLSD& userdata)
+    {
+        LLVector3 agentPos = gAgent.getPositionAgent();
+        U64 agentRegion = gAgent.getRegion()->getHandle();
+        LLVector3 targetPos(agentPos.mV[0], agentPos.mV[1],
+                            LLWorld::getInstance()->resolveLandHeightAgent(agentPos));
+        LLVector3d pos_global = from_region_handle(agentRegion);
+        pos_global += LLVector3d((F64)targetPos.mV[0], (F64)targetPos.mV[1], (F64)targetPos.mV[2]);
+        gAgent.teleportViaLocation(pos_global);
+        return true;
+    }
+};
+
+//////////////////////////////
+// CMDLINE TELEPORT POSITION //
+//////////////////////////////
+
+class LLAdvancedCmdLineTeleportPos : public view_listener_t
+{
+    bool handleEvent(const LLSD& userdata)
+    {
+        LLNotificationsUtil::add("CmdLineTeleportPos", LLSD(), LLSD(),
+            [](const LLSD& notification, const LLSD& response)
+            {
+                if (LLNotificationsUtil::getSelectedOption(notification, response) != 0) return false;
+                std::string input = response["coords"].asString();
+                F32 x, y, z;
+                std::istringstream ss(input);
+                if (ss >> x && ss >> y && ss >> z)
+                {
+                    LLViewerRegion* region = gAgent.getRegion();
+                    if (region)
+                    {
+                        LLVector3d pos_global = from_region_handle(region->getHandle());
+                        pos_global += LLVector3d((F64)x, (F64)y, (F64)z);
+                        gAgent.teleportViaLocation(pos_global);
+                    }
+                }
+                return false;
+            });
+        return true;
+    }
+};
+
+//////////////////////////////
+// CMDLINE TELEPORT HEIGHT  //
+//////////////////////////////
+
+class LLAdvancedCmdLineTeleportHeight : public view_listener_t
+{
+    bool handleEvent(const LLSD& userdata)
+    {
+        LLNotificationsUtil::add("CmdLineTeleportHeight", LLSD(), LLSD(),
+            [](const LLSD& notification, const LLSD& response)
+            {
+                if (LLNotificationsUtil::getSelectedOption(notification, response) != 0) return false;
+                std::string heightStr = response["height"].asString();
+                if (!heightStr.empty())
+                {
+                    F32 z = (F32)response["height"].asReal();
+                    LLVector3 agentPos = gAgent.getPositionAgent();
+                    U64 agentRegion = gAgent.getRegion()->getHandle();
+                    LLVector3d pos_global = from_region_handle(agentRegion);
+                    pos_global += LLVector3d((F64)agentPos.mV[VX], (F64)agentPos.mV[VY], (F64)z);
+                    gAgent.teleportViaLocation(pos_global);
+                }
+                return false;
+            });
+        return true;
+    }
+};
+
+//////////////////////////////
+// CMDLINE DRAW DISTANCE    //
+//////////////////////////////
+
+class LLAdvancedCmdLineDrawDistance : public view_listener_t
+{
+    bool handleEvent(const LLSD& userdata)
+    {
+        LLNotificationsUtil::add("CmdLineDrawDistance", LLSD(), LLSD(),
+            [](const LLSD& notification, const LLSD& response)
+            {
+                if (LLNotificationsUtil::getSelectedOption(notification, response) != 0) return false;
+                F32 dist = (F32)response["distance"].asReal();
+                if (dist > 0.f)
+                {
+                    gSavedSettings.setF32("RenderFarClip", dist);
+                    gAgentCamera.mDrawDistance = dist;
+                }
+                return false;
+            });
+        return true;
+    }
+};
+
+//////////////////////////////
+// CMDLINE TELEPORT TO SIM  //
+//////////////////////////////
+
+class LLAdvancedCmdLineMapTo : public view_listener_t
+{
+    bool handleEvent(const LLSD& userdata)
+    {
+        LLNotificationsUtil::add("CmdLineMapTo", LLSD(), LLSD(),
+            [](const LLSD& notification, const LLSD& response)
+            {
+                if (LLNotificationsUtil::getSelectedOption(notification, response) != 0) return false;
+                std::string input = response["simname"].asString();
+                LLStringUtil::trim(input);
+                if (!input.empty())
+                {
+                    S32 x = 128, y = 128, z = 0;
+                    std::string region_name;
+                    // Try to parse "name x y z" — walk backwards to find trailing integers
+                    std::istringstream ss(input);
+                    std::vector<std::string> tokens;
+                    std::string tok;
+                    while (ss >> tok) tokens.push_back(tok);
+                    S32 coord_count = 0;
+                    S32 i = (S32)tokens.size() - 1;
+                    if (i >= 2)
+                    {
+                        std::istringstream iz(tokens[i]), iy(tokens[i-1]), ix(tokens[i-2]);
+                        S32 tz, ty, tx;
+                        if ((iz >> tz) && (iy >> ty) && (ix >> tx))
+                        {
+                            z = tz; y = ty; x = tx;
+                            coord_count = 3;
+                        }
+                    }
+                    if (coord_count == 3 && (S32)tokens.size() > 3)
+                    {
+                        for (S32 j = 0; j < (S32)tokens.size() - 3; ++j)
+                            region_name += (j > 0 ? " " : "") + tokens[j];
+                    }
+                    else
+                    {
+                        region_name = input;
+                    }
+                    LLStringUtil::trim(region_name);
+                    if (!region_name.empty())
+                    {
+                        std::string url = llformat("secondlife:///app/teleport/%s/%d/%d/%d",
+                                                   LLWeb::escapeURL(region_name).c_str(), x, y, z);
+                        LLURLDispatcher::dispatch(url, "clicked", nullptr, true);
+                    }
+                }
+                return false;
+            });
+        return true;
+    }
+};
+
+//////////////////////////////
+// CMDLINE REZ PLATFORM     //
+//////////////////////////////
+
+class LLAdvancedCmdLineRezPlat : public view_listener_t
+{
+    bool handleEvent(const LLSD& userdata)
+    {
+        LLNotificationsUtil::add("CmdLineRezPlat", LLSD(), LLSD(),
+            [](const LLSD& notification, const LLSD& response)
+            {
+                if (LLNotificationsUtil::getSelectedOption(notification, response) != 0) return false;
+                std::string input = response["width"].asString();
+                LLStringUtil::trim(input);
+                if (!input.empty())
+                {
+                    F32 width = (F32)atof(input.c_str());
+                    cmdline_rezplat(false, width);
+                }
+                else
+                {
+                    cmdline_rezplat();
+                }
+                return false;
+            });
+        return true;
+    }
+};
+
+//////////////////////////////
+// CMDLINE TELEPORT TO CAM  //
+//////////////////////////////
+
+class LLAdvancedCmdLineTeleportToCam : public view_listener_t
+{
+    bool handleEvent(const LLSD& userdata)
+    {
+        gAgent.teleportViaLocation(gAgentCamera.getCameraPositionGlobal());
+        return true;
+    }
+};
+
+//////////////////////////////
+// CMDLINE TELEPORT HOME    //
+//////////////////////////////
+
+class LLAdvancedCmdLineTeleportHome : public view_listener_t
+{
+    bool handleEvent(const LLSD& userdata)
+    {
+        gAgent.teleportHome();
+        return true;
+    }
+};
+
+//////////////////////////////
+// CMDLINE AO TOGGLE        //
+//////////////////////////////
+
+class LLAdvancedCmdLineAOToggle : public view_listener_t
+{
+    bool handleEvent(const LLSD& userdata)
+    {
+        BOOL current = gSavedPerAccountSettings.getBOOL("UseAO");
+        gSavedPerAccountSettings.setBOOL("UseAO", !current);
+        return true;
+    }
+};
+
+//////////////////////////////
+// CMDLINE CALC             //
+//////////////////////////////
+
+class LLAdvancedCmdLineCalc : public view_listener_t
+{
+    bool handleEvent(const LLSD& userdata)
+    {
+        LLNotificationsUtil::add("CmdLineCalc", LLSD(), LLSD(),
+            [](const LLSD& notification, const LLSD& response)
+            {
+                if (LLNotificationsUtil::getSelectedOption(notification, response) != 0) return false;
+                std::string expr = response["expression"].asString();
+                LLStringUtil::trim(expr);
+                if (!expr.empty())
+                {
+                    LLStringUtil::toUpper(expr);
+                    F32 result = 0.f;
+                    if (LLCalc::getInstance()->evalString(expr, result))
+                    {
+                        std::ostringstream out;
+                        out << expr << " = " << result;
+                        report_to_nearby_chat(out.str());
+                    }
+                    else
+                    {
+                        report_to_nearby_chat("Calculation Failed");
+                    }
+                }
+                return false;
+            });
         return true;
     }
 };
@@ -12052,6 +12320,16 @@ void initialize_menus()
     view_listener_t::addMenu(new LLAdvancedDumpAttachments(), "Advanced.DumpAttachments");
     view_listener_t::addMenu(new LLAdvancedRebakeTextures(), "Advanced.RebakeTextures");
     view_listener_t::addMenu(new LLAdvancedRefreshScene(), "Advanced.RefreshScene");
+    view_listener_t::addMenu(new LLAdvancedTPToGround(), "Advanced.TPToGround");
+    view_listener_t::addMenu(new LLAdvancedCmdLineTeleportPos(),    "Advanced.CmdLineTeleportPos");
+    view_listener_t::addMenu(new LLAdvancedCmdLineTeleportHeight(), "Advanced.CmdLineTeleportHeight");
+    view_listener_t::addMenu(new LLAdvancedCmdLineDrawDistance(),   "Advanced.CmdLineDrawDistance");
+    view_listener_t::addMenu(new LLAdvancedCmdLineMapTo(),         "Advanced.CmdLineMapTo");
+    view_listener_t::addMenu(new LLAdvancedCmdLineRezPlat(),       "Advanced.CmdLineRezPlat");
+    view_listener_t::addMenu(new LLAdvancedCmdLineTeleportToCam(), "Advanced.CmdLineTeleportToCam");
+    view_listener_t::addMenu(new LLAdvancedCmdLineTeleportHome(),  "Advanced.CmdLineTeleportHome");
+    view_listener_t::addMenu(new LLAdvancedCmdLineAOToggle(),      "Advanced.CmdLineAOToggle");
+    view_listener_t::addMenu(new LLAdvancedCmdLineCalc(),          "Advanced.CmdLineCalc");
 //MK from KB
     commit.add("Advanced.RefreshAttachments", boost::bind(&handle_refresh_attachments));
 //mk from kb

@@ -13706,4 +13706,65 @@ are wearing now.
           name="okignore"
           yestext="OK"/>
   </notification>
+
+  <notification name="CmdLineTeleportPos" type="alertmodal">
+      Teleport to position in region.
+      Enter X Y Z coordinates (e.g. 128 128 50):
+      <form name="form">
+        <input name="coords" type="text"/>
+        <button default="true" index="0" name="OK" text="OK"/>
+        <button index="1" name="Cancel" text="Cancel"/>
+      </form>
+  </notification>
+
+  <notification name="CmdLineTeleportHeight" type="alertmodal">
+      Teleport to altitude.
+      Enter Z height (e.g. 50):
+      <form name="form">
+        <input name="height" type="text"/>
+        <button default="true" index="0" name="OK" text="OK"/>
+        <button index="1" name="Cancel" text="Cancel"/>
+      </form>
+  </notification>
+
+  <notification name="CmdLineDrawDistance" type="alertmodal">
+      Set draw distance.
+      Enter distance in meters (e.g. 128):
+      <form name="form">
+        <input name="distance" type="text"/>
+        <button default="true" index="0" name="OK" text="OK"/>
+        <button index="1" name="Cancel" text="Cancel"/>
+      </form>
+  </notification>
+
+  <notification name="CmdLineCalc" type="alertmodal">
+      Calculate expression.
+      Enter expression (e.g. SIN(2+2)):
+      <form name="form">
+        <input name="expression" type="text"/>
+        <button default="true" index="0" name="OK" text="OK"/>
+        <button index="1" name="Cancel" text="Cancel"/>
+      </form>
+  </notification>
+
+  <notification name="CmdLineMapTo" type="alertmodal">
+      Teleport to region.
+      Enter region name, or name x y z:
+      <form name="form">
+        <input name="simname" type="text"/>
+        <button default="true" index="0" name="OK" text="OK"/>
+        <button index="1" name="Cancel" text="Cancel"/>
+      </form>
+  </notification>
+
+  <notification name="CmdLineRezPlat" type="alertmodal">
+      Rez a platform under your avatar.
+      Enter size (0-30, default 30):
+      <form name="form">
+        <input name="width" type="text"/>
+        <button default="true" index="0" name="OK" text="OK"/>
+        <button index="1" name="Cancel" text="Cancel"/>
+      </form>
+  </notification>
+
 </notifications>
