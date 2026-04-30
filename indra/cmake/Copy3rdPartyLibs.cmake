@@ -184,7 +184,8 @@ elseif(DARWIN)
        )
 
     if (TARGET ll::fmodstudio)
-      set(debug_files ${debug_files} libfmodL.dylib)
+      #set(debug_files ${debug_files} libfmodL.dylib)
+      set(debug_files ${debug_files} libfmod.dylib)
       set(release_files ${release_files} libfmod.dylib)
     endif ()
 
