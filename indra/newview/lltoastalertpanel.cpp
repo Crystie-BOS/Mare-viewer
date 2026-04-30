@@ -483,6 +483,18 @@ bool LLToastAlertPanel::handleKeyHere(KEY key, MASK mask )
         LLToastPanel::focusPrevItem(false);
         return true;
     }
+    else if (KEY_ESCAPE == key && mask == MASK_NONE)
+    {
+        for (S32 i = 0; i < (S32)mButtonData.size(); ++i)
+        {
+            if (i != mDefaultOption && mButtonData[i].mButton)
+            {
+                mButtonData[i].mButton->onCommit();
+                return true;
+            }
+        }
+        return true;
+    }
     else
     {
         return true;
