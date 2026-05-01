@@ -90,8 +90,9 @@ LLButton* LLToastNotifyPanel::createButton(const LLSD& form_element, bool is_opt
     std::string name = form_element["name"].asString();
     std::string text = form_element["text"].asString();
     bool make_small_btn = index == -1 || index == -2; // for block and ignore buttons in script dialog
+    std::string fontSize = (mIsScriptDialog && gSavedSettings.getBOOL("KokuaSmallScriptDialogButtonFont")) ? "Small" : "Medium";
     const LLFontGL* font = LLFontGL::getFont(LLFontDescriptor(
-        mIsScriptDialog ? sFontScript : sFontDefault, make_small_btn ? "Small" : "Medium", 0));
+        mIsScriptDialog ? sFontScript : sFontDefault, make_small_btn ? "Small" : fontSize, 0));
     p.name = name;
     p.label = text;
     p.tool_tip = text;
