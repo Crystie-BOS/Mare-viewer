@@ -265,6 +265,10 @@ void LLToastNotifyPanel::init( LLRect rect, bool show_images )
 {
     deleteAllChildren();
 
+//MK (CA)
+	static LLCachedControl<bool> sFixedHeight(gSavedSettings, "KokuaFixedHeightDialogs");
+//mk (CA)
+
     LLRect current_rect = getRect();
 
     setXMLFilename("");
@@ -372,13 +376,22 @@ void LLToastNotifyPanel::init( LLRect rect, bool show_images )
 
             // width for 3 columns: 3 buttons + 2 gaps
             S32 min_width_required = 3 * BUTTON_WIDTH + 2 * (2 * HPAD);
+			// CA: this doesn't allow for padding before first and after last, so...
+			min_width_required += (2 * HPAD);
+
             if (min_width_required > button_panel_width)
             {
                 button_panel_width = min_width_required;
                 S32 width_increase = button_panel_width - mControlPanel->getRect().getWidth();
                 reshape(getRect().getWidth() + width_increase, getRect().getHeight());
                 mInfoPanel->reshape(mInfoPanel->getRect().getWidth() + width_increase, mInfoPanel->getRect().getHeight());
-                mTextBox->reshape(mTextBox->getRect().getWidth() + width_increase, mTextBox->getRect().getHeight());
+//MK (CA)
+// up until 26.2.0 the xml provided enough space for a scroll bar if needed - now we need to add it ourselves in the sizing logic
+// testing revealed that the default here can cause overhanging text if a line is long enough to need wrapping, so we adjust the default logic too
+
+                //mTextBox->reshape(mTextBox->getRect().getWidth() + width_increase, mTextBox->getRect().getHeight());
+                mTextBox->reshape(mTextBox->getRect().getWidth() + (sFixedHeight ? width_increase - 36 : width_increase - 32), mTextBox->getRect().getHeight());
+//mk (CA)
             }
 
             //try get an average h_pad to spread out buttons
@@ -428,32 +441,32 @@ void LLToastNotifyPanel::init( LLRect rect, bool show_images )
     //.xml file intially makes info panel only follow left/right/top. This is so that when control buttons are added the info panel
     //can shift upward making room for the buttons inside mControlPanel. After the buttons are added, the info panel can then be set to follow 'all'.
     mInfoPanel->setFollowsAll();
-/* Comment out panel height adjustments. See Kokua Ticket #331
 //MK
     // If we are a script dialog, don't allow changing the height of the toast
-    if (!mIsScriptDialog)
+    if (!mIsScriptDialog || !sFixedHeight)
     {
 //mk
-*/
-    // Add checkbox (one of couple types) if nessesary.
-    setCheckBoxes(HPAD * 2, 0, mInfoPanel);
-    if (mCheck)
-    {
-        mCheck->setFollows(FOLLOWS_BOTTOM | FOLLOWS_LEFT);
-    }
-    snapToMessageHeight(mTextBox, LLToastPanel::MAX_TEXT_LENGTH);
-    if (mCheck)
-    {
-        S32 new_panel_height = mCheck->getRect().getHeight() + getRect().getHeight() + VPAD;
-        reshape(getRect().getWidth(), new_panel_height);
-    }
-
-/*
+	    setCheckBoxes(HPAD * 2, 0, mInfoPanel);
+	    if (mCheck)
+	    {
+	        mCheck->setFollows(FOLLOWS_BOTTOM | FOLLOWS_LEFT);
+	    }
+	    // Snap to message, then to checkbox if present
+	    snapToMessageHeight(mTextBox, LLToastPanel::MAX_TEXT_LENGTH);
+	    if (mCheck)
+	    {
+	        S32 new_panel_height = mCheck->getRect().getHeight() + getRect().getHeight() + VPAD;
+	        reshape(getRect().getWidth(), new_panel_height);
+	    }
 //MK
-        adjustPanelForScriptNotice(mControlPanel->getRect().getWidth(), mControlPanel->getRect().getHeight()+20);
+        if (sFixedHeight)
+		{
+			adjustPanelForScriptNotice(mControlPanel->getRect().getWidth(), mControlPanel->getRect().getHeight()+20);
+		}
     }
 //mk
-*/
+
+
     // reshape the panel to its previous size
     if (current_rect.notEmpty())
     {
