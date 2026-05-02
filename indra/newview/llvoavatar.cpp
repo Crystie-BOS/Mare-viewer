@@ -3862,9 +3862,11 @@ void LLVOAvatar::idleUpdateNameTagText(bool new_name)
             const LLFontGL* font = LLFontGL::getFontSansSerif();
             std::string full_name = LLCacheName::buildFullName( firstname->getString(), lastname->getString() );
             have_name = !full_name.empty();
-            if (gAgent.mRRInterface.getDummyName(full_name) != full_name)
+            // MARE: Use UUID-stable version so the same avatar keeps the same dummy name across sim crossings
+            std::string dummy_name = gAgent.mRRInterface.getDummyName(getID(), full_name);
+            if (dummy_name != full_name)
             {
-                addNameTagLine(gAgent.mRRInterface.getDummyName(full_name), name_tag_color, LLFontGL::NORMAL, font);
+                addNameTagLine(dummy_name, name_tag_color, LLFontGL::NORMAL, font);
             }
             else
             {
@@ -4721,19 +4723,25 @@ void LLVOAvatar::computeUpdatePeriod()
     {
 //MK
     mRenderAsSilhouette = false;
-    if (gRRenabled && !isSelf() && gAgentAvatarp && getRezzedStatus() >= 2) // fully rezzed
+    if (gRRenabled && !isSelf() && gAgentAvatarp && getRezzedStatus() >= 2) // fully rezzed // fully rezzed
     {
         LLVector3d my_head_pos (gAgent.getPosGlobalFromAgent(gAgentAvatarp->mHeadp->getWorldPosition()));
         LLVector3d their_head_pos (gAgent.getPosGlobalFromAgent(mHeadp->getWorldPosition()));
         LLVector3d offset (their_head_pos - my_head_pos);
         F32 distance_squared = (F32)offset.magVecSquared();
         F32 show_avs_dist_max_squared = gAgent.mRRInterface.mShowavsDistMax * gAgent.mRRInterface.mShowavsDistMax;
-
         // If the avatar is farther than the "camavdist" distance, render as silhouette.
         // But if the outer sphere is opaque, no need to render a silhouette or even the avatar at all.
         // KKA-835 extended for setsphere
-        mRenderAsSilhouette = (
-            distance_squared > show_avs_dist_max_squared
+             
+        // MARE: Check if this avatar has an exception to camavdist
+         // Check if there's a camavdist:<UUID> restriction stored
+         std::string exception_check = "camavdist:" + mID.asString();
+         bool has_exception = gAgent.mRRInterface.contains(exception_check);
+         
+         mRenderAsSilhouette = (
+            !has_exception  // MARE: Don't silhouette if they have an exception
+            && distance_squared > show_avs_dist_max_squared
             && !(distance_squared > gAgent.mRRInterface.mLeastDistMaxSquared && (gAgent.mRRInterface.mCamDistDrawAlphaMax >= 1.f || gAgent.mRRInterface.mSetsphereValueMax >= 1.f))
             );
     }
@@ -10694,6 +10702,10 @@ const LLVOAvatar::MatrixPaletteCache& LLVOAvatar::updateSkinInfoMatrixPalette(co
     if (entry.mFrame != gFrameCount)
     {
         LL_PROFILE_ZONE_SCOPED_CATEGORY_AVATAR;
+
+        // MARE: Phase 2 Step 4 — snapshot current (frame N-1) data before overwriting.
+        // mPrevGLMp is empty on the very first call; the velocity pass guards against that.
+        entry.mPrevGLMp = entry.mGLMp;
 
         entry.mFrame = gFrameCount;
 

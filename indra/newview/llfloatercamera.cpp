@@ -46,6 +46,7 @@
 #include "lltabcontainer.h"
 #include "llviewercamera.h"
 #include "llvoavatarself.h"
+#include "llcallbacklist.h"  // gIdleCallbacks
 
 static LLDefaultChildRegistry::Register<LLPanelCameraItem> r("panel_camera_item");
 
@@ -74,6 +75,7 @@ public:
 
     /* virtual */ bool  postBuild();
     /* virtual */ void  draw();
+    /* virtual */ void  reshape(S32 width, S32 height, bool called_from_parent = true);
 
 protected:
     LLPanelCameraZoom(const Params& p) { onCreate(); }
@@ -161,6 +163,7 @@ void LLPanelCameraItem::setValue(const LLSD& value)
     getChildView("selected_picture")->setVisible( value["selected"]);
 }
 
+
 static LLPanelInjector<LLPanelCameraZoom> t_camera_zoom_panel("camera_zoom_panel");
 
 //-------------------------------------------------------------------------------
@@ -186,8 +189,41 @@ bool LLPanelCameraZoom::postBuild()
 
 void LLPanelCameraZoom::draw()
 {
+    // Size joystick widgets each frame ONLY when not dragging.
+    // LLLayoutStack::updateLayout() runs during the parent draw pass and
+    // overwrites layout_panel rects after reshape(), so we must do this here.
+    //
+    // Keep joystick widgets square and as large as possible within their panels.
+    // MUST be square: LLJoystick::pointInCenterDot() returns true for any
+    // non-square widget, treating every click as a center-dot reset so the
+    // camera never orbits.  We use min(pw,ph) so the widget scales with the
+    // floater.  Only resize when no drag is active — changing the rect
+    // mid-drag shifts the coordinate origin and breaks input.
+    if (!gFocusMgr.getMouseCapture())
+    {
+        auto square_joy = [this](const char* panel_name, const char* stick_name)
+        {
+            LLView* panel = findChildView(panel_name, true);
+            LLView* stick = findChildView(stick_name, true);
+            if (!panel || !stick) return;
+            S32 pw = panel->getRect().getWidth();
+            S32 ph = panel->getRect().getHeight();
+            S32 sz = llmin(pw, ph);
+            S32 ox = (pw - sz) / 2;
+            S32 oy = (ph - sz) / 2;
+            stick->setShape(LLRect(ox, ph - oy, ox + sz, ph - oy - sz));
+        };
+        square_joy("rotate_panel", "cam_rotate_stick");
+        square_joy("track_panel",  "cam_track_stick");
+    }
+
     mSlider->setValue(gAgentCamera.getCameraZoomFraction());
     LLPanel::draw();
+}
+
+void LLPanelCameraZoom::reshape(S32 width, S32 height, bool called_from_parent)
+{
+    LLPanel::reshape(width, height, called_from_parent);
 }
 
 void LLPanelCameraZoom::onZoomPlusHeldDown()
@@ -413,6 +449,31 @@ LLFloaterCamera* LLFloaterCamera::findInstance()
     return LLFloaterReg::findTypedInstance<LLFloaterCamera>("camera");
 }
 
+// MARE v1.1.0: fully proportional reshape so all three rows scale together.
+//
+// Layout (y increases upward in local floater coords):
+//
+//   [buttons_panel]        proportional ~17% of content height (28–52 px)
+//   [zoom]                 fills the middle, min MIN_ZOOM_H
+//   [preset_buttons_panel] scales between PRESET_MIN and PRESET_MAX at bottom
+//
+// buttons_panel: height scales so the row stays visually balanced at any size.
+// At the default floater height (230 px, ch=212), buttons_h = round(212*0.17)
+// = 36 px — identical to the old fixed value, so the default view is unchanged.
+// The five panel_camera_item children are redistributed evenly across the full
+// panel width and their icon layers are resized to fill each item square.
+void LLFloaterCamera::reshape(S32 width, S32 height, bool called_from_parent)
+{
+    // Let the XML follows= system handle all panel sizing/positioning.
+    LLFloater::reshape(width, height, called_from_parent);
+
+    // Hide "Save as preset…" when the floater is too short for two rows.
+    S32 ch = height - getHeaderHeight();
+    LLView* save_btn = findChildView("save_preset_btn", true);
+    if (save_btn)
+        save_btn->setVisible(ch >= 180);
+}
+
 void LLFloaterCamera::onOpen(const LLSD& key)
 {
     LLFirstUse::viewPopup();
@@ -429,12 +490,18 @@ void LLFloaterCamera::onOpen(const LLSD& key)
     mClosed = false;
 
     populatePresetCombo();
-    doResize(gSavedSettings.getBOOL("KokuaCameraPresetsHidden"));
     showDebugInfo(LLView::sDebugCamera);
+
+    // MARE: open faded — controls hidden until user hovers.
+    mFadeAlpha = 0.f;
+    mUnhoverTimer.reset();
+    gIdleCallbacks.addFunction(idleCB, this);
 }
 
 void LLFloaterCamera::onClose(bool app_quitting)
 {
+    gIdleCallbacks.deleteFunction(idleCB, this);
+
     //We don't care of camera mode if app is quitting
     if (app_quitting)
         return;
@@ -463,7 +530,7 @@ LLFloaterCamera::LLFloaterCamera(const LLSD& val)
 {
     LLHints::getInstance()->registerHintTarget("view_popup", getHandle());
     mCommitCallbackRegistrar.add("CameraPresets.ChangeView", boost::bind(&LLFloaterCamera::onClickCameraItem, _2));
-    mCommitCallbackRegistrar.add("CameraPresets.Resize", boost::bind(&LLFloaterCamera::onClickResize, _2));
+    // CameraPresets.Resize removed — expand/contract mechanism dropped in MARE v1.1.0 (Firestorm-style layout)
     mCommitCallbackRegistrar.add("CameraPresets.Save", boost::bind(&LLFloaterCamera::onSavePreset, this));
     mCommitCallbackRegistrar.add("CameraPresets.ShowPresetsList", boost::bind(&LLFloaterReg::showInstance, "camera_presets", LLSD(), false));
 }
@@ -473,7 +540,6 @@ bool LLFloaterCamera::postBuild()
 {
     updateTransparency(TT_ACTIVE); // force using active floater transparency (STORM-730)
 
-    mControls = getChild<LLPanel>("controls");
     mAgentCameraInfo = getChild<LLPanel>("agent_camera_info");
     mViewerCameraInfo = getChild<LLPanel>("viewer_camera_info");
     mRotate = getChild<LLJoystickCameraRotate>(ORBIT);
@@ -496,7 +562,7 @@ bool LLFloaterCamera::postBuild()
 
         mPresetCombo->setCommitCallback(boost::bind(&LLFloaterCamera::onCustomPresetSelected, this));
         LLPresetsManager::getInstance()->setPresetListChangeCameraCallback(boost::bind(&LLFloaterCamera::populatePresetCombo, this));
-        gSavedSettings.getControl("KokuaCameraPresetsHidden")->getCommitSignal()->connect(boost::bind(&handleKokuaCameraPresetsHidden, _2));
+        // KokuaCameraPresetsHidden signal handler removed — expand/contract dropped (MARE v1.1.0)
     }
 
     update();
@@ -509,11 +575,61 @@ bool LLFloaterCamera::postBuild()
 
 F32 LLFloaterCamera::getCurrentTransparency()
 {
-
     static LLCachedControl<F32> camera_opacity(gSavedSettings, "CameraOpacity");
     static LLCachedControl<F32> active_floater_transparency(gSavedSettings, "ActiveFloaterTransparency");
     return llmin(camera_opacity(), active_floater_transparency());
+}
 
+/*static*/ const F32 LLFloaterCamera::COLLAPSE_DELAY = 0.5f;
+/*static*/ const F32 LLFloaterCamera::FADE_SPEED     = 4.0f;  // full fade in 0.25s
+
+// ---------------------------------------------------------------------------
+// MARE: idle-callback fade.
+//
+// We poll mouse position each frame in an idle callback (registered on open,
+// unregistered on close).  This runs BEFORE draw() and event dispatch, so it
+// never touches GL state or interferes with joystick mouse-capture routing.
+//
+// When faded:  buttons_panel and preset_buttons_panel are hidden (setVisible
+// false blocks input).  The floater background is also hidden.  mZoom is
+// always visible so joystick clicks and drag always reach the widgets.
+//
+// When hovered: alpha ramps up → panels shown → floater looks normal.
+// When unhovered: after COLLAPSE_DELAY alpha ramps down → panels hidden.
+// ---------------------------------------------------------------------------
+
+// static
+void LLFloaterCamera::idleCB(void* user_data)
+{
+    LLFloaterCamera* self = static_cast<LLFloaterCamera*>(user_data);
+    if (!self || !self->isInVisibleChain()) return;
+
+    F32 dt = llclamp(LLFrameTimer::getFrameDeltaTimeF32(), 0.f, 0.1f);
+
+    // Check whether the mouse is currently over the floater.
+    S32 mx, my;
+    LLUI::getInstance()->getMousePositionLocal(self, &mx, &my);
+    bool hovered = self->getLocalRect().pointInRect(mx, my);
+
+    if (hovered)
+    {
+        self->mUnhoverTimer.reset();
+        self->mFadeAlpha = llmin(self->mFadeAlpha + FADE_SPEED * dt, 1.f);
+    }
+    else if (self->mUnhoverTimer.getElapsedTimeF32() >= COLLAPSE_DELAY)
+    {
+        self->mFadeAlpha = llmax(self->mFadeAlpha - FADE_SPEED * dt, 0.f);
+    }
+
+    bool faded = (self->mFadeAlpha < 0.99f);
+
+    LLView* buttons = self->findChildView("buttons_panel",        false);
+    LLView* preset  = self->findChildView("preset_buttons_panel", false);
+
+    if (buttons) buttons->setVisible(!faded);
+    if (preset)  preset->setVisible(!faded);
+    self->setBackgroundVisible(!faded);  // hide gray frame when faded
+    // mZoom always stays visible — joystick input is never interrupted.
 }
 
 void LLFloaterCamera::fillFlatlistFromPanel (LLFlatListView* list, LLPanel* panel)
@@ -694,47 +810,25 @@ void LLFloaterCamera::onClickCameraItem(const LLSD& param)
     }
 }
 
+// MARE v1.1.0: expand/contract mechanism removed. Firestorm-style 3-panel layout
+// (buttons_panel fixed top, zoom follows=all, preset_buttons_panel fixed bottom)
+// makes these functions unnecessary. Stubs kept so .h declarations compile cleanly.
 /*static*/
-bool LLFloaterCamera::handleKokuaCameraPresetsHidden(const LLSD& newvalue)
+bool LLFloaterCamera::handleKokuaCameraPresetsHidden(const LLSD& /*newvalue*/)
 {
-  LLFloaterCamera::doResize(newvalue.asBoolean());
     return true;
 }
 
-
 /*static*/
-void LLFloaterCamera::doResize(bool reduced)
+void LLFloaterCamera::doResize(bool /*reduced*/)
 {
-    LLFloaterCamera* camera_floater = LLFloaterCamera::findInstance();
-
-    camera_floater->getChildView("expand_btn")->setVisible(reduced);
-    camera_floater->getChildView("contract_btn")->setVisible(!reduced);
-    camera_floater->getChildView("buttons_panel")->setVisible(!reduced);
-
-    if (reduced)
-    {
-        camera_floater->reshape(FLOATERCAMERA_MIN_WIDTH, camera_floater->getRect().getHeight());
-    }
-    else
-    {
-        camera_floater->reshape(FLOATERCAMERA_MAX_WIDTH, camera_floater->getRect().getHeight());
-    }
-    gSavedSettings.setBOOL("KokuaCameraPresetsHidden",reduced);
+    // No-op: Firestorm-style layout self-manages all sizing via follows attributes.
 }
 
 /*static*/
-void LLFloaterCamera::onClickResize(const LLSD& param)
+void LLFloaterCamera::onClickResize(const LLSD& /*param*/)
 {
-    std::string name = param.asString();
-
-    if ("expand" == name)
-    {
-        doResize(false);
-    }
-    else if ("contract" == name)
-    {
-        doResize(true);
-    }
+    // No-op: expand/contract buttons removed from UI (MARE v1.1.0).
 }
 
 // static

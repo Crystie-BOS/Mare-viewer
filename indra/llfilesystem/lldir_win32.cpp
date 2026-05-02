@@ -306,7 +306,8 @@ void LLDir_Win32::initAppDirs(const std::string &app_name,
         mSkinBaseDir = add(mAppRODataDir, "skins");
     }
     mAppName = app_name;
-    mOSUserAppDir = add(mOSUserDir, app_name);
+// MARE: Use "MARE Viewer" for isolated password storage
+mOSUserAppDir = add(mOSUserDir, "MARE Viewer");
 
     int res = LLFile::mkdir(mOSUserAppDir);
     if (res == -1)

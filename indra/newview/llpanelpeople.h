@@ -75,7 +75,10 @@ public:
     bool updateNearbyArrivalTime();
 
 private:
-
+     // MARE: RLV tab visibility management
+    void applyRLVPeopleVisibility();
+    static void idleCB(void* userdata);
+    
     typedef enum e_sort_oder {
         E_SORT_BY_NAME = 0,
         E_SORT_BY_STATUS = 1,

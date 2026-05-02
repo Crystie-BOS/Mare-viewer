@@ -11525,6 +11525,14 @@ BOOL enable_export_object()
     // </FS:CR>
 }
 
+
+    // MARE: Enable Favorite Wearables menu based on RLV  
+BOOL RLVEnableShowFavorites()
+{
+    return !gRRenabled || !gAgent.mRRInterface.mContainsShowfavorites;
+}
+
+
 class FSObjectExport : public view_listener_t
 {
     bool handleEvent( const LLSD& userdata)
@@ -12208,4 +12216,5 @@ void initialize_menus()
 
     enable.add("RLV.CanShowName", boost::bind(&KokuaRLVExtrasMenuCanShowName));
     enable.add("RLV.EnableIfNot", boost::bind(&KokuaRLVExtrasMenuEnableIfNot, _2));
+    enable.add("RLV.EnableShowFavorites", boost::bind(&RLVEnableShowFavorites));
 }

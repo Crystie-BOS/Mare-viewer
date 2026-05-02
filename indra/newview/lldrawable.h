@@ -109,6 +109,8 @@ public:
 
     const LLMatrix4&      getWorldMatrix() const        { return mXform.getWorldMatrix(); }
     const LLMatrix4&      getRenderMatrix() const;
+    // MARE: Phase 2 Step 3 — previous-frame render matrix for dynamic velocity pass
+    const LLMatrix4&      getPrevRenderMatrix() const   { return mPrevRenderMatrix; }
     void                  setPosition(LLVector3 v) const { }
     const LLVector3&      getPosition() const           { return mXform.getPosition(); }
     const LLVector3&      getWorldPosition() const      { return mXform.getPositionW(); }
@@ -318,6 +320,11 @@ private:
     S32             mGeneration;
 
     LLVector3       mCurrentScale;
+
+    // MARE: Phase 2 Step 3 — previous-frame world matrix for motion-vector pass.
+    // Snapshotted at the TOP of updateXform() before the current matrix is computed,
+    // so it always holds the matrix from the preceding frame.
+    LLMatrix4       mPrevRenderMatrix;
 
     static U32 sNumZombieDrawables;
     static std::vector<LLPointer<LLDrawable> > sDeadList;

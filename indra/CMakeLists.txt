@@ -18,8 +18,8 @@ if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.31.0")
     cmake_policy(SET CMP0179 NEW)
 endif()
 
-set(ROOT_PROJECT_NAME "Kokua" CACHE STRING
-    "The root project/makefile/solution name. Defaults to Kokua.")
+set(ROOT_PROJECT_NAME "Mare" CACHE STRING
+    "The root project/makefile/solution name. Defaults to Mare.")
 project(${ROOT_PROJECT_NAME})
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake"  "${CMAKE_CURRENT_BINARY_DIR}")
@@ -157,7 +157,6 @@ else (USE_BUGSPLAT)
 endif (USE_BUGSPLAT)
 
 add_subdirectory(${VIEWER_PREFIX}newview)
-  add_dependencies(viewer kokua-bin)
 
 add_subdirectory(${VIEWER_PREFIX}doxygen EXCLUDE_FROM_ALL)
 

@@ -166,6 +166,12 @@ LLGLSLShader            gDeferredSunProbeProgram;
 LLGLSLShader            gHazeProgram;
 LLGLSLShader            gHazeWaterProgram;
 LLGLSLShader            gDeferredBlurLightProgram;
+LLGLSLShader            gDeferredVelocityProgram;          // MARE: Phase 2 Step 2 — static/camera velocity
+LLGLSLShader            gDeferredDynamicVelocityProgram;   // MARE: Phase 2 Step 3 — per-object velocity
+LLGLSLShader            gDeferredAvatarVelocityProgram;    // MARE: Phase 2 Step 4 — skinned/avatar velocity
+LLGLSLShader            gDeferredTAAProgram;               // MARE: Phase 3 Step 1 — TAA accumulation pass
+LLGLSLShader            gDeferredTAACopyProgram;           // MARE: Phase 3 Step 1 — TAA copy-back pass
+LLGLSLShader            gDeferredNISProgram;               // MARE: Phase 3 Step 2 — NIS sharpening
 LLGLSLShader            gDeferredSoftenProgram;
 LLGLSLShader            gDeferredShadowProgram;
 LLGLSLShader            gDeferredSkinnedShadowProgram;
@@ -1113,6 +1119,12 @@ bool LLViewerShaderMgr::loadShadersDeferred()
         gDeferredMultiSpotLightProgram.unload();
         gDeferredSunProgram.unload();
         gDeferredBlurLightProgram.unload();
+        gDeferredVelocityProgram.unload();          // MARE: Phase 2 Step 2
+        gDeferredDynamicVelocityProgram.unload();   // MARE: Phase 2 Step 3
+        gDeferredAvatarVelocityProgram.unload();    // MARE: Phase 2 Step 4
+        gDeferredTAAProgram.unload();               // MARE: Phase 3 Step 1
+        gDeferredTAACopyProgram.unload();           // MARE: Phase 3 Step 1
+        gDeferredNISProgram.unload();               // MARE: Phase 3 Step 2
         gDeferredSoftenProgram.unload();
         gDeferredShadowProgram.unload();
         gDeferredSkinnedShadowProgram.unload();
@@ -1772,6 +1784,131 @@ bool LLViewerShaderMgr::loadShadersDeferred()
         success = gDeferredBlurLightProgram.createShader();
         llassert(success);
     }
+
+    // MARE: Phase 2–3 — velocity + upscaler shaders.
+    // These are OPTIONAL — a failure must NOT poison the standard Kokua `success` chain,
+    // which would skip all subsequent standard shaders and cause a blind crash on their
+    // unguarded bind() calls.  Use a separate `mare_ok` bool so that MARE shader load
+    // failures gracefully disable the upscaler rather than killing the viewer.
+    // The pipeline.cpp velocity bind() call sites are already null-guarded with
+    // isComplete(); the MARETAAUpscaler/MARENISUpscaler apply() functions check
+    // mProgramObject before binding — so mare_ok==false just silently skips each pass.
+    {
+        bool mare_ok = success; // only attempt MARE shaders if standard shaders are OK so far
+
+        // Phase 2 — static (camera reprojection) velocity pass
+        if (mare_ok)
+        {
+            gDeferredVelocityProgram.mName = "MARE Deferred Velocity Shader";
+            gDeferredVelocityProgram.mFeatures.isDeferred = true;
+
+            gDeferredVelocityProgram.mShaderFiles.clear();
+            gDeferredVelocityProgram.mShaderFiles.push_back(make_pair("deferred/velocityV.glsl", GL_VERTEX_SHADER));
+            gDeferredVelocityProgram.mShaderFiles.push_back(make_pair("deferred/velocityF.glsl", GL_FRAGMENT_SHADER));
+            gDeferredVelocityProgram.mShaderLevel = mShaderLevel[SHADER_DEFERRED];
+
+            add_common_permutations(&gDeferredVelocityProgram);
+
+            mare_ok = gDeferredVelocityProgram.createShader();
+            llassert(mare_ok);
+        }
+
+        // Phase 2 Step 3 — per-object (dynamic drawable) velocity shader
+        if (mare_ok)
+        {
+            gDeferredDynamicVelocityProgram.mName = "MARE Deferred Dynamic Velocity Shader";
+            gDeferredDynamicVelocityProgram.mFeatures.isDeferred = false;
+
+            gDeferredDynamicVelocityProgram.mShaderFiles.clear();
+            gDeferredDynamicVelocityProgram.mShaderFiles.push_back(make_pair("deferred/dynamicVelocityV.glsl", GL_VERTEX_SHADER));
+            gDeferredDynamicVelocityProgram.mShaderFiles.push_back(make_pair("deferred/dynamicVelocityF.glsl", GL_FRAGMENT_SHADER));
+            gDeferredDynamicVelocityProgram.mShaderLevel = mShaderLevel[SHADER_DEFERRED];
+
+            add_common_permutations(&gDeferredDynamicVelocityProgram);
+
+            mare_ok = gDeferredDynamicVelocityProgram.createShader();
+            llassert(mare_ok);
+        }
+
+        // Phase 2 Step 4 — skinned (avatar / rigged-mesh attachment) velocity shader.
+        // MAX_JOINTS_PER_MESH_OBJECT is NOT injected by add_common_permutations(); it is
+        // only set in the character shader loader's attribs map.  Inject it explicitly here.
+        if (mare_ok)
+        {
+            gDeferredAvatarVelocityProgram.mName = "MARE Deferred Avatar Velocity Shader";
+            gDeferredAvatarVelocityProgram.mFeatures.isDeferred = false;
+            gDeferredAvatarVelocityProgram.mFeatures.hasObjectSkinning = true;
+
+            gDeferredAvatarVelocityProgram.mShaderFiles.clear();
+            gDeferredAvatarVelocityProgram.mShaderFiles.push_back(make_pair("deferred/avatarVelocityV.glsl", GL_VERTEX_SHADER));
+            gDeferredAvatarVelocityProgram.mShaderFiles.push_back(make_pair("deferred/avatarVelocityF.glsl", GL_FRAGMENT_SHADER));
+            gDeferredAvatarVelocityProgram.mShaderLevel = mShaderLevel[SHADER_DEFERRED];
+
+            add_common_permutations(&gDeferredAvatarVelocityProgram);
+            gDeferredAvatarVelocityProgram.addPermutation("MAX_JOINTS_PER_MESH_OBJECT",
+                std::to_string(LLSkinningUtil::getMaxJointCount()));
+
+            mare_ok = gDeferredAvatarVelocityProgram.createShader();
+            llassert(mare_ok);
+        }
+
+        // Phase 3 Step 1 — TAA accumulation pass.
+        if (mare_ok)
+        {
+            gDeferredTAAProgram.mName = "MARE TAA Accumulation Shader";
+            gDeferredTAAProgram.mFeatures.isDeferred = false;
+
+            gDeferredTAAProgram.mShaderFiles.clear();
+            gDeferredTAAProgram.mShaderFiles.push_back(make_pair("deferred/mareUpscaleV.glsl", GL_VERTEX_SHADER));
+            gDeferredTAAProgram.mShaderFiles.push_back(make_pair("deferred/mareUpscaleF.glsl", GL_FRAGMENT_SHADER));
+            gDeferredTAAProgram.mShaderLevel = mShaderLevel[SHADER_DEFERRED];
+
+            add_common_permutations(&gDeferredTAAProgram);
+
+            mare_ok = gDeferredTAAProgram.createShader();
+            llassert(mare_ok);
+        }
+
+        // Phase 3 Step 1 — TAA copy-back pass.
+        if (mare_ok)
+        {
+            gDeferredTAACopyProgram.mName = "MARE TAA Copy Shader";
+            gDeferredTAACopyProgram.mFeatures.isDeferred = false;
+
+            gDeferredTAACopyProgram.mShaderFiles.clear();
+            gDeferredTAACopyProgram.mShaderFiles.push_back(make_pair("deferred/mareUpscaleV.glsl", GL_VERTEX_SHADER));
+            gDeferredTAACopyProgram.mShaderFiles.push_back(make_pair("deferred/mareCopyF.glsl", GL_FRAGMENT_SHADER));
+            gDeferredTAACopyProgram.mShaderLevel = mShaderLevel[SHADER_DEFERRED];
+
+            add_common_permutations(&gDeferredTAACopyProgram);
+
+            mare_ok = gDeferredTAACopyProgram.createShader();
+            llassert(mare_ok);
+        }
+
+        // Phase 3 Step 2 — NIS adaptive sharpening pass.
+        if (mare_ok)
+        {
+            gDeferredNISProgram.mName = "MARE NIS Sharpening Shader";
+            gDeferredNISProgram.mFeatures.isDeferred = false;
+
+            gDeferredNISProgram.mShaderFiles.clear();
+            gDeferredNISProgram.mShaderFiles.push_back(make_pair("deferred/mareUpscaleV.glsl", GL_VERTEX_SHADER));
+            gDeferredNISProgram.mShaderFiles.push_back(make_pair("deferred/mareNISF.glsl", GL_FRAGMENT_SHADER));
+            gDeferredNISProgram.mShaderLevel = mShaderLevel[SHADER_DEFERRED];
+
+            add_common_permutations(&gDeferredNISProgram);
+
+            mare_ok = gDeferredNISProgram.createShader();
+            llassert(mare_ok);
+        }
+
+        if (!mare_ok)
+        {
+            LL_WARNS() << "MARE: one or more upscaler shaders failed to load; upscaler unavailable this session" << LL_ENDL;
+        }
+    }
+    // NOTE: `success` is intentionally not modified by the MARE block above.
 
     if (success)
     {

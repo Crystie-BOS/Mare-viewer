@@ -120,3 +120,38 @@ web/secondlife.com.*
 .env
 .vscode
 /scripts/messages/*.sha1
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.opendb
+ipch/
+
+# Credentials and secrets
+*.key
+*.pem
+*.p12
+*.pfx
+secrets.*
+credentials.*
+
+# Windows OS files
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# Generated build headers
+kokuabuildversion.h
+buildversion.h
+
+# Executables and compiled output
+*.exe
+*.pdb
+*.ilk
+*.lib
+*.exp
+*.obj

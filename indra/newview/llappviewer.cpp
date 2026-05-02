@@ -399,10 +399,10 @@ WorkQueue gMainloopWork("mainloop", 1024*1024);
 // Internal globals... that should be removed.
 static std::string gArgs;
 const int MAX_MARKER_LENGTH = 1024;
-const std::string MARKER_FILE_NAME("Kokua.exec_marker");
-const std::string START_MARKER_FILE_NAME("Kokua.start_marker");
-const std::string ERROR_MARKER_FILE_NAME("Kokua.error_marker");
-const std::string LOGOUT_MARKER_FILE_NAME("Kokua.logout_marker");
+const std::string MARKER_FILE_NAME("Mare.exec_marker");
+const std::string START_MARKER_FILE_NAME("Mare.start_marker");
+const std::string ERROR_MARKER_FILE_NAME("Mare.error_marker");
+const std::string LOGOUT_MARKER_FILE_NAME("Mare.logout_marker");
 static std::string gLaunchFileOnQuit;
 
 // Used on Win32 for other apps to identify our window (eg, win_setup)
@@ -714,7 +714,7 @@ LLAppViewer::LLAppViewer()
 
     // Need to do this initialization before we do anything else, since anything
     // that touches files should really go through the lldir API
-    gDirUtilp->initAppDirs("Kokua");
+    gDirUtilp->initAppDirs("Mare");
     //
     // IMPORTANT! Do NOT put anything that will write
     // into the log files during normal startup until AFTER
@@ -787,7 +787,7 @@ bool LLAppViewer::init()
     //initialize particle index pool
     LLVOPartGroup::initClass();
 
-    gDirUtilp->initAppDirs("Kokua");// this is setting up $HOME/.kokua
+    gDirUtilp->initAppDirs("Mare");// this is setting up $HOME/.mare
     // set skin search path to default, will be overridden later
     // this allows simple skinned file lookups to work
     gDirUtilp->setSkinFolder("default", "en");
@@ -2713,12 +2713,12 @@ void LLAppViewer::initLoggingAndGetLastDuration()
 
         // Remove the last ".old" log file.
         std::string old_log_file = gDirUtilp->getExpandedFilename(LL_PATH_LOGS,
-                                 "Kokua.old");
+                                 "Mare.old");
         LLFile::remove(old_log_file);
 
         // Get name of the log file
         std::string log_file = gDirUtilp->getExpandedFilename(LL_PATH_LOGS,
-                                 "Kokua.log");
+                                 "Mare.log");
         /*
         * Before touching any log files, compute the duration of the last run
         * by comparing the ctime of the previous start marker file with the ctime

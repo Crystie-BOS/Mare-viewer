@@ -78,21 +78,25 @@ Dummy Name replaced at run time
     </panel>
     <panel
       border="true"
-      label="Kokua Credits"
+      label="MARE Viewer"
       help_topic="about_kokua_credits_tab"
       name="kokua_credits_panel">
       <text
           follows="top|left|right"
-          height="65"
+          height="95"
           layout="topleft"
           left="5"
           name="kokua_intro"
           top="10"
           width="435"
           wrap="true">
-Kokua is an open source viewer for Second Life.  The goal of Kokua is to improve the user interface and usability of the viewer through community involvement, thoughtful design, modern development methods, and a pro-change atmosphere. 
+MARE Viewer is an independent third-party viewer for Second Life, designed for the mare and pony roleplay community using RLV (Restrained Love Viewer) collars.
 
-The Kokua Development Team:
+This software is not provided or supported by Linden Lab, the makers of Second Life.
+
+MARE Viewer is based on the Kokua viewer and the Linden Lab open source viewer.
+
+The Kokua Development Team (upstream):
       </text>
       <text_editor
        enabled="false"
@@ -198,7 +202,7 @@ Topaz Harley, LuTze, and others.
           top="10"
           width="435"
           wrap="true">
-Kokua uses code from Firestorm and recognizes significant contributions by Firestorm and its developers to all Third Party Viewers and specifically to Kokua. Firestorm is developed and distributed by The Phoenix Firestorm Project, Inc., a non-profit organization.
+MARE Viewer uses code from Firestorm (via Kokua) and recognizes significant contributions by Firestorm and its developers to all Third Party Viewers. Firestorm is developed and distributed by The Phoenix Firestorm Project, Inc., a non-profit organization.
 
 The Firestorm Development Team:
       </text>

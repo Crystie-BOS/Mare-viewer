@@ -31,6 +31,7 @@
 #include "llrender.h"
 
 #include "llagent.h"
+#include "llagentcamera.h"
 #include "llviewercontrol.h"
 #include "llcriticaldamp.h"
 #include "lldrawable.h"
@@ -103,6 +104,12 @@ LLHUDText::~LLHUDText()
 
 void LLHUDText::render()
 {
+   // MARE: Hide all hover text in mouselook for immersion
+    if (gAgentCamera.cameraMouselook())
+    {
+        return;
+    }
+
     if (!mOnHUDAttachment && sDisplayText)
     {
         LLGLDepthTest gls_depth(GL_TRUE, GL_FALSE);

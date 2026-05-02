@@ -1,504 +1,108 @@
-﻿Updated 1 June 2023
+# MARE Viewer
 
-================
+**A Full-Time Restrained Love Viewer for Second Life, designed for the mare roleplay community.**
 
-Please note: We do not provide support for self-building outside of the active Kokua team. This is due, in part, to the use of licenced components which we cannot share in buildable form and also the limited resources of the current team. Before trying to build Kokua, make sure that you can successfully build the standard LL Viewer. At this writing, several repositories no longer provide Python2 updates. To update to the last supplied version 2.7.18, follow the procedure at:
+---
 
-https://tecadmin.net/install-python-2-7-on-ubuntu-and-linuxmint/
+## Important Disclaimer
 
---------------------------
+> **This software is not provided or supported by Linden Lab, the makers of Second Life.**
+>
+> MARE Viewer is an independent third-party viewer. Use at your own risk.
+>
+> MARE Viewer is not affiliated with, endorsed by, or in any way connected to Linden Lab or its products.
 
-Contributing Code to Kokua
+---
 
-Contributing one patch with less than 3 files touched can be submitted as a diff or patch file. Please open a jira issue and attach the file to the issue.
+## Adult Content and Age Notice
 
-Our issue tracker is at https://kokua.atlassian.net/secure/Dashboard.jspa
+MARE Viewer is designed specifically for **adult consensual RLV (Restrained Love Viewer) roleplay** within Second Life, in the context of mare and pony roleplay communities that use RLV-capable collars.
 
-Contributions by frequent contributors or Kokua Team members requires a formalized work flow as outlined below.
+- **This viewer is intended for adults aged 18 and over only.**
+- It is not appropriate for general-purpose use or for underage users.
+- It is designed for consensual restraint and submission roleplay. All use is subject to Second Life's Terms of Service and Community Standards.
 
-Kokua repositories use git branches. We do not specify a master branch because the Kokua repo maintains three different releases so there is no single "master". Kokua-MKRLV is the closest we have to a master branch, and if you clone kokua repository, it will default to Kokua-MKRLV as that is the most popular Kokua variant (and also usually the most recently committed to since it gets updated in the last stage of the work flow below).
+---
 
-Work Flow:
+## What is MARE Viewer?
 
-On Bitbucket, fork kokua to your Bitbucket account. The repository name will default to kokua but can be named as desired.
+MARE Viewer is a Full-Time Restrained Love Viewer (FTRLV) — a Second Life viewer in which RLV (Restrained Love Viewer) is always active and cannot be disabled by the user. It is built on the [Kokua viewer](https://github.com/NickyPerian/kokua), which is itself based on the official Linden Lab open source viewer.
 
-Now is when you should clone your fork to your local file system.
+MARE Viewer is designed for participants in mare and pony roleplay communities in Second Life, where a worn RLV collar controls the viewer's behavior. The viewer's deliberate limitations are features, not bugs — they are part of what makes consensual RLV roleplay work.
 
-We use SmartGit for graphical display of our repositories. Open the repository and notice branches named Kokua-MKRLV and Kokua-NORLV; these represent our most used branches.
+---
 
-Our workflow starts with lindenlab/viewer master branch which is assigned branch LL-VIEWER-RELEASE-TIP within kokua repository. At this point we should be able
+## Who is it for?
 
-Next, LL-VIEWER-RELEASE-TIP is merged into Kokua-NORLV. This binds the latest SL default viewer to Kokua-NORLV which becomes a kokua deliverable. The merge is usually taken from one commit behind the LL tip to avoid including the version number increment which LL perform after promoting a release.
+- Second Life users who participate in mare/pony roleplay
+- Users who wear RLV-capable collars and want a viewer that enforces those restrictions fully
+- Community owners and operators who want a viewer that is always in FTRLV mode
 
-Then, Kokua-NORLV is merged into Kokua-MKRLV. Two deliverables, Kokua-MKRLV and Kokua-FTRLV may result from building the Kokua-MKRLV branch.
+This viewer is **not** a general-purpose viewer and is not recommended for users who do not understand or consent to RLV restrictions.
 
-When contributing a change, it should be implemented first on Kokua-NORLV and then merged to Kokua-MRKLV. There are two exceptions to this. The first is when the change is only for the with-RLV versions of Kokua - make the change on the Kokua-MKRLV branch. The other is when it's likely the commit will be modified after being accepted - in this case it's simpler to only commit on NORLV and leave us to do the merge to MKRLV once the NORLV code is approved.
+---
 
-When LindenLab updated autobuild, most custom build variables were moved to a repository. The kokua custom repository should be cloned as follows:
+## Feature Differences from Standard Viewers
 
-git clone https://bitbucket.org/kokua/viewer-build-variables.git
+The following features behave differently in MARE Viewer compared to a standard Second Life viewer. These differences are **intentional and permanent** — they cannot be toggled off by the user.
 
-The variables file in this repository contains custom build variables for windows macOS and linux.
+As required by the [Linden Lab Third-Party Viewer Policy Section 1c.3](https://secondlife.com/corporate/third-party-viewers), these limitations are disclosed here:
 
-An environment variable must be set in order for autobuild to see custom build variables throughout configure and build phases.
+| Feature | Standard Viewer | MARE Viewer |
+|---------|----------------|-------------|
+| Friends list | Visible and functional | Hidden and displayed as offline/unavailable |
+| Friend online/offline notifications | Shown as popups | Suppressed |
+| Group messages | Shown normally | Suppressed when RLV IM blocking is active |
+| Inbound IM popups | Shown normally | Suppressed when RLV IM blocking is active |
+| Environment / sky settings | User can set a personal environment | Locked to sim/shared environment — user cannot override |
+| RLV mode | Optional, user can toggle | Always active, cannot be disabled |
 
-Follow each operating system's procedure for persistent setting of environment variables.
+These restrictions are deliberate design choices for the intended use case.
 
-For linux it is:
+---
 
-export AUTOBUILD_VARIABLES_FILE=/home/<user>/viewer-build-variables/variables
+## Disclaimer / Not Affiliated with Linden Lab
 
-If not already done, use git clone to place your forked kokua repository on your local file system.
+MARE Viewer is an independent third-party viewer created under the [Linden Lab Third-Party Viewer Policy](https://secondlife.com/corporate/third-party-viewers).
 
-Example:
+- MARE Viewer is **not** made by, affiliated with, or supported by Linden Lab
+- "Second Life" is a trademark of Linden Research, Inc.
+- Linden Lab does not review, endorse, or certify third-party viewers
 
-git clone https://bitbucket.org/kokua/kokua.git
+---
 
-Linux 64 Bit
+## Support
 
-------------
+Please use [GitHub Issues](../../issues) to report bugs or ask questions. There is no official support channel beyond this repository.
 
-Development system:
+---
 
--------------
+## Building from Source
 
-Development system: Ubuntu 18.04.6
+MARE Viewer is built using the same toolchain as Kokua and the Linden Lab viewer. Please refer to [Kokua's build documentation](https://github.com/NickyPerian/kokua) for the general build process.
 
-Linux ubuntu 5.4.0-150-generic #167~18.04.1-Ubuntu SMP Wed May 24 00:51:42 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
+Brief summary for Windows (Visual Studio 2022 / MSVC 17):
 
-Preparations to build:
+```
+autobuild configure -A 64 -c ReleaseOS -- -DLL_TESTS:BOOL=OFF -DPACKAGE:BOOL=FALSE -DOPENAL:BOOL=TRUE -DRLV_ALWAYS_ON:BOOL=TRUE
+autobuild build -A 64 -c ReleaseOS --no-configure
+```
 
---------------
+Set `AUTOBUILD_VARIABLES_FILE` to point to your viewer-build-variables file before running.
 
-Git may need updating for SmartGit to work completely (in particular, a problem was observed around trying to revert a commit). The follow sets things up for tracking with current git releases.
+---
 
-sudo apt-add-repository ppa:git-core/ppa
+## License
 
-sudo apt update
+MARE Viewer source code is licensed under the GNU Lesser General Public License v2.1 (LGPL-2.1), the same as the Linden Lab viewer and Kokua, in compliance with the [Linden Lab Third-Party Viewer Policy Section 3b](https://secondlife.com/corporate/third-party-viewers).
 
-sudo apt install git (or upgrade instead of install if already present)
+See [LICENSE](LICENSE) for the full license text.
 
-sudo apt upgrade
+---
 
-Download script cmake-3.26.4-linux-x86_64.sh from cmake, run as normal user, and follow prompts to install cmake.
+## Links
 
-sudo apt install --install-recommends bison bzip2 ninja-build curl flex pkg-config
-
-sudo apt install --install-recommends pulseaudio
-
-sudo apt install --install-recommends libgl1-mesa-dev libglu1-mesa-dev libstdc++6 libxinerama-dev libxml2-dev libxrender-dev libpulse-dev libalut-dev libgtk2.0-dev
-
-Verify
-
-gcc --version
-
-gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0
-
-Install autobuild into python
-
-Use of python virtual environment provides a level of system isolation for installing autobuild.
-Using Python 3 set up a virtual environment named autobuild.
-Make a directory name Envs and make it active and make a directory named autobuild and make it active.
-
-        sudo apt install python3.8-venv
-
-        python3.8 -m venv /home/<user>/Envs/autobuild
-
-This will place all the python bits into autobuild.
-And then you can switch to it (this can be added to the .bashrc).
-
-        source <venv location>/bin/activate
-
-Below will install the most recent version of autobuild. Public version V3 will be installed:_
-
-        sudo pip install git+https://github.com/secondlife/autobuild.git@v3
-
-Current development version may be installed with:
-
-        sudo pip install git+https://github.com/secondlife/autobuild#egg=autobuild
-
-Install optional tools
-
-sudo apt install --install-recommends git kdiff3 mc
-
-If using ssh
-
-mkdir ~/.ssh
-
-And copy your keys to this directory
-
-cd ~/.ssh
-
-sudo chmod 600 id_rsa
-
-id_rsa is an older key which is no longer on some servers. Consider updating to id_ecdsa or id_ed25519. Bitbucket and SourceForge
-have instructions for replacing with the newer keys.
-
-
-
-cd ~/
-
-sudo chmod 700 .ssh
-
-Voice libraries are already installed on 32 bit systems so, steps below can be skipped.
-
-Voice 32 bit libraries are not needed to build the viewer but, are needed to test voice in the viewer.
-
-sudo dpkg --add-architecture i386
-
-sudo apt update
-
-sudo apt install --install-recommends libasound2:i386 libasound2-plugins:i386 libasyncns0:i386 libattr1:i386 libc6:i386 libc6-i686:i386 libcap2:i386 libdbus-1-3:i386 libflac8:i386 libgcc1:i386 libice6:i386 libidn11:i386 libogg0:i386 libpulse0:i386 libsm6:i386 libsndfile1:i386 libstdc++6:i386 libvorbis0a:i386 libvorbisenc2:i386 libwrap0:i386 libuuid1:i386 libx11-6:i386 libx11-xcb1:i386 libxau6:i386 libxcb1:i386 libxdmcp6:i386 libxext6:i386 libxi6:i386 libxtst6:i386 zlib1g:i386
-
-Removed libjson0:i386. It was not found. Need to research a replacement.
-
-Open your vm and follow instructions for 64 bit from above.
-
-Kdiff3 as a merge tool and gedit as a visual editor.
-
-The visual editor may be changed based on personal preference.
-
-As an option add this to you bash history file ~/.bashrc
-
-export AUTOBUILD_PLATFORM_OVERRIDE='linux64'
-
-  git clone https://bitbucket.org/kokua/kokua
-
-  Kokua-NORLV can be built with opensource or proprietary audio engine. The opensource solution uses openal for sounds. Use of the proprietary FMOD Studio library for sounds and streaming audio is supported but, the FMOD Studio library must be provided separately.
-
-- Configure for an openal build:
-
-Following assumes a clean build tree.
-
-cd kokua
-
-Update the source tree to Kokua-NORLV. This is a build without RLV or if you want RLV it would be git checkout Kokua-MKRLV
-
-git checkout Kokua-NORLV
-
-autobuild configure -A 64 -c ReleaseOS -- -DLL_TESTS:BOOL=OFF -DUSE_KDU:BOOL=OFF -DHAVOK_TPV:BOOL=OFF -DUSE_FMODSTUDIO:BOOL=OFF -DUSE_OPENAL:BOOL=ON -DPACKAGE:BOOL=ON -DOpenGL_GL_PREFERENCE=LEGACY 2>&1 |tee configure.log
-
-Note: Kokua is built with various libraries which have restrictions on their distribution in source form. For this reason we do not recommend self-builds of Kokua unless it's specifically for contributing code.
-
-- Build the viewer
-
-autobuild build -A 64 -c ReleaseOS 2>&1 |tee build.log
-
-- Configuration and building typically takes 30-45 minutes for NORLV or MKRLV depending on the hardware. FTRLV and MKRLV use substantially the same code so building one after the other is much quicker with only changed files needing compilation.
-
-- Test the build
-
-cd build-linux-x86_64-kokua-norlv/newview/packaged
-
-- Install the viewer with
-
-sudo ./install.sh follow the defaults
-
-This places the viewer in /opt/kokua-install and places a Kokua menu entry under Applications->Internet
-
-sudo is the preferred method as the chrome-sandbox a part of Chrome Embedded Framework requires root permissions.
-
-Note: The install.sh script takes a backup of the previous installed version and may error if installs are done in quick succession. If this happens simply delete the backup folder and retry.
-
-Windows
-
-Below assumes a working Visual Studio 2017 installed.
-
-Reference:https://wiki.secondlife.com/wiki/Visual_Studio_Viewer_Builds
-
-You will need these items before you begin:
-
--  An installer for Windows 10 Pro 64bit
-
--  A valid Windows Product key
-
--  An installer for Visual Studio 2017
-
--  A valid license for Visual Studio 2017
-
-- Install Windows 10 Pro 64bit using your own product key
-
-- Keep running Windows Update (Start Menu -> All Programs -> Windows Update) until clicking on "Check for Updates" there tells you everything is up to date.
-
-- Depending on the age of the install media you started with, this could take a really long time and many, many iterations.
-
-==Microsoft Visual Studio 2017 Pro==
-
-- Install VS 2017 Pro
-
-- Note: If you don't own a copy of VS 2017 Pro, you might consider installing the 
-
-- [http://www.visualstudio.com/en-us/news/vs2017-community-vs.aspx Community Version]
-
-- Run the installer as Administrator (right click, "Run as administrator")
-
-- Uncheck all the "Optional features to install:" - they are not required
-
-- Download and install VS2017 Service Packs and updates
-
-************Below needs confirmation.********************
-- [http://www.visualstudio.com/en-us/downloads/download-visual-studio-vs#DownloadFamilies_5 Update 4 ] 
-
-- is the most recent '''released''' version at time of writing (2015-01)
-
-- Run the installer as Administrator (right click, "Run as administrator")
-
-==DirectX SDK==
-
-- Download and install [http://www.microsoft.com/en-us/download/details.aspx?id=6812 DirectX SDK (June 2010)]
-
-- Run the installer as Administrator (right click, "Run as administrator")
-
-- At the Installation Options screen, set everything except the DirectX Headers and Libs to "This feature will not be installed"
-
-==CMake==
-
-- Download and install [http://www.cmake.org/download/ CMake 3.18.04] (32bit is only option)
-
-- Run the installer as Administrator (right click, "Run as administrator")
-
-- At the "Install options" screen, select "Add CMake to the system PATH for all users"
-
-- For everything else, use the default options (path, etc.)
-
-==Cygwin==
-
-- Download and install [http://cygwin.com/install.html Cygwin 64] (64bit)
-
-- Run the installer as Administrator (right click, "Run as administrator")
-
-- Use default options (path, components etc.) *until* you get to the "Select Packages" screen
-
-- Add additional packages:
-
-- Devel/patch
-
-- Use default options for everything else
-
-==Python==
-
-- Download and install [https://www.python.org/ftp/python/2.7.17/python-2.7.17.msi Python 2.7.17 (32bit)] 
-
-- Note: No option available to install as Administrator
-
-- Use default options (path, components etc.) *until* you get to the "Customize Python" screen
-
-- Change "Add python.exe to Path" to "Will be installed on local hard drive"
-
-==Intermediate check==
-
-- Confirm things are installed properly so far
-
-- Open a Cygwin terminal and type:
-
--  cmake --version
-
--  git --version
-
--  python --version
-
-- If they all report sensible values and not "Command not found" errors, then you are in good shape}}
-
-==Set up Autobuild and Python==
-
--  This section only works inside the Windows Command Prompt. 
-
-- Bootstrap pip 
-
--   Download (Save As) https://bootstrap.pypa.io/get-pip.py get-pip.py and copy to a temp folder
-
--   Open Windows Command Prompt
-
--   Switch to that temp folder and execute it <code>python get-pip.py</code>
-
--   Pip will be installed
-
-- Bootstrap easy_install 
-
--   Download (Save As) https://bootstrap.pypa.io/ez_setup.py ez_setup.py and copy to a temp folder
-
--   Remain in Windows Command Prompt
-
--   Switch to that temp folder and execute it python ez_setup.py
-
--   easy_install will be installed
-
-- Install Autobuild
-
--   Remain in Windows Command Prompt
-
--   Change to the Python Scripts folder that was just created
-
--   Typically cd \Python27\Scripts
-
--   If building lindenlab viewer64 code base use autobuild-1.1
-
--       Run pip install git+http://bitbucket.org/lindenlab/autobuild-1.1#egg=autobuild
-
-- Update system PATH
-
--  Add Python Scripts folder to PATH environment variable via the Control Panel
-
--  Typically C:\Python27\Scripts
-
-==NSIS (Unicode)==
-
--  Install V3 for packaging under Windows
-
-
-==Check Paths in VS 2017==
-
-Open Developer Command Prompt for VS2017 C:\Program Files (x86)\Microsoft Visual Studio 2017\Common7\Tools\VsDevCmd.bat
-
-This command prompt is kinda hard to find on newer windows versions. Use File Explorer to locate VsDevCmd.bat then,
-
-right click and send shortcut to Desktop.
-
-In Developer Command Prompt for VS2017
-
-Verify that these version request.
-
--  cmake --version
-
--  git --version
-
--  python --version
-
--  autobuild --version
-
-==Get source and compile==
-Use git to clone kokua-release repository to your local machine. For example: 
-
--   git clone https://bitbucket.org/kokua/kokua-release
-
--   This will place a folder with the source code typically in <pathto>/kokua-release
-
--   cd kokua-release 
-
--   git checkout Kokua-NORLV
-
--   autobuild configure -c ReleaseOS -A 64 -- -DCMAKE_VERBOSE_MAKEFILE:BOOL=FALSE -DLL_TESTS:BOOL=OFF -DPACKAGE:BOOL=FALSE -DOPENAL:BOOL=TRUE -DFMODSTUDIO:BOOL=OFF -DUSE_KDU:BOOL=OFF -DHAVOK_TPV:BOOL=OFF
-    
-    autobuild build --no-configure -c ReleaseOS -A 64
- 
--  The above will produce a command line build without an install program.
-
--  In folder <pathto>kokua-release/build-vc150/newview/Release find and right click on file kokua-bin.exe and select Send to->Desktop (create shortcut)
-
--  Select Desktop and right click the kokua-bin.exe shortcut and click Properties.
-
--  Edit Start in to "<pathto>\kokua-release\indra\newview". This allows use of working tree skin and settings files.
-
--  Click on the kokua-bin.exe shortcut and the viewer should startup and run.
-
--  Optionally, Visual Studio 2017 program may be used to build the viewer.
-
--  After the autobuild configure step, start Visual Studio 2017 and open the solution from <pathto>\Kokua-release\build-vc150\Kokua.sln
-
--  Follow the steps below to confirm or set the Start up project and Debugging working directory...
-
--  In the Solution Explorer click on kokua-bin, then from the main menu Project select Set as startup project.    
-
--  From main menu Project open kokua-bin Properties, then in kokua-bin Properties window chose Debugging, then Working directory.
-
--  At the right side a down arrow expanders. From there use Browse or Edit and set to <pathto>/kokua-release/build-vc150/newview/Release
-
--  And Apply to write the property page to memory.
-
--  Under main menu DEBUG is a right pointing green arrow with text 'Local Windows Debugger' click to start building...
-
--  Once the build competes the viewer should be at the start page waiting to logon.
---------
-
-Mac
-
---------
-
-The following has been tested with MacOS 26.1 with XCode 26.1.1. The Deployment Target is OS X 11.
-
-Besides XCode you need cmake and autobuild.
-
-Your can get cmake from MacPorts https://www.macports.org or homebrew https://brew.sh .
-
-With MacPorts installed, in terminal install the following ports:
-
-• sudo port install cmake
-
-HomeBrew has the advantage by using similar commands for Linux and MacOS.
-
-•  brew install cmake
-
-Homebrew installs packages to their own directory and the symlinks their files into /usr/local.
-
-For installing autobuild use pip:
-
-•  pip3 install autobuild
-
-You should update your path in order to have cmake and autouild alvailable, e.g. MacPorts might have written something like this into your ~/.zprofile:
-
-export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
-
-Likewise, homebrew might have used something like this:
-
-eval "$(/opt/homebrew/bin/brew shellenv)"
-
-Depending on how you use pip, it might have created a diretory in your user directory. Then use something like:
-
-export PATH="$HOME/Library/Python/3.9/bin:$PATH"
-
-Depending on how much you have used XCode already, you might need torun the following once on your system:
-
-xcodebuild -runFirstLaunch
-
-To verify your build environment the best way forward is most likely to download the LL source by following the instructions on https://wiki.secondlife.com/wiki/Build_the_Viewer_on_macOS 
-
---
-
-To build Kokua first download the Kokua source code with the following command in terminal:
-
-git clone https://bitbucket.org/kokua/kokua-release 
-
-You also need the build variables. Get them as follows and set the environment variable to point there:
-
-git clone https://bitbucket.org/kokua/viewer-build-variables.git
-export AUTOBUILD_VARIABLES_FILE=/Users/<your directory>/viewer-build-variables/variables
-
-Then you can configure the build with:
-
-autobuild configure -c ReleaseOS -A 64 -- -DLL_TESTS:BOOL=OFF -DPACKAGE:BOOL=FALSE -DFMODSTUDIO:BOOL=OFF -DUSE_KDU:BOOL=OFF -DHAVOK_TPV:BOOL=OFF
-
-or 
-
-autobuild configure -c RelWithDebInfoOS -A 64 -- -DLL_TESTS:BOOL=OFF -DPACKAGE:BOOL=FALSE -DFMODSTUDIO:BOOL=OFF -DUSE_KDU:BOOL=OFF -DHAVOK_TPV:BOOL=OFF
-
-If that succeeds you can compile with
-
-autobuild build --no-configure -A 64
-
-and if even that succeeds you can start with
-
-open build-darwin-universal-kokua-mkrlv/newview/RelWithDebInfo/Kokua\ Test.app
-
---
-
-You should be able to both use the Xcode project (easiest to verify) and the command line build. 
-
-NOTE: Regardless of which configuration option you use on the command line the Xcode project will have the build mode set to Debug. To change this go to Product > Scheme > Edit Scheme (with ALL_BUILD selected) and change the Build Configuration to RelWithDebInfo or Release respectively
-
-BUILD NOTE: When building in Xcode at some point the build will fail because it cannot find packages-info.txt. At this point just restart the build and it will continue from there.
-
-The root cause of this is that it tries to run autobuild by spawning a shell from inside autobuild, but Xcode will not allow any other version than the system python to be called so autobuild will fail - it does not even find it.  For anything but a (final) release build this is not significant. This build has to be done from the command line. 
-
-
-Disclaimer
-
------
-
--      This software is not provided nor supported by Linden Lab, the makers of Second Life.
-
-
-
-
-
-
-
+- [Linden Lab Third-Party Viewer Policy](https://secondlife.com/corporate/third-party-viewers)
+- [Kokua upstream repository](https://github.com/NickyPerian/kokua)
+- [Linden Lab open source viewer](https://github.com/secondlife/viewer)
+- [Linden Lab Privacy Policy](https://www.lindenlab.com/privacy)

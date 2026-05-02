@@ -186,6 +186,46 @@ public:
     virtual void    resetJoystickCamera();
 };
 
+// -----------------------------------------------------------------------
+// MARE: Movement joystick widgets — same oval/crosshair visual as the
+// camera orbit/track widgets, but wired to avatar movement commands.
+// -----------------------------------------------------------------------
+
+// Move avatar forward/back and turn — renders as oval (like camera orbit)
+class LLJoystickMoveForwardBack : public LLJoystickCameraRotate
+{
+public:
+    struct Params : public LLInitParam::Block<Params, LLJoystickCameraRotate::Params>
+    {
+        Params() { changeDefault(held_down_delay.seconds, 0.0); }
+    };
+
+    LLJoystickMoveForwardBack(const Params& p) : LLJoystickCameraRotate(p) {}
+
+    virtual bool    handleMouseDown(S32 x, S32 y, MASK mask);
+    virtual bool    handleMouseUp(S32 x, S32 y, MASK mask);
+    virtual void    onHeldDown();
+    virtual void    resetJoystickCamera() {}    // no camera to reset
+};
+
+// Strafe avatar left/right — renders as crosshair (like camera track)
+class LLJoystickMoveStrafe : public LLJoystickCameraTrack
+{
+public:
+    struct Params : public LLInitParam::Block<Params, LLJoystickCameraTrack::Params>
+    {
+        Params() {}
+    };
+
+    LLJoystickMoveStrafe(const Params& p) : LLJoystickCameraTrack(p) {}
+
+    virtual bool    handleMouseDown(S32 x, S32 y, MASK mask);
+    virtual bool    handleMouseUp(S32 x, S32 y, MASK mask);
+    virtual void    onHeldDown();
+    virtual void    onMouseUp();
+    virtual void    resetJoystickCamera() {}    // no camera to reset
+};
+
 //
 class LLJoystickQuaternion :
     public LLJoystick

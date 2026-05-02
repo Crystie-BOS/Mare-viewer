@@ -501,7 +501,7 @@ class WindowsManifest(ViewerManifest):
 
         if self.is_packaging_viewer():
             # Find kokua-bin.exe in the 'configuration' dir, then rename it to the result of final_exe.
-            self.path(src='%s/kokua-bin.exe' % self.args['configuration'], dst=self.final_exe())
+            self.path(src='%s/mare-viewer.exe' % self.args['configuration'], dst=self.final_exe())
 
             """
             with self.prefix(src=os.path.join(pkgdir, "VMP")):

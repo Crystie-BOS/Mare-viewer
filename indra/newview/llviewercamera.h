@@ -33,6 +33,7 @@
 #include "m4math.h"
 #include "llcoord.h"
 #include "lltrace.h"
+#include "glm/glm.hpp"
 
 class LLViewerObject;
 const bool FOR_SELECTION = true;
@@ -104,6 +105,16 @@ public:
     F32 getZoomFactor() const { return mZoomFactor; }
     S16 getZoomSubRegion() const { return mZoomSubregion; }
 
+    // MARE: TAA / upscaler infrastructure (Phase 1)
+    // Call once at the top of each frame (before setup3DRender) to capture the
+    // previous VP matrix and advance the Halton jitter sequence.
+    void beginFrame();
+    F32  getJitterX() const              { return mJitterX; }
+    F32  getJitterY() const              { return mJitterY; }
+    const glm::mat4& getPrevViewProj() const { return mPrevViewProjMatrix; }
+    bool hadCameraJump()  const              { return mCameraJumped; }      // MARE: Phase 2 Step 5
+    bool getCameraMoved() const              { return mCameraMoved; }       // MARE: true when camera panned/walked this frame
+
 protected:
     void calcProjection(const F32 far_distance) const;
 
@@ -123,6 +134,15 @@ protected:
     S32                 mScreenPixelArea; // Pixel area of entire window
     F32                 mZoomFactor;
     S16                 mZoomSubregion;
+
+    // MARE: TAA / upscaler infrastructure (Phase 1)
+    U32       mJitterFrame;         // Halton sequence counter; wraps naturally
+    F32       mJitterX;             // sub-pixel NDC jitter X; 0 when upscaler disabled
+    F32       mJitterY;             // sub-pixel NDC jitter Y; 0 when upscaler disabled
+    glm::mat4 mPrevViewProjMatrix;  // view-projection matrix captured end of previous frame
+    LLVector3 mPrevCamOrigin;       // MARE: Phase 2 Step 5 — camera world position at start of previous frame
+    bool      mCameraJumped = false;// MARE: Phase 2 Step 5 — true when a teleport / jump was detected this frame
+    bool      mCameraMoved  = false;// MARE: true when camera panned/walked this frame (TAA camera-cut trigger)
 
 public:
 };

@@ -1023,6 +1023,9 @@ void setting_setup_signal_listener(LLControlGroup& group, const std::string& set
 
 void settings_setup_listeners()
 {
+    // MARE: Force FTRLV mode - RLV always enabled on startup
+    gSavedSettings.setBOOL("RestrainedLove", TRUE);
+    
 //MK
     setting_setup_signal_listener(gSavedSettings, "RestrainedLoveDebug",handleRestrainedLoveDebugChanged);
     setting_setup_signal_listener(gSavedSettings, "RestrainedLoveLogging",handleRestrainedLoveLoggingChanged);

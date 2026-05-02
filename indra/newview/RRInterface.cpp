@@ -439,6 +439,10 @@ void refreshCachedVariable (std::string var)
     //else if (var == "shownames")          gAgent.mRRInterface.mContainsShownames = contained;
     else if (var == "shownametags")         gAgent.mRRInterface.mContainsShownametags = contained;
     else if (var == "shownearby")           gAgent.mRRInterface.mContainsShowNearby = contained;
+    else if (var == "showfriends")          gAgent.mRRInterface.mContainsShowfriends = contained;
+    else if (var == "showgroups")           gAgent.mRRInterface.mContainsShowgroups = contained;
+    else if (var == "shownotify")           gAgent.mRRInterface.mContainsShownotify = contained;
+    else if (var == "showfavorites")        gAgent.mRRInterface.mContainsShowfavorites = contained; 
     else if (var == "setenv")               gAgent.mRRInterface.mContainsSetenv = contained;
     else if (var == "setdebug")             gAgent.mRRInterface.mContainsSetdebug = contained;
     else if (var == "fly")                  gAgent.mRRInterface.mContainsFly = contained;
@@ -791,6 +795,10 @@ RRInterface::RRInterface():
     , mContainsShowminimap(false)
     , mContainsShowloc(false)
     , mContainsShownames(false)
+    , mContainsShowfriends(false)
+    , mContainsShowgroups(false)
+    , mContainsShownotify(false)
+    , mContainsShowfavorites(false)
     , mContainsShownametags(false)
     , mContainsShowNearby(false)
     , mContainsViewScript(false)
@@ -4082,6 +4090,32 @@ std::string RRInterface::getDummyName(std::string name, EChatAudible audible /* 
     return res;
 }
 
+// MARE: UUID-based overload that caches the dummy name per avatar UUID so the same
+// avatar always gets the same dummy name throughout the session, even across sim crossings
+// where the name string may temporarily differ (partial fetch, display name vs username, etc.)
+std::string RRInterface::getDummyName(const LLUUID& id, const std::string& name, EChatAudible audible)
+{
+    if (id.isNull() || name.empty())
+        return getDummyName(name, audible);
+
+    auto it = mDummyNameCache.find(id);
+    if (it != mDummyNameCache.end())
+    {
+        if (audible == CHAT_AUDIBLE_BARELY)
+            return it->second + " afar";
+        return it->second;
+    }
+
+    // Compute base name without "afar" suffix and store it
+    std::string base = getDummyName(name, CHAT_AUDIBLE_FULLY);
+    if (!base.empty())
+        mDummyNameCache[id] = base;
+
+    if (audible == CHAT_AUDIBLE_BARELY)
+        return base + " afar";
+    return base;
+}
+
 std::string RRInterface::getCensoredMessage (std::string str)
 {
 #ifdef KOKUA_SHOWNAMES
@@ -6375,7 +6409,7 @@ bool RRInterface::updateCameraLimits ()
     mCamZoomMin = getMax("camzoommin", -EXTREMUM);
     if (mCamZoomMin == 0.f) mCamZoomMin = -EXTREMUM;
 
-    // setcam_fovmin and setcam_fovmax set the FOV, i.e. 60°/multiplier;
+    // setcam_fovmin and setcam_fovmax set the FOV, i.e. 60 /multiplier;
     // in other words, they are equivalent to camzoommin and camzoommax.
     F32 fovmin = getMax("setcam_fovmin", 0.001f);
     if (fovmin != 0.f && fovmin != 0.001f)

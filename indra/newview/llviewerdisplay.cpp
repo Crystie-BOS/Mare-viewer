@@ -790,6 +790,12 @@ void display(bool rebuild, F32 zoom_factor, int subfield, bool for_snapshot)
             gPipeline.toggleRenderType(LLPipeline::RENDER_TYPE_HUD_PARTICLES);
         }
 
+        // MARE: capture prev VP matrix and advance Halton jitter before camera setup (Phase 1)
+        if (LLViewerCamera::instanceExists())
+        {
+            LLViewerCamera::getInstance()->beginFrame();
+        }
+
         stop_glerror();
         display_update_camera();
         stop_glerror();

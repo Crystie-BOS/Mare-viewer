@@ -40,6 +40,7 @@
 #include "lltabcontainer.h"
 #include "lltoggleablemenu.h"
 #include "lluictrlfactory.h"
+#include "RRInterface.h"
 
 #include "llpanelpeople.h"
 
@@ -819,6 +820,11 @@ bool LLPanelPeople::postBuild()
     mOnlineFriendList->setRefreshCompleteCallback(boost::bind(&LLPanelPeople::onFriendListRefreshComplete, this, _1, _2));
     mAllFriendList->setRefreshCompleteCallback(boost::bind(&LLPanelPeople::onFriendListRefreshComplete, this, _1, _2));
 
+    // MARE: Start a very light idle poll to keep tabs synced with RLV flags
+    gIdleCallbacks.addFunction(&LLPanelPeople::idleCB, this);
+    // Apply once on build
+    applyRLVPeopleVisibility();
+
     return true;
 }
 
@@ -854,8 +860,20 @@ void LLPanelPeople::updateFriendListHelpText()
     }
 }
 
+void LLPanelPeople::idleCB(void* userdata)
+{
+    if (auto* self = static_cast<LLPanelPeople*>(userdata))
+        self->applyRLVPeopleVisibility();
+}
+
 void LLPanelPeople::updateFriendList()
 {
+    if (!mOnlineFriendList || !mAllFriendList)
+        return;
+    
+    // MARE: Update RLV tab visibility
+    applyRLVPeopleVisibility();
+
     if (!mOnlineFriendList || !mAllFriendList)
         return;
 
@@ -2398,6 +2416,101 @@ void LLPanelPeople::onContactSetsMenuItemClicked(const LLSD& userdata)
             }
         }
     }
+}
+
+void LLPanelPeople::applyRLVPeopleVisibility()
+{
+    if (!mTabContainer) return;
+
+    const bool hide_friends = (gRRenabled && gAgent.mRRInterface.mContainsShowfriends);
+    const bool hide_groups  = (gRRenabled && gAgent.mRRInterface.mContainsShowgroups);
+    const bool hide_favorites = (gRRenabled && gAgent.mRRInterface.mContainsShowfavorites);
+
+    // Track previous state to avoid constantly changing visibility
+    static bool last_hide_friends = false;
+    static bool last_hide_groups = false;
+    static bool first_run = true;
+
+    // Only update if state changed or first run
+    bool state_changed = first_run || 
+                        (last_hide_friends != hide_friends) || 
+                        (last_hide_groups != hide_groups);
+
+    if (!state_changed)
+    {
+        return; // Nothing changed, don't touch anything
+    }
+
+     // State changed, update visibility
+    LLPanel* friends_panel = mTabContainer->getPanelByName(FRIENDS_TAB_NAME);
+    LLPanel* groups_panel  = mTabContainer->getPanelByName(GROUP_TAB_NAME);
+    LLPanel* contact_sets_panel = mTabContainer->getPanelByName(CONTACT_SETS_TAB_NAME);
+    LLPanel* recent_panel = mTabContainer->getPanelByName(RECENT_TAB_NAME);  // MARE: Add Recent tab
+
+    // If currently on a restricted tab, switch away (only on state change)
+    if (hide_friends && !last_hide_friends) // Friends JUST got hidden
+    {
+        const std::string active = getActiveTabName();
+        if (active == FRIENDS_TAB_NAME || active == RECENT_TAB_NAME || active == CONTACT_SETS_TAB_NAME)
+        {
+            mTabContainer->selectTabByName(NEARBY_TAB_NAME);
+        }
+    }
+    
+    if (hide_groups && !last_hide_groups) // Groups JUST got hidden
+    {
+        const std::string active = getActiveTabName();
+        if (active == GROUP_TAB_NAME || active == CONTACT_SETS_TAB_NAME)
+        {
+            mTabContainer->selectTabByName(NEARBY_TAB_NAME);
+        }
+    }
+
+    // Update tab visibility (only when state changes)
+    if (friends_panel)
+    {
+        S32 friends_index = mTabContainer->getIndexForPanel(friends_panel);
+        if (friends_index >= 0)
+        {
+            mTabContainer->setTabVisibility(friends_panel, !hide_friends);
+            mTabContainer->enableTabButton(friends_index, !hide_friends);
+        }
+    }
+
+    if (groups_panel)
+    {
+        S32 groups_index = mTabContainer->getIndexForPanel(groups_panel);
+        if (groups_index >= 0)
+        {
+            mTabContainer->setTabVisibility(groups_panel, !hide_groups);
+            mTabContainer->enableTabButton(groups_index, !hide_groups);
+        }
+    }
+    
+    if (contact_sets_panel)
+    {
+        S32 contact_sets_index = mTabContainer->getIndexForPanel(contact_sets_panel);
+        if (contact_sets_index >= 0)
+        {
+            mTabContainer->setTabVisibility(contact_sets_panel, !hide_friends);  // MARE: Hide with friends
+            mTabContainer->enableTabButton(contact_sets_index, !hide_friends);
+        }
+    }
+
+    if (recent_panel)
+    {
+        S32 recent_index = mTabContainer->getIndexForPanel(recent_panel);
+        if (recent_index >= 0)
+        {
+            mTabContainer->setTabVisibility(recent_panel, !hide_friends);  // MARE: Hide with friends
+            mTabContainer->enableTabButton(recent_index, !hide_friends);
+        }
+    }
+
+    // Remember current state for next time
+    last_hide_friends = hide_friends;
+    last_hide_groups = hide_groups;
+    first_run = false;
 }
 
 void LLPanelPeople::handlePickerCallback(const uuid_vec_t& ids, const std::string& set)

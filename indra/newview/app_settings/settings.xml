@@ -13103,6 +13103,50 @@
       <key>Value</key>
       <integer>0</integer>
     </map>
+  <key>RenderUpscalerEnabled</key>
+  <map>
+    <key>Comment</key>
+    <string>MARE: Enable AI upscaler (FSR 2 / NIS). Adds per-frame Halton jitter to the projection matrix for temporal anti-aliasing. Must be false when no upscaler backend is loaded.</string>
+    <key>Persist</key>
+    <integer>1</integer>
+    <key>Type</key>
+    <string>Boolean</string>
+    <key>Value</key>
+    <integer>0</integer>
+  </map>
+  <key>RenderUpscalerMode</key>
+  <map>
+    <key>Comment</key>
+    <string>MARE upscaler mode: 0 = TAA only, 1 = NIS adaptive sharpening only, 2 = TAA then NIS, 3 = FSR 2.</string>
+    <key>Persist</key>
+    <integer>1</integer>
+    <key>Type</key>
+    <string>U32</string>
+    <key>Value</key>
+    <integer>0</integer>
+  </map>
+  <key>RenderResolutionPreset</key>
+  <map>
+    <key>Comment</key>
+    <string>MARE render resolution preset for FSR 2 upscaler. 0=Native(100%), 1=UltraQuality(77%), 2=Quality(67%), 3=Balanced(59%), 4=Performance(50%). Ignored when RenderUpscalerMode != 3.</string>
+    <key>Persist</key>
+    <integer>1</integer>
+    <key>Type</key>
+    <string>U32</string>
+    <key>Value</key>
+    <integer>0</integer>
+  </map>
+  <key>RenderNISSharpenStrength</key>
+  <map>
+    <key>Comment</key>
+    <string>MARE NIS adaptive sharpening strength [0..1]. Applied when RenderUpscalerMode is 1 or 2.</string>
+    <key>Persist</key>
+    <integer>1</integer>
+    <key>Type</key>
+    <string>F32</string>
+    <key>Value</key>
+    <real>0.5</real>
+  </map>
   <key>RenderUseAdvancedAtmospherics</key>
   <map>
     <key>Comment</key>
@@ -20828,6 +20872,17 @@
     <string>F32</string>
     <key>Value</key>
     <real>4.699</real>
+  </map>
+  <key>MAREForceSilhouettes</key>
+  <map>
+    <key>Comment</key>
+    <string>Force all other avatars to render as silhouettes (impostors)</string>
+    <key>Persist</key>
+    <integer>1</integer>
+    <key>Type</key>
+    <string>Boolean</string>
+    <key>Value</key>
+    <integer>0</integer>
   </map>
   <key>AutoTuneRenderFarClipMin</key>
   <map>
