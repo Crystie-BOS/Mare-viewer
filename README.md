@@ -54,7 +54,7 @@ As required by the [Linden Lab Third-Party Viewer Policy Section 1c.3](https://s
 | Friend online/offline notifications | Shown as popups | Suppressed |
 | Group messages | Shown normally | Suppressed when RLV IM blocking is active |
 | Inbound IM popups | Shown normally | Suppressed when RLV IM blocking is active |
-| Environment / sky settings | User can set a personal environment | Locked to sim/shared environment — user cannot override |
+| Environment / sky settings | User can set a personal environment | Locked to sim/shared environment when collar sends `@setenv=n` |
 | RLV mode | Optional, user can toggle | Always active, cannot be disabled |
 
 These restrictions are deliberate design choices for the intended use case.

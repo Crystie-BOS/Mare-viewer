@@ -24,7 +24,7 @@ The following features are deliberately restricted or removed in MARE Viewer:
 
 4. **Group messages are suppressed when RLV IM blocking is active.** Group chat messages may be blocked from displaying depending on your RLV collar's configuration.
 
-5. **The environment/sky setting is locked.** You cannot set a personal environment override. The viewer always uses the sim's environment or shared environment setting.
+5. **The environment/sky setting is locked when your collar commands it.** When your RLV collar sends `@setenv=n`, you cannot set a personal environment override and the viewer uses the sim's environment or shared environment. Released when the collar sends `@setenv=y`.
 
 6. **RLV is always active and cannot be disabled.** MARE Viewer is a Full-Time RLV Viewer (FTRLV). The RLV system is permanently enabled. You cannot turn it off from within the viewer.
 

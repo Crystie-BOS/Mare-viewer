@@ -38,8 +38,8 @@ turned off by the user:
 
   4. Group messages are suppressed when RLV IM blocking is active.
 
-  5. Environment/sky is locked to sim or shared environment. You cannot
-     set a personal environment override.
+  5. Environment/sky is locked to sim or shared environment when your
+     collar sends @setenv=n. Released when the collar sends @setenv=y.
 
   6. RLV is always active and cannot be disabled. This is a Full-Time
      RLV Viewer (FTRLV).
