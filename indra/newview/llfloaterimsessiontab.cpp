@@ -430,6 +430,11 @@ void LLFloaterIMSessionTab::draw()
         mRefreshTimer->setTimerExpirySec(REFRESH_INTERVAL);
     }
 
+    // MARE: hover-based transparency — opaque when mouse is over, transparent when not
+    S32 mx, my;
+    LLUI::getInstance()->getMousePositionLocal(this, &mx, &my);
+    setBackgroundOpaque(getLocalRect().pointInRect(mx, my));
+
     super::draw();
 }
 
