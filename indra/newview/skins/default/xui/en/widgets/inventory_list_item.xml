@@ -14,10 +14,11 @@
    font.style="NORMAL" />
 
   <!-- style for inventory list item WORN on avatar -->
+  <!-- MARE: EmphasisColor is near-black (0.2,0.2,0.2) — invisible on dark panels; use white. Bold font still distinguishes worn items. -->
   <worn_style
    font="SansSerifSmall"
    font.style="BOLD"
-   color="EmphasisColor" />
+   color="white" />
   <item_icon
     height="16"
     follows="top|left"

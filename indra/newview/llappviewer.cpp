@@ -713,7 +713,7 @@ LLAppViewer::LLAppViewer()
 
     // Need to do this initialization before we do anything else, since anything
     // that touches files should really go through the lldir API
-    gDirUtilp->initAppDirs("Kokua");
+    gDirUtilp->initAppDirs("Mare"); // MARE: isolated data dir — prevents credential bleed from other Kokua installs
     //
     // IMPORTANT! Do NOT put anything that will write
     // into the log files during normal startup until AFTER
@@ -786,7 +786,7 @@ bool LLAppViewer::init()
     //initialize particle index pool
     LLVOPartGroup::initClass();
 
-    gDirUtilp->initAppDirs("Kokua");// this is setting up $HOME/.kokua
+    gDirUtilp->initAppDirs("Mare"); // MARE: isolated data dir — $HOME/.mare (Linux/Mac path)
     // set skin search path to default, will be overridden later
     // this allows simple skinned file lookups to work
     gDirUtilp->setSkinFolder("default", "en");
