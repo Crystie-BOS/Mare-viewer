@@ -147,6 +147,12 @@ bool FSFloaterWearableFavorites::postBuild()
 //virtual
 void FSFloaterWearableFavorites::onOpen(const LLSD& /*info*/)
 {
+    if (gRRenabled && gAgent.mRRInterface.mContainsShowfavorites)
+    {
+        closeFloater();
+        return;
+    }
+
     if (!mInitialized)
     {
         if (sFolderID.isNull())
