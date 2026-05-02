@@ -25,8 +25,8 @@
      name="chat_history_lp"
      width="242">
       <chat_history
-       bg_readonly_color="ChatHistoryBgColor"
-       bg_writeable_color="ChatHistoryBgColor"
+       bg_readonly_color="0 0 0 0"
+       bg_writeable_color="0 0 0 0"
        follows="all"
        layout="topleft"
        left="5"
@@ -36,8 +36,8 @@
        parse_highlights="true"
        parse_urls="true"
        right_widget_pad="5"
-       text_color="ChatHistoryTextColor"
-       text_readonly_color="ChatHistoryTextColor"
+       text_color="1 1 1 1"
+       text_readonly_color="1 1 1 1"
        top="0"
        width="237" />
     </layout_panel>

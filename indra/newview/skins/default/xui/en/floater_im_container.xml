@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <multi_floater
- can_close="true"  
+ can_close="true"
  can_minimize="true"
  can_resize="true"
  height="210"
@@ -13,6 +13,8 @@
  single_instance="true"
  reuse_instance="true"
  title="CONVERSATIONS"
+ bg_opaque_color="0 0 0 0.65"
+ bg_alpha_color="0 0 0 0"
  bottom="-50"
  left="5"
  width="450"
