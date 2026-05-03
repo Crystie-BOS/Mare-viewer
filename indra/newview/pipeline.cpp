@@ -10924,6 +10924,29 @@ void LLPipeline::generateSunShadow(LLCamera& camera)
             set_last_modelview(mShadowModelview[j]);
             set_last_projection(mShadowProjection[j]);
 
+            // MARE: texel-snapping — snap ortho cascade projection to shadow map texel grid.
+            // Eliminates shadow shimmer/crawl as the camera moves. Only applied to ortho
+            // projections (mShadowFOV < 0); perspective cascades don't benefit from this.
+            if (j < 4 && mShadowFOV.mV[j] < 0.f)
+            {
+                F32 res = (F32)mRT->shadow[j].getWidth();
+                if (res > 0.f)
+                {
+                    // Transform world origin into NDC via current light-space proj*view.
+                    // Any fixed world point works; origin is stable and always visible.
+                    glm::vec4 ref = proj[j] * view[j] * glm::vec4(0.f, 0.f, 0.f, 1.f);
+                    // Convert to texel space and measure fractional offset from nearest texel.
+                    F32 tx = ref.x * res * 0.5f;
+                    F32 ty = ref.y * res * 0.5f;
+                    F32 dx = roundf(tx) - tx;
+                    F32 dy = roundf(ty) - ty;
+                    // Apply sub-texel correction to the projection translation terms.
+                    proj[j][3][0] += dx * 2.f / res;
+                    proj[j][3][1] += dy * 2.f / res;
+                    set_current_projection(proj[j]);
+                }
+            }
+
             mShadowModelview[j] = view[j];
             mShadowProjection[j] = proj[j];
             mSunShadowMatrix[j] = trans*proj[j]*view[j]*inv_view;

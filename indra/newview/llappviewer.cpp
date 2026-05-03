@@ -155,6 +155,8 @@
 
 #if LL_WINDOWS
 #   include <share.h> // For _SH_DENYWR in processMarkerFiles
+#   include <avrt.h>  // MARE: MMCSS P-Core scheduling
+#   pragma comment(lib, "avrt.lib")
 #else
 #   include <sys/file.h> // For processMarkerFiles
 #endif
@@ -2580,6 +2582,38 @@ void LLAppViewer::initGeneralThread()
 bool LLAppViewer::initThreads()
 {
     static const bool enable_threads = true;
+
+#if LL_WINDOWS
+    // MARE: Register the main/render thread with MMCSS as a "Games" task.
+    // On Intel 12th-gen+ hybrid CPUs this causes Windows to schedule the thread
+    // on a Performance core (P-Core) rather than an Efficiency core (E-Core).
+    // On older Intel and AMD CPUs the call succeeds but has no core-routing effect;
+    // the elevated priority is still beneficial. Safe to call even if MMCSS is
+    // unavailable — failure is logged and execution continues normally.
+    {
+        DWORD task_index = 0;
+        HANDLE h_task = AvSetMmThreadCharacteristicsW(L"Games", &task_index);
+        if (h_task)
+        {
+            AvSetMmThreadPriority(h_task, AVRT_PRIORITY_HIGH);
+            LL_INFOS("AppInit") << "MARE: main thread registered with MMCSS (P-Core scheduling enabled)" << LL_ENDL;
+        }
+        else
+        {
+            LL_WARNS("AppInit") << "MARE: AvSetMmThreadCharacteristics failed (error " << GetLastError() << ") — P-Core scheduling unavailable" << LL_ENDL;
+        }
+    }
+    // Disable Windows power throttling for the render thread so Windows 11
+    // does not throttle it when on battery or under efficiency policies.
+    {
+        THREAD_POWER_THROTTLING_STATE throttle = {};
+        throttle.Version  = THREAD_POWER_THROTTLING_CURRENT_VERSION;
+        throttle.ControlMask = THREAD_POWER_THROTTLING_EXECUTION_SPEED;
+        throttle.StateMask   = 0; // 0 = always run at full speed, never throttle
+        SetThreadInformation(GetCurrentThread(), ThreadPowerThrottling,
+                             &throttle, sizeof(throttle));
+    }
+#endif
 
     LLImage::initClass(gSavedSettings.getBOOL("TextureNewByteRange"),gSavedSettings.getS32("TextureReverseByteRange"));
 
