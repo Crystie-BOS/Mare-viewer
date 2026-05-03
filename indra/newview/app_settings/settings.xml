@@ -10774,6 +10774,50 @@
     <key>Value</key>
     <integer>256</integer>
   </map>
+  <key>RenderLocalLightSmartCulling</key>
+  <map>
+    <key>Comment</key>
+    <string>MARE: Cap local light processing radius in deferred mode. Lights beyond RenderLocalLightCullDistance are ignored, reducing GPU work in busy scenes. No visual difference beyond the cull distance.</string>
+    <key>Persist</key>
+    <integer>1</integer>
+    <key>Type</key>
+    <string>Boolean</string>
+    <key>Value</key>
+    <integer>1</integer>
+  </map>
+  <key>RenderLocalLightCullDistance</key>
+  <map>
+    <key>Comment</key>
+    <string>MARE: Maximum distance in metres for local light processing when RenderLocalLightSmartCulling is enabled. Lights beyond this radius are skipped. Default 64m.</string>
+    <key>Persist</key>
+    <integer>1</integer>
+    <key>Type</key>
+    <string>F32</string>
+    <key>Value</key>
+    <real>64.0</real>
+  </map>
+  <key>RenderShadowThrottleEnabled</key>
+  <map>
+    <key>Comment</key>
+    <string>MARE: Skip re-rendering distant shadow cascades when the camera has been still for RenderShadowThrottleSettleFrames frames. Cascade 0 (nearest) always updates. Saves significant GPU time during stationary roleplay.</string>
+    <key>Persist</key>
+    <integer>1</integer>
+    <key>Type</key>
+    <string>Boolean</string>
+    <key>Value</key>
+    <integer>1</integer>
+  </map>
+  <key>RenderShadowThrottleSettleFrames</key>
+  <map>
+    <key>Comment</key>
+    <string>MARE: Number of consecutive still frames before distant shadow cascades stop updating. Higher values reduce transition flicker on slow hardware.</string>
+    <key>Persist</key>
+    <integer>1</integer>
+    <key>Type</key>
+    <string>U32</string>
+    <key>Value</key>
+    <integer>6</integer>
+  </map>
   <key>RenderShadowSplitExponent</key>
   <map>
     <key>Comment</key>

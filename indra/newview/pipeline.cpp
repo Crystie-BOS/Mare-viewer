@@ -5697,7 +5697,13 @@ void LLPipeline::calcNearbyLights(LLCamera& camera)
         F32 max_dist;
         if (LLPipeline::sRenderDeferred)
         {
-            max_dist = RenderFarClip;
+            // MARE: cap light processing radius to avoid evaluating lights the
+            // GPU can't usefully contribute (deferred shading sorts by proximity
+            // so distant lights are always outcompeted by nearer ones).
+            static LLCachedControl<bool> smart_cull(gSavedSettings, "RenderLocalLightSmartCulling", true);
+            static LLCachedControl<F32>  cull_dist (gSavedSettings, "RenderLocalLightCullDistance",  64.f);
+            max_dist = smart_cull ? llmin((F32)RenderFarClip, llmax(cull_dist, 1.f))
+                                  : (F32)RenderFarClip;
         }
         else
         {
@@ -10953,16 +10959,45 @@ void LLPipeline::generateSunShadow(LLCamera& camera)
 
             stop_glerror();
 
-            mRT->shadow[j].bindTarget();
-            mRT->shadow[j].getViewport(gGLViewport);
-            mRT->shadow[j].clear();
-
+            // MARE: shadow throttle — skip re-rendering distant cascades when the
+            // camera has been still for enough frames. Cascade 0 (nearest) always
+            // updates so nearby shadow detail stays sharp. Cascades 1-3 are reused
+            // from the previous frame, saving significant GPU time during stationary
+            // roleplay where the camera rarely moves.
             {
-                static LLCullResult result[4];
-                renderShadow(view[j], proj[j], shadow_cam, result[j], true);
-            }
+                static LLCachedControl<bool> throttle_on  (gSavedSettings, "RenderShadowThrottleEnabled",    true);
+                static LLCachedControl<U32>  settle_frames (gSavedSettings, "RenderShadowThrottleSettleFrames", 6u);
 
-            mRT->shadow[j].flush();
+                static LLVector3    s_last_cam_pos;
+                static LLVector3    s_last_cam_dir;
+                static U32          s_still_frames = 0;
+
+                // Only evaluate camera movement on cascade 0 so all cascades share
+                // the same decision this frame.
+                if (j == 0)
+                {
+                    LLVector3 cam_pos = camera.getOrigin();
+                    LLVector3 cam_dir = camera.getAtAxis();
+                    bool moved = ((cam_pos - s_last_cam_pos).lengthSquared() > 0.0001f)
+                              || ((cam_dir * s_last_cam_dir) < 0.99999f);
+                    s_still_frames = moved ? 0 : (s_still_frames + 1);
+                    s_last_cam_pos = cam_pos;
+                    s_last_cam_dir = cam_dir;
+                }
+
+                bool skip_render = throttle_on && (j > 0) && (s_still_frames >= (U32)settle_frames);
+                if (!skip_render)
+                {
+                    mRT->shadow[j].bindTarget();
+                    mRT->shadow[j].getViewport(gGLViewport);
+                    mRT->shadow[j].clear();
+                    {
+                        static LLCullResult result[4];
+                        renderShadow(view[j], proj[j], shadow_cam, result[j], true);
+                    }
+                    mRT->shadow[j].flush();
+                }
+            }
 
             if (!gPipeline.hasRenderDebugMask(LLPipeline::RENDER_DEBUG_SHADOW_FRUSTA) && !gCubeSnapshot)
             {
