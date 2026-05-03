@@ -78,6 +78,15 @@ float calcAmbientOcclusion(vec4 pos, vec3 norm, vec2 pos_screen)
 {
     float ret = 1.0;
     vec3 pos_world = pos.xyz;
+
+    // MARE: SSAO has no perceptible effect beyond ~64m — the sample radius in
+    // screen space becomes sub-pixel and the result is indistinguishable from 1.0.
+    // Early-out saves 8 texture fetches + math per distant pixel.
+    if (-pos_world.z > 64.0)
+    {
+        return 1.0;
+    }
+
     vec2 noise_reflect = texture(noiseMap, pos_screen.xy * (screen_res / 128)).xy;
 
     float angle_hidden = 0.0;
