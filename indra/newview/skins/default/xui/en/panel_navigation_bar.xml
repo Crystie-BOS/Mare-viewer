@@ -241,8 +241,9 @@
                 top="13"
                 width="50"
                 bottom="0"
+                halign="center"
                 valign="bottom">
-                More &#9660;
+                &#9660;
                 </more_button>
          </favorites_bar>
          </layout_panel>

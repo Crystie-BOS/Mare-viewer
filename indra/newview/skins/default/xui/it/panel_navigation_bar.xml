@@ -15,7 +15,7 @@
 					Barra dei Preferiti
 				</label>
 				<more_button name="&gt;&gt;" tool_tip="Mostra altri Preferiti">
-					Altro ▼
+					▼
 				</more_button>
 			</favorites_bar>
 		</layout_panel>

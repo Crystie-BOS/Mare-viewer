@@ -1070,7 +1070,7 @@ void LLFavoritesBarCtrl::updateButtons(bool force_update)
             // or there are some new favorites, or width had been changed
             // so if we need to display chevron button,  we must update dropdown items too.
             mUpdateDropDownItems = true;
-            S32 buttonHGap = button_params.rect.left; // default value
+            S32 buttonHGap = button_params.rect.left + 10;
             // Chevron button should stay right aligned
             LLRect rect(mMoreTextBox->getRect());
             rect.translate(getRect().mRight - rect.mRight - buttonHGap, 0);

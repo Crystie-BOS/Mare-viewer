@@ -15,7 +15,7 @@
 					Pasek Ulubionych
 				</label>
 				<more_button name=">>" tool_tip="Pokaż więcej Moich Ulubionych">
-					Więcej &#9660;
+					&#9660;
 				</more_button>
 			</favorites_bar>
 		</layout_panel>

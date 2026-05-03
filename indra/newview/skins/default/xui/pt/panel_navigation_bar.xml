@@ -15,7 +15,7 @@
 					Barra Destaques
 				</label>
 				<more_button name="&gt;&gt;" tool_tip="Mostrar mais favoritos">
-					Mais ▼
+					▼
 				</more_button>
 			</favorites_bar>
 		</layout_panel>
