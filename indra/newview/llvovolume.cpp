@@ -1718,6 +1718,23 @@ bool LLVOVolume::calcLOD()
 
     if (cur_detail != mLOD)
     {
+        // MARE: hysteresis band — when reducing LOD quality (object moving away),
+        // require the object to be clearly past the switch threshold before committing.
+        // Re-evaluate at 90% of current distance: if the closer evaluation still
+        // wants to reduce detail we're well past the threshold and should switch;
+        // if not, we're right on the boundary and hold the current LOD to prevent
+        // flip-flopping as the camera moves slightly back and forth.
+        // LOD improvement (moving closer) always switches immediately.
+        if (cur_detail > mLOD)
+        {
+            F32 hyst_dist = ll_round(distance * 0.9f, 0.01f);
+            S32 hyst_detail = computeLODDetail(hyst_dist, ll_round(radius, 0.01f), lod_factor);
+            if (hyst_detail <= mLOD)
+            {
+                return false;
+            }
+        }
+
         mAppAngle = ll_round((F32) atan2( mDrawable->getRadius(), mDrawable->mDistanceWRTCamera) * RAD_TO_DEG, 0.01f);
         mLOD = cur_detail;
 
