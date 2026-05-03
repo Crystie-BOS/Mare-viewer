@@ -15,7 +15,7 @@
 					Favoritenleiste
 				</label>
 				<more_button name="&gt;&gt;" tool_tip="Mehr meiner Favoriten anzeigen">
-					Mehr ▼
+					▼
 				</more_button>
 			</favorites_bar>
 		</layout_panel>

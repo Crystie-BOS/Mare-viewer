@@ -15,7 +15,7 @@
 					最愛列
 				</label>
 				<more_button name="&gt;&gt;" tool_tip="顯示更多我的最愛">
-					詳情 ▼
+					▼
 				</more_button>
 			</favorites_bar>
 		</layout_panel>
