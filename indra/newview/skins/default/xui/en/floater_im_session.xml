@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <floater
- background_visible="true"
- bg_opaque_color="0 0 0 0.65"
+ background_visible="false"
+ bg_opaque_color="0 0 0 0"
  bg_alpha_color="0 0 0 0"
  height="355"
  help_topic="floater_im_box"

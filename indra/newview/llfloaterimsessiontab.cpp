@@ -28,6 +28,7 @@
 #include "llviewerprecompiledheaders.h"
 
 #include "llfloaterimsessiontab.h"
+#include "llui.h"
 
 #include "llagent.h"
 #include "llagentcamera.h"
@@ -430,10 +431,15 @@ void LLFloaterIMSessionTab::draw()
         mRefreshTimer->setTimerExpirySec(REFRESH_INTERVAL);
     }
 
-    // MARE: hover-based transparency — opaque when mouse is over, transparent when not
-    S32 mx, my;
-    LLUI::getInstance()->getMousePositionLocal(this, &mx, &my);
-    setBackgroundOpaque(getLocalRect().pointInRect(mx, my));
+    // MARE: draw dark background only while mouse is over the window
+    {
+        S32 mx, my;
+        LLUI::getInstance()->getMousePositionLocal(this, &mx, &my);
+        if (getLocalRect().pointInRect(mx, my))
+        {
+            gl_rect_2d(getLocalRect(), LLColor4(0.f, 0.f, 0.f, 0.65f));
+        }
+    }
 
     super::draw();
 }
