@@ -156,6 +156,7 @@ public:
     void bindScreenToTexture();
     void renderFinalize();
     void copyScreenSpaceReflections(LLRenderTarget* src, LLRenderTarget* dst);
+    void buildHiZBuffer();
     void generateLuminance(LLRenderTarget* src, LLRenderTarget* dst);
     void generateExposure(LLRenderTarget* src, LLRenderTarget* dst, bool use_history = true);
     void tonemap(LLRenderTarget* src, LLRenderTarget* dst, bool gamma_correct);
@@ -761,6 +762,16 @@ public:
     // mRT->screen so that tonemapping and bloom run at display resolution.
     // Released (zero size) when FSR 2 is not the active upscaler mode.
     LLRenderTarget          mDisplayScreen;
+
+    // MARE: Hi-Z depth pyramid for SSR acceleration.
+    // mHiZTexture is a GL_R32F texture with a full mip chain.
+    // mHiZFBOs[i] wraps mip level i (one FBO per level).
+    static constexpr S32    HIZ_MAX_LEVELS = 8;
+    GLuint                  mHiZTexture  = 0;
+    GLuint                  mHiZFBOs[HIZ_MAX_LEVELS] = {};
+    S32                     mHiZLevels   = 0;   // actual mip levels allocated
+    S32                     mHiZWidth    = 0;
+    S32                     mHiZHeight   = 0;
 
     // render ui to buffer target
     LLRenderTarget          mUIScreen;

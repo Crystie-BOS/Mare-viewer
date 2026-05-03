@@ -25,6 +25,7 @@
 
 uniform sampler2D sceneMap;
 uniform sampler2D sceneDepth;
+uniform sampler2D hiZMap;       // MARE: Hi-Z depth pyramid for SSR coarse skip
 
 uniform vec2 screen_res;
 uniform mat4 projection_matrix;
@@ -105,6 +106,23 @@ bool traceScreenRay(vec3 position, vec3 reflection, out vec4 hitColor, out float
                 hit = false;
                 break;
             }
+
+            // MARE: Hi-Z coarse skip — if the ray is clearly in front of all geometry
+            // in an 8x8 screen region, advance 4 extra steps and skip getLinearDepth().
+            {
+                vec4 marchProj = projection_matrix * vec4(marchingPosition, 1.0);
+                if (marchProj.w > 0.0)
+                {
+                    float marchNDC01 = marchProj.z / marchProj.w * 0.5 + 0.5;
+                    float hiZCoarse  = textureLod(hiZMap, screenPosition, 3.0).r;
+                    if (marchNDC01 < hiZCoarse - 0.001)
+                    {
+                        marchingPosition += step * 4.0;
+                        continue;
+                    }
+                }
+            }
+
             depthFromScreen = getLinearDepth(screenPosition);
             delta = abs(marchingPosition.z) - depthFromScreen;
 

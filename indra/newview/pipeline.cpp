@@ -947,6 +947,56 @@ bool LLPipeline::allocateScreenBufferInternal(U32 resX, U32 resY)
             mSceneMap.release();
         }
 
+        // MARE: Hi-Z depth pyramid — allocate/reallocate when SSR is enabled.
+        // Released via releaseScreenBuffers() when SSR is off.
+        if (RenderScreenSpaceReflections)
+        {
+            // Only reallocate if size changed.
+            if ((S32)resX != mHiZWidth || (S32)resY != mHiZHeight)
+            {
+                // Release old resources first.
+                if (mHiZTexture)  { glDeleteTextures(1, &mHiZTexture);  mHiZTexture = 0; }
+                for (S32 i = 0; i < HIZ_MAX_LEVELS; ++i)
+                {
+                    if (mHiZFBOs[i]) { glDeleteFramebuffers(1, &mHiZFBOs[i]); mHiZFBOs[i] = 0; }
+                }
+
+                mHiZWidth  = (S32)resX;
+                mHiZHeight = (S32)resY;
+
+                // Compute mip count: floor(log2(max(w,h))) + 1, capped at HIZ_MAX_LEVELS.
+                S32 maxDim  = llmax(mHiZWidth, mHiZHeight);
+                mHiZLevels  = 1;
+                while ((maxDim >> mHiZLevels) > 0 && mHiZLevels < HIZ_MAX_LEVELS) ++mHiZLevels;
+
+                glGenTextures(1, &mHiZTexture);
+                glBindTexture(GL_TEXTURE_2D, mHiZTexture);
+                glTexStorage2D(GL_TEXTURE_2D, mHiZLevels, GL_R32F, mHiZWidth, mHiZHeight);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                glBindTexture(GL_TEXTURE_2D, 0);
+
+                for (S32 i = 0; i < mHiZLevels; ++i)
+                {
+                    glGenFramebuffers(1, &mHiZFBOs[i]);
+                    glBindFramebuffer(GL_FRAMEBUFFER, mHiZFBOs[i]);
+                    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mHiZTexture, i);
+                    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                }
+            }
+        }
+        else if (mHiZTexture)
+        {
+            glDeleteTextures(1, &mHiZTexture);  mHiZTexture = 0;
+            for (S32 i = 0; i < HIZ_MAX_LEVELS; ++i)
+            {
+                if (mHiZFBOs[i]) { glDeleteFramebuffers(1, &mHiZFBOs[i]); mHiZFBOs[i] = 0; }
+            }
+            mHiZLevels = mHiZWidth = mHiZHeight = 0;
+        }
+
         // MARE: post-processing buffers run at display resolution when FSR 2 is active
         // so that tonemapping and bloom are sharp on the upscaled image.
         {
@@ -1335,6 +1385,24 @@ void LLPipeline::releaseScreenBuffers()
 
     mVelocityBuffer.release();  // MARE: Phase 2 — safe no-op if upscaler was disabled
     mDisplayScreen.release();   // MARE: Phase 3 Step 3 — safe no-op if FSR 2 was not active
+
+    // MARE: Hi-Z pyramid cleanup
+    if (mHiZTexture)
+    {
+        glDeleteTextures(1, &mHiZTexture);
+        mHiZTexture = 0;
+    }
+    for (S32 i = 0; i < HIZ_MAX_LEVELS; ++i)
+    {
+        if (mHiZFBOs[i])
+        {
+            glDeleteFramebuffers(1, &mHiZFBOs[i]);
+            mHiZFBOs[i] = 0;
+        }
+    }
+    mHiZLevels = 0;
+    mHiZWidth  = 0;
+    mHiZHeight = 0;
 }
 
 void LLPipeline::releaseSunShadowTarget(U32 index)
@@ -7507,6 +7575,69 @@ void LLPipeline::copyScreenSpaceReflections(LLRenderTarget* src, LLRenderTarget*
     }
 }
 
+void LLPipeline::buildHiZBuffer()
+{
+    if (!RenderScreenSpaceReflections || gCubeSnapshot) return;
+    if (!mHiZTexture || mHiZLevels < 1)                return;
+    if (!gHiZCopyProgram.isComplete())                  return;
+    if (!gHiZReduceProgram.isComplete())                return;
+
+    LL_PROFILE_GPU_ZONE("Hi-Z build");
+
+    // Disable depth test/write for the full-screen passes.
+    LLGLDepthTest no_depth(GL_FALSE, GL_FALSE);
+    LLGLDisable no_blend(GL_BLEND);
+
+    // --- Mip 0: copy scene NDC depth to Hi-Z texture ---
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, mHiZFBOs[0]);
+        glViewport(0, 0, mHiZWidth, mHiZHeight);
+
+        gHiZCopyProgram.bind();
+
+        S32 depth_channel = gHiZCopyProgram.getTextureChannel(LLShaderMgr::DEFERRED_DEPTH);
+        gGL.getTexUnit(depth_channel)->bind(&mRT->deferredScreen, true); // bind depth attachment
+
+        mScreenTriangleVB->setBuffer();
+        mScreenTriangleVB->drawArrays(LLRender::TRIANGLES, 0, 3);
+
+        gHiZCopyProgram.unbind();
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    // --- Mips 1+: min-reduce from previous level ---
+    {
+        gHiZReduceProgram.bind();
+
+        // Bind the Hi-Z texture to unit 0 for all reduce passes.
+        S32 hiz_channel = gHiZReduceProgram.getTextureChannel(LLShaderMgr::HIZ_MAP);
+        glActiveTexture(GL_TEXTURE0 + hiz_channel);
+        glBindTexture(GL_TEXTURE_2D, mHiZTexture);
+
+        for (S32 lvl = 1; lvl < mHiZLevels; ++lvl)
+        {
+            S32 w = llmax(1, mHiZWidth  >> lvl);
+            S32 h = llmax(1, mHiZHeight >> lvl);
+
+            glBindFramebuffer(GL_FRAMEBUFFER, mHiZFBOs[lvl]);
+            glViewport(0, 0, w, h);
+
+            gHiZReduceProgram.uniform1i(LLShaderMgr::HIZ_SRC_LEVEL, lvl - 1);
+
+            mScreenTriangleVB->setBuffer();
+            mScreenTriangleVB->drawArrays(LLRender::TRIANGLES, 0, 3);
+
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        }
+
+        glBindTexture(GL_TEXTURE_2D, 0);
+        gHiZReduceProgram.unbind();
+    }
+
+    // Restore pipeline viewport.
+    glViewport(gGLViewport[0], gGLViewport[1], gGLViewport[2], gGLViewport[3]);
+}
+
 void LLPipeline::generateGlow(LLRenderTarget* src)
 {
     LL_PROFILE_GPU_ZONE("glow generate");
@@ -8214,6 +8345,7 @@ void LLPipeline::renderFinalize()
     if (hdr)
     {
         copyScreenSpaceReflections(&mRT->screen, &mSceneMap);
+        buildHiZBuffer(); // MARE: build Hi-Z pyramid for SSR ray march acceleration
 
         generateLuminance(&mRT->screen, &mLuminanceMap);
 
@@ -9844,7 +9976,13 @@ void LLPipeline::bindReflectionProbes(LLGLSLShader& shader)
         gGL.getTexUnit(channel)->bind(&mSceneMap, true);
     }
 
-
+    // MARE: bind Hi-Z pyramid for SSR ray march acceleration
+    channel = shader.enableTexture(LLShaderMgr::HIZ_MAP);
+    if (channel > -1 && mHiZTexture)
+    {
+        glActiveTexture(GL_TEXTURE0 + channel);
+        glBindTexture(GL_TEXTURE_2D, mHiZTexture);
+    }
 }
 
 void LLPipeline::unbindReflectionProbes(LLGLSLShader& shader)

@@ -171,6 +171,8 @@ LLGLSLShader            gDeferredAvatarVelocityProgram;    // MARE: Phase 2 Step
 LLGLSLShader            gDeferredTAAProgram;               // MARE: Phase 3 Step 1 — TAA accumulation pass
 LLGLSLShader            gDeferredTAACopyProgram;           // MARE: Phase 3 Step 1 — TAA copy-back pass
 LLGLSLShader            gDeferredNISProgram;               // MARE: Phase 3 Step 2 — NIS sharpening
+LLGLSLShader            gHiZCopyProgram;                   // MARE: Hi-Z mip-0 copy
+LLGLSLShader            gHiZReduceProgram;                 // MARE: Hi-Z min-reduce
 LLGLSLShader            gDeferredSoftenProgram;
 LLGLSLShader            gDeferredShadowProgram;
 LLGLSLShader            gDeferredSkinnedShadowProgram;
@@ -1125,6 +1127,8 @@ bool LLViewerShaderMgr::loadShadersDeferred()
         gDeferredTAAProgram.unload();               // MARE: Phase 3 Step 1
         gDeferredTAACopyProgram.unload();           // MARE: Phase 3 Step 1
         gDeferredNISProgram.unload();               // MARE: Phase 3 Step 2
+        gHiZCopyProgram.unload();                   // MARE: Hi-Z
+        gHiZReduceProgram.unload();                 // MARE: Hi-Z
         gDeferredSoftenProgram.unload();
         gDeferredShadowProgram.unload();
         gDeferredSkinnedShadowProgram.unload();
@@ -1900,6 +1904,40 @@ bool LLViewerShaderMgr::loadShadersDeferred()
             add_common_permutations(&gDeferredNISProgram);
 
             mare_ok = gDeferredNISProgram.createShader();
+            llassert(mare_ok);
+        }
+
+        // Hi-Z mip-0 copy pass.
+        if (mare_ok)
+        {
+            gHiZCopyProgram.mName = "MARE Hi-Z Copy Shader";
+            gHiZCopyProgram.mFeatures.isDeferred = false;
+
+            gHiZCopyProgram.mShaderFiles.clear();
+            gHiZCopyProgram.mShaderFiles.push_back(make_pair("deferred/postDeferredNoTCV.glsl", GL_VERTEX_SHADER));
+            gHiZCopyProgram.mShaderFiles.push_back(make_pair("deferred/hiZCopyDepthF.glsl", GL_FRAGMENT_SHADER));
+            gHiZCopyProgram.mShaderLevel = mShaderLevel[SHADER_DEFERRED];
+
+            add_common_permutations(&gHiZCopyProgram);
+
+            mare_ok = gHiZCopyProgram.createShader();
+            llassert(mare_ok);
+        }
+
+        // Hi-Z min-reduce pass.
+        if (mare_ok)
+        {
+            gHiZReduceProgram.mName = "MARE Hi-Z Reduce Shader";
+            gHiZReduceProgram.mFeatures.isDeferred = false;
+
+            gHiZReduceProgram.mShaderFiles.clear();
+            gHiZReduceProgram.mShaderFiles.push_back(make_pair("deferred/postDeferredNoTCV.glsl", GL_VERTEX_SHADER));
+            gHiZReduceProgram.mShaderFiles.push_back(make_pair("deferred/hiZReduceF.glsl", GL_FRAGMENT_SHADER));
+            gHiZReduceProgram.mShaderLevel = mShaderLevel[SHADER_DEFERRED];
+
+            add_common_permutations(&gHiZReduceProgram);
+
+            mare_ok = gHiZReduceProgram.createShader();
             llassert(mare_ok);
         }
 

@@ -349,6 +349,9 @@ public:
         SMAA_SEARCH_TEX,                    //  "searchTex"
         SMAA_BLEND_TEX,                     //  "blendTex"
 
+        HIZ_MAP,                            //  "hiZMap"
+        HIZ_SRC_LEVEL,                      //  "srcLevel"
+
         END_RESERVED_UNIFORMS
     } eGLSLReservedUniforms;
     // clang-format on

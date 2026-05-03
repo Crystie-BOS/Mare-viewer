@@ -241,6 +241,8 @@ extern LLGLSLShader         gDeferredAvatarVelocityProgram;    // MARE: Phase 2 
 extern LLGLSLShader         gDeferredTAAProgram;               // MARE: Phase 3 Step 1 — TAA accumulation
 extern LLGLSLShader         gDeferredTAACopyProgram;           // MARE: Phase 3 Step 1 — TAA copy-back
 extern LLGLSLShader         gDeferredNISProgram;               // MARE: Phase 3 Step 2 — NIS sharpening
+extern LLGLSLShader         gHiZCopyProgram;                   // MARE: Hi-Z mip-0 copy
+extern LLGLSLShader         gHiZReduceProgram;                 // MARE: Hi-Z min-reduce
 extern LLGLSLShader         gDeferredAvatarProgram;
 extern LLGLSLShader         gDeferredSoftenProgram;
 extern LLGLSLShader         gDeferredShadowProgram;
