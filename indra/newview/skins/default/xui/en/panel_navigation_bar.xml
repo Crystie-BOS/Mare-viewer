@@ -207,19 +207,7 @@
              image_drag_indication="Accordion_ArrowOpened_Off"
              tool_tip="Drag Landmarks here for quick access to your favorite places in [SECOND_LIFE]"
              width="310">
-            <label
-             follows="left|top"
-             height="13"
-             layout="topleft"
-             left="10"
-             name="favorites_bar_label"
-             text_color="LtGray"
-             tool_tip="Drag Landmarks here for quick access to your favorite places in [SECOND_LIFE]"
-             top="13"
-	     valign="bottom"
-             width="290">
-              Places you save to your favorites bar will appear here.
-            </label>
+
               <!-- Subfolder filter button — hidden when no subfolders exist -->
               <subfolder_button
                 follows="left|bottom"

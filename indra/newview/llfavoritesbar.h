@@ -179,7 +179,7 @@ private:
     LLUICtrl* mLandingTab;
     LLUICtrl* mLastTab;
     LLTextBox* mMoreTextBox;
-    LLTextBox* mBarLabel;
+
     LLTextBox* mSubfolderFilterBtn;
     LLUUID      mFilterFolderID;
     bool        mSubfolderBtnWasVisible;
