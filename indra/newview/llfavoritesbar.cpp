@@ -460,9 +460,7 @@ LLFavoritesBarCtrl::LLFavoritesBarCtrl(const LLFavoritesBarCtrl::Params& p)
 
     mDropDownItemsCount = 0;
 
-    LLTextBox::Params label_param(p.label);
-    mBarLabel = LLUICtrlFactory::create<LLTextBox> (label_param);
-    addChild(mBarLabel);
+
 }
 
 LLFavoritesBarCtrl::~LLFavoritesBarCtrl()
@@ -956,12 +954,7 @@ void LLFavoritesBarCtrl::updateButtons(bool force_update)
 
     if(mItems.empty())
     {
-        mBarLabel->setVisible(true);
         mLastTab = NULL;
-    }
-    else
-    {
-        mBarLabel->setVisible(false);
     }
     const child_list_t* childs = getChildList();
     child_list_const_iter_t child_it = childs->begin();
