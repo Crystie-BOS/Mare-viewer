@@ -121,6 +121,8 @@ protected:
 
     LLHandle<LLView> mOverflowMenuHandle;
     LLHandle<LLView> mContextMenuHandle;
+    LLHandle<LLView> mLandmarkContextMenuHandle;
+    LLHandle<LLView> mVisitedContextMenuHandle;
     LLHandle<LLView> mSubfolderMenuHandle;
 
     LLUUID mFavoriteFolderId;
@@ -186,6 +188,7 @@ private:
 
     EBarMode    mBarMode;
     std::map<LLUUID, LLVector3d> mVisitedPositions;
+    std::map<LLUUID, S32>        mVisitedIndices;
 
     LLUUID mDragItemId;
     bool mStartDrag;
