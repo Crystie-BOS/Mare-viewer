@@ -5521,7 +5521,13 @@ std::string RRInterface::getFullPath (LLInventoryItem* item, std::string option,
                 for (unsigned int i = 0; i < attach_point->mAttachedObjects.size(); ++i) {
                     LLViewerObject* attached_object = attach_point->mAttachedObjects.at(i);
                     if (attached_object) {
-                        item = getItemAux (attached_object, gAgent.mRRInterface.getRlvShare());
+                        item = getItemAux (attached_object, gAgent.mRRInterface.getRlvShare(), false); // objects only on first call
+                        if (item == NULL || !gAgent.mRRInterface.isUnderRlvShare(item))
+                        {
+                        	// try again with links allowed this time
+                        	item = getItemAux (attached_object, gAgent.mRRInterface.getRlvShare(), true);
+                        }
+
                         if (item != NULL && !gAgent.mRRInterface.isUnderRlvShare(item)) item = NULL; // security : we would return the path even if the item was not shared otherwise
                         else {
                             // We have found the inventory item => add its path to the list
@@ -5558,7 +5564,7 @@ std::string RRInterface::getFullPath (LLInventoryItem* item, std::string option,
 }
 
 
-LLInventoryItem* RRInterface::getItemAux (LLViewerObject* attached_object, LLInventoryCategory* root)
+LLInventoryItem* RRInterface::getItemAux (LLViewerObject* attached_object, LLInventoryCategory* root, bool includeLinks)
 {
     static LLCachedControl<bool> doNotCheckLinks(gSavedSettings, "RestrainedLoveGetPathLinksAsObjects", FALSE);
 
@@ -5589,7 +5595,7 @@ LLInventoryItem* RRInterface::getItemAux (LLViewerObject* attached_object, LLInv
 				// getpath returning the link location within RLV whilst the parent outside of #RLV gets culled from the
 				// results
 				//
-				&& (doNotCheckLinks || !item->getIsLinkType())
+				&& ((doNotCheckLinks && includeLinks) || !item->getIsLinkType())
                 && (item->getType() == LLAssetType::AT_OBJECT || item->getType() == LLAssetType::AT_CLOTHING)
                 && avatar->getWornAttachment (item->getLinkedUUID()) == attached_object
                 ) {
@@ -5602,7 +5608,7 @@ LLInventoryItem* RRInterface::getItemAux (LLViewerObject* attached_object, LLInv
         count = static_cast<S32>(cats->size());
         for(i = 0; i < count; ++i) {
             cat = cats->at(i);
-            item = getItemAux (attached_object, cat);
+            item = getItemAux (attached_object, cat, includeLinks);
             if (item != NULL) return item;
         }
     }
