@@ -40,8 +40,10 @@
 #include "llagent.h"
 #include "llteleporthistorystorage.h"
 #include "llagentpicksinfo.h"
+#include "llavataractions.h"
 #include "llavatarnamecache.h"
 #include "llclipboard.h"
+#include "llgiveinventory.h"
 #include "llinventorybridge.h"
 #include "llinventoryfunctions.h"
 #include "llfloatersidepanelcontainer.h"
@@ -798,7 +800,9 @@ void LLFavoritesBarCtrl::changed(U32 mask)
             gInventory.fetchDescendentsOf(mFavoriteFolderId);
         }
     }
-    else
+
+    // Cache SLURLs for favorites items (only when the favorites folder is available)
+    if (mFavoriteFolderId.notNull())
     {
         LLInventoryModel::item_array_t items;
         LLInventoryModel::cat_array_t cats;
@@ -809,23 +813,25 @@ void LLFavoritesBarCtrl::changed(U32 mask)
         {
             LLFavoritesOrderStorage::instance().getSLURL((*i)->getAssetUUID());
         }
+    }
 
-        if (sWaitingForCallabck < LLTimer::getTotalSeconds())
+    // Update the bar for all modes. LANDMARKS and VISITED don't need mFavoriteFolderId.
+    // FAVORITES mode: collectFavoriteItems() returns early if folder is still null.
+    if (sWaitingForCallabck < LLTimer::getTotalSeconds())
+    {
+        updateButtons();
+        if (!mItemsChangedTimer.getStarted())
         {
-            updateButtons();
-            if (!mItemsChangedTimer.getStarted())
-            {
-                mItemsChangedTimer.start();
-            }
-            else
-            {
-                mItemsChangedTimer.reset();
-            }
+            mItemsChangedTimer.start();
         }
         else
         {
-            mItemsListDirty = true;
+            mItemsChangedTimer.reset();
         }
+    }
+    else
+    {
+        mItemsListDirty = true;
     }
 }
 
@@ -1161,6 +1167,20 @@ bool LLFavoritesBarCtrl::postBuild()
     menu->setBackgroundColor(LLUIColorTable::instance().getColor("MenuPopupBgColor"));
     mContextMenuHandle = menu->getHandle();
 
+    LLMenuGL* landmark_menu = LLUICtrlFactory::getInstance()->createFromFile<LLMenuGL>("menu_favorites_landmark.xml", gMenuHolder, LLViewerMenuHolderGL::child_registry_t::instance());
+    if (landmark_menu)
+    {
+        landmark_menu->setBackgroundColor(LLUIColorTable::instance().getColor("MenuPopupBgColor"));
+        mLandmarkContextMenuHandle = landmark_menu->getHandle();
+    }
+
+    LLMenuGL* visited_menu = LLUICtrlFactory::getInstance()->createFromFile<LLMenuGL>("menu_favorites_visited.xml", gMenuHolder, LLViewerMenuHolderGL::child_registry_t::instance());
+    if (visited_menu)
+    {
+        visited_menu->setBackgroundColor(LLUIColorTable::instance().getColor("MenuPopupBgColor"));
+        mVisitedContextMenuHandle = visited_menu->getHandle();
+    }
+
     mRlvBehaviorCallbackConnection = gAgent.mRRInterface.setBehaviourCallback(boost::bind(&LLFavoritesBarCtrl::updateRlvRestrictions, this, _1)); // KKA-928
 
     return true;
@@ -1382,12 +1402,16 @@ bool LLFavoritesBarCtrl::collectVisitedItems(LLInventoryModel::item_array_t &ite
     const LLTeleportHistoryStorage::slurl_list_t& hist_items = hist->getItems();
     if (hist_items.empty()) return false;
 
-    // Newest first
-    for (auto it = hist_items.rbegin(); it != hist_items.rend(); ++it)
+    mVisitedIndices.clear();
+
+    // Newest first; idx tracks the real index into hist_items
+    S32 idx = (S32)hist_items.size() - 1;
+    for (auto it = hist_items.rbegin(); it != hist_items.rend(); ++it, --idx)
     {
         LLUUID fake_id;
         fake_id.generate();
         mVisitedPositions[fake_id] = it->mGlobalPos;
+        mVisitedIndices[fake_id] = idx;
 
         LLPointer<LLViewerInventoryItem> item = new LLViewerInventoryItem();
         item->setUUID(fake_id);
@@ -1569,7 +1593,14 @@ void LLFavoritesBarCtrl::onButtonRightClick( LLUUID item_id,LLView* fav_button,S
 {
     mSelectedItemID = item_id;
 
-    LLMenuGL* menu = (LLMenuGL*)mContextMenuHandle.get();
+    LLMenuGL* menu = nullptr;
+    if (mBarMode == BAR_MODE_LANDMARKS)
+        menu = (LLMenuGL*)mLandmarkContextMenuHandle.get();
+    else if (mBarMode == BAR_MODE_VISITED)
+        menu = (LLMenuGL*)mVisitedContextMenuHandle.get();
+    else
+        menu = (LLMenuGL*)mContextMenuHandle.get();
+
     if (!menu)
     {
         return;
@@ -1616,6 +1647,17 @@ bool LLFavoritesBarCtrl::enableSelected(const LLSD& userdata)
 {
     std::string param = userdata.asString();
 
+    // Visited items: position-based enable/visibility checks
+    if (mBarMode == BAR_MODE_VISITED)
+    {
+        if (param == "show_on_map" || param == "copy_slurl")
+        {
+            auto it = mVisitedPositions.find(mSelectedItemID);
+            return it != mVisitedPositions.end() && !it->second.isExactlyZero();
+        }
+        return true;
+    }
+
     if (param == std::string("can_paste"))
     {
         return isClipboardPasteable();
@@ -1637,6 +1679,33 @@ bool LLFavoritesBarCtrl::enableSelected(const LLSD& userdata)
         LLLandmark* landmark = gLandmarkList.getAsset(asset_id, NULL /*callback*/);
         return nullptr != landmark;
     }
+    else if (param == "share")
+    {
+        LLViewerInventoryItem* item = gInventory.getItem(mSelectedItemID);
+        if (!item) return false;
+        const LLUUID trash_id = gInventory.findCategoryUUIDForType(LLFolderType::FT_TRASH);
+        if (gInventory.isObjectDescendentOf(mSelectedItemID, trash_id)) return false;
+        return LLGiveInventory::isInventoryGiveAcceptable(item);
+    }
+    else if (param == "move_to_landmarks_visible")
+    {
+        return (mBarMode != BAR_MODE_LANDMARKS);
+    }
+    else if (param == "move_to_favorites_visible")
+    {
+        const LLUUID fav_id = gInventory.findCategoryUUIDForType(LLFolderType::FT_FAVORITE);
+        return !gInventory.isObjectDescendentOf(mSelectedItemID, fav_id);
+    }
+    else if (param == "restore_visible")
+    {
+        const LLUUID trash_id = gInventory.findCategoryUUIDForType(LLFolderType::FT_TRASH);
+        return gInventory.isObjectDescendentOf(mSelectedItemID, trash_id);
+    }
+    else if (param == "cut")
+    {
+        if (mSelectedItemID.isNull()) return false;
+        return get_is_item_removable(&gInventory, mSelectedItemID, true);
+    }
 
     return false;
 }
@@ -1645,6 +1714,65 @@ void LLFavoritesBarCtrl::doToSelected(const LLSD& userdata)
 {
     std::string action = userdata.asString();
     LL_INFOS("FavoritesBar") << "Action = " << action << " Item = " << mSelectedItemID.asString() << LL_ENDL;
+
+    // Visited items have fake UUIDs not present in inventory — handle them first
+    if (mBarMode == BAR_MODE_VISITED)
+    {
+        auto pos_it = mVisitedPositions.find(mSelectedItemID);
+        auto idx_it = mVisitedIndices.find(mSelectedItemID);
+        if (pos_it == mVisitedPositions.end())
+            return;
+
+        const LLVector3d& pos = pos_it->second;
+        S32 hist_idx = (idx_it != mVisitedIndices.end()) ? idx_it->second : -1;
+
+        if (action == "open")
+        {
+            gAgent.teleportViaLocation(pos);
+        }
+        else if (action == "view")
+        {
+            if (hist_idx >= 0)
+            {
+                LLSD params;
+                params["id"] = hist_idx;
+                params["type"] = "teleport_history";
+                LLFloaterSidePanelContainer::showPanel("places", params);
+            }
+        }
+        else if (action == "show_on_map")
+        {
+            LLFloaterWorldMap* worldmap = LLFloaterWorldMap::getInstance();
+            if (worldmap && !pos.isExactlyZero())
+            {
+                worldmap->trackLocation(pos);
+                LLFloaterReg::showInstance("world_map", "center");
+            }
+        }
+        else if (action == "copy_slurl")
+        {
+            if (!pos.isExactlyZero())
+                LLLandmarkActions::getSLURLfromPosGlobal(pos, copy_slurl_to_clipboard_cb);
+        }
+        else if (action == "remove")
+        {
+            if (hist_idx >= 0)
+            {
+                LLTeleportHistoryStorage::getInstance()->removeItem(hist_idx);
+                LLTeleportHistoryStorage::getInstance()->save();
+                updateButtons(true);
+            }
+        }
+
+        LLToggleableMenu* omenu = (LLToggleableMenu*)mOverflowMenuHandle.get();
+        if (mRestoreOverflowMenu && omenu && !omenu->getVisible())
+        {
+            omenu->resetScrollPositionOnShow(false);
+            showDropDownMenu();
+            omenu->resetScrollPositionOnShow(true);
+        }
+        return;
+    }
 
     LLViewerInventoryItem* item = gInventory.getItem(mSelectedItemID);
     if (!item)
@@ -1709,8 +1837,32 @@ void LLFavoritesBarCtrl::doToSelected(const LLSD& userdata)
         args["item_id"] = item->getUUID();
         LLFloaterSidePanelContainer::showPanel("places", args);
     }
+    else if (action == "share")
+    {
+        if (!LLGiveInventory::isInventoryGiveAcceptable(item))
+            return;
+        uuid_set_t selected;
+        selected.insert(mSelectedItemID);
+        LLFloater* root_floater = gFloaterView->getParentFloater(this);
+        LLAvatarActions::shareWithAvatars(selected, root_floater);
+    }
+    else if (action == "move_to_favorites")
+    {
+        change_item_parent(mSelectedItemID, gInventory.findCategoryUUIDForType(LLFolderType::FT_FAVORITE));
+    }
+    else if (action == "restore")
+    {
+        const LLUUID new_parent = gInventory.findCategoryUUIDForType(
+            LLFolderType::assetTypeToFolderType(item->getType()));
+        gInventory.changeItemParent(item, new_parent, false);
+    }
     else if (action == "cut")
     {
+        if (get_is_item_removable(&gInventory, mSelectedItemID, true))
+        {
+            LLClipboard::instance().setCutMode(true);
+            LLClipboard::instance().addToClipboard(mSelectedItemID);
+        }
     }
     else if (action == "copy")
     {

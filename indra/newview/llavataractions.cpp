@@ -1275,7 +1275,7 @@ void LLAvatarActions::shareWithAvatars(const uuid_set_t inventory_selected_uuids
     using namespace action_give_inventory;
 
     LLFloaterAvatarPicker* picker =
-        LLFloaterAvatarPicker::show(boost::bind(give_inventory_ids, _1, _2, inventory_selected_uuids), true, false, false, root_floater->getName());
+        LLFloaterAvatarPicker::show(boost::bind(give_inventory_ids, _1, _2, inventory_selected_uuids), true, false, false, root_floater ? root_floater->getName() : std::string());
     if (!picker)
     {
         return;
