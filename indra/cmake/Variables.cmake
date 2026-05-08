@@ -191,7 +191,7 @@ set(GRID agni CACHE STRING "Target Grid")
 # Set the default channel always to "Kokua Release". Any other words set here will be included in the Windows installer.
 # For example, "Kokua Experimental" will create an installer string of Kokua_Experimental_[VERSION]_Setup.exe
 # and "Kokua Experimental [VERSION]: Installation Folder" -- MC
-set(VIEWER_CHANNEL "Mare Viewer" CACHE STRING "Viewer Channel Name")
+set(VIEWER_CHANNEL "Mare Release" CACHE STRING "Viewer Channel Name")
 
 set(ENABLE_SIGNING OFF CACHE BOOL "Enable signing the viewer")
 set(SIGNING_IDENTITY "" CACHE STRING "Specifies the signing identity to use, if necessary.")
