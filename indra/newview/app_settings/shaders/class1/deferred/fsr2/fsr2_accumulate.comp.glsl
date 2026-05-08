@@ -115,13 +115,20 @@ void main()
     // ── Blend factor ──────────────────────────────────────────────────────────
     float lock        = texture(u_lockStatus, renderUV).r;
     float mvMag       = length(mv);
-    float motionDecay = 1.0 - smoothstep(0.0, 0.02, mvMag);   // less history for fast motion
+    float motionDecay = 1.0 - smoothstep(0.0, 0.02, mvMag);
 
-    // More lock → more history (0.9 base, up to 0.97 for static locked pixels).
+    // Base alpha from lock confidence.
     float alpha = mix(0.85, 0.97, lock * motionDecay);
 
+    // Reduce history aggressively during fast camera/object motion to prevent
+    // smearing.  Typical panning: 0.01–0.05 NDC/frame; fast pan: 0.05+ NDC/frame.
+    // At full fade (mvMag >= 0.05), keep 15% history minimum so RCAS still has
+    // something to sharpen and we don't get full temporal aliasing on fast pans.
+    float fastFade = 1.0 - smoothstep(0.01, 0.05, mvMag) * 0.82;
+    alpha *= fastFade;
+
     if (u_cameraCut != 0)
-        alpha = 0.0;  // first frame — no history
+        alpha = 0.0;  // first frame or teleport — no history
 
     // ── Output ────────────────────────────────────────────────────────────────
     vec3 result = mix(curr, prevClamped, alpha);
