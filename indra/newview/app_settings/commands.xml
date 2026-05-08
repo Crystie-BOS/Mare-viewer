@@ -410,7 +410,7 @@
            execute_function="Floater.Toggle"
            execute_parameters="fs_wearable_favorites"
            is_enabled_function="Agent.IsActionAllowed"
-           is_enabled_parameters="inventory"
+           is_enabled_parameters="favorites"
            is_running_function="Floater.IsOpen"
            is_running_parameters="fs_wearable_favorites"
            />

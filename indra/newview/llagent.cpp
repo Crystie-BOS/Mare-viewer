@@ -357,6 +357,18 @@ bool LLAgent::isActionAllowed(const LLSD& sdname)
             }
         }
     }
+    else if (param == "favorites")
+    {
+        retval = true;
+        if (gRRenabled)
+        {
+            if (gAgent.mRRInterface.mContainsShowfavorites)
+            {
+                retval = false;
+            }
+        }
+    }
+//mk
     else if (param == "map")
     {
         retval = true;

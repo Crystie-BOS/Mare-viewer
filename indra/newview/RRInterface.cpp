@@ -622,6 +622,13 @@ void refreshCachedVariable (std::string var)
         }
     }
 
+    // MARE: close the Wearable Favorites floater immediately when @showfavorites is added
+    else if (var == "showfavorites") {
+        if (gAgent.mRRInterface.mContainsShowfavorites) {
+            LLFloaterReg::hideInstance("fs_wearable_favorites", LLSD());
+        }
+    }
+
     //CA viewscript prevents the RLV console, unless being done from inside it
     else if (var == "viewscript") {
         if (gAgent.mRRInterface.mContainsViewScript && gAgent.getID() != current_handlecommand_caller) {
