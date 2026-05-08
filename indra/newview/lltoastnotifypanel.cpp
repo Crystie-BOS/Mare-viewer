@@ -266,10 +266,6 @@ void LLToastNotifyPanel::init( LLRect rect, bool show_images )
 {
     deleteAllChildren();
 
-//MK (CA)
-	static LLCachedControl<bool> sFixedHeight(gSavedSettings, "KokuaFixedHeightDialogs");
-//mk (CA)
-
     LLRect current_rect = getRect();
 
     setXMLFilename("");
@@ -388,14 +384,6 @@ void LLToastNotifyPanel::init( LLRect rect, bool show_images )
                     button_panel_width = min_width_required;
                     S32 width_increase = button_panel_width - mControlPanel->getRect().getWidth();
                     reshape(getRect().getWidth() + width_increase, getRect().getHeight());
-                    mInfoPanel->reshape(mInfoPanel->getRect().getWidth() + width_increase, mInfoPanel->getRect().getHeight());
-//MK (CA)
-// up until 26.2.0 the xml provided enough space for a scroll bar if needed - now we need to add it ourselves in the sizing logic
-// testing revealed that the default here can cause overhanging text if a line is long enough to need wrapping, so we adjust the default logic too
-
-	                //mTextBox->reshape(mTextBox->getRect().getWidth() + width_increase, mTextBox->getRect().getHeight());
-	                mTextBox->reshape(mTextBox->getRect().getWidth() + (sFixedHeight ? width_increase - 20 : width_increase - 16), mTextBox->getRect().getHeight());
-//mk (CA)
                 }
             }
             //try get an average h_pad to spread out buttons
@@ -447,6 +435,7 @@ void LLToastNotifyPanel::init( LLRect rect, bool show_images )
     mInfoPanel->setFollowsAll();
 //MK
     // If we are a script dialog, don't allow changing the height of the toast
+	static LLCachedControl<bool> sFixedHeight(gSavedSettings, "KokuaFixedHeightDialogs");
     if (!mIsScriptDialog || !sFixedHeight)
     {
 //mk
