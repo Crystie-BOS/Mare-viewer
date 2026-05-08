@@ -542,7 +542,7 @@ class WindowsManifest(ViewerManifest):
             if self.args['discord'] == 'ON':
                 self.path("discord_partner_sdk.dll")
 
-            if self.args['openal'] == 'ON':
+            if self.args['openal'].upper() in ('ON', 'TRUE', 'YES', '1'):
                 # Get openal dll
                 self.path("OpenAL32.dll")
                 self.path("alut.dll")
@@ -896,7 +896,7 @@ class DarwinManifest(ViewerManifest):
                     self.path2basename(relpkgdir, "HockeySDK.framework")
 
                 # OpenAL dylibs
-                if self.args['openal'] == 'ON':
+                if self.args['openal'].upper() in ('ON', 'TRUE', 'YES', '1'):
                     for libfile in (
                                 "libopenal.dylib",
                                 "libalut.dylib",
