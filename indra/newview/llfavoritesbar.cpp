@@ -850,6 +850,14 @@ void LLFavoritesBarCtrl::draw()
 {
     LLUICtrl::draw();
 
+    if (mSubfolderFilterBtn && mSubfolderFilterBtn->getVisible())
+    {
+        S32 sep_x  = mSubfolderFilterBtn->getRect().mRight + 1;
+        S32 btn_top = mSubfolderFilterBtn->getRect().mTop;
+        gl_line_2d(sep_x, 1, sep_x, btn_top - 1,
+                   LLColor4(1.f, 1.f, 1.f, 0.3f));
+    }
+
     if (mShowDragMarker)
     {
         S32 w = mImageDragIndication->getWidth();
@@ -1277,7 +1285,7 @@ void LLFavoritesBarCtrl::updateSubfolderFilter()
     {
         mSubfolderFilterBtn->setText(label);
         static const S32 SF_LEFT_PAD = 6;
-        static const S32 SF_H_PAD   = 14;
+        static const S32 SF_H_PAD   = 6;
         S32 btn_width = llmin(100, (S32)mFont->getWidth(label) + SF_H_PAD);
         LLRect r(SF_LEFT_PAD, 14, SF_LEFT_PAD + btn_width, 0);
         mSubfolderFilterBtn->setRect(r);
