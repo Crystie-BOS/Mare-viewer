@@ -217,7 +217,7 @@
                 top="13"
                 width="60"
                 bottom="0"
-                valign="bottom">
+                valign="center">
                 All &#9660;
                 </subfolder_button>
               <!-- More button actually is a text box. -->

@@ -1256,8 +1256,10 @@ void LLFavoritesBarCtrl::updateSubfolderFilter()
     if (mSubfolderFilterBtn)
     {
         mSubfolderFilterBtn->setText(label);
-        S32 btn_width = llmin(100, (S32)mFont->getWidth(label) + 16);
-        LLRect r(0, getRect().getHeight(), btn_width, 0);
+        static const S32 SF_LEFT_PAD = 6;
+        static const S32 SF_H_PAD   = 14;
+        S32 btn_width = llmin(100, (S32)mFont->getWidth(label) + SF_H_PAD);
+        LLRect r(SF_LEFT_PAD, 14, SF_LEFT_PAD + btn_width, 0);
         mSubfolderFilterBtn->setRect(r);
         mSubfolderFilterBtn->setVisible(true);
     }
