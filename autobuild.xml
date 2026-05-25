@@ -16,11 +16,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>35ada1add45d2a4b1d41434db153e539eb6d8f50</string>
+              <string>251822fef1b15e68a90a2df0225d25789fe41aed</string>
               <key>hash_algorithm</key>
               <string>sha1</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-sdl/downloads/SDL-1.2.15-linux64-251012092810.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-sdl/downloads/SDL-1.2.15-linux64-261450744.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -680,11 +680,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>7b6805d5f9672be634aa688380bd49e1cfa56870</string>
+              <string>081de893bec082ddd34e1647fe46ccd6689e1f21</string>
               <key>hash_algorithm</key>
               <string>sha1</string>
               <key>url</key>
-              <string>https://bitbucket.org/kokua/3p-fontconfig/downloads/fontconfig-2.12.93-linux64-251012110805.tar.bz2</string>
+              <string>https://bitbucket.org/kokua/3p-fontconfig/downloads/fontconfig-2.12.93-linux64-261450756.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
