@@ -443,7 +443,9 @@ void refreshCachedVariable (std::string var)
     else if (var == "showfriends")          gAgent.mRRInterface.mContainsShowfriends = contained;
     else if (var == "showgroups")           gAgent.mRRInterface.mContainsShowgroups = contained;
     else if (var == "shownotify")           gAgent.mRRInterface.mContainsShownotify = contained;
-    else if (var == "showfavorites")        gAgent.mRRInterface.mContainsShowfavorites = contained; 
+    else if (var == "showfavorites")        gAgent.mRRInterface.mContainsShowfavorites = contained;
+    else if (var == "showim")               gAgent.mRRInterface.mContainsShowim = contained;
+    else if (var == "showgroupchat")        gAgent.mRRInterface.mContainsShowgroupchat = contained;
     else if (var == "setenv")               gAgent.mRRInterface.mContainsSetenv = contained;
     else if (var == "setdebug")             gAgent.mRRInterface.mContainsSetdebug = contained;
     else if (var == "fly")                  gAgent.mRRInterface.mContainsFly = contained;
@@ -806,6 +808,8 @@ RRInterface::RRInterface():
     , mContainsShowgroups(false)
     , mContainsShownotify(false)
     , mContainsShowfavorites(false)
+    , mContainsShowim(false)
+    , mContainsShowgroupchat(false)
     , mContainsShownametags(false)
     , mContainsShowNearby(false)
     , mContainsViewScript(false)

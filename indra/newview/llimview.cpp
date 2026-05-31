@@ -3279,6 +3279,21 @@ void LLIMMgr::addMessage(
     {
         is_group_chat = gAgent.isInGroup(new_session_id);
     }
+
+//MK
+    // MARE: suppress incoming IM/group chat windows entirely under @showim/@showgroupchat
+    // Uses containsWithoutException so a collar can exempt itself via @showim:<uuid>=rem
+    if (gRRenabled && new_session)
+    {
+        if (!is_group_chat && gAgent.mRRInterface.mContainsShowim
+            && gAgent.mRRInterface.containsWithoutException("showim", other_participant_id.asString()))
+            return;
+        if (is_group_chat && gAgent.mRRInterface.mContainsShowgroupchat
+            && gAgent.mRRInterface.containsWithoutException("showgroupchat", new_session_id.asString()))
+            return;
+    }
+//mk
+
     if (new_session)
     {
         // Group chat session was initiated by muted resident, do not start this session viewerside

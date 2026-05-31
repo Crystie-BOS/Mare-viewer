@@ -288,6 +288,8 @@ public:
     bool mContainsShowgroups;
     bool mContainsShownotify;
     bool mContainsShowfavorites;
+    bool mContainsShowim;           // MARE: suppress incoming P2P IM windows
+    bool mContainsShowgroupchat;    // MARE: suppress incoming group chat windows
     bool mContainsSetenv;
     bool mContainsSetdebug;
     bool mContainsFly;
