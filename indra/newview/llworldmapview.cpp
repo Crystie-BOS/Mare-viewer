@@ -521,76 +521,70 @@ void LLWorldMapView::draw()
         // Draw the region name in the lower left corner
         if (mMapScale >= DRAW_TEXT_THRESHOLD)
         {
-            LLFontGL* font = LLFontGL::getFont(LLFontDescriptor("SansSerif", "Small", LLFontGL::BOLD));
-            std::string mesg;
-            if (info->isDown())
-            {
-                mesg = llformat( "%s (%s)", info->getName().c_str(), sStringsMap["offline"].c_str());
-            }
-            else
-            {
-                mesg = info->getName();
-            }
-            if (!mesg.empty())
-            {
-                font->renderUTF8(
-                    mesg, 0,
-                    //llfloor(left + 3), llfloor(bottom + 2),
-                    (F32)llfloor(left + 3.f), (F32)llfloor(bottom + (drawAdvancedRegionInfo ? 16.f : 2.f)),
-                    LLColor4::white,
-                    LLFontGL::LEFT, LLFontGL::BASELINE, LLFontGL::NORMAL, LLFontGL::DROP_SHADOW,
-                    S32_MAX, //max_chars
-                    (S32)mMapScale, //max_pixels
-                    nullptr,
-                    /*use_ellipses*/true);
+            static LLCachedControl<bool> print_coords(gSavedSettings, "MapShowGridCoords");
+            static LLFontGL* font = LLFontGL::getFontSansSerifSmallBold();
 
-                if (drawAdvancedRegionInfo)
+            auto print = [&](std::string text, F32 x, F32 y, bool use_ellipses)
                 {
-                    std::string advanced_info = "(";
-
-                    // Only show agent count when region is online
-                    if (!info->isDown())
-                    {
-                        S32 agent_count = info->getAgentCount();
-                        LLViewerRegion *region = gAgent.getRegion();
-                        if (region && region->getHandle() == info->getHandle())
-                        {
-                            ++agent_count; // Bump by 1 if we're in this region
-                            // @shownearby - force this back to 0, ie no caption
-                            if (gRRenabled && gAgent.mRRInterface.mContainsShowNearby)
-                            {
-                                agent_count = 0;
-                            }
-                        }
-                        if (agent_count > 0)
-                        {
-                            advanced_info += llformat("%d - ", agent_count);
-                        }
-                    }
-
-                    advanced_info += llformat("%s)", info->getAccessString().c_str());
-
-                    font->renderUTF8(
-                        advanced_info, 0,
-                        (F32)llfloor(left + 3.f), (F32)llfloor(bottom + 2.f),
+                    font->renderUTF8(text, 0,
+                        (F32)llfloor(left + x), (F32)llfloor(bottom + y),
                         LLColor4::white,
                         LLFontGL::LEFT, LLFontGL::BASELINE, LLFontGL::NORMAL, LLFontGL::DROP_SHADOW,
                         S32_MAX, //max_chars
                         (S32)mMapScale, //max_pixels
-                        nullptr,
-                        true); //use ellipses
-                }
-            }
-// <FS:CR> Show the grid coordinates (in units of regions)
-            if (sDrawRegionGridCoordinates)
+                        NULL,
+                        use_ellipses);
+                };
+
+            std::string grid_name = info->getName();
+            if (info->isDown())
             {
-                LLVector3d origin = info->getGlobalOrigin();
-                std::ostringstream coords;
-                coords << "(" << origin.mdV[VX] / REGION_WIDTH_METERS << "," << origin.mdV[VY] / REGION_WIDTH_METERS << ")";
-                font->renderUTF8(coords.str(), 0, llfloor(left + 3), llfloor(bottom + (drawAdvancedRegionInfo ? 30.f : 16.f)), LLColor4::white,
-                                 LLFontGL::LEFT, LLFontGL::BASELINE, LLFontGL::NORMAL, LLFontGL::DROP_SHADOW);
+                grid_name += " (" + sStringsMap["offline"] + ")";
             }
-// </FS:CR>
+
+            if (print_coords)
+            {
+                print(grid_name, 3, drawAdvancedRegionInfo ? (F32)26.0 : (F32)14.0, true);
+                // Obtain and print the grid map coordinates
+                LLVector3d region_pos = info->getGlobalOrigin();
+                std::string grid_coords = llformat("[%.0f, %.0f]", region_pos[VX] / 256, region_pos[VY] / 256);
+                print(grid_coords, 3, drawAdvancedRegionInfo ? (F32)14.0 : (F32)2.0, false);
+            }
+            else
+            {
+                print(grid_name, 3, drawAdvancedRegionInfo ? (F32)14.0 : (F32)2.0, true);
+            }
+
+
+// merge note - this section is retained from Kokua's version
+            if (drawAdvancedRegionInfo)
+            {
+                std::string advanced_info = "(";
+
+                // Only show agent count when region is online
+                if (!info->isDown())
+                {
+                    S32 agent_count = info->getAgentCount();
+                    LLViewerRegion *region = gAgent.getRegion();
+                    if (region && region->getHandle() == info->getHandle())
+                    {
+                        ++agent_count; // Bump by 1 if we're in this region
+                    }
+                    // @shownearby - force this back to 0, ie no caption
+                    if (gRRenabled && gAgent.mRRInterface.mContainsShowNearby)
+                    {
+                        agent_count = 0;
+                    }
+                    if (agent_count > 0)
+                    {
+                        advanced_info += llformat("%d - ", agent_count);
+                    }
+                }
+
+                advanced_info += llformat("%s)", info->getAccessString().c_str());
+
+                print (advanced_info, 3, 2, true);
+            }
         }
     }
 

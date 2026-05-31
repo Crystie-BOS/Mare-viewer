@@ -413,6 +413,7 @@ public:
     virtual     void        setFocusColor(const LLUIColor& c);
     virtual     void        setWriteableColor(const LLUIColor& c);
     /*virtual*/ void        onVisibilityChange(bool new_visibility) override;
+    void                    setBgReadOnlyColor(const LLUIColor& c) { mReadOnlyBgColor = c; }
 
     /*virtual*/ void        setValue(const LLSD& value) override;
     /*virtual*/ LLTextViewModel* getViewModel() const override;

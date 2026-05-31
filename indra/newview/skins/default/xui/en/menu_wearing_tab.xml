@@ -46,13 +46,6 @@
         function="Wearing.Favorite" />
     </menu_item_call>
     <menu_item_call
-     label="Take Off / Detach"
-     layout="topleft"
-     name="take_off_or_detach">
-        <on_click
-         function="Wearing.TakeOffDetach" />
-    </menu_item_call>
-    <menu_item_call
      label="Find Original"
      layout="topleft"
      name="show_original">

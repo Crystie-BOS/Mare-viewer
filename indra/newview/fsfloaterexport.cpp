@@ -421,7 +421,7 @@ void FSFloaterObjectExport::addPrim(LLViewerObject* object, bool root)
         {
             if(volobjp->isSculpted())
             {
-                const LLSculptParams *sculpt_params = (const LLSculptParams *)object->getParameterEntry(LLNetworkData::PARAMS_SCULPT);
+                const LLSculptParams *sculpt_params = object->getSculptParams();
                 if (sculpt_params)
                 {
                     if(volobjp->isMesh())
@@ -449,7 +449,7 @@ void FSFloaterObjectExport::addPrim(LLViewerObject* object, bool root)
 
             if(volobjp->isFlexible())
             {
-                const LLFlexibleObjectData *flexible_param_block = (const LLFlexibleObjectData *)object->getParameterEntry(LLNetworkData::PARAMS_FLEXIBLE);
+                const LLFlexibleObjectData *flexible_param_block = object->getFlexibleObjectData();
                 if (flexible_param_block)
                 {
                     prim["flexible"] = flexible_param_block->asLLSD();
@@ -458,7 +458,7 @@ void FSFloaterObjectExport::addPrim(LLViewerObject* object, bool root)
 
             if (volobjp->getIsLight())
             {
-                const LLLightParams *light_param_block = (const LLLightParams *)object->getParameterEntry(LLNetworkData::PARAMS_LIGHT);
+                const LLLightParams *light_param_block = object->getLightParams();
                 if (light_param_block)
                 {
                     prim["light"] = light_param_block->asLLSD();
@@ -467,7 +467,7 @@ void FSFloaterObjectExport::addPrim(LLViewerObject* object, bool root)
 
             if (volobjp->hasLightTexture())
             {
-                const LLLightImageParams* light_image_param_block = (const LLLightImageParams*)object->getParameterEntry(LLNetworkData::PARAMS_LIGHT_IMAGE);
+                const LLLightImageParams* light_image_param_block = object->getLightImageParams();
                 if (light_image_param_block)
                 {
                     prim["light_texture"] = light_image_param_block->asLLSD();

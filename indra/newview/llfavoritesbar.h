@@ -42,10 +42,21 @@ class LLToggleableMenu;
 class LLFavoritesBarCtrl : public LLUICtrl, public LLInventoryObserver
 {
 public:
+    enum EBarMode
+    {
+        BAR_MODE_FAVORITES = 0,
+        BAR_MODE_LANDMARKS,
+        BAR_MODE_VISITED
+    };
+
+    void        setBarMode(EBarMode mode);
+    EBarMode    getBarMode() const { return mBarMode; }
+
     struct Params : public LLInitParam::Block<Params, LLUICtrl::Params>
     {
         Optional<LLUIImage*> image_drag_indication;
         Optional<LLTextBox::Params> more_button;
+        Optional<LLTextBox::Params> subfolder_button;
         Optional<LLTextBox::Params> label;
         Params();
     };
@@ -79,6 +90,7 @@ protected:
     LLButton* createButton(const LLPointer<LLViewerInventoryItem> item, const LLButton::Params& button_params, S32 x_offset );
     const LLButton::Params& getButtonParams();
     bool collectFavoriteItems(LLInventoryModel::item_array_t &items);
+    bool collectVisitedItems(LLInventoryModel::item_array_t &items);
 
     void onButtonClick(LLUUID id);
     void onButtonRightClick(LLUUID id,LLView* button,S32 x,S32 y,MASK mask);
@@ -98,8 +110,20 @@ protected:
 
     void onMoreTextBoxClicked();
 
+    LLUUID getBarRootFolderID() const;
+    void getDirectSubfolders(LLInventoryModel::cat_array_t& cats);
+    void collectAllSubfoldersRecursive(const LLUUID& parent_id, int depth,
+        std::vector<std::pair<LLPointer<LLViewerInventoryCategory>, int>>& result);
+    void updateSubfolderFilter();
+    void onSubfolderFilterClicked();
+    void onSubfolderSelected(const LLUUID& folder_id);
+    void createSubfolderMenu();
+
     LLHandle<LLView> mOverflowMenuHandle;
     LLHandle<LLView> mContextMenuHandle;
+    LLHandle<LLView> mLandmarkContextMenuHandle;
+    LLHandle<LLView> mVisitedContextMenuHandle;
+    LLHandle<LLView> mSubfolderMenuHandle;
 
     LLUUID mFavoriteFolderId;
     const LLFontGL *mFont;
@@ -151,15 +175,20 @@ private:
     // Fits menu item label width with favorites menu width
     void fitLabelWidth(LLMenuItemCallGL* menu_item);
 
-    void addOpenLandmarksMenuItem(LLToggleableMenu* menu);
-
     void positionAndShowOverflowMenu();
 
     bool mShowDragMarker;
     LLUICtrl* mLandingTab;
     LLUICtrl* mLastTab;
     LLTextBox* mMoreTextBox;
-    LLTextBox* mBarLabel;
+
+    LLTextBox* mSubfolderFilterBtn;
+    LLUUID      mFilterFolderID;
+    bool        mSubfolderBtnWasVisible;
+
+    EBarMode    mBarMode;
+    std::map<LLUUID, LLVector3d> mVisitedPositions;
+    std::map<LLUUID, S32>        mVisitedIndices;
 
     LLUUID mDragItemId;
     bool mStartDrag;

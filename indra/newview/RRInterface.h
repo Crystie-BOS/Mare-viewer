@@ -225,7 +225,7 @@ public:
 
     std::string getFullPath (LLInventoryCategory* cat);
     std::string getFullPath (LLInventoryItem* item, std::string option = "", bool full_list = true);
-    LLInventoryItem* getItemAux (LLViewerObject* attached_object, LLInventoryCategory* root);
+    LLInventoryItem* getItemAux (LLViewerObject* attached_object, LLInventoryCategory* root, bool includeLinks = false);
     LLInventoryItem* getItem (LLUUID wornObjectUuidInWorld);
     void attachObjectByUUID (LLUUID assetUUID, int attachPtNumber = 0);
 

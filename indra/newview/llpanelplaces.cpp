@@ -84,6 +84,8 @@ static const std::string LANDMARK_INFO_TYPE         = "landmark";
 static const std::string REMOTE_PLACE_INFO_TYPE     = "remote_place";
 static const std::string TELEPORT_HISTORY_INFO_TYPE = "teleport_history";
 static const std::string LANDMARK_TAB_INFO_TYPE     = "open_landmark_tab";
+static const std::string FAVORITES_TAB_INFO_TYPE    = "open_favorites_tab";
+static const std::string VISITED_TAB_INFO_TYPE      = "open_visited_tab";
 
 // Support for secondlife:///app/parcel/{UUID}/about SLapps
 class LLParcelHandler : public LLCommandHandler
@@ -409,6 +411,23 @@ void LLPanelPlaces::onOpen(const LLSD& key)
             // Update the active tab
             onTabSelected();
             // Update the buttons at the bottom of the panel
+            updateVerbs();
+        }
+        else if (key_type == FAVORITES_TAB_INFO_TYPE)
+        {
+            togglePlaceInfoPanel(false);
+            mPlaceInfoType = key_type;
+            togglePlaceInfoPanel(false);
+            onTabSelected();
+            updateVerbs();
+        }
+        else if (key_type == VISITED_TAB_INFO_TYPE)
+        {
+            togglePlaceInfoPanel(false);
+            LLPanel* visited_panel = mTabContainer->getPanelByName("Teleport History");
+            if (visited_panel)
+                mTabContainer->selectTabPanel(visited_panel);
+            onTabSelected();
             updateVerbs();
         }
         else if (key_type == CREATE_PICK_TYPE)
@@ -1068,7 +1087,8 @@ void LLPanelPlaces::togglePlaceInfoPanel(bool visible)
     }
     else if (mPlaceInfoType == CREATE_LANDMARK_INFO_TYPE ||
              mPlaceInfoType == LANDMARK_INFO_TYPE ||
-             mPlaceInfoType == LANDMARK_TAB_INFO_TYPE)
+             mPlaceInfoType == LANDMARK_TAB_INFO_TYPE ||
+             mPlaceInfoType == FAVORITES_TAB_INFO_TYPE)
     {
         mLandmarkInfo->setVisible(visible);
         mPlaceProfile->setVisible(false);
@@ -1079,12 +1099,11 @@ void LLPanelPlaces::togglePlaceInfoPanel(bool visible)
         else
         {
             std::string tab_panel_name("Landmarks");
-            if (mItem.notNull())
+            if (mPlaceInfoType == FAVORITES_TAB_INFO_TYPE ||
+                (mItem.notNull() &&
+                 gInventory.isObjectDescendentOf(mItem->getUUID(), gInventory.findCategoryUUIDForType(LLFolderType::FT_FAVORITE))))
             {
-                if (gInventory.isObjectDescendentOf(mItem->getUUID(), gInventory.findCategoryUUIDForType(LLFolderType::FT_FAVORITE)))
-                {
-                    tab_panel_name = "Favorites";
-                }
+                tab_panel_name = "Favorites";
             }
 
             LLLandmarksPanel* landmarks_panel = dynamic_cast<LLLandmarksPanel*>(mTabContainer->getPanelByName(tab_panel_name));

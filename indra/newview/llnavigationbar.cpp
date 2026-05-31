@@ -277,7 +277,8 @@ LLNavigationBar::LLNavigationBar()
     mNavigationPanel(NULL),
     mFavoritePanel(NULL),
     mRlvBehaviorCallbackConnection(), // KKA-928
-    mNavPanWidth(0)
+    mNavPanWidth(0),
+    mLastPlacesTabType("open_favorites_tab")
 {
     buildFromFile( "panel_navigation_bar.xml");
 
@@ -322,6 +323,21 @@ bool LLNavigationBar::postBuild()
     mBtnHome->setClickedCallback(boost::bind(&LLNavigationBar::onHomeButtonClicked, this));
 
     mBtnLandmarks->setClickedCallback(boost::bind(&LLNavigationBar::onLandmarksButtonClicked, this));
+
+    // Register right-click context menu callbacks and load the menu
+    LLUICtrl::CommitCallbackRegistry::currentRegistrar().add(
+        "NavBar.OpenPlacesTab",
+        boost::bind(&LLNavigationBar::onOpenPlacesTab, this, _2));
+    LLUICtrl::EnableCallbackRegistry::currentRegistrar().add(
+        "NavBar.CheckPlacesTab",
+        boost::bind(&LLNavigationBar::isPlacesTabActive, this, _2));
+    LLMenuGL* lm_menu = LLUICtrlFactory::getInstance()->createFromFile<LLMenuGL>(
+        "menu_landmarks_btn.xml", gMenuHolder,
+        LLViewerMenuHolderGL::child_registry_t::instance());
+    if (lm_menu)
+        mLandmarksBtnMenuHandle = lm_menu->getHandle();
+    mBtnLandmarks->setRightMouseDownCallback(
+        boost::bind(&LLNavigationBar::onLandmarksButtonRightClick, this, _1, _2, _3, _4));
 
     mCmbLocation->setCommitCallback(boost::bind(&LLNavigationBar::onLocationSelection, this));
 
@@ -431,7 +447,40 @@ void LLNavigationBar::onHomeButtonClicked()
 void LLNavigationBar::onLandmarksButtonClicked()
 {
     LLFloaterReg::toggleInstanceOrBringToFront("places");
-    LLFloaterSidePanelContainer::showPanel("places", LLSD().with("type", "open_landmark_tab"));
+    LLFloaterSidePanelContainer::showPanel("places", LLSD().with("type", mLastPlacesTabType));
+}
+
+void LLNavigationBar::onLandmarksButtonRightClick(LLUICtrl* ctrl, S32 x, S32 y, MASK mask)
+{
+    LLMenuGL* menu = static_cast<LLMenuGL*>(mLandmarksBtnMenuHandle.get());
+    if (menu)
+    {
+        menu->buildDrawLabels();
+        menu->updateParent(LLMenuGL::sMenuContainer);
+        LLMenuGL::showPopup(ctrl, menu, x, y);
+    }
+}
+
+void LLNavigationBar::onOpenPlacesTab(const LLSD& param)
+{
+    mLastPlacesTabType = param.asString();
+
+    // Mirror the selection in the favorites bar
+    LLFavoritesBarCtrl* fav_bar = findChild<LLFavoritesBarCtrl>("favorite");
+    if (fav_bar)
+    {
+        LLFavoritesBarCtrl::EBarMode mode = LLFavoritesBarCtrl::BAR_MODE_FAVORITES;
+        if (mLastPlacesTabType == "open_landmark_tab")
+            mode = LLFavoritesBarCtrl::BAR_MODE_LANDMARKS;
+        else if (mLastPlacesTabType == "open_visited_tab")
+            mode = LLFavoritesBarCtrl::BAR_MODE_VISITED;
+        fav_bar->setBarMode(mode);
+    }
+}
+
+bool LLNavigationBar::isPlacesTabActive(const LLSD& param) const
+{
+    return mLastPlacesTabType == param.asString();
 }
 
 void LLNavigationBar::onTeleportHistoryMenuItemClicked(const LLSD& userdata)
@@ -754,7 +803,14 @@ void LLNavigationBar::resizeLayoutPanel()
 }
 void LLNavigationBar::invokeSearch(std::string search_text)
 {
-    LLFloaterReg::showInstance("search", LLSD().with("category", "standard").with("query", LLSD(search_text)));
+    LLSD key;
+    key["category"] = "standard";
+    key["query"] = search_text;
+    LLSD collections = LLSD::emptyArray();
+    collections.append("destinations");
+    collections.append("places");
+    key["collections"] = collections;
+    LLFloaterReg::showInstance("search", key);
 }
 
 void LLNavigationBar::clearHistoryCache()

@@ -113,10 +113,11 @@
      left="255"
      max_chars="135"
      name="time_format_combobox"
-     width="70">
+     width="71">
+        <combo_box.drop_down_button pad_right="22" />
         <combo_box.item
          enabled="true"
-         label="1:00 AM"
+         label="1:00 PM"
          name="12H"
          value="0" />
         <combo_box.item
@@ -355,6 +356,28 @@
         top_delta="0"
         left_pad="60"
         tool_tip="Hide your active group title from yourself and others." />
+    <combo_box
+     height="23"
+     layout="topleft"
+     control_name="GroupTitlesTagMode"
+     enabled_control="AvatarNameTagMode"
+     left="38"
+     top_pad="3"
+     name="group_title"
+     width="130">
+        <combo_box.item
+         label="No group tags"
+         name="no_tags"
+         value="0" />
+        <combo_box.item
+         label="Only my group tag"
+         name="my_tag"
+         value="1" />
+        <combo_box.item
+         label="All group tags"
+         name="all_tags"
+         value="2" />
+    </combo_box>
    <check_box
 	     control_name="FSTagShowARW"
 	     enabled_control="AvatarNameTagMode"

@@ -155,7 +155,7 @@ void LLFloaterIMSession::onClickCloseBtn(bool app_qutting)
 {
     if (app_qutting)
     {
-        LLFloaterIMSessionTab::onClickCloseBtn();
+        LLFloaterIMSessionTab::onClickCloseBtn(app_qutting);
         return;
     }
 
@@ -1123,7 +1123,7 @@ void LLFloaterIMSession::processAgentListUpdates(const LLSD& body)
                         label = LLTrans::getString("IM_group_label") + " " + LLIMModel::instance().getName(mSessionID);
                     }
                     else
-                        label = LLTrans::getString("IM_to_label") + " " + LLIMModel::instance().getName(mSessionID);
+                        label = LLIMModel::instance().getName(mSessionID);
                     mInputEditor->setLabel(label);
 
                     if (moderator_muted_text)

@@ -31,6 +31,7 @@
 #include "lltoggleablemenu.h"
 
 #include "llagent.h"
+#include "llstartup.h"
 #include "llaccordionctrl.h"
 #include "llaccordionctrltab.h"
 #include "llappearancemgr.h"
@@ -176,15 +177,22 @@ protected:
         menu->setItemEnabled("edit_item",          1 == mUUIDs.size() && get_is_item_editable(mUUIDs.front()));
         menu->setItemVisible("take_off",    allow_take_off);
         menu->setItemVisible("detach",      allow_detach);
-        if (allow_detach && gRRenabled)
+        if (allow_detach)
         {
-            for (uuid_vec_t::const_iterator it = mUUIDs.begin(); it != mUUIDs.end(); ++it)
+            if (LLStartUp::getStartupState() < STATE_CLEANUP)
             {
-                LLViewerInventoryItem* item = gInventory.getItem(*it);
-                if (item && !gAgent.mRRInterface.canDetach(item))
+                menu->setItemEnabled("detach", false);
+            }
+            else if (gRRenabled)
+            {
+                for (uuid_vec_t::const_iterator it = mUUIDs.begin(); it != mUUIDs.end(); ++it)
                 {
-                    menu->setItemEnabled("detach", false);
-                    break;
+                    LLViewerInventoryItem* item = gInventory.getItem(*it);
+                    if (item && !gAgent.mRRInterface.canDetach(item))
+                    {
+                        menu->setItemEnabled("detach", false);
+                        break;
+                    }
                 }
             }
         }
@@ -582,6 +590,14 @@ void LLPanelWearing::onRemoveAttachment()
     LLScrollListItem* item = mTempItemsList->getFirstSelected();
     if (item && item->getUUID().notNull())
     {
+        if (LLStartUp::getStartupState() < STATE_CLEANUP)
+        {
+            return;
+        }
+        if (gRRenabled && !gAgent.mRRInterface.canDetach(mAttachmentsMap[item->getUUID()]))
+        {
+            return;
+        }
         LLSelectMgr::getInstance()->deselectAll();
         LLSelectMgr::getInstance()->selectObjectAndFamily(mAttachmentsMap[item->getUUID()]);
         LLSelectMgr::getInstance()->sendDetach();

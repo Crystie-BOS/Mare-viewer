@@ -15,7 +15,7 @@
 					Barra de Favoritos
 				</label>
 				<more_button name="&gt;&gt;" tool_tip="Ver más de Mis favoritos">
-					Más ▼
+					▼
 				</more_button>
 			</favorites_bar>
 		</layout_panel>

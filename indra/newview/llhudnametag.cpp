@@ -303,7 +303,7 @@ void LLHUDNameTag::renderText()
 // CA KKA-936 use the colour from the first element instead of a default
         LLColor4 label_top_color = mLabelSegments.begin()->mColor;
 //      LLColor4 label_top_color = text_color;
-        label_top_color.mV[VALPHA] = gSavedSettings.getF32("ChatBubbleOpacity") * alpha_factor;
+        label_top_color.mV[VALPHA] = bubble_opacity() * alpha_factor;
 
         mRoundedRectTopImgp->draw3D(render_position, x_pixel_vec, y_pixel_vec, label_top_rect, label_top_color);
     }

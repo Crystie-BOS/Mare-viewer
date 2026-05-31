@@ -327,6 +327,7 @@ void LLPanelDirBrowser::showDetailPanel(S32 type, LLSD id)
             mFloaterDirectory->mPanelAvatarp->setVisible(true);
             mFloaterDirectory->mPanelAvatarp->onOpen(id);
             mFloaterDirectory->mPanelAvatarp->updateData();
+            mFloaterDirectory->showPeopleButtons(id.asUUID());
         }
         break;
     case GROUP_CODE:
@@ -334,6 +335,7 @@ void LLPanelDirBrowser::showDetailPanel(S32 type, LLSD id)
         {
             mFloaterDirectory->mPanelGroupp->setVisible(true);
             mFloaterDirectory->mPanelGroupp->onOpen(LLSD().with("group_id", id));
+            mFloaterDirectory->showGroupButtons(id.asUUID());
         }
         break;
     case PLACE_CODE:

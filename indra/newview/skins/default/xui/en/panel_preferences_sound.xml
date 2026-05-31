@@ -222,7 +222,7 @@
      image_unselected="Audio_Off"
      is_toggle="true"
      layout="topleft"
-	   left_pad="5"
+	   left_pad="4"
      name="mute_audio_music"
      tab_stop="false"
 	 width="16" />
@@ -242,7 +242,7 @@
 		control_name="AudioLevelMedia"
 		disabled_control="MuteAudio"
 		follows="left|top"
-		height="16"
+		height="15"
 		increment="0.025"
 		initial_value="0.5"
 		label="Media"
@@ -290,7 +290,7 @@
 		control_name="AudioLevelVoice"
 		disabled_control="MuteAudio"
 		follows="left|top"
-		height="16"
+		height="15"
 		increment="0.025"
 		initial_value="0.5"
 		label="Voice Chat"
@@ -351,15 +351,14 @@
    top_delta="22"
    name="Listen media from"
    height="15"
-   word_wrap="true"
-   width="160">
+   width="180">
       Hear media and sounds from:
   </text>
   <combo_box
    control_name="MediaSoundsEarLocation"
    follows="left|top"
    layout="topleft"
-   left_pad="5"
+   left_pad="10"
    width="130"
    height="23"
    top_delta="-4"
@@ -380,7 +379,7 @@
    height="15"
    left="30"
    top_pad="8"
-   width="160"
+   width="180"
    name="media_autoplay_label">
     Auto-play media
   </text>
@@ -413,7 +412,7 @@
         top_pad="8"
         height="15"
         left="30"
-        width="160"
+        width="180"
         name="media_firstinteract_label"
         halign="left">
             Media first-interact
@@ -429,6 +428,7 @@
     width="130"
     name="media_first_interact_combo"
     tool_tip="This setting controls which media (once loaded) does not require a first click to focus before interaction can begin. This allows clicks to be passed directly to media bypassing the focus click requirement. Each option also inherits the previous ones.">
+        <combo_box.drop_down_button pad_right="19" />
         <item
             label="Disabled"
             name="media_first_click_none"
@@ -614,7 +614,7 @@
    layout="topleft"
    follows="left|top"
    height="15"
-   width="160"
+   width="170"
    name="noise_suppression_label"
    left="25"
    top_delta="22"

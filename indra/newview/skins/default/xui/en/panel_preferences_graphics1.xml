@@ -124,7 +124,7 @@
     layout="topleft"
     left="65"
     name="FasterText"
-    top_pad="4"
+    top_pad="10"
     width="80">
       Faster
   </text>
@@ -141,7 +141,7 @@
       Better
   </text>
   <icon
-    color="DkGray"
+    color="DkGray0"
     height="14"
     image_name="Rounded_Square"
     layout="topleft"
@@ -150,7 +150,7 @@
     top_delta="-2"
     width="2" />
   <icon
-    color="DkGray"
+    color="DkGray0"
     height="14"
     image_name="Rounded_Square"
     layout="topleft"
@@ -158,7 +158,7 @@
     name="LowMidGraphicsDivet"
     width="2" />
   <icon
-    color="DkGray"
+    color="DkGray0"
     height="14"
     image_name="Rounded_Square"
     layout="topleft"
@@ -167,7 +167,7 @@
     top_delta="0"
     width="2" />
   <icon
-    color="DkGray"
+    color="DkGray0"
     height="14"
     image_name="Rounded_Square"
     layout="topleft"
@@ -176,7 +176,7 @@
     top_delta="0"
     width="2" />
   <icon
-    color="DkGray"
+    color="DkGray0"
     height="14"
     image_name="Rounded_Square"
     layout="topleft"
@@ -185,7 +185,7 @@
     top_delta="0"
     width="2" />
   <icon
-    color="DkGray"
+    color="DkGray0"
     height="14"
     image_name="Rounded_Square"
     layout="topleft"
@@ -194,7 +194,7 @@
     top_delta="0"
     width="2" />
   <icon
-    color="DkGray"
+    color="DkGray0"
     height="14"
     image_name="Rounded_Square"
     layout="topleft"
@@ -234,7 +234,7 @@
     min_val="64"
     max_val="512"
     name="DrawDistance"
-    top_delta="40"
+    top_delta="34"
     width="427" />
   <text
     type="string"

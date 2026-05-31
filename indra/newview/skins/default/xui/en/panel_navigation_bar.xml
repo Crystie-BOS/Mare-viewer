@@ -89,7 +89,7 @@
 	         image_hover_unselected="PushButton_Over"
 	         image_bottom_pad="1"
 	         layout="topleft"
-	         left="10"
+	         left="9"
 	         name="back_btn"
 	         tool_tip="Go back to previous location"
 	         top="2"
@@ -102,7 +102,7 @@
 	         image_hover_unselected="PushButton_Over"
 	         image_bottom_pad="1"
 	         layout="topleft"
-	         left_pad="0"
+	         left_pad="1"
 	         name="forward_btn"
 	         tool_tip="Go forward one location"
 	         top_delta="0"
@@ -207,19 +207,19 @@
              image_drag_indication="Accordion_ArrowOpened_Off"
              tool_tip="Drag Landmarks here for quick access to your favorite places in [SECOND_LIFE]"
              width="310">
-            <label
-             follows="left|top"
-             height="13"
-             layout="topleft"
-             left="10"
-             name="favorites_bar_label"
-             text_color="LtGray"
-             tool_tip="Drag Landmarks here for quick access to your favorite places in [SECOND_LIFE]"
-             top="13"
-	     valign="bottom"
-             width="290">
-              Places you save to your favorites bar will appear here.
-            </label>
+
+              <!-- Subfolder filter button — hidden when no subfolders exist -->
+              <subfolder_button
+                follows="left|bottom"
+                name="subfolder_filter"
+                tab_stop="false"
+                tool_tip="Filter favorites by subfolder"
+                top="13"
+                width="60"
+                bottom="0"
+                valign="center">
+                All &#9660;
+                </subfolder_button>
               <!-- More button actually is a text box. -->
               <more_button
                 follows="left|bottom"
@@ -229,8 +229,9 @@
                 top="13"
                 width="50"
                 bottom="0"
+                halign="center"
                 valign="bottom">
-                More &#9660;
+                &#9660;
                 </more_button>
          </favorites_bar>
          </layout_panel>

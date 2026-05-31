@@ -51,6 +51,7 @@
 // Implementation of conversations list session widgets
 //
 static LLDefaultChildRegistry::Register<LLConversationViewSession> r_conversation_view_session("conversation_view_session");
+static LLUIColor sFlashConvBgColor;
 
 const LLColor4U DEFAULT_WHITE(255, 255, 255);
 
@@ -64,11 +65,18 @@ public:
 
     virtual void onChange(EStatusType status, const LLSD& channelInfo, bool proximal)
     {
+        bool voice_enabled = LLVoiceClient::getInstance()->voiceEnabled() && LLVoiceClient::getInstance()->isVoiceWorking();
         conversation->showVoiceIndicator(conversation
             && status != STATUS_JOINING
             && status != STATUS_LEFT_CHANNEL
-            && LLVoiceClient::getInstance()->voiceEnabled()
-            && LLVoiceClient::getInstance()->isVoiceWorking());
+            && voice_enabled);
+
+        static bool s_voice_enabled(false);
+        if (s_voice_enabled != voice_enabled)
+        {
+            s_voice_enabled = voice_enabled;
+            conversation->updateConversationIndicators();
+        }
     }
 
 private:
@@ -96,6 +104,7 @@ LLConversationViewSession::LLConversationViewSession(const LLConversationViewSes
 {
     mFlashTimer = new LLFlashTimer();
     mAreChildrenInited = true; // inventory only
+    sFlashConvBgColor = LLUIColorTable::instance().getColor("ConversationTabFlashBgColor", DEFAULT_WHITE);
 }
 
 LLConversationViewSession::~LLConversationViewSession()
@@ -317,7 +326,7 @@ void LLConversationViewSession::draw()
 
     // draw highlight for selected items
     static LLUIColor alt_color = LLUIColorTable::instance().getColor("MentionFlashBgColor", DEFAULT_WHITE);
-    drawHighlight(show_context, true, sHighlightBgColor, mIsAltFlashColor ? alt_color : sFlashBgColor, sFocusOutlineColor, sMouseOverColor);
+    drawHighlight(show_context, true, sHighlightBgColor, mIsAltFlashColor ? alt_color : sFlashConvBgColor, sFocusOutlineColor, sMouseOverColor);
 
     // Draw children if root folder, or any other folder that is open. Do not draw children when animating to closed state or you get rendering overlap.
     bool draw_children = getRoot() == static_cast<LLFolderViewFolder*>(this) || isOpen();
@@ -535,11 +544,25 @@ void LLConversationViewSession::refresh()
     // Update all speaking indicators
     LLSpeakingIndicatorManager::updateSpeakingIndicators();
 
+    updateConversationIndicators();
+
+    requestArrange();
+    if (vmi)
+    {
+        // Do the regular upstream refresh
+        LLFolderViewFolder::refresh();
+    }
+}
+
+void LLConversationViewSession::updateConversationIndicators()
+{
+    bool is_active_channel = isInActiveVoiceChannel();
+
     // we should show indicator for specified voice session only if this is current channel. EXT-5562.
     if (mSpeakingIndicator)
     {
-        mSpeakingIndicator->setIsActiveChannel(mIsInActiveVoiceChannel);
-        mSpeakingIndicator->setShowParticipantsSpeaking(mIsInActiveVoiceChannel);
+        mSpeakingIndicator->setIsActiveChannel(is_active_channel);
+        mSpeakingIndicator->setShowParticipantsSpeaking(is_active_channel);
     }
 
     LLConversationViewParticipant* participant = NULL;
@@ -549,15 +572,8 @@ void LLConversationViewSession::refresh()
         participant = dynamic_cast<LLConversationViewParticipant*>(*iter);
         if (participant)
         {
-            participant->allowSpeakingIndicator(mIsInActiveVoiceChannel);
+            participant->allowSpeakingIndicator(is_active_channel);
         }
-    }
-
-    requestArrange();
-    if (vmi)
-    {
-        // Do the regular upstream refresh
-        LLFolderViewFolder::refresh();
     }
 }
 
@@ -569,7 +585,7 @@ void LLConversationViewSession::onCurrentVoiceSessionChanged(const LLUUID& sessi
     {
         bool old_value = mIsInActiveVoiceChannel;
         mIsInActiveVoiceChannel = vmi->getUUID() == session_id;
-        mCallIconLayoutPanel->setVisible(mIsInActiveVoiceChannel && !LLVoiceChannel::isSuspended());
+        mCallIconLayoutPanel->setVisible(isInActiveVoiceChannel() && !LLVoiceChannel::isSuspended());
         if (old_value != mIsInActiveVoiceChannel)
         {
             refresh();
@@ -593,10 +609,12 @@ bool LLConversationViewSession::highlightFriendTitle(LLConversationItem* vmi, st
             LLStyle::Params title_style;
             if (colorFriendsAsNameTag)
             {
-                LLColor4 color = LLUIColorTable::instance().getColor("ConversationFriendColor"); //KKA-848 start with LL default
-                color = LGGContactSets::getInstance()->colorize(session->mOtherParticipantID, color, LGG_CS_TAG);
-                LGGContactSets::getInstance()->hasFriendColorThatShouldShow(session->mOtherParticipantID, LGG_CS_TAG, color);
-                LLNetMap::getAvatarMarkColor(session->mOtherParticipantID, color);
+                //LLColor4 color = LLUIColorTable::instance().getColor("ConversationFriendColor"); //KKA-848 start with LL default#
+				// CA: this behaves more logically if we start from default name tag friend colour instead
+				LLColor4 color = LLUIColorTable::instance().getColor("NameTagFriend", LLColor4::white).get();
+                //color = LGGContactSets::getInstance()->colorize(session->mOtherParticipantID, color, LGG_CS_TAG);
+                //LGGContactSets::getInstance()->hasFriendColorThatShouldShow(session->mOtherParticipantID, LGG_CS_TAG, color);
+                //LLNetMap::getAvatarMarkColor(session->mOtherParticipantID, color);
                 title_style.color = color;
             }
             else
@@ -608,6 +626,13 @@ bool LLConversationViewSession::highlightFriendTitle(LLConversationItem* vmi, st
         }
     }
     return false;
+}
+
+bool LLConversationViewSession::isInActiveVoiceChannel()
+{
+    return mIsInActiveVoiceChannel &&
+           LLVoiceClient::getInstance()->voiceEnabled() &&
+           LLVoiceClient::getInstance()->isVoiceWorking();
 }
 
 //
@@ -691,12 +716,15 @@ void LLConversationViewParticipant::draw()
     static LLUIColor sFgDisabledColor = LLUIColorTable::instance().getColor("MenuItemDisabledColor", DEFAULT_WHITE);
     static LLUIColor sHighlightFgColor = LLUIColorTable::instance().getColor("MenuItemHighlightFgColor", DEFAULT_WHITE);
     static LLUIColor sHighlightBgColor = LLUIColorTable::instance().getColor("MenuItemHighlightBgColor", DEFAULT_WHITE);
-    static LLUIColor sFlashBgColor = LLUIColorTable::instance().getColor("MenuItemFlashBgColor", DEFAULT_WHITE);
+   	// CA: this used to to be MenuItemFlashBgColor, which was set to beaconcolor. Now separated since bright orange doesn't work with purples
+    static LLUIColor sFlashConvBgColor = LLUIColorTable::instance().getColor("ConversationTabFlashBgColor", DEFAULT_WHITE);
     static LLUIColor sFocusOutlineColor = LLUIColorTable::instance().getColor("InventoryFocusOutlineColor", DEFAULT_WHITE);
     static LLUIColor sMouseOverColor = LLUIColorTable::instance().getColor("InventoryMouseOverColor", DEFAULT_WHITE);
     static LLUIColor sFriendColor = LLUIColorTable::instance().getColor("ConversationFriendColor");
-        static LLCachedControl<bool> colorFriends(gSavedSettings, "KokuaColorFriendNamesInConversationsFloater");
-        static LLCachedControl<bool> colorFriendsAsNameTag(gSavedSettings, "KokuaColorFriendNamesInConversationsFloaterAsNameTags");
+	static LLUIColor sNameTagFriendColor = LLUIColorTable::instance().getColor("NameTagFriend", DEFAULT_WHITE);
+    static LLCachedControl<bool> colorFriends(gSavedSettings, "KokuaColorFriendNamesInConversationsFloater");
+    static LLCachedControl<bool> colorFriendsAsNameTag(gSavedSettings, "KokuaColorFriendNamesInConversationsFloaterAsNameTags");
+    static LLCachedControl<bool> showFriendsNameTag(gSavedSettings, "NameTagShowFriends");
 
     const bool show_context = (getRoot() ? getRoot()->getShowSelectionContext() : false);
 
@@ -709,6 +737,11 @@ void LLConversationViewParticipant::draw()
     LLUIColor* color;
 	// LGGContacts really needs converting to use LLUIColor too, but that's a task for another time
 	LLColor4 lgg_color = sFriendColor; //KKA-848 start with LL default
+	if (showFriendsNameTag && colorFriendsAsNameTag)
+	{
+		// in this case we start from the defined name tag friend colour as our base instead of the chat friend colour
+		lgg_color = sNameTagFriendColor;
+	}
 	LLUIColor lgg_uicolor;
 
     LLLocalSpeakerMgr *speakerMgr = LLLocalSpeakerMgr::getInstance();
@@ -747,7 +780,7 @@ void LLConversationViewParticipant::draw()
         mSpeakingIndicator->setIsModeratorMuted(participant_model->isModeratorMuted());
     }
 
-    drawHighlight(show_context, mIsSelected, sHighlightBgColor, sFlashBgColor, sFocusOutlineColor, sMouseOverColor);
+    drawHighlight(show_context, mIsSelected, sHighlightBgColor, sFlashConvBgColor, sFocusOutlineColor, sMouseOverColor);
     drawLabel(font, text_left, y, color->get(), right_x);
 
     LLView::draw();

@@ -1381,7 +1381,6 @@ LLFolderViewItem* LLInventoryPanel::buildViewsTree(const LLUUID& id,
         LLViewerInventoryItem* item;
         LLUUID item_uuid;
         LLFolderViewItem* view_itemp = NULL;
-        std::map<LLUUID, LLFolderViewItem*>::iterator map_it;
         mInventory->lockDirectDescendentArrays(id, categories, items);
 
         // Make sure panel won't lock in a loop over existing items if
@@ -1417,7 +1416,7 @@ LLFolderViewItem* LLInventoryPanel::buildViewsTree(const LLUUID& id,
                         //KKA-827 Optimise as suggested above to not call getItemByID()
                         //KKA-827 In addition, only call cat->getUUID() once
                         view_itemp = NULL;
-                        map_it = mItemMap.find(cat_uuid);
+                        auto map_it = mItemMap.find(cat_uuid);
                         if (map_it != mItemMap.end())
                         {
                             view_itemp = map_it->second;
@@ -1471,7 +1470,7 @@ LLFolderViewItem* LLInventoryPanel::buildViewsTree(const LLUUID& id,
 
                     //KKA-827 Optimise as suggested above to not call getItemByID()
                     //KKA-827 In addition, only call item->getUUID() once
-                    map_it = mItemMap.find(item_uuid);
+                    auto map_it = mItemMap.find(item_uuid);
                     view_itemp = NULL;
                     if (map_it != mItemMap.end())
                     {
@@ -1946,6 +1945,7 @@ void LLInventoryPanel::purgeSelectedItems()
 {
     if (!mFolderRoot.get()) return;
 
+    const LLUUID trash_id = gInventory.findCategoryUUIDForType(LLFolderType::FT_TRASH);
     const std::set<LLFolderViewItem*> inventory_selected = mFolderRoot.get()->getSelectionList();
     if (inventory_selected.empty()) return;
     LLSD args;
@@ -1955,12 +1955,17 @@ void LLInventoryPanel::purgeSelectedItems()
         it != end_it;
         ++it)
     {
+        // Selection allows items outside trash folder, only count the ones inside.
         LLUUID item_id = static_cast<LLFolderViewModelItemInventory*>((*it)->getViewModelItem())->getUUID();
-        LLInventoryModel::cat_array_t cats;
-        LLInventoryModel::item_array_t items;
-        gInventory.collectDescendents(item_id, cats, items, LLInventoryModel::INCLUDE_TRASH);
-        count += items.size() + cats.size();
-        selected_items.push_back(item_id);
+        LLInventoryObject* obj = gInventory.getObject(item_id);
+        if (obj->getParentUUID() == trash_id)
+        {
+            LLInventoryModel::cat_array_t cats;
+            LLInventoryModel::item_array_t items;
+            gInventory.collectDescendents(item_id, cats, items, LLInventoryModel::INCLUDE_TRASH);
+            count += items.size() + cats.size();
+            selected_items.push_back(item_id);
+        }
     }
     args["COUNT"] = static_cast<S32>(count);
     LLNotificationsUtil::add("PurgeSelectedItems", args, LLSD(), boost::bind(callbackPurgeSelectedItems, _1, _2, selected_items));
@@ -2262,8 +2267,7 @@ LLFolderViewItem* LLInventoryPanel::getItemByID(const LLUUID& id)
 {
     LL_PROFILE_ZONE_SCOPED;
 
-    std::map<LLUUID, LLFolderViewItem*>::iterator map_it;
-    map_it = mItemMap.find(id);
+    auto map_it = mItemMap.find(id);
     if (map_it != mItemMap.end())
     {
         return map_it->second;

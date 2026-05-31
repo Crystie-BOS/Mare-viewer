@@ -5566,7 +5566,13 @@ std::string RRInterface::getFullPath (LLInventoryItem* item, std::string option,
                 for (unsigned int i = 0; i < attach_point->mAttachedObjects.size(); ++i) {
                     LLViewerObject* attached_object = attach_point->mAttachedObjects.at(i);
                     if (attached_object) {
-                        item = getItemAux (attached_object, gAgent.mRRInterface.getRlvShare());
+                        item = getItemAux (attached_object, gAgent.mRRInterface.getRlvShare(), false); // objects only on first call
+                        if (item == NULL || !gAgent.mRRInterface.isUnderRlvShare(item))
+                        {
+                        	// try again with links allowed this time
+                        	item = getItemAux (attached_object, gAgent.mRRInterface.getRlvShare(), true);
+                        }
+
                         if (item != NULL && !gAgent.mRRInterface.isUnderRlvShare(item)) item = NULL; // security : we would return the path even if the item was not shared otherwise
                         else {
                             // We have found the inventory item => add its path to the list
@@ -5603,8 +5609,10 @@ std::string RRInterface::getFullPath (LLInventoryItem* item, std::string option,
 }
 
 
-LLInventoryItem* RRInterface::getItemAux (LLViewerObject* attached_object, LLInventoryCategory* root)
+LLInventoryItem* RRInterface::getItemAux (LLViewerObject* attached_object, LLInventoryCategory* root, bool includeLinks)
 {
+    static LLCachedControl<bool> doNotCheckLinks(gSavedSettings, "RestrainedLoveGetPathLinksAsObjects", FALSE);
+
     // auxiliary function for getItem()
     if (!attached_object) return NULL;
     LLVOAvatarSelf* avatar = gAgentAvatarp;
@@ -5627,7 +5635,12 @@ LLInventoryItem* RRInterface::getItemAux (LLViewerObject* attached_object, LLInv
 				// its own folder and then having links to it in each KDC restraint folder. Fixing this stops the
 				// CTS Wardrobe showing the wrong folder as worn in this scenario. The logic goes wrong here because
 				// getType() follows the link so AT_OBJECT is returned when we're actually looking at the link.
-				&& !item->getIsLinkType()
+				//
+				// CA: However, there are of course situations where people have relied on the buggy behaviour with
+				// getpath returning the link location within RLV whilst the parent outside of #RLV gets culled from the
+				// results
+				//
+				&& ((doNotCheckLinks && includeLinks) || !item->getIsLinkType())
                 && (item->getType() == LLAssetType::AT_OBJECT || item->getType() == LLAssetType::AT_CLOTHING)
                 && avatar->getWornAttachment (item->getLinkedUUID()) == attached_object
                 ) {
@@ -5640,7 +5653,7 @@ LLInventoryItem* RRInterface::getItemAux (LLViewerObject* attached_object, LLInv
         count = static_cast<S32>(cats->size());
         for(i = 0; i < count; ++i) {
             cat = cats->at(i);
-            item = getItemAux (attached_object, cat);
+            item = getItemAux (attached_object, cat, includeLinks);
             if (item != NULL) return item;
         }
     }

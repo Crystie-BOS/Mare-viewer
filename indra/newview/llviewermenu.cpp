@@ -131,6 +131,10 @@
 #include "lltoolselectland.h"
 #include "lltrans.h"
 #include "llurlentry.h"
+#include "llurldispatcher.h"
+#include "chatbar_as_cmdline.h"
+#include "llcalc.h"
+#include "fscommon.h"
 #include "llviewerdisplay.h" //for gWindowResized
 #include "llviewergenericmessage.h"
 #include "llviewerhelp.h"
@@ -167,7 +171,7 @@
 #include "llwindow.h"
 #include "llpathfindingmanager.h"
 #include "llstartup.h"
-#include "boost/unordered_map.hpp"
+#include <unordered_map>
 #include "llvowlsky.h"
 #include "fsfloaterexport.h"
 #include "daeexport.h"
@@ -190,7 +194,7 @@ using namespace LLAvatarAppearanceDefines;
 
 typedef LLPointer<LLViewerObject> LLViewerObjectPtr;
 
-static boost::unordered_map<std::string, LLStringExplicit> sDefaultItemLabels;
+static std::unordered_map<std::string, LLStringExplicit> sDefaultItemLabels;
 
 LLVOAvatar* find_avatar_from_object(LLViewerObject* object);
 LLVOAvatar* find_avatar_from_object(const LLUUID& object_id);
@@ -472,7 +476,23 @@ static LLSLMMenuUpdater* gSLMMenuUpdater = NULL;
 
 LLSLMMenuUpdater::LLSLMMenuUpdater()
 {
-    mMarketplaceListingsItem = gMenuHolder->getChild<LLView>("MarketplaceListings")->getHandle();
+    LLView* me_menu = gMenuHolder->findChild<LLView>("Me");
+    if (!me_menu)
+    {
+        LLError::LLUserWarningMsg::showMissingFiles();
+        LL_ERRS() << "Can't find 'Me' menu in 'menu_viewer'" << LL_ENDL;
+        return;
+    }
+
+    LLView* marketplace_listings = me_menu->findChild<LLView>("MarketplaceListings");
+    if (!marketplace_listings)
+    {
+        LLError::LLUserWarningMsg::showMissingFiles();
+        LL_ERRS() << "Can't find 'MarketplaceListings' in 'Me' menu" << LL_ENDL;
+        return;
+    }
+
+    mMarketplaceListingsItem = marketplace_listings->getHandle();
 }
 void LLSLMMenuUpdater::setMerchantMenu()
 {
@@ -484,7 +504,7 @@ void LLSLMMenuUpdater::setMerchantMenu()
     LLCommand* command = LLCommandManager::instance().getCommand("marketplacelistings");
     gToolBarView->enableCommand(command->id(), true);
 
-    const LLUUID marketplacelistings_id = gInventory.findCategoryUUIDForType(LLFolderType::FT_MARKETPLACE_LISTINGS);
+    const LLUUID marketplacelistings_id = gInventory.getMarketplaceListingsUUID();
     if (marketplacelistings_id.isNull())
     {
         U32 mkt_status = LLMarketplaceData::instance().getSLMStatus();
@@ -532,6 +552,8 @@ void check_merchant_status(bool force)
 
 void init_menus()
 {
+    LL_PROFILE_ZONE_SCOPED;
+
     // Initialize actions
     initialize_menus();
 
@@ -642,7 +664,29 @@ void init_menus()
     gMenuBarView = LLUICtrlFactory::getInstance()->createFromFile<LLMenuBarGL>(kokuamainmenu, gMenuHolder, LLViewerMenuHolderGL::child_registry_t::instance());
 //kokua we could add a legacy menu here
 
-    LLView* menu_bar_holder = gViewerWindow->getRootView()->getChildView("menu_bar_holder");
+    LLView* menu_stack = gViewerWindow->getMainView()->findChildView("menu_stack");
+    if (!menu_stack)
+    {
+        LLError::LLUserWarningMsg::showMissingFiles();
+        LL_ERRS() << "Can't find menu_stack in main_view" << LL_ENDL;
+        return;
+    }
+
+    LLView* status_bar_container = menu_stack->findChildView("status_bar_container");
+    if (!status_bar_container)
+    {
+        LLError::LLUserWarningMsg::showMissingFiles();
+        LL_ERRS() << "Can't find status_bar_container in main_view" << LL_ENDL;
+        return;
+    }
+
+    LLView* menu_bar_holder = status_bar_container->findChildView("menu_bar_holder");
+    if (!menu_bar_holder)
+    {
+        LLError::LLUserWarningMsg::showMissingFiles();
+        LL_ERRS() << "Can't find status_bar_container in main_view" << LL_ENDL;
+        return;
+    }
 
     gMenuBarView->setRect(LLRect(0, menu_bar_holder->getRect().mTop, 0, menu_bar_holder->getRect().mTop - MENU_BAR_HEIGHT));
     gMenuBarView->setBackgroundColor( color );
@@ -655,8 +699,32 @@ void init_menus()
     // *TODO:Also fix cost in llfolderview.cpp for Inventory menus
     const std::string sound_upload_cost_str = std::to_string(LLAgentBenefitsMgr::current().getSoundUploadCost());
     const std::string animation_upload_cost_str = std::to_string(LLAgentBenefitsMgr::current().getAnimationUploadCost());
-    gMenuHolder->childSetLabelArg("Upload Sound", "[COST]", sound_upload_cost_str);
-    gMenuHolder->childSetLabelArg("Upload Animation", "[COST]", animation_upload_cost_str);
+
+    LLView* main_upload_menu = gMenuHolder->findChild<LLView>("Upload");
+    if (!main_upload_menu)
+    {
+        LLError::LLUserWarningMsg::showMissingFiles();
+        LL_ERRS() << "Can't find 'Upload' menu in 'menu_viewer'" << LL_ENDL;
+        return;
+    }
+
+    LLView* upload_sound = main_upload_menu->findChild<LLView>("Upload Sound");
+    if (!upload_sound)
+    {
+        LLError::LLUserWarningMsg::showMissingFiles();
+        LL_ERRS() << "Can't find 'Upload Sound' menu item in 'Upload' menu" << LL_ENDL;
+        return;
+    }
+    upload_sound->setLabelArg("[COST]", sound_upload_cost_str);
+
+    LLView* upload_anim = main_upload_menu->findChild<LLView>("Upload Animation");
+    if (!upload_anim)
+    {
+        LLError::LLUserWarningMsg::showMissingFiles();
+        LL_ERRS() << "Can't find 'Upload Animation' menu item in 'Upload' menu" << LL_ENDL;
+        return;
+    }
+    upload_anim->setLabelArg("[COST]", animation_upload_cost_str);
 
 #if RLV_ALWAYS_ON
   gMenuHolder->childSetEnabled("Show RLV Menu", false);
@@ -667,13 +735,6 @@ void init_menus()
 
     gDetachAvatarMenu = gMenuHolder->getChild<LLMenuGL>("Avatar Detach", true);
     gDetachHUDAvatarMenu = gMenuHolder->getChild<LLMenuGL>("Avatar Detach HUD", true);
-
-    // Don't display the Memory console menu if the feature is turned off
-    LLMenuItemCheckGL *memoryMenu = gMenuBarView->getChild<LLMenuItemCheckGL>("Memory", true);
-    if (memoryMenu)
-    {
-        memoryMenu->setVisible(false);
-    }
 
     gMenuBarView->createJumpKeys();
 
@@ -687,7 +748,7 @@ void init_menus()
     LLRect menuBarRect = gLoginMenuBarView->getRect();
     menuBarRect.setLeftTopAndSize(0, menu_bar_holder->getRect().getHeight(), menuBarRect.getWidth(), menuBarRect.getHeight());
     gLoginMenuBarView->setRect(menuBarRect);
-    gLoginMenuBarView->setBackgroundColor( color );
+    gLoginMenuBarView->setBackgroundColor(LLColor4::black);
     menu_bar_holder->addChild(gLoginMenuBarView);
 
     // tooltips are on top of EVERYTHING, including menus
@@ -2239,6 +2300,270 @@ class LLAdvancedRebakeTextures : public view_listener_t
     }
 };
 
+///////////////////////////
+// TELEPORT TO GROUND    //
+///////////////////////////
+
+class LLAdvancedTPToGround : public view_listener_t
+{
+    bool handleEvent(const LLSD& userdata)
+    {
+        LLVector3 agentPos = gAgent.getPositionAgent();
+        U64 agentRegion = gAgent.getRegion()->getHandle();
+        LLVector3 targetPos(agentPos.mV[0], agentPos.mV[1],
+                            LLWorld::getInstance()->resolveLandHeightAgent(agentPos));
+        LLVector3d pos_global = from_region_handle(agentRegion);
+        pos_global += LLVector3d((F64)targetPos.mV[0], (F64)targetPos.mV[1], (F64)targetPos.mV[2]);
+        gAgent.teleportViaLocation(pos_global);
+        return true;
+    }
+};
+
+//////////////////////////////
+// CMDLINE TELEPORT POSITION //
+//////////////////////////////
+
+class LLAdvancedCmdLineTeleportPos : public view_listener_t
+{
+    bool handleEvent(const LLSD& userdata)
+    {
+        LLNotificationsUtil::add("CmdLineTeleportPos", LLSD(), LLSD(),
+            [](const LLSD& notification, const LLSD& response)
+            {
+                if (LLNotificationsUtil::getSelectedOption(notification, response) != 0) return false;
+                std::string input = response["coords"].asString();
+                F32 x, y, z;
+                std::istringstream ss(input);
+                if (ss >> x && ss >> y && ss >> z)
+                {
+                    LLViewerRegion* region = gAgent.getRegion();
+                    if (region)
+                    {
+                        LLVector3d pos_global = from_region_handle(region->getHandle());
+                        pos_global += LLVector3d((F64)x, (F64)y, (F64)z);
+                        gAgent.teleportViaLocation(pos_global);
+                    }
+                }
+                return false;
+            });
+        return true;
+    }
+};
+
+//////////////////////////////
+// CMDLINE TELEPORT HEIGHT  //
+//////////////////////////////
+
+class LLAdvancedCmdLineTeleportHeight : public view_listener_t
+{
+    bool handleEvent(const LLSD& userdata)
+    {
+        LLNotificationsUtil::add("CmdLineTeleportHeight", LLSD(), LLSD(),
+            [](const LLSD& notification, const LLSD& response)
+            {
+                if (LLNotificationsUtil::getSelectedOption(notification, response) != 0) return false;
+                std::string heightStr = response["height"].asString();
+                if (!heightStr.empty())
+                {
+                    F32 z = (F32)response["height"].asReal();
+                    LLVector3 agentPos = gAgent.getPositionAgent();
+                    U64 agentRegion = gAgent.getRegion()->getHandle();
+                    LLVector3d pos_global = from_region_handle(agentRegion);
+                    pos_global += LLVector3d((F64)agentPos.mV[VX], (F64)agentPos.mV[VY], (F64)z);
+                    gAgent.teleportViaLocation(pos_global);
+                }
+                return false;
+            });
+        return true;
+    }
+};
+
+//////////////////////////////
+// CMDLINE DRAW DISTANCE    //
+//////////////////////////////
+
+class LLAdvancedCmdLineDrawDistance : public view_listener_t
+{
+    bool handleEvent(const LLSD& userdata)
+    {
+        LLNotificationsUtil::add("CmdLineDrawDistance", LLSD(), LLSD(),
+            [](const LLSD& notification, const LLSD& response)
+            {
+                if (LLNotificationsUtil::getSelectedOption(notification, response) != 0) return false;
+                F32 dist = (F32)response["distance"].asReal();
+                if (dist > 0.f)
+                {
+                    gSavedSettings.setF32("RenderFarClip", dist);
+                    gAgentCamera.mDrawDistance = dist;
+                }
+                return false;
+            });
+        return true;
+    }
+};
+
+//////////////////////////////
+// CMDLINE TELEPORT TO SIM  //
+//////////////////////////////
+
+class LLAdvancedCmdLineMapTo : public view_listener_t
+{
+    bool handleEvent(const LLSD& userdata)
+    {
+        LLNotificationsUtil::add("CmdLineMapTo", LLSD(), LLSD(),
+            [](const LLSD& notification, const LLSD& response)
+            {
+                if (LLNotificationsUtil::getSelectedOption(notification, response) != 0) return false;
+                std::string input = response["simname"].asString();
+                LLStringUtil::trim(input);
+                if (!input.empty())
+                {
+                    S32 x = 128, y = 128, z = 0;
+                    std::string region_name;
+                    // Try to parse "name x y z" — walk backwards to find trailing integers
+                    std::istringstream ss(input);
+                    std::vector<std::string> tokens;
+                    std::string tok;
+                    while (ss >> tok) tokens.push_back(tok);
+                    S32 coord_count = 0;
+                    S32 i = (S32)tokens.size() - 1;
+                    if (i >= 2)
+                    {
+                        std::istringstream iz(tokens[i]), iy(tokens[i-1]), ix(tokens[i-2]);
+                        S32 tz, ty, tx;
+                        if ((iz >> tz) && (iy >> ty) && (ix >> tx))
+                        {
+                            z = tz; y = ty; x = tx;
+                            coord_count = 3;
+                        }
+                    }
+                    if (coord_count == 3 && (S32)tokens.size() > 3)
+                    {
+                        for (S32 j = 0; j < (S32)tokens.size() - 3; ++j)
+                            region_name += (j > 0 ? " " : "") + tokens[j];
+                    }
+                    else
+                    {
+                        region_name = input;
+                    }
+                    LLStringUtil::trim(region_name);
+                    if (!region_name.empty())
+                    {
+                        std::string url = llformat("secondlife:///app/teleport/%s/%d/%d/%d",
+                                                   LLWeb::escapeURL(region_name).c_str(), x, y, z);
+                        LLURLDispatcher::dispatch(url, "clicked", nullptr, true);
+                    }
+                }
+                return false;
+            });
+        return true;
+    }
+};
+
+//////////////////////////////
+// CMDLINE REZ PLATFORM     //
+//////////////////////////////
+
+class LLAdvancedCmdLineRezPlat : public view_listener_t
+{
+    bool handleEvent(const LLSD& userdata)
+    {
+        LLNotificationsUtil::add("CmdLineRezPlat", LLSD(), LLSD(),
+            [](const LLSD& notification, const LLSD& response)
+            {
+                if (LLNotificationsUtil::getSelectedOption(notification, response) != 0) return false;
+                std::string input = response["width"].asString();
+                LLStringUtil::trim(input);
+                if (!input.empty())
+                {
+                    F32 width = (F32)atof(input.c_str());
+                    cmdline_rezplat(false, width);
+                }
+                else
+                {
+                    cmdline_rezplat();
+                }
+                return false;
+            });
+        return true;
+    }
+};
+
+//////////////////////////////
+// CMDLINE TELEPORT TO CAM  //
+//////////////////////////////
+
+class LLAdvancedCmdLineTeleportToCam : public view_listener_t
+{
+    bool handleEvent(const LLSD& userdata)
+    {
+        gAgent.teleportViaLocation(gAgentCamera.getCameraPositionGlobal());
+        return true;
+    }
+};
+
+//////////////////////////////
+// CMDLINE TELEPORT HOME    //
+//////////////////////////////
+
+class LLAdvancedCmdLineTeleportHome : public view_listener_t
+{
+    bool handleEvent(const LLSD& userdata)
+    {
+        gAgent.teleportHome();
+        return true;
+    }
+};
+
+//////////////////////////////
+// CMDLINE AO TOGGLE        //
+//////////////////////////////
+
+class LLAdvancedCmdLineAOToggle : public view_listener_t
+{
+    bool handleEvent(const LLSD& userdata)
+    {
+        BOOL current = gSavedPerAccountSettings.getBOOL("UseAO");
+        gSavedPerAccountSettings.setBOOL("UseAO", !current);
+        return true;
+    }
+};
+
+//////////////////////////////
+// CMDLINE CALC             //
+//////////////////////////////
+
+class LLAdvancedCmdLineCalc : public view_listener_t
+{
+    bool handleEvent(const LLSD& userdata)
+    {
+        LLNotificationsUtil::add("CmdLineCalc", LLSD(), LLSD(),
+            [](const LLSD& notification, const LLSD& response)
+            {
+                if (LLNotificationsUtil::getSelectedOption(notification, response) != 0) return false;
+                std::string expr = response["expression"].asString();
+                LLStringUtil::trim(expr);
+                if (!expr.empty())
+                {
+                    LLStringUtil::toUpper(expr);
+                    F32 result = 0.f;
+                    if (LLCalc::getInstance()->evalString(expr, result))
+                    {
+                        std::ostringstream out;
+                        out << expr << " = " << result;
+                        report_to_nearby_chat(out.str());
+                    }
+                    else
+                    {
+                        report_to_nearby_chat("Calculation Failed");
+                    }
+                }
+                return false;
+            });
+        return true;
+    }
+};
+
 //MK from KB
 void handle_refresh_attachments()
 {
@@ -3038,7 +3363,7 @@ class LLObjectTexRefresh : public view_listener_t
             // Refresh sculpt texture
             if (node->getObject()->isSculpted())
             {
-                LLSculptParams *sculpt_params = (LLSculptParams *)node->getObject()->getParameterEntry(LLNetworkData::PARAMS_SCULPT);
+                LLSculptParams *sculpt_params = node->getObject()->getSculptParams();
                 if (sculpt_params)
                 {
                     LLUUID sculpt_uuid = sculpt_params->getSculptTexture();
@@ -3167,11 +3492,45 @@ void handle_object_show_original()
     show_item_original(object->getAttachmentItemID());
 }
 
+void handle_object_set_favorite(const LLSD& userdata)
+{
+    LLViewerObject* object = LLSelectMgr::getInstance()->getSelection()->getPrimaryObject();
+    if (!object)
+    {
+        return;
+    }
+    LLViewerObject *parent = (LLViewerObject*)object->getParent();
+    while (parent)
+    {
+        if(parent->isAvatar())
+        {
+            break;
+        }
+        object = parent;
+        parent = (LLViewerObject*)parent->getParent();
+    }
+    if (!object || object->isAvatar())
+    {
+        return;
+    }
+
+    LLUUID item_id = gInventory.getLinkedItemID(object->getAttachmentItemID());
+
+    std::string action = userdata.asString();
+    if (action == "Add")
+    {
+        set_favorite(item_id, true);
+    }
+    if (action == "Remove")
+    {
+        set_favorite(item_id, false);
+    }
+}
 
 static void init_default_item_label(LLUICtrl* ctrl)
 {
     const std::string& item_name = ctrl->getName();
-    boost::unordered_map<std::string, LLStringExplicit>::iterator it = sDefaultItemLabels.find(item_name);
+    std::unordered_map<std::string, LLStringExplicit>::iterator it = sDefaultItemLabels.find(item_name);
     if (it == sDefaultItemLabels.end())
     {
         // *NOTE: This will not work for items of type LLMenuItemCheckGL because they return boolean value
@@ -3187,7 +3546,7 @@ static void init_default_item_label(LLUICtrl* ctrl)
 static LLStringExplicit get_default_item_label(const std::string& item_name)
 {
     LLStringExplicit res("");
-    boost::unordered_map<std::string, LLStringExplicit>::iterator it = sDefaultItemLabels.find(item_name);
+    std::unordered_map<std::string, LLStringExplicit>::iterator it = sDefaultItemLabels.find(item_name);
     if (it != sDefaultItemLabels.end())
     {
         res = it->second;
@@ -3222,6 +3581,41 @@ bool enable_object_touch(LLUICtrl* ctrl)
 
     return new_value;
 };
+
+bool enable_object_favorite(const LLSD& userdata)
+{
+    LLViewerObject* object = LLSelectMgr::getInstance()->getSelection()->getPrimaryObject();
+    if (!object)
+    {
+        return false;
+    }
+    LLViewerObject* parent = (LLViewerObject*)object->getParent();
+    while (parent)
+    {
+        if (parent->isAvatar())
+        {
+            break;
+        }
+        object = parent;
+        parent = (LLViewerObject*)parent->getParent();
+    }
+    if (!object || object->isAvatar())
+    {
+        return false;
+    }
+
+    std::string action = userdata.asString();
+    LLUUID item_id = gInventory.getLinkedItemID(object->getAttachmentItemID());
+    if (action == "Add")
+    {
+        return !get_is_favorite(item_id);
+    }
+    if (action == "Remove")
+    {
+        return get_is_favorite(item_id);
+    }
+    return false;
+}
 
 //void label_touch(std::string& label, void*)
 //{
@@ -11344,23 +11738,6 @@ class LLWorldEnableEnvPreset : public view_listener_t
     }
 };
 
-
-/// Post-Process callbacks
-class LLWorldPostProcess : public view_listener_t
-{
-    bool handleEvent(const LLSD& userdata)
-    {
-//MK
-        if (gRRenabled && gAgent.mRRInterface.mContainsSetenv)
-        {
-            return true;
-        }
-//mk
-        LLFloaterReg::showInstance("env_post_process");
-        return true;
-    }
-};
-
 class LLWorldCheckBanLines : public view_listener_t
 {
     bool handleEvent(const LLSD& userdata)
@@ -11612,6 +11989,8 @@ void initialize_spellcheck_menu()
 
 void initialize_menus()
 {
+    LL_PROFILE_ZONE_SCOPED;
+
     // A parameterized event handler used as ctrl-8/9/0 zoom controls below.
     class LLZoomer : public view_listener_t
     {
@@ -11735,7 +12114,6 @@ void initialize_menus()
     view_listener_t::addMenu(new LLWorldEnableEnvSettings(), "World.EnableEnvSettings");
     view_listener_t::addMenu(new LLWorldEnvPreset(), "World.EnvPreset");
     view_listener_t::addMenu(new LLWorldEnableEnvPreset(), "World.EnableEnvPreset");
-    view_listener_t::addMenu(new LLWorldPostProcess(), "World.PostProcess");
     view_listener_t::addMenu(new LLWorldCheckBanLines() , "World.CheckBanLines");
     view_listener_t::addMenu(new LLWorldShowBanLines() , "World.ShowBanLines");
 
@@ -11942,6 +12320,16 @@ void initialize_menus()
     view_listener_t::addMenu(new LLAdvancedDumpAttachments(), "Advanced.DumpAttachments");
     view_listener_t::addMenu(new LLAdvancedRebakeTextures(), "Advanced.RebakeTextures");
     view_listener_t::addMenu(new LLAdvancedRefreshScene(), "Advanced.RefreshScene");
+    view_listener_t::addMenu(new LLAdvancedTPToGround(), "Advanced.TPToGround");
+    view_listener_t::addMenu(new LLAdvancedCmdLineTeleportPos(),    "Advanced.CmdLineTeleportPos");
+    view_listener_t::addMenu(new LLAdvancedCmdLineTeleportHeight(), "Advanced.CmdLineTeleportHeight");
+    view_listener_t::addMenu(new LLAdvancedCmdLineDrawDistance(),   "Advanced.CmdLineDrawDistance");
+    view_listener_t::addMenu(new LLAdvancedCmdLineMapTo(),         "Advanced.CmdLineMapTo");
+    view_listener_t::addMenu(new LLAdvancedCmdLineRezPlat(),       "Advanced.CmdLineRezPlat");
+    view_listener_t::addMenu(new LLAdvancedCmdLineTeleportToCam(), "Advanced.CmdLineTeleportToCam");
+    view_listener_t::addMenu(new LLAdvancedCmdLineTeleportHome(),  "Advanced.CmdLineTeleportHome");
+    view_listener_t::addMenu(new LLAdvancedCmdLineAOToggle(),      "Advanced.CmdLineAOToggle");
+    view_listener_t::addMenu(new LLAdvancedCmdLineCalc(),          "Advanced.CmdLineCalc");
 //MK from KB
     commit.add("Advanced.RefreshAttachments", boost::bind(&handle_refresh_attachments));
 //mk from kb
@@ -12081,6 +12469,7 @@ void initialize_menus()
     view_listener_t::addMenu(new LLObjectBuild(), "Object.Build");
     commit.add("Object.Touch", boost::bind(&handle_object_touch));
     commit.add("Object.ShowOriginal", boost::bind(&handle_object_show_original));
+    commit.add("Object.SetFavorite", boost::bind(&handle_object_set_favorite, _2));
     commit.add("Object.SitOrStand", boost::bind(&handle_object_sit_or_stand));
     commit.add("Object.Teleport", boost::bind(&handle_object_teleport));
     commit.add("Object.Delete", boost::bind(&handle_object_delete));
@@ -12115,6 +12504,7 @@ void initialize_menus()
     enable.add("Object.EnableEditGLTFMaterial", boost::bind(&enable_object_edit_gltf_material));
     enable.add("Object.EnableOpen", boost::bind(&enable_object_open));
     enable.add("Object.EnableTouch", boost::bind(&enable_object_touch, _1));
+    enable.add("Object.EnableFavorites", boost::bind(&enable_object_favorite, _2));
     enable.add("Object.EnableDelete", boost::bind(&enable_object_delete));
     enable.add("Object.EnableWear", boost::bind(&object_is_wearable));
 

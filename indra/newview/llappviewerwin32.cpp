@@ -72,6 +72,11 @@
 #include <fstream>
 #include <exception>
 
+// Velopack installer and update framework
+#if LL_VELOPACK
+#include "llvelopack.h"
+#endif
+
 // Bugsplat (http://bugsplat.com) crash reporting tool
 #ifdef LL_BUGSPLAT
 #include "BugSplat.h"
@@ -120,6 +125,7 @@ namespace
     // MiniDmpSender pointer. As things stand, though, we must define an
     // actual function and store the pointer statically.
     static MiniDmpSender *sBugSplatSender = nullptr;
+    static std::string sBugsplatDescriptionField;
 
     bool bugsplatSendLog(UINT nCode, LPVOID lpVal1, LPVOID lpVal2)
     {
@@ -185,8 +191,21 @@ namespace
                 // <FS:Ansariel>
             }
 
-            // LL_ERRS message, when there is one
-            sBugSplatSender->setDefaultUserDescription(WCSTR(LLError::getFatalMessage()));
+            if (!sBugsplatDescriptionField.empty())
+            {
+                // Can be set by watchdog or other code that detects a problem
+                // and wants to add some context to the crash report.
+                // Will be visible in the BugSplat web UI.
+                sBugSplatSender->setDefaultUserDescription(WCSTR(sBugsplatDescriptionField));
+                // This type of crash is not necessarily a crash, or final.
+                // Prepare for the next one.
+                sBugsplatDescriptionField.clear();
+            }
+            else
+            {
+                // LL_ERRS message, when there is one
+                sBugSplatSender->setDefaultUserDescription(WCSTR(LLError::getFatalMessage()));
+            }
 
             sBugSplatSender->setAttribute(WCSTR(L"OS"), WCSTR(LLOSInfo::instance().getOSStringSimple())); // In case we ever stop using email for this
             sBugSplatSender->setAttribute(WCSTR(L"AppState"), WCSTR(LLStartUp::getStartupStateString()));
@@ -255,7 +274,6 @@ LONG WINAPI catchallCrashHandler(EXCEPTION_POINTERS * /*ExceptionInfo*/)
     return 0;
 }
 
-const std::string LLAppViewerWin32::sWindowClass = "Second Life";
 
 /*
     This function is used to print to the command line a text message
@@ -459,6 +477,17 @@ int APIENTRY WINMAIN(HINSTANCE hInstance,
                      PWSTR     pCmdLine,
                      int       nCmdShow)
 {
+#if LL_VELOPACK
+    // Velopack MUST be initialized first - it may handle install/uninstall
+    // commands and exit the process before we do anything else.
+    if (!velopack_initialize())
+    {
+        // Obsolete? Always return true
+        // Velopack handled the invocation (install/uninstall hook)
+        return 0;
+    }
+#endif
+
     // Call Tracy first thing to have it allocate memory
     // https://github.com/wolfpld/tracy/issues/196
     LL_PROFILER_FRAME_END;
@@ -940,6 +969,38 @@ bool LLAppViewerWin32::reportCrashToBugsplat(void* pExcepInfo)
     return false;
 }
 
+#if defined(LL_BUGSPLAT)
+static int reportCustomToBugsplatFilter(EXCEPTION_POINTERS* pExcepInfo)
+{
+    if (sBugSplatSender)
+    {
+        sBugSplatSender->createReport(pExcepInfo);
+    }
+    return EXCEPTION_EXECUTE_HANDLER;
+}
+#endif
+
+bool LLAppViewerWin32::reportCustomToBugsplat(const std::string &description)
+{
+#if defined(LL_BUGSPLAT)
+    if (sBugSplatSender)
+    {
+        sBugsplatDescriptionField = description;
+
+        __try
+        {
+            // Generate a custom exception code
+            RaiseException(0xE0000001, 0, 0, NULL);
+        }
+        __except (reportCustomToBugsplatFilter(GetExceptionInformation()))
+        {
+        }
+        return true;
+    }
+#endif // LL_BUGSPLAT
+    return false;
+}
+
 bool LLAppViewerWin32::initWindow()
 {
     // This is a workaround/hotfix for a change in Windows 11 24H2 (and possibly later)
@@ -1040,7 +1101,7 @@ bool LLAppViewerWin32::restoreErrorTrap()
 bool LLAppViewerWin32::sendURLToOtherInstance(const std::string& url)
 {
     wchar_t window_class[256]; /* Flawfinder: ignore */   // Assume max length < 255 chars.
-    mbstowcs(window_class, sWindowClass.c_str(), 255);
+    mbstowcs(window_class, sWindowClass, 255);
     window_class[255] = 0;
     // Use the class instead of the window name.
     HWND other_window = FindWindow(window_class, NULL);
