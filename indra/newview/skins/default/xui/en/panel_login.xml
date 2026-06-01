@@ -70,17 +70,17 @@
          bg_opaque_color="PanelDark"
          background_opaque="true">
           <icon
-           height="80"
-           width="80"
-           image_name="login_kokua_logo"
+           height="280"
+           width="280"
+           image_name="startup_logo"
            layout="topleft"
            follows="left|top"
-           left="110"
-           top="39"
+           left="10"
+           top="10"
            name="kokua_logo_small" />
           <icon
            left="40"
-           top_pad="30"
+           top_pad="50"
            width="220"
            height="28"
            image_name="TextField_Active"
