@@ -425,6 +425,7 @@ StrCpy $INSTSHORTCUT "${SHORTCUT}"
 
 Call CheckIfAdministrator		# Make sure the user can install/uninstall
 Call CloseSecondLife			# Make sure Second Life not currently running
+Call CheckAndUninstallPrevious	# MARE: silently remove previous version before installing
 Call CheckWillUninstallV2		# Check if Second Life is already installed
 
 StrCmp $DO_UNINSTALL_V2 "" PRESERVE_DONE
@@ -621,7 +622,44 @@ lbl_is_admin:
 FunctionEnd
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Function CheckWillUninstallV2               
+;; MARE: Silently uninstall any previous version of this viewer before
+;; installing the new one, so users don't accumulate stale DLLs or files
+;; removed between releases.  User settings in %AppData%\Roaming\Mare\ are
+;; NOT touched — only the program files in $INSTDIR are removed.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+Function CheckAndUninstallPrevious
+  Push $0
+  Push $1
+
+  ; Read the uninstaller path from the Windows Apps & Features registry entry
+  ReadRegStr $0 SHELL_CONTEXT "${MSUNINSTALL_KEY}" "UninstallString"
+
+  ; Nothing registered — fresh install, nothing to do
+  StrCmp $0 "" UNINSTPREV_DONE
+
+  ; Strip surrounding quotes if present (registry value may be quoted)
+  StrCpy $1 $0 1
+  StrCmp $1 '"' 0 UNINSTPREV_RUN
+    StrCpy $0 $0 "" 1          ; remove leading "
+    StrCpy $1 $0               ; find trailing "
+    StrLen $1 $1
+    IntOp $1 $1 - 1
+    StrCpy $0 $0 $1            ; strip trailing "
+
+UNINSTPREV_RUN:
+  ; Run silently. _?=$INSTDIR keeps the process in-place so ExecWait works.
+  ExecWait '"$0" /S _?=$INSTDIR'
+  ; Delete the leftover uninst.exe (silent run leaves it behind due to _?)
+  Delete "$INSTDIR\uninst.exe"
+
+UNINSTPREV_DONE:
+  Pop $1
+  Pop $0
+  Return
+FunctionEnd
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Function CheckWillUninstallV2
 ;;
 ;; If called through auto-update, need to uninstall any existing V2 installation.
 ;; Don't want to end up with SecondLifeViewer2 and SecondLifeViewer installations
