@@ -4264,6 +4264,12 @@ void LLContextMenu::show(S32 x, S32 y, LLView* spawning_view)
             y += height;
         }
     }
+    // Clamp so menu doesn't go above the top of the screen
+    // MARE: fix menus getting cut off when near top edge
+    if (y > menu_region_rect.mTop)
+    {
+        y = menu_region_rect.mTop;
+    }
 
     // Open out to the left if menu extends past right edge
     if (x + width > menu_region_rect.mRight)
@@ -4276,6 +4282,12 @@ void LLContextMenu::show(S32 x, S32 y, LLView* spawning_view)
         {
             x -= width;
         }
+    }
+    // Clamp so menu doesn't go past the left edge of the screen
+    // MARE: fix menus getting cut off when near left edge
+    if (x < menu_region_rect.mLeft)
+    {
+        x = menu_region_rect.mLeft;
     }
 
     S32 local_x, local_y;
