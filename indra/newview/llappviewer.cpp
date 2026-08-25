@@ -4923,7 +4923,16 @@ bool LLAppViewer::initCache()
     LLVOCache::initParamSingleton(read_only);
 
     // initialize the new disk cache using saved settings
-    const std::string cache_dir_name = gSavedSettings.getString("DiskCacheDirName");
+    std::string cache_dir_name = gSavedSettings.getString("DiskCacheDirName");
+    // MARE: LLDiskCache (used for GLTF/PBR material assets, mesh, etc.) has no
+    // read-only mode like the legacy texture cache. Running a second instance
+    // concurrently can interleave writes to the same cache files and corrupt
+    // them, producing garbled/rainbow textures on PBR-materialed items. Give
+    // second instances their own disk cache directory to avoid the collision.
+    if (mSecondInstance)
+    {
+        cache_dir_name += "_2nd";
+    }
 
     const U32 MB = 1024 * 1024;
     const uintmax_t MIN_CACHE_SIZE = 896 * MB;

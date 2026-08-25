@@ -2117,10 +2117,14 @@ bool LLAppearanceMgr::getCanReplaceCOF(const LLUUID& outfit_cat_id)
         return false;
     }
 
-    // Check whether the outfit contains any wearables
+    // Check whether the outfit contains any wearable content (clothing, body parts,
+    // attachments, or gestures) - must match the criteria used to decide whether the
+    // "Replace Outfit" menu item is shown in the first place, otherwise folders that
+    // contain only attachments/gestures show the option but leave it disabled.
     LLInventoryModel::cat_array_t cats;
     LLInventoryModel::item_array_t items;
-    LLFindWearables is_wearable;
+    const std::vector<LLAssetType::EType> types = { LLAssetType::AT_CLOTHING, LLAssetType::AT_BODYPART, LLAssetType::AT_OBJECT, LLAssetType::AT_GESTURE };
+    LLIsOneOfTypes is_wearable(types);
     gInventory.collectDescendentsIf(outfit_cat_id,
         cats,
         items,

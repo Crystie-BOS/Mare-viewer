@@ -409,15 +409,7 @@ void LLFloaterSnapshot::Impl::updateControls(LLFloaterSnapshotBase* floater)
 
     LLPanelSnapshot* current_panel = Impl::getActivePanel(floater);
 //MK
-    if (gRRenabled && gAgent.mRRInterface.mHasLockedHuds)
-    {
-        floater->childSetEnabled("hud_check",FALSE);
-        gSavedSettings.setBOOL( "RenderHUDInSnapshot", TRUE );
-    }
-    else
-    {
-        floater->childSetEnabled("hud_check",TRUE);
-    }
+    floater->childSetEnabled("hud_check",TRUE);
     floater->childSetValue("hud_check", gSavedSettings.getBOOL("RenderHUDInSnapshot")); //KKA-804 - follow the control variable, not the other way around
 //mk
     if (current_panel)
@@ -538,12 +530,6 @@ void LLFloaterSnapshotBase::ImplBase::onClickFilter(LLUICtrl *ctrl, void* data)
 // static
 void LLFloaterSnapshotBase::ImplBase::onClickDisplaySetting(LLUICtrl* ctrl, void* data)
 {
-//MK
-    if (gRRenabled && gAgent.mRRInterface.mHasLockedHuds)
-    {
-        gSavedSettings.setBOOL( "RenderHUDInSnapshot", TRUE );
-    }
-//mk
     LLFloaterSnapshot* view = (LLFloaterSnapshot*)data;
     if (view)
     {
@@ -1011,17 +997,7 @@ bool LLFloaterSnapshot::postBuild()
     childSetCommitCallback("balance_check", ImplBase::onClickDisplaySetting, this);
     childSetCommitCallback("hud_check", ImplBase::onClickDisplaySetting, this);
 //MK
-    if (gRRenabled && gAgent.mRRInterface.mHasLockedHuds)
-    {
-        getChild<LLUICtrl>("hud_check")->setValue(TRUE);
-        gSavedSettings.setBOOL( "RenderHUDInSnapshot", TRUE );
-        getChild<LLUICtrl>("hud_check")->setEnabled(FALSE);
-    }
-    else
-    {
-        getChild<LLUICtrl>("hud_check")->setEnabled(TRUE);
-
-    }
+    getChild<LLUICtrl>("hud_check")->setEnabled(TRUE);
     mRlvBehaviorCallbackConnection = gAgent.mRRInterface.setBehaviourCallback(boost::bind(&LLFloaterSnapshot::updateRlvRestrictions, this, _1, _2));
 //mk
 
