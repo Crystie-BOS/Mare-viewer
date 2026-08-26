@@ -5163,13 +5163,6 @@ bool LLViewerWindow::rawSnapshot(LLImageRaw *raw, S32 image_width, S32 image_hei
     // if not showing ui, use full window to render world view
     updateWorldViewRect(!show_ui);
 
-//MK
-    if (gRRenabled && gAgent.mRRInterface.mHasLockedHuds)
-    {
-        LLPipeline::sShowHUDAttachments = TRUE;
-    }
-//mk
-
     // Copy screen to a buffer
     // crop sides or top and bottom, if taking a snapshot of different aspect ratio
     // from window
