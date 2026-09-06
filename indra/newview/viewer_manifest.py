@@ -1429,7 +1429,7 @@ class LinuxManifest(ViewerManifest):
             self.path("register_hopprotocol.sh", "etc/register_hopprotocol.sh")
             self.path("refresh_desktop_app_entry.sh", "etc/refresh_desktop_app_entry.sh")
             self.path("launch_url.sh","etc/launch_url.sh")
-            self.path("wrapper.sh","kokua")
+            self.path("wrapper.sh","mare-viewer")
             with self.prefix(src="", dst="etc"):
                 self.path("handle_secondlifeprotocol.sh")
                 self.path("register_secondlifeprotocol.sh")
@@ -1438,7 +1438,7 @@ class LinuxManifest(ViewerManifest):
             self.path("install.sh")
 
         with self.prefix(src="", dst="bin"):
-            self.path("kokua-bin","do-not-directly-run-kokua-bin")
+            self.path("mare-viewer","do-not-directly-run-mare-viewer-bin")
             self.path2basename("../llplugin/slplugin", "SLPlugin")
 
         # recurses, packaged again

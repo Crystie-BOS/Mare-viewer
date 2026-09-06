@@ -139,7 +139,7 @@ export SAVED_LD_LIBRARY_PATH="${LD_LIBRARY_PATH}"
 #    fi
 #fi
 
-BINARY_TYPE=$(expr match "$(file -b bin/do-not-directly-run-kokua-bin)" '\(.*executable\)')
+BINARY_TYPE=$(expr match "$(file -b bin/do-not-directly-run-mare-viewer-bin)" '\(.*executable\)')
 if [ "${BINARY_TYPE}" == "ELF 32-bit LSB executable" ]; then
 
     export LD_LIBRARY_PATH="$PWD/lib:${LD_LIBRARY_PATH}"
@@ -169,7 +169,7 @@ done
 # Don't quote $LL_WRAPPER because, if empty, it should simply vanish from the
 # command line. But DO quote "${ARGS[@]}": preserve separate args as
 # individually quoted.
-$LL_WRAPPER bin/do-not-directly-run-kokua-bin "${ARGS[@]}"
+$LL_WRAPPER bin/do-not-directly-run-mare-viewer-bin "${ARGS[@]}"
 LL_RUN_ERR=$?
 
 
@@ -185,7 +185,7 @@ if [ -n "$LL_RUN_ERR" ]; then
 			cat << EOFMARKER
 You are running the Kokua Viewer on a x86_64 platform.  The
 most common problems when launching the Viewer (particularly
-'bin/do-not-directly-run-kokua-bin: not found' and 'error while
+'bin/do-not-directly-run-mare-viewer-bin: not found' and 'error while
 loading shared libraries') may be solved by installing your Linux
 distribution's 32-bit compatibility packages.
 For example, on Ubuntu and other Debian-based Linuxes you might run:

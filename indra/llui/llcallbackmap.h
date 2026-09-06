@@ -39,10 +39,6 @@ public:
     // callback definition.
     typedef std::function<void* (void* data)> callback_t;
 
-    typedef std::unordered_map<std::string, LLCallbackMap> map_t;
-    typedef map_t::iterator map_iter_t;
-    typedef map_t::const_iterator map_const_iter_t;
-
     template <class T>
     static void* buildPanel(void* data)
     {
@@ -56,5 +52,12 @@ public:
     callback_t  mCallback;
     void*       mData;
 };
+
+// These must live outside LLCallbackMap: a std::unordered_map<std::string, LLCallbackMap>
+// requires LLCallbackMap to be a complete type, which it isn't yet while its own
+// class body (and thus a nested typedef) is still being parsed.
+typedef std::unordered_map<std::string, LLCallbackMap> LLCallbackMap_map_t;
+typedef LLCallbackMap_map_t::iterator LLCallbackMap_map_iter_t;
+typedef LLCallbackMap_map_t::const_iterator LLCallbackMap_map_const_iter_t;
 
 #endif // LLCALLBACKMAP_H
