@@ -136,6 +136,12 @@ public:
     F32 getMin (std::string action, F32 dflt = -EXTREMUM); // returns the min value of all the @action:...=n restrictions
     LLColor3 getMixedColors (std::string action, LLColor3 dflt = LLColor3::black); // return the product of all the colors specified by actions "action"
     bool containsWithoutException (std::string action, std::string except = ""); // return true if the action or action+"_sec" is contained, and either there is no global exception, or there is no local exception in the case of action+"_sec"
+//MK
+    // MARE: return true if this avatar (or group) has been explicitly named as an exception on any
+    // IM-related restriction (@showim, @sendim, @recvim, @startim, plain or _sec). A leash HUD's
+    // "allow my holder to IM me" override is usually an @sendim exception, so @showim honors it too.
+    bool isImException (const std::string& id);
+//mk
     bool isFolderLocked(LLInventoryCategory* cat); // return true if cat has a lock specified for it or one of its parents, or not shared and @unshared is active
     FolderLock isFolderLockedWithoutException (LLInventoryCategory* cat, std::string attach_or_detach); // attach_or_detach must be equal to either "attach" or "detach"
     FolderLock isFolderLockedWithoutExceptionAux (LLInventoryCategory* cat, std::string attach_or_detach, std::deque<std::string> list_of_restrictions); // auxiliary function to isFolderLockedWithoutException

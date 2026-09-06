@@ -32,6 +32,7 @@
 #include "llagentwearables.h"
 #include "llappearancemgr.h"
 #include "llavatarnamecache.h"
+#include "llcallbacklist.h"     // MARE: defer the @showim close sweep to the next idle tick
 #include "llcamera.h"
 #include "lldrawpoolalpha.h"
 #include "llenvadapters.h" // new include for EEP
@@ -39,6 +40,7 @@
 //#include "llfloaterenvsettings.h"
 //#include "llfloatereditsky.h" // no longer exists with EEP
 #include "llfloaterimnearbychat.h"
+#include "llfloaterimsession.h"     // MARE: @showim/@showgroupchat close open IM windows
 #include "llfloatermap.h"
 #include "llfloaterperformance.h"
 #include "llfloaterpostprocess.h"
@@ -52,6 +54,7 @@
 #include "llfocusmgr.h"
 #include "llgroupactions.h"
 #include "llhudtext.h"
+#include "llimview.h"                // MARE: @showim/@showgroupchat close open IM windows
 #include "llinventoryfunctions.h"
 #include "llmoveview.h"
 #include "llnavigationbar.h"
@@ -408,6 +411,79 @@ void setVisibleAll(std::string floater_name, bool visible)
     }
 }
 
+//MK
+// MARE: A restriction and the exceptions that qualify it normally arrive as one command chain
+// (e.g. "@showim=n,sendim:<holder>=add"), and each command is applied in turn. Running the sweep
+// immediately would therefore close the leash holder's window a moment before the exception that
+// should have spared it is registered, so the sweep is deferred to the next idle tick, once the
+// whole batch has landed. It re-reads the live restriction state when it runs, so a restriction
+// that was lifted again in the meantime simply closes nothing.
+static bool sIMCloseSweepPending = false;
+
+// MARE: Close (and leave) every IM session that is currently blocked by @showim or
+// @showgroupchat. Turning the restriction on must also get rid of the windows that were
+// already open, not just suppress the new ones. Exceptions (@showim:<uuid>=add, and the
+// @sendim family - see RRInterface::isImException) are honored, so an exempted conversation stays.
+void closeRestrictedIMSessions()
+{
+    sIMCloseSweepPending = false;
+
+    if (!gRRenabled) return;
+    if (!gIMMgr) return;
+    if (!LLIMModel::instanceExists()) return;
+    if (!gAgent.mRRInterface.mContainsShowim && !gAgent.mRRInterface.mContainsShowgroupchat) return;
+
+    // Collect first: leaveSession() erases entries from the session map as we go.
+    std::vector<LLUUID> to_close;
+    std::map<LLUUID, LLIMModel::LLIMSession*>::iterator it;
+    for (it = LLIMModel::getInstance()->mId2SessionMap.begin();
+         it != LLIMModel::getInstance()->mId2SessionMap.end(); ++it)
+    {
+        LLIMModel::LLIMSession* session = it->second;
+        if (!session || it->first.isNull()) continue;
+
+        // Ad-hoc conferences count as IMs here, same as in LLIMMgr::addMessage(), and the same
+        // exception rules apply so an exempted conversation is never closed out from under us.
+        if (session->isGroupSessionType()) {
+            const std::string group_id = it->first.asString();
+            if (gAgent.mRRInterface.mContainsShowgroupchat
+                && gAgent.mRRInterface.containsWithoutException("showgroupchat", group_id)
+                && !gAgent.mRRInterface.isImException(group_id)) {
+                to_close.push_back(it->first);
+            }
+        }
+        else {
+            const std::string other_id = session->mOtherParticipantID.asString();
+            if (gAgent.mRRInterface.mContainsShowim
+                && gAgent.mRRInterface.containsWithoutException("showim", other_id)
+                && !gAgent.mRRInterface.isImException(other_id)) {
+                to_close.push_back(it->first);
+            }
+        }
+    }
+
+    for (size_t i = 0; i < to_close.size(); ++i)
+    {
+        // Same path as clicking the X on a conversation: closing the floater ends the session.
+        LLFloaterIMSession* im_floater = LLFloaterIMSession::findInstance(to_close[i]);
+        if (im_floater) {
+            LLFloater::onClickClose(im_floater);
+        }
+        else {
+            // No window for this session (never opened, or already torn down) => just end it.
+            gIMMgr->leaveSession(to_close[i]);
+        }
+    }
+}
+
+void scheduleRestrictedIMSessionClose()
+{
+    if (sIMCloseSweepPending) return;
+    sIMCloseSweepPending = true;
+    doOnIdleOneTime(&closeRestrictedIMSessions);
+}
+//mk
+
 void refreshCachedVariable (std::string var)
 {
     // Call this function when adding/removing a restriction only, i.e. in this file
@@ -444,8 +520,26 @@ void refreshCachedVariable (std::string var)
     else if (var == "showgroups")           gAgent.mRRInterface.mContainsShowgroups = contained;
     else if (var == "shownotify")           gAgent.mRRInterface.mContainsShownotify = contained;
     else if (var == "showfavorites")        gAgent.mRRInterface.mContainsShowfavorites = contained;
-    else if (var == "showim")               gAgent.mRRInterface.mContainsShowim = contained;
-    else if (var == "showgroupchat")        gAgent.mRRInterface.mContainsShowgroupchat = contained;
+//MK
+    // MARE: also react to the exception form (@showim:<uuid>=add), and close any conversation
+    // window that the restriction now covers.
+    else if (var == "showim" || var.find ("showim:") == 0) {
+        gAgent.mRRInterface.mContainsShowim = gAgent.mRRInterface.contains ("showim");
+        scheduleRestrictedIMSessionClose();
+    }
+    else if (var == "showgroupchat" || var.find ("showgroupchat:") == 0) {
+        gAgent.mRRInterface.mContainsShowgroupchat = gAgent.mRRInterface.contains ("showgroupchat");
+        scheduleRestrictedIMSessionClose();
+    }
+    // An exception on any IM-related restriction can exempt an avatar from @showim (see
+    // RRInterface::isImException), so dropping one - a leash being released, say - has to close
+    // the conversation that exception was keeping open.
+    else if (var.find ("sendim:") == 0 || var.find ("sendim_sec:") == 0
+          || var.find ("recvim:") == 0 || var.find ("recvim_sec:") == 0
+          || var.find ("startim:") == 0 || var.find ("startim_sec:") == 0) {
+        scheduleRestrictedIMSessionClose();
+    }
+//mk
     else if (var == "setenv")               gAgent.mRRInterface.mContainsSetenv = contained;
     else if (var == "setdebug")             gAgent.mRRInterface.mContainsSetdebug = contained;
     else if (var == "fly")                  gAgent.mRRInterface.mContainsFly = contained;
@@ -1164,6 +1258,27 @@ bool RRInterface::containsWithoutException (std::string action, std::string exce
     // 4. Finally return false if we didn't find anything
     return false;
 }
+
+//MK
+// MARE: Is this avatar (or group) explicitly named as an exception on any IM-related restriction?
+// Leash HUDs grant their "the person holding your leash may still IM you" override by adding an
+// exception to the standard @sendim (or @sendim_sec) restriction, not to our own @showim. Honor
+// any of them, so an override written for stock RLV works against @showim/@showgroupchat unchanged.
+// Note the _sec forms are matched regardless of which object issued them: this only ever grants
+// visibility, never takes it away, so the looser scope is the safe direction.
+bool RRInterface::isImException (const std::string& id)
+{
+    if (id.empty()) return false;
+
+    static const std::string im_behavs[] = { "showim", "showgroupchat", "sendim", "recvim", "startim" };
+    for (size_t i = 0; i < sizeof(im_behavs) / sizeof(im_behavs[0]); ++i)
+    {
+        if (contains (im_behavs[i] + ":" + id)) return true;
+        if (contains (im_behavs[i] + "_sec:" + id)) return true;
+    }
+    return false;
+}
+//mk
 
 bool RRInterface::isFolderLocked(LLInventoryCategory* cat)
 {

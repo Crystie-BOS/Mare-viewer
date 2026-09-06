@@ -3281,15 +3281,20 @@ void LLIMMgr::addMessage(
     }
 
 //MK
-    // MARE: suppress incoming IM/group chat windows entirely under @showim/@showgroupchat
-    // Uses containsWithoutException so a collar can exempt itself via @showim:<uuid>=rem
+    // MARE: suppress incoming IM/group chat windows entirely under @showim/@showgroupchat.
+    // containsWithoutException lets a collar exempt itself via @showim:<uuid>=add, and
+    // isImException additionally honors the exceptions a leash HUD adds to the standard
+    // @sendim/@recvim/@startim restrictions, which is how the "my holder may still IM me"
+    // override is normally written.
     if (gRRenabled && new_session)
     {
         if (!is_group_chat && gAgent.mRRInterface.mContainsShowim
-            && gAgent.mRRInterface.containsWithoutException("showim", other_participant_id.asString()))
+            && gAgent.mRRInterface.containsWithoutException("showim", other_participant_id.asString())
+            && !gAgent.mRRInterface.isImException(other_participant_id.asString()))
             return;
         if (is_group_chat && gAgent.mRRInterface.mContainsShowgroupchat
-            && gAgent.mRRInterface.containsWithoutException("showgroupchat", new_session_id.asString()))
+            && gAgent.mRRInterface.containsWithoutException("showgroupchat", new_session_id.asString())
+            && !gAgent.mRRInterface.isImException(new_session_id.asString()))
             return;
     }
 //mk
