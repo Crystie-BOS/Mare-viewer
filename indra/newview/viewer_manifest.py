@@ -964,15 +964,25 @@ class Windows_x86_64_Manifest(ViewerManifest):
 
         # Check two paths, one for Program Files, and one for Program Files (x86).
         # Yay 64bit windows.
-        nsis_path = "makensis.exe"
+        # MARE: this used to run `possible_path` - the loop variable, left holding
+        # whatever combination was tried last rather than the one that matched,
+        # because the `break` only left the inner loop. It happened to work only
+        # when NSIS lived in the final candidate directory. Search properly, use
+        # the result, and fail loudly instead of invoking a path that isn't there.
+        nsis_path = None
         for program_files in '${programfiles}', '${programfiles(x86)}':
-            for nesis_path in 'NSIS', 'NSIS\\Unicode':
-                possible_path = os.path.expandvars(f"{program_files}\\{nesis_path}\\makensis.exe")
+            for nsis_dir in 'NSIS', 'NSIS\\Unicode':
+                possible_path = os.path.expandvars(f"{program_files}\\{nsis_dir}\\makensis.exe")
                 if os.path.exists(possible_path):
                     nsis_path = possible_path
                     break
+            if nsis_path:
+                break
 
-        self.run_command([possible_path, '/V2', self.dst_path_of(tempfile)])
+        if not nsis_path:
+            raise ManifestError("makensis.exe not found - is NSIS installed?")
+
+        self.run_command([nsis_path, '/V2', self.dst_path_of(tempfile)])
 
         self.sign(installer_file)
         self.created_path(self.dst_path_of(installer_file))

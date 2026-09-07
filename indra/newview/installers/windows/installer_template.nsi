@@ -34,6 +34,8 @@ XPStyle on                  # Add an XP manifest to the installer
 RequestExecutionLevel admin	# For when we write to Program Files
 Unicode true                # Enable unicode support
 
+!include "FileFunc.nsh"     # ${GetSize}, used to report a real EstimatedSize
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Project flags
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -511,14 +513,23 @@ WriteRegStr SHELL_CONTEXT "${INSTNAME_KEY}" "" "$INSTDIR"
 WriteRegStr SHELL_CONTEXT "${INSTNAME_KEY}" "Version" "${VERSION_LONG}"
 WriteRegStr SHELL_CONTEXT "${INSTNAME_KEY}" "Shortcut" "$INSTSHORTCUT"
 WriteRegStr SHELL_CONTEXT "${INSTNAME_KEY}" "Exe" "$VIEWER_EXE"
-WriteRegStr SHELL_CONTEXT "${MSUNINSTALL_KEY}" "Publisher" "Linden Research, Inc."
-WriteRegStr SHELL_CONTEXT "${MSUNINSTALL_KEY}" "URLInfoAbout" "http://secondlife.com/whatis/"
-WriteRegStr SHELL_CONTEXT "${MSUNINSTALL_KEY}" "URLUpdateInfo" "http://secondlife.com/support/downloads/"
-WriteRegStr SHELL_CONTEXT "${MSUNINSTALL_KEY}" "HelpLink" "https://support.secondlife.com/contact-support/"
+# MARE: this is not a Linden Lab product - the publisher and support links have to
+# say so. Stock upstream left these pointing at Linden Research / secondlife.com.
+WriteRegStr SHELL_CONTEXT "${MSUNINSTALL_KEY}" "Publisher" "MARE Viewer Project"
+WriteRegStr SHELL_CONTEXT "${MSUNINSTALL_KEY}" "URLInfoAbout" "https://github.com/Crystie-BOS/Mare-viewer"
+WriteRegStr SHELL_CONTEXT "${MSUNINSTALL_KEY}" "URLUpdateInfo" "https://github.com/Crystie-BOS/Mare-viewer/releases"
+WriteRegStr SHELL_CONTEXT "${MSUNINSTALL_KEY}" "HelpLink" "https://github.com/Crystie-BOS/Mare-viewer/issues"
 WriteRegStr SHELL_CONTEXT "${MSUNINSTALL_KEY}" "DisplayName" "$INSTNAME"
 WriteRegStr SHELL_CONTEXT "${MSUNINSTALL_KEY}" "UninstallString" '"$INSTDIR\uninst.exe"'
+# MARE: upstream never wrote InstallLocation, so Apps & Features showed a blank
+# location and anything resolving the install through the standard key failed.
+WriteRegStr SHELL_CONTEXT "${MSUNINSTALL_KEY}" "InstallLocation" "$INSTDIR"
 WriteRegStr SHELL_CONTEXT "${MSUNINSTALL_KEY}" "DisplayVersion" "${VERSION_LONG}"
-WriteRegDWORD SHELL_CONTEXT "${MSUNINSTALL_KEY}" "EstimatedSize" "0x0001D500"		# ~117 MB
+# MARE: measure the install rather than reporting a hardcoded ~117 MB that has been
+# wrong for years. GetSize returns the size in KB in $0, which is what this expects.
+${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
+IntFmt $0 "0x%08X" $0
+WriteRegDWORD SHELL_CONTEXT "${MSUNINSTALL_KEY}" "EstimatedSize" "$0"
 
 # from FS:Ansariel
 WriteRegStr SHELL_CONTEXT "${MSUNINSTALL_KEY}" "DisplayIcon" '"$INSTDIR\$VIEWER_EXE"'
