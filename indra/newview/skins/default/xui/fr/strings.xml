@@ -670,7 +670,7 @@ Veuillez réessayer de vous connecter dans une minute.
 		Notes de version
 	</string>
 	<string name="RELEASE_NOTES_BASE_URL">
-		https://releasenotes.secondlife.com/viewer/
+		https://github.com/Crystie-BOS/Mare-viewer/releases/tag/
 	</string>
 	<string name="LoadingData">
 		Chargement...

@@ -388,7 +388,8 @@ void LLLoginInstance::handleLoginFailure(const LLSD& event)
             relnotes = LLTrans::getString("RELEASE_NOTES_BASE_URL");
             if (!LLStringUtil::endsWith(relnotes, "/"))
                 relnotes += "/";
-            relnotes += LLURI::escape(login_version) + ".html";
+            // MARE: GitHub release tags are "v<version>" with no .html suffix.
+            relnotes += "v" + LLURI::escape(login_version);
         }
 
         if (gViewerWindow)

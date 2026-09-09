@@ -616,7 +616,7 @@ support@secondlife.com にお問い合わせください。
 		リリースノート
 	</string>
 	<string name="RELEASE_NOTES_BASE_URL" translate="false">
-		https://releasenotes.secondlife.com/viewer/
+		https://github.com/Crystie-BOS/Mare-viewer/releases/tag/
 	</string>
 	<string name="LoadingData">
 		読み込んでいます…

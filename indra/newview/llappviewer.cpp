@@ -3792,18 +3792,15 @@ LLSD LLAppViewer::getViewerInfo() const
         info["BUILD_CONFIG"] = build_config;
     }
 
-    // return a URL to the release notes for this viewer, such as:
-    // http://wiki.secondlife.com/wiki/Release_Notes/Second Life Beta Viewer/2.1.0.123456
+    // MARE: return a URL to the release notes for this viewer, which for us is the
+    // GitHub release carrying the matching tag, e.g.
+    // https://github.com/Crystie-BOS/Mare-viewer/releases/tag/v1.2.4.7
+    // Upstream built a wiki-style path that included the channel name; that page
+    // does not exist for this viewer, so append "v" + version and no channel.
     std::string url = LLTrans::getString("RELEASE_NOTES_BASE_URL");
     if (! LLStringUtil::endsWith(url, "/"))
         url += "/";
-    std::string channel = versionInfo.getChannel();
-    if (LLStringUtil::endsWith(boost::to_lower_copy(channel), " edu")) // Release Notes url shouldn't include the EDU parameter
-    {
-        boost::erase_tail(channel, 4);
-    }
-    url += LLURI::escape(channel) + "/";
-    url += LLURI::escape(LLVersionInfo::instance().getVersion());
+    url += "v" + LLURI::escape(versionInfo.getVersion());
     info["VIEWER_RELEASE_NOTES_URL"] = url;
 #if LL_MSVC
     info["COMPILER"] = "MSVC";

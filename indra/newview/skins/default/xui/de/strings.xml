@@ -669,7 +669,7 @@ Warten Sie kurz und versuchen Sie dann noch einmal, sich anzumelden.
 		Versionshinweise
 	</string>
 	<string name="RELEASE_NOTES_BASE_URL">
-		https://releasenotes.secondlife.com/viewer/
+		https://github.com/Crystie-BOS/Mare-viewer/releases/tag/
 	</string>
 	<string name="LoadingData">
 		Wird geladen...
