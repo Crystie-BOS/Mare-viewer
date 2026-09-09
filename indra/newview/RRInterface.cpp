@@ -432,10 +432,7 @@ void closeRestrictedIMSessions()
     if (!gRRenabled) return;
     if (!gIMMgr) return;
     if (!LLIMModel::instanceExists()) return;
-    if (!gAgent.mRRInterface.mContainsShowim && !gAgent.mRRInterface.mContainsShowgroupchat) {
-        LL_INFOS("RLV") << "MARE showim sweep: neither restriction cached, nothing to do" << LL_ENDL;
-        return;
-    }
+    if (!gAgent.mRRInterface.mContainsShowim && !gAgent.mRRInterface.mContainsShowgroupchat) return;
 
     // Collect first: leaveSession() erases entries from the session map as we go.
     std::vector<LLUUID> to_close;
@@ -450,35 +447,21 @@ void closeRestrictedIMSessions()
         // exception rules apply so an exempted conversation is never closed out from under us.
         if (session->isGroupSessionType()) {
             const std::string group_id = it->first.asString();
-            const bool restricted = gAgent.mRRInterface.containsWithoutException("showgroupchat", group_id);
-            const bool excepted   = gAgent.mRRInterface.isImException(group_id);
-            LL_INFOS("RLV") << "MARE showim sweep: group " << group_id
-                            << " cached=" << (int)gAgent.mRRInterface.mContainsShowgroupchat
-                            << " restricted=" << (int)restricted
-                            << " excepted=" << (int)excepted << LL_ENDL;
-            if (gAgent.mRRInterface.mContainsShowgroupchat && restricted && !excepted) {
+            if (gAgent.mRRInterface.mContainsShowgroupchat
+                && gAgent.mRRInterface.containsWithoutException("showgroupchat", group_id)
+                && !gAgent.mRRInterface.isImException(group_id)) {
                 to_close.push_back(it->first);
             }
         }
         else {
             const std::string other_id = session->mOtherParticipantID.asString();
-            const bool restricted = gAgent.mRRInterface.containsWithoutException("showim", other_id);
-            const bool excepted   = gAgent.mRRInterface.isImException(other_id);
-            LL_INFOS("RLV") << "MARE showim sweep: p2p session " << it->first.asString()
-                            << " other=" << other_id
-                            << " cached=" << (int)gAgent.mRRInterface.mContainsShowim
-                            << " restricted=" << (int)restricted
-                            << " excepted=" << (int)excepted << LL_ENDL;
-            if (gAgent.mRRInterface.mContainsShowim && restricted && !excepted) {
+            if (gAgent.mRRInterface.mContainsShowim
+                && gAgent.mRRInterface.containsWithoutException("showim", other_id)
+                && !gAgent.mRRInterface.isImException(other_id)) {
                 to_close.push_back(it->first);
             }
         }
     }
-
-    LL_INFOS("RLV") << "MARE showim sweep: showim=" << (int)gAgent.mRRInterface.mContainsShowim
-                    << " showgroupchat=" << (int)gAgent.mRRInterface.mContainsShowgroupchat
-                    << " sessions=" << (S32)LLIMModel::getInstance()->mId2SessionMap.size()
-                    << " to_close=" << (S32)to_close.size() << LL_ENDL;
 
     for (size_t i = 0; i < to_close.size(); ++i)
     {
@@ -501,8 +484,6 @@ void closeRestrictedIMSessions()
         }
 
         LLFloaterIMSession* im_floater = LLFloaterIMSession::findInstance(to_close[i]);
-        LL_INFOS("RLV") << "MARE showim sweep: closing " << to_close[i].asString()
-                        << (im_floater ? " (floater)" : " (no floater, leaveSession)") << LL_ENDL;
         if (im_floater) {
             im_floater->closeFloater(false);
         }
