@@ -34,8 +34,6 @@ XPStyle on                  # Add an XP manifest to the installer
 RequestExecutionLevel admin	# For when we write to Program Files
 Unicode true                # Enable unicode support
 
-!include "FileFunc.nsh"     # ${GetSize}, used to report a real EstimatedSize
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Project flags
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
