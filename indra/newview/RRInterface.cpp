@@ -41,6 +41,7 @@
 //#include "llfloatereditsky.h" // no longer exists with EEP
 #include "llfloaterimnearbychat.h"
 #include "llfloaterimsession.h"     // MARE: @showim/@showgroupchat close open IM windows
+#include "llvoicechannel.h"      // MARE: end active calls before closing IM windows
 #include "llfloatermap.h"
 #include "llfloaterperformance.h"
 #include "llfloaterpostprocess.h"
@@ -431,7 +432,10 @@ void closeRestrictedIMSessions()
     if (!gRRenabled) return;
     if (!gIMMgr) return;
     if (!LLIMModel::instanceExists()) return;
-    if (!gAgent.mRRInterface.mContainsShowim && !gAgent.mRRInterface.mContainsShowgroupchat) return;
+    if (!gAgent.mRRInterface.mContainsShowim && !gAgent.mRRInterface.mContainsShowgroupchat) {
+        LL_INFOS("RLV") << "MARE showim sweep: neither restriction cached, nothing to do" << LL_ENDL;
+        return;
+    }
 
     // Collect first: leaveSession() erases entries from the session map as we go.
     std::vector<LLUUID> to_close;
@@ -446,28 +450,61 @@ void closeRestrictedIMSessions()
         // exception rules apply so an exempted conversation is never closed out from under us.
         if (session->isGroupSessionType()) {
             const std::string group_id = it->first.asString();
-            if (gAgent.mRRInterface.mContainsShowgroupchat
-                && gAgent.mRRInterface.containsWithoutException("showgroupchat", group_id)
-                && !gAgent.mRRInterface.isImException(group_id)) {
+            const bool restricted = gAgent.mRRInterface.containsWithoutException("showgroupchat", group_id);
+            const bool excepted   = gAgent.mRRInterface.isImException(group_id);
+            LL_INFOS("RLV") << "MARE showim sweep: group " << group_id
+                            << " cached=" << (int)gAgent.mRRInterface.mContainsShowgroupchat
+                            << " restricted=" << (int)restricted
+                            << " excepted=" << (int)excepted << LL_ENDL;
+            if (gAgent.mRRInterface.mContainsShowgroupchat && restricted && !excepted) {
                 to_close.push_back(it->first);
             }
         }
         else {
             const std::string other_id = session->mOtherParticipantID.asString();
-            if (gAgent.mRRInterface.mContainsShowim
-                && gAgent.mRRInterface.containsWithoutException("showim", other_id)
-                && !gAgent.mRRInterface.isImException(other_id)) {
+            const bool restricted = gAgent.mRRInterface.containsWithoutException("showim", other_id);
+            const bool excepted   = gAgent.mRRInterface.isImException(other_id);
+            LL_INFOS("RLV") << "MARE showim sweep: p2p session " << it->first.asString()
+                            << " other=" << other_id
+                            << " cached=" << (int)gAgent.mRRInterface.mContainsShowim
+                            << " restricted=" << (int)restricted
+                            << " excepted=" << (int)excepted << LL_ENDL;
+            if (gAgent.mRRInterface.mContainsShowim && restricted && !excepted) {
                 to_close.push_back(it->first);
             }
         }
     }
 
+    LL_INFOS("RLV") << "MARE showim sweep: showim=" << (int)gAgent.mRRInterface.mContainsShowim
+                    << " showgroupchat=" << (int)gAgent.mRRInterface.mContainsShowgroupchat
+                    << " sessions=" << (S32)LLIMModel::getInstance()->mId2SessionMap.size()
+                    << " to_close=" << (S32)to_close.size() << LL_ENDL;
+
     for (size_t i = 0; i < to_close.size(); ++i)
     {
-        // Same path as clicking the X on a conversation: closing the floater ends the session.
+        // MARE: do NOT route this through LLFloater::onClickClose() / onClickCloseBtn().
+        // Those are the interactive close-button handlers, and two of them can raise a
+        // confirmation and return WITHOUT closing anything:
+        //   LLFloaterIMSession::onClickCloseBtn()    -> "ConfirmLeaveCall" when a voice
+        //                                               channel is active
+        //   LLFloaterIMSessionTab::onClickCloseBtn() -> "ConfirmLeaveAdhoc" for ad-hoc
+        //                                               conferences
+        // This sweep runs unattended from an idle callback, so there is nobody present to
+        // answer either prompt and the window would just stay open. End any active voice
+        // channel ourselves, then close via closeFloater() - LLFloaterIMSessionTab
+        // overrides that only to save emoji-picker state before delegating to
+        // LLFloater::closeFloater(), so there is no confirmation in the way.
+        LLVoiceChannel* voice_channel = LLIMModel::getInstance()->getVoiceChannel(to_close[i]);
+        if (voice_channel && voice_channel->isActive())
+        {
+            voice_channel->deactivate();
+        }
+
         LLFloaterIMSession* im_floater = LLFloaterIMSession::findInstance(to_close[i]);
+        LL_INFOS("RLV") << "MARE showim sweep: closing " << to_close[i].asString()
+                        << (im_floater ? " (floater)" : " (no floater, leaveSession)") << LL_ENDL;
         if (im_floater) {
-            LLFloater::onClickClose(im_floater);
+            im_floater->closeFloater(false);
         }
         else {
             // No window for this session (never opened, or already torn down) => just end it.
