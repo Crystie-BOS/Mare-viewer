@@ -48,8 +48,8 @@ function warn()
 function homedir_install()
 {
     warn "You are not running as a privileged user, so you will only be able"
-    warn "to install the Kokua Viewer in your home directory. If you"
-    warn "would like to install the Kokua Viewer system-wide, please run"
+    warn "to install the MARE Viewer in your home directory. If you"
+    warn "would like to install the MARE Viewer system-wide, please run"
     warn "this script as the root user, or with the 'sudo' command."
     echo
 
@@ -58,13 +58,13 @@ function homedir_install()
 	exit 0
     fi
 
-    install_to_prefix "$HOME/.kokua-install"
-    $HOME/.kokua-install/etc/refresh_desktop_app_entry.sh
+    install_to_prefix "$HOME/.mare-install"
+    $HOME/.mare-install/etc/refresh_desktop_app_entry.sh
 }
 
 function root_install()
 {
-    local default_prefix="/opt/kokua-install"
+    local default_prefix="/opt/mare-install"
 
     echo -n "Enter the desired installation directory [${default_prefix}]: ";
     read
@@ -85,6 +85,7 @@ function install_to_prefix()
     test -e "$1" && backup_previous_installation "$1"
     mkdir -p "$1" || die "Failed to create installation directory!"
 
+    INSTALL_PREFIX="$1"
     echo " - Installing to $1"
 
     cp -a "${tarball_path}"/* "$1/" || die "Failed to complete the installation!"
@@ -106,11 +107,13 @@ else
     homedir_install
 fi
 
-CEFSANDBOX="/opt/kokua-install/bin/chrome-sandbox"
+# MARE: was hardcoded to /opt/kokua-install, which was wrong for a home install
+# or any custom prefix. Use the prefix we actually installed to.
+CEFSANDBOX="${INSTALL_PREFIX}/bin/chrome-sandbox"
 if [ "$UID" == "0" ]; then
 chown root:root $CEFSANDBOX
 #chmod 4755 $CEFSANDBOX
 else
 echo -e "\e[1;33m your running as normal user sandbox will be turned off \e[0m"
-#echo -e "\e[1;33m YOU MUST!!!! command as root or sudo cd $HOME/.kokua-install/bin/ && chown root:root chrome-sandbox &&  chmod 4755 chrome-sandbox \e[0m"
+#echo -e "\e[1;33m YOU MUST!!!! command as root or sudo cd $HOME/.mare-install/bin/ && chown root:root chrome-sandbox &&  chmod 4755 chrome-sandbox \e[0m"
 fi

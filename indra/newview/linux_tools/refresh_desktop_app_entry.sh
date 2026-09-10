@@ -12,20 +12,20 @@ function install_desktop_entry()
 
     local desktop_entry="\
 [Desktop Entry]\n\
-Name=kokua\n\
+Name=MARE Viewer\n\
 Comment=Client for the On-line Virtual Worlds\n\
-Exec=${installation_prefix}/kokua\n\
-Icon=${installation_prefix}/kokua_icon.png\n\
+Exec=${installation_prefix}/mare-viewer\n\
+Icon=${installation_prefix}/mare_icon.png\n\
 Terminal=false\n\
 Type=Application\n\
 Categories=Application;Network;\n\
 StartupNotify=true\n\
-StartupWMClass=do-not-directly-run-kokua-bin\n\
+StartupWMClass=do-not-directly-run-mare-viewer-bin\n\
 X-Desktop-File-Install-Version=3.0"
 
     echo " - Installing menu entries in ${desktop_entries_dir}"
     mkdir -vp "${desktop_entries_dir}"
-    echo -e $desktop_entry > "${desktop_entries_dir}/kokua-viewer.desktop" || "Failed to install application menu!"
+    echo -e $desktop_entry > "${desktop_entries_dir}/mare-viewer.desktop" || "Failed to install application menu!"
 }
 
 if [ "$UID" == "0" ]; then
