@@ -1458,7 +1458,7 @@ class LinuxManifest(ViewerManifest):
         icon_path = self.icon_path()
         print("DEBUG: icon_path '%s'" % icon_path)
         with self.prefix(src=icon_path, dst="") :
-            self.path("kokua_icon.png","mare_icon.png" )
+            self.path("kokua_icon.png","kokua_icon.png" )
             with self.prefix(src="",dst="res-sdl") :
                 self.path("kokua_icon.bmp","kokua_icon.BMP")
 

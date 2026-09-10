@@ -13,8 +13,8 @@ fi
 RUN_PATH=`dirname "$0" || echo .`
 cd "${RUN_PATH}"
 
-if [ `pidof do-not-directly-run-mare-viewer-bin` ]; then
-    exec dbus-send --type=method_call --dest=com.mareviewer.ViewerAppAPIService /com/mareviewer/ViewerAppAPI com.mareviewer.ViewerAppAPI.GoSLURL string:"$1"
+if [ `pidof do-not-directly-run-kokua-bin` ]; then
+    exec dbus-send --type=method_call --dest=com.kokuaviewer.ViewerAppAPIService /com/kokuaviewer/ViewerAppAPI com.kokuaviewer.ViewerAppAPI.GoSLURL string:"$1"
 else
-	exec ./mare-viewer -url \'"${URL}"\'
+	exec ./kokua -url \'"${URL}"\'
 fi
