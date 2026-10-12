@@ -42,6 +42,34 @@ This viewer is **not** a general-purpose viewer and is not recommended for users
 
 ---
 
+## Installing MARE Viewer
+
+Download the latest installer from the [Releases page](../../releases/latest).
+
+### Windows: "Windows protected your PC"
+
+When you run the installer, Windows may show a blue **"Windows protected your PC"** box from Microsoft Defender SmartScreen. This **does not mean MARE Viewer contains a virus.** It means Windows hasn't seen this file downloaded many times yet.
+
+SmartScreen judges files by reputation. Large companies buy code-signing certificates that carry reputation from one release to the next. MARE Viewer is a free, community-made viewer and doesn't have one, so each new release starts with no reputation and Windows warns about it until enough people have installed it.
+
+**To install anyway:**
+
+1. In the blue box, click **More info**.
+2. Check that the file name starts with `Mare_` and ends in `_Setup.exe`.
+3. Click **Run anyway**.
+
+If your browser blocks the download itself, choose **Keep** (Edge: the **…** menu next to the download → **Keep** → **Show more** → **Keep anyway**).
+
+**Only download MARE Viewer from this GitHub page.** If you got the installer anywhere else, delete it and download it again from here. The source code for every release is published in this repository, and you can [scan any file with VirusTotal](https://www.virustotal.com/) before running it.
+
+The installer automatically removes any previous version of MARE Viewer before installing the new one.
+
+### Linux
+
+Download the `.tar.xz` file from the Releases page and extract it. MARE Viewer needs `libopenal1` and `libalut0` installed system-wide; they are deliberately not bundled.
+
+---
+
 ## Feature Differences from Standard Viewers
 
 The following features behave differently in MARE Viewer compared to a standard Second Life viewer. These differences are **intentional and permanent** — they cannot be toggled off by the user.
